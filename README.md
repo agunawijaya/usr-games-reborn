@@ -47,6 +47,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Selene              | `/usr/games/toys`     | pom (1989)                                        | shipped     | hosted |
 | Abyssal Worms       | `/usr/games/toys`     | worms (1989)                                      | shipped     | hosted |
 | Rain on Still Water | `/usr/games/toys`     | rain (1989)                                       | shipped     | hosted |
+| Lightkeeper         | `/usr/games/strategy` | trek (1976)                                       | shipped     | native |
 | Broadside           | `/usr/games/strategy` | sail (1980)                                       | shipped     | hosted |
 | Trek — Deep Space   | `/usr/games/strategy` | trek (1980)                                       | shipped     | hosted |
 | Hunt — Ricochet     | `/usr/games/arcade`   | hunt (1983)                                       | shipped     | hosted |

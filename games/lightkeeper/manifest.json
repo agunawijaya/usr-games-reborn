@@ -1,0 +1,127 @@
+{
+  "id": "lightkeeper",
+  "title": "Lightkeeper",
+  "tagline": "Thirty-two lit worlds, one ship, and a swarm that will not wait.",
+  "teaser": "Keep the lights of thirty-two worlds burning while self-replicating mining drones spread through the Reach. Answer calls before their deadlines, fight with beams and flares, and climb six ranks by the 1976 promotion rule. Every gleaner you stop makes the clock last longer.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [10, 25],
+  "status": "shipped",
+  "accent": "#f0a534",
+  "emblem": "M17 41h14M19 41l2-15h6l2 15M20 26h8M21 26v-4h6v4M24 22v-4M8 28h7M33 28h7M11 15l6 6M37 15l-6 6M24 5v7",
+  "inspiredBy": {
+    "program": "trek",
+    "originalTitle": "Star Trek",
+    "uiTitle": "trek",
+    "year": 1976
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "lightkeeper — answer the calls, stop the swarm, keep the lights on.",
+    "description": "A reborn trek, Eric Allman’s 1976 space game from BSD Unix, with the systems its source hid: a reserve clock shared by the swarm, worlds that call for help and fall into forges, a six-rank career with the original’s promotion rule, and tournament codes that give everyone the same galaxy.",
+    "seeAlso": ["trek", "sail", "atc"]
+  },
+  "howToPlay": [
+    "Click a zone on the chart to jump there; click a cell to move inside a zone.",
+    "Lower the shield and fire the beams, or aim a flare; gleaners answer every order.",
+    "Answer worlds’ calls before their deadlines, and moor at harbours to refill."
+  ],
+  "cronGoals": [
+    {
+      "id": "gleaners",
+      "stat": "gleanersStopped",
+      "label": "Stop {n} gleaners in Lightkeeper",
+      "min": 15,
+      "max": 60
+    },
+    {
+      "id": "calls",
+      "stat": "callsAnswered",
+      "label": "Answer {n} worlds’ calls",
+      "min": 2,
+      "max": 6
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-gleaner",
+      "title": "Lights out, gleaner",
+      "description": "Stop your first gleaner.",
+      "tier": "core"
+    },
+    {
+      "id": "first-light",
+      "title": "First light",
+      "description": "Answer a world’s call before it falls.",
+      "tier": "core"
+    },
+    {
+      "id": "safe-harbour",
+      "title": "Safe harbour",
+      "description": "Moor at a harbour.",
+      "tier": "core"
+    },
+    {
+      "id": "shutdown-code",
+      "title": "Shutdown code",
+      "description": "Talk a worn-down gleaner into powering off.",
+      "tier": "core"
+    },
+    {
+      "id": "watch-kept",
+      "title": "Watch kept",
+      "description": "Stop the whole swarm in a watch.",
+      "tier": "core"
+    },
+    {
+      "id": "promoted",
+      "title": "Promoted",
+      "description": "Earn a promotion with a clean record.",
+      "tier": "core"
+    },
+    {
+      "id": "relit",
+      "title": "Relit",
+      "description": "Clear a dark world’s zone and light it again.",
+      "tier": "extra"
+    },
+    {
+      "id": "chain-reaction",
+      "title": "Chain reaction",
+      "description": "Set off two stars with a single flare.",
+      "tier": "extra"
+    },
+    {
+      "id": "every-light",
+      "title": "Every light",
+      "description": "Win a watch with all thirty-two worlds still lit.",
+      "tier": "extra"
+    },
+    {
+      "id": "late-news",
+      "title": "Late news",
+      "description": "Fix the radio and hear a call that came while it was out.",
+      "tier": "extra"
+    },
+    {
+      "id": "time-portal",
+      "title": "Second chance",
+      "description": "Slip backwards through a time portal past the redline.",
+      "tier": "rare"
+    },
+    {
+      "id": "emeritus",
+      "title": "Warden Emeritus",
+      "description": "Earn a promotion as High Warden.",
+      "tier": "rare"
+    }
+  ]
+}

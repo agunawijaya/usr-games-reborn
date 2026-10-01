@@ -4,6 +4,7 @@
     { "id": "pom", "source": "game" },
     { "id": "worms", "source": "game" },
     { "id": "rain", "source": "game" },
+    { "id": "lightkeeper", "source": "game" },
     { "id": "sail", "source": "game" },
     { "id": "trek", "source": "game" },
     { "id": "hunt", "source": "game" },

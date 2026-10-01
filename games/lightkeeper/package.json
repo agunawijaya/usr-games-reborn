@@ -1,0 +1,15 @@
+{
+  "name": "@usr-games/game-lightkeeper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lightkeeper: one keeper ship, thirty-two lit worlds and a swarm of mining drones. Inspired by trek (BSD games, 1976).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5300 --strictPort",
+    "sim": "tsx scripts/sim.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

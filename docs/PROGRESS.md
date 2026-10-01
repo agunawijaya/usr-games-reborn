@@ -15,6 +15,7 @@ Status values: `coming-soon`, `adopting`, `in progress`, `hero frames` (waiting 
 | pom | Selene | hosted | shipped | 01 | adopted as built; toy XP once a day; light look missing (KNOWN-ISSUES) |
 | worms | Abyssal Worms | hosted | shipped | 01 | adopted as built; toy XP once a day; light look missing (KNOWN-ISSUES) |
 | rain | Rain on Still Water | hosted | shipped | 01 | adopted as built; one upstream test skipped (captures not adopted); light look missing |
+| lightkeeper | Lightkeeper | native | shipped | owner request, built in-session (no prompt file) | second interpretation of trek: the 1976 source's hidden systems as a game (reserve clock shared by the swarm, calls that turn worlds into forges, sieges, radio backlog, time portals); six-rank career with the original promotion rule, Tonight's watch daily, open watches with codes and the 1976 rules in full; Chart and Night Watch looks designed; no hero-frame review yet |
 | sail | Broadside | hosted | shipped | 01 | adopted as built; title tagline and a scenario name are temporary trademark exceptions |
 | trek | Trek — Deep Space | hosted | shipped | 01 | adopted as built; trademark terms listed in KNOWN-ISSUES until the trek modification prompt |
 | hunt | Hunt — Ricochet | hosted | shipped | 01 | adopted as built; a match counts when ended from the pause menu; violent wording listed |

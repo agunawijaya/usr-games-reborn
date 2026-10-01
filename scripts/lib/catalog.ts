@@ -13,6 +13,7 @@ export const PLANNED_IDS = [
   'pom',
   'worms',
   'rain',
+  'lightkeeper',
   'sail',
   'trek',
   'hunt',
