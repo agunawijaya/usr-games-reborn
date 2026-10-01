@@ -1,0 +1,288 @@
+/*
+ * The rank-up moment: the room's lights flare in the palette's colour, a refresh line sweeps the
+ * glass, a card names the new group and its cosmetics fly into the home-directory chip. The
+ * header stays lit above the veil so the prompt can be seen rewriting itself.
+ */
+
+[data-style='machine-room'] .rank-up {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: start center;
+  padding: clamp(120px, 20vh, 230px) 24px 24px;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    transparent 0 96px,
+    color-mix(in srgb, var(--ug-bg) 70%, transparent) 190px
+  );
+  cursor: pointer;
+  animation: mr-rank-veil 0.35s var(--ease) both;
+  transition: opacity 0.22s var(--ease);
+}
+
+[data-style='machine-room'] .rank-up.is-leaving {
+  opacity: 0;
+}
+
+[data-style='machine-room'] .rank-up__lights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      58vw 50vh at 50% 36%,
+      color-mix(in srgb, var(--ug-accent) 40%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      90vw 30vh at 50% 0%,
+      color-mix(in srgb, var(--ug-accent-2) 18%, transparent),
+      transparent 70%
+    );
+  animation: mr-rank-lights 2s var(--ease) both;
+}
+
+/* The ceiling lights coming up: a bright strip along the top of the room. */
+[data-style='machine-room'] .rank-up__lights::before {
+  content: '';
+  position: absolute;
+  inset: 0 8vw auto;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--ug-accent);
+  box-shadow:
+    0 0 24px 6px color-mix(in srgb, var(--ug-accent) 70%, transparent),
+    0 0 120px 40px color-mix(in srgb, var(--ug-accent) 30%, transparent);
+}
+
+/* One bright refresh line down the glass as the new rank is written. */
+[data-style='machine-room'] .rank-up__sweep {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 22vh;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--ug-glow) 22%, transparent) 70%,
+    color-mix(in srgb, var(--ug-glow) 42%, transparent) 96%,
+    transparent
+  );
+  transform: translateY(-30vh);
+  animation: mr-rank-sweep 0.9s cubic-bezier(0.4, 0, 0.6, 1) 0.1s both;
+}
+
+[data-style='machine-room'] .rank-up__card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  width: min(680px, 100%);
+  padding: 28px clamp(24px, 2.4vw, 40px) 28px;
+  border: 1px solid color-mix(in srgb, var(--ug-accent) 55%, var(--panel-border));
+  border-radius: var(--panel-radius);
+  background: var(--ug-surface);
+  box-shadow:
+    0 40px 90px -30px var(--ug-shadow),
+    0 0 60px -16px color-mix(in srgb, var(--ug-glow) 45%, transparent);
+  color: var(--ug-ink);
+  cursor: default;
+  animation: mr-rank-card 0.45s var(--ease) 0.12s both;
+}
+
+[data-style='machine-room'] .rank-up__cmd {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .rank-up__title {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 4px;
+}
+
+[data-style='machine-room'] .rank-up__kicker {
+  font-family: var(--ug-font-body);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .rank-up__rank {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  font-size: calc(clamp(3.4rem, calc(4vw + 1rem), 5.6rem) * var(--title-scale));
+  line-height: 0.95;
+  color: var(--ug-accent);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .rank-up__flavour {
+  max-width: 46ch;
+  font-size: 1.14rem;
+}
+
+[data-style='machine-room'] .rank-up__unlocks {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ug-line);
+}
+
+[data-style='machine-room'] .rank-up__label {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .rank-up__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+[data-style='machine-room'] .rank-up__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--tile-bg);
+  font-size: 0.95rem;
+  will-change: transform, opacity;
+}
+
+[data-style='machine-room'] .rank-up__kind {
+  font-family: var(--ug-font-mono);
+  font-size: 0.85rem;
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .rank-up__name {
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .rank-up__item--more {
+  font-family: var(--ug-font-mono);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .rank-up__skip {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--tile-bg);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  cursor: pointer;
+}
+
+[data-style='machine-room'] .rank-up__skip kbd {
+  padding: 0 6px;
+  border: 1px solid var(--ug-line-strong);
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* The prompt's user part while it is being rewritten, and the chip taking in the cosmetics. */
+[data-style='machine-room'] .prompt__user.is-rewriting {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ug-accent) 16%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ug-accent) 16%, transparent);
+}
+
+[data-style='machine-room'] .rank-chip.is-receiving {
+  animation: mr-chip-receive 0.42s var(--ease) 0.5s 3;
+}
+
+/* The room's own ambience brightens while the lights are up. */
+[data-style='machine-room'] .ambience {
+  transition:
+    opacity 0.5s var(--ease),
+    filter 0.5s var(--ease);
+}
+
+[data-style='machine-room'][data-moment='rank-up'] .ambience {
+  filter: brightness(1.4) saturate(1.3);
+}
+
+@keyframes mr-rank-veil {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes mr-rank-lights {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes mr-rank-sweep {
+  to {
+    transform: translateY(110vh);
+  }
+}
+
+@keyframes mr-rank-card {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@keyframes mr-chip-receive {
+  50% {
+    border-color: var(--ug-accent);
+    box-shadow:
+      var(--panel-shadow),
+      0 0 0 4px color-mix(in srgb, var(--ug-accent) 30%, transparent);
+  }
+}
+
+/* Reduced motion: the same card and light, arriving and leaving as a cross-fade. */
+[data-style='machine-room'] .rank-up.is-still .rank-up__sweep {
+  display: none;
+}
+
+[data-style='machine-room'] .rank-up.is-still .rank-up__card {
+  animation-name: mr-rank-veil;
+}
+
+[data-style='machine-room'] .rank-up.is-still .rank-up__lights {
+  animation: mr-rank-veil 0.3s ease both;
+  opacity: 0.8;
+}
+
+/* Screenshot scenes hold the peak: lights up, card settled, prompt rewritten. */
+[data-style='machine-room'] .rank-up.is-peak,
+[data-style='machine-room'] .rank-up.is-peak .rank-up__card {
+  animation: none;
+}
+
+[data-style='machine-room'] .rank-up.is-peak .rank-up__lights {
+  animation: none;
+  opacity: 0.9;
+}
+
+[data-style='machine-room'] .rank-up.is-peak .rank-up__sweep {
+  display: none;
+}

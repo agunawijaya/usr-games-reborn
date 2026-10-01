@@ -1,0 +1,169 @@
+{
+  "raster": {
+    "allow": [
+      {
+        "path": "docs/media/**",
+        "reason": "Documentation screenshots of the Hall; never shipped (zero-raster ADR)."
+      },
+      {
+        "path": "games/*/docs/media/**",
+        "reason": "Per-game documentation screenshots; never shipped (zero-raster ADR)."
+      },
+      {
+        "path": "packages/bridge/src/*.test.ts",
+        "reason": "Tests of the poster message use tiny truncated sample data URLs to prove the validator (ADR 0009); test files are never shipped."
+      },
+      {
+        "path": "apps/hall/src/core/art/*.test.ts",
+        "reason": "Tests of posters sent by games use a tiny truncated sample data URL (ADR 0009); test files are never shipped."
+      },
+      {
+        "path": "apps/hall/e2e/shots/*.ts",
+        "reason": "The screenshot script re-encodes its PNG captures as WebP through a data URL in the browser; it writes documentation only and is never shipped."
+      },
+      {
+        "path": "packages/bridge/testing/shots.ts",
+        "reason": "The hosted games’ screenshot helper re-encodes its PNG captures as WebP through a data URL in the browser, like the Hall’s; it writes documentation only and is never shipped (ADR 0011)."
+      },
+      {
+        "path": "games/battlestar/app/scripts/contact.mjs",
+        "reason": "A developer tool of the adopted starship adventure that builds a contact sheet of screenshots; it sits in the workbench the build leaves out and never ships (ADR 0011)."
+      }
+    ]
+  },
+  "network": {
+    "allowUrlPrefixes": ["http://www.w3.org/", "https://www.w3.org/"],
+    "allow": [
+      {
+        "path": "games/*/app/scripts/**",
+        "reason": "Developer tools that came with the adopted games (local servers, screenshot and timing scripts). The build leaves them out (scripts/lib/hosted.ts), so they never ship (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "THREE.FileLoader",
+        "reason": "three.js file loaders are bundled with the adopted robots game but never called: every texture, mesh and sound in it is generated in code. Its end-to-end suite records zero requests beyond its own files (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "raw.githack.com/pmndrs/drei-assets",
+        "reason": "The environment-preset table of @react-three/drei, bundled but unused: robots lights its scene with in-scene light formers, never a downloaded preset (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "reactjs.org/docs/error-decoder",
+        "reason": "React production error messages carry a link to their decoder page as text; nothing is requested (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "docs.pmnd.rs/react-three-fiber",
+        "reason": "An error message of @react-three/fiber that names its documentation; text only (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "github.com/pmndrs/postprocessing",
+        "reason": "A credit string inside the postprocessing library; text only (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "www.shadertoy.com/view/4tsBD7",
+        "reason": "A shader comment in a bundled library crediting the technique it uses (ADR 0011)."
+      },
+      {
+        "path": "dist/play/robots/assets/*.js",
+        "match": "www.iquilezles.org/www/articles/intersectors",
+        "reason": "A shader comment in a bundled library crediting the technique it uses (ADR 0011)."
+      },
+      {
+        "path": "games/*/app/**",
+        "match": "github.com/vattam/BSDGames",
+        "reason": "Credit links and source comments in the adopted games pointing to the BSD code they port; nothing is fetched, and a link opens only when the player follows it (ADR 0011)."
+      },
+      {
+        "path": "dist/play/**",
+        "match": "github.com/vattam/BSDGames",
+        "reason": "The same credit links and comments in the built copies of the adopted games (ADR 0011)."
+      },
+      {
+        "path": "games/*/app/src/vendor/three.*.js",
+        "reason": "three.js vendored by four adopted games: link comments, an XML namespace string and file loaders the games never call, since they draw everything in code. Their in-Hall suites record no request beyond the Hall (ADR 0011)."
+      },
+      {
+        "path": "dist/play/*/src/vendor/three.*.js",
+        "reason": "The same vendored three.js in the built copies (ADR 0011)."
+      },
+      {
+        "path": "games/hunt/app/src/engine/*.js",
+        "match": "WebSocket",
+        "reason": "Comments in the adopted hunt engine about a possible future server; no socket is ever opened (ADR 0011)."
+      },
+      {
+        "path": "dist/play/hunt/src/engine/*.js",
+        "match": "WebSocket",
+        "reason": "The same comments in the built copy of hunt (ADR 0011)."
+      }
+    ]
+  },
+  "words": {
+    "trademarkAllow": [
+      {
+        "path": "games/trek/app/**",
+        "reason": "Temporary trademark exception for the adopted trek game, listed in docs/KNOWN-ISSUES.md (prompt 01 §8); the trek modification prompt replaces these words."
+      },
+      {
+        "path": "games/sail/app/**",
+        "match": "Star Trek",
+        "reason": "Temporary exception: the adopted sail game lists the original 1980 program’s fictional scenario by its name (docs/KNOWN-ISSUES.md)."
+      },
+      {
+        "path": "games/sail/app/**",
+        "match": "Klingon",
+        "reason": "Temporary exception: the same fictional scenario’s nation table in the adopted sail game (docs/KNOWN-ISSUES.md)."
+      },
+      {
+        "path": "games/battlestar/app/**",
+        "match": "Klingon",
+        "reason": "Temporary exception: a rank title in the adopted starship adventure’s upstream text (docs/KNOWN-ISSUES.md); shipped by the owner’s decision until its modification prompt (docs/KNOWN-ISSUES.md #16)."
+      },
+      {
+        "path": "games/atc-classic/app/docs/diff-log.md",
+        "match": "monopoly",
+        "reason": "The adopted Control Room 1986’s upstream change log uses “monopoly” as a plain noun (“the terminal-appearance monopoly”), not the board game’s name; workbench prose, never shipped (ADR 0011)."
+      }
+    ],
+    "contentAllow": [
+      {
+        "path": "packages/kit/src/profile/username.ts",
+        "reason": "The username all-ages screen has to list the words it rejects."
+      },
+      {
+        "path": "games/battlestar/app/src/engine/data/world.js",
+        "reason": "The original adventure’s vocabulary, kept by design in the adopted starship adventure (its ADR 003); shipped by the owner’s decision until its modification prompt reviews the text (docs/KNOWN-ISSUES.md #16)."
+      },
+      {
+        "path": "games/battlestar/app/src/render/**",
+        "match": "hurry",
+        "reason": "Code comments in the adopted starship adventure’s renderer, never shown to players."
+      }
+    ]
+  },
+  "provenance": {
+    "allow": [
+      {
+        "path": "games/battlestar/app/**",
+        "reason": "The adopted starship adventure keeps the original’s text and data by design (its ADR 003), derived under the Regents’ BSD licence kept in LICENSES/; shipped by the owner’s decision until its modification prompt (ADR 0011, docs/KNOWN-ISSUES.md #16)."
+      },
+      {
+        "path": "games/hunt/app/src/engine/hunt.js",
+        "reason": "Rules of the adopted hunt game ported function by function from the BSD source, with the Regents’ notice in the file and in LICENSES/ (ADR 0011)."
+      },
+      {
+        "path": "games/sail/app/src/engine/boarding.js",
+        "reason": "Rules of the adopted sail game ported function by function from the BSD source, with the Regents’ notice in LICENSES/ (ADR 0011)."
+      },
+      {
+        "path": "games/hunt/app/scripts/oracle/harness.c",
+        "reason": "A developer harness compiled against the BSD hunt sources to capture reference traces; it sits in the workbench the build leaves out and never ships (ADR 0011)."
+      }
+    ]
+  }
+}

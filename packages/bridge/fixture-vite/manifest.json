@@ -1,0 +1,45 @@
+{
+  "id": "fixture-vite",
+  "title": "Bridge fixture (Vite build)",
+  "tagline": "The bridge fixture, built by its own Vite step.",
+  "teaser": "The same tiny test game as the static fixture, bundled by its own Vite build with the bridge imported as a package. It proves the hosted-vite build path.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": { "min": 1, "max": 1 },
+  "sessionMinutes": [1, 2],
+  "status": "unlisted",
+  "accent": "#4f8fd6",
+  "emblem": "M10 24h8M30 24h8M18 24a6 6 0 0 1 12 0a6 6 0 0 1-12 0M24 10v6M24 32v6M8 40h32",
+  "inspiredBy": {
+    "program": "fixture",
+    "originalTitle": "fixture",
+    "uiTitle": "fixture",
+    "year": 1970
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-vite",
+    "source": "packages/bridge/fixture-vite",
+    "output": "play/fixture-vite/"
+  },
+  "manPage": {
+    "synopsis": "fixture-vite — start a round, then win, lose or leave.",
+    "description": "Imports the bridge from the workspace package and is built with its base set to /play/fixture-vite/. Used by the end-to-end tests; never listed in the Hall.",
+    "seeAlso": []
+  },
+  "packages": [
+    {
+      "id": "fixture-first",
+      "title": "First contact",
+      "description": "Press the unlock button once.",
+      "tier": "core"
+    },
+    {
+      "id": "fixture-win",
+      "title": "Winning round",
+      "description": "Win a round of the fixture.",
+      "tier": "core"
+    }
+  ]
+}

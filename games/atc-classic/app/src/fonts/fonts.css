@@ -1,0 +1,22 @@
+/* The two families this game used to fetch from a font CDN, served from the game's own
+   folder so it makes no network requests (/usr/games Reborn, hard rule 4). Latin subsets of the
+   @fontsource builds, both under the SIL Open Font License 1.1; see LICENSES/FONTS.md at the
+   repository root. Family names match the game's own styles, so nothing else changes. Each family
+   comes in one weight; the bold radar letters and headings are synthesised by the browser, as they
+   were with the web fonts. */
+
+@font-face {
+  font-family: 'VT323';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./vt323-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Share Tech Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./share-tech-mono-latin-400-normal.woff2') format('woff2');
+}

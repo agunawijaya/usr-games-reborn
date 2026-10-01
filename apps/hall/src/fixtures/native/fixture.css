@@ -1,0 +1,113 @@
+/* The native fixture's own look: plain, token-driven, and scoped to its root. */
+
+.fx-root {
+  --fx-accent: var(--ug-accent);
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 96px 24px 48px;
+  background:
+    radial-gradient(
+      60% 50% at 50% 30%,
+      color-mix(in srgb, var(--fx-accent) 16%, transparent),
+      transparent
+    ),
+    var(--ug-bg);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-body);
+  text-align: center;
+}
+
+.fx-title,
+.fx-play {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+
+.fx-title[hidden],
+.fx-play[hidden] {
+  display: none;
+}
+
+.fx-emblem {
+  width: 96px;
+  height: 96px;
+  fill: none;
+  stroke: var(--fx-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fx-heading {
+  font-family: var(--ug-font-display);
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  line-height: 1;
+}
+
+.fx-lede {
+  max-width: 34ch;
+  color: var(--ug-ink-2);
+  font-size: 1.1rem;
+}
+
+.fx-meta {
+  color: var(--ug-ink-2);
+  font-family: var(--ug-font-mono);
+  font-size: 0.9rem;
+}
+
+.fx-score {
+  display: grid;
+  gap: 4px;
+}
+
+.fx-score span {
+  color: var(--ug-ink-2);
+}
+
+.fx-score__value {
+  font-family: var(--ug-font-mono);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.fx-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.fx-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 48px;
+  padding: 0.5em 1.4em;
+  border: 1.5px solid var(--ug-line-strong);
+  border-radius: 10px;
+  background: var(--ug-surface);
+  color: var(--ug-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fx-button--primary {
+  border-color: var(--ug-accent);
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+}
+
+.fx-button kbd {
+  padding: 0 0.4em;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+.fx-root--demo {
+  min-height: 0;
+  padding: 24px;
+}

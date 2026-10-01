@@ -1,0 +1,17 @@
+{
+  "name": "@bsdgames/worms-fancy-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Abyssal Worms: fancy-web port of BSD worms(6), a bioluminescent deep-sea screensaver rendered entirely from code. Engine faithful to worms.c.",
+  "author": "Agun Wijaya",
+  "license": "MIT",
+  "scripts": {
+    "start": "node scripts/serve.mjs 5203",
+    "test": "node --test \"tests/*.test.js\"",
+    "shots": "node scripts/capture-screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

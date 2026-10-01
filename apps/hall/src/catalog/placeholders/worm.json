@@ -1,0 +1,37 @@
+{
+  "id": "worm",
+  "title": "Growing worm",
+  "tagline": "Eat the numbers. Grow longer. Don’t bump anything.",
+  "teaser": "Steer a worm around the screen eating numbers. Each one makes you longer, and the room feels smaller.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 6],
+  "status": "coming-soon",
+  "accent": "#a5d63f",
+  "emblem": "M8 36h7M19 36h7M30 36h6v-7M36 25v-6M14 10h9l-6 11",
+  "inspiredBy": {
+    "program": "worm",
+    "originalTitle": "worm",
+    "uiTitle": "worm",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "worm — steer, eat numbers, grow, avoid the walls and yourself.",
+    "description": "Michael Toy’s growing-worm game: a tiny, tense exercise in steering that shipped with BSD.",
+    "seeAlso": ["snake", "worms", "robots"]
+  },
+  "howToPlay": [
+    "Steer the worm around the screen.",
+    "Eat the numbers to grow longer.",
+    "Avoid the walls and your own tail."
+  ]
+}

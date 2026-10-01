@@ -1,0 +1,322 @@
+/*
+ * The first-visit login. A small screen on the left boots the machine in three seconds; the
+ * friendly form on the right asks for a name. It borrows Console Home's palette, like the picker.
+ */
+
+[data-style='login'] body {
+  background: var(--ug-bg);
+}
+
+[data-style='login'] .lg-page {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 0 clamp(20px, 4vw, 80px) 28px;
+  color: var(--ug-ink);
+}
+
+[data-style='login'] .lg-glow {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 120%;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      40vw 32vw at 24% 56%,
+      color-mix(in srgb, #98a6ff 24%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      36vw 30vw at 78% 44%,
+      color-mix(in srgb, #c6a4ff 20%, transparent),
+      transparent 70%
+    );
+  filter: blur(8px);
+}
+
+[data-style='login'] .lg-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 28px 0 8px;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+}
+
+[data-style='login'] .lg-brand b {
+  font-family: var(--ug-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ug-accent);
+}
+
+[data-style='login'] .lg-brand__mark {
+  width: 30px;
+  height: 30px;
+  color: var(--ug-accent);
+}
+
+[data-style='login'] .lg-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 96px);
+  width: min(100%, 1320px);
+  margin: 0 auto;
+}
+
+/* The little screen that boots. Dark in both appearances: it is a device on the desk. */
+[data-style='login'] .lg-screen {
+  position: relative;
+  min-height: 340px;
+  padding: 30px 32px 64px;
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 50% 30%, #1b2442 0%, #0b1020 70%), #0b1020;
+  box-shadow:
+    inset 0 0 0 1px rgba(152, 166, 255, 0.18),
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    0 40px 80px -40px rgba(10, 14, 40, 0.8);
+  color: #dfe5ff;
+  font-family: var(--ug-font-mono);
+  font-size: 1.05rem;
+}
+
+[data-style='login'] .lg-boot {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-style='login'] .lg-boot__line {
+  opacity: 1;
+}
+
+[data-style='login'] .is-booting .lg-boot__line {
+  opacity: 0;
+  animation: lg-appear 0.3s ease-out forwards;
+  animation-delay: calc(var(--lg-line) * 0.45s);
+}
+
+[data-style='login'] .lg-boot__line--title {
+  margin-bottom: 8px;
+  font-family: var(--ug-font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+[data-style='login'] .lg-boot__ok {
+  color: #7ee8a8;
+}
+
+[data-style='login'] .lg-boot__line--ready {
+  margin-top: 6px;
+  color: #98a6ff;
+}
+
+@keyframes lg-appear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-style='login'] .lg-skip {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(223, 229, 255, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: #dfe5ff;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+[data-style='login'] .lg-skip kbd {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+[data-style='login'] .is-booted .lg-skip {
+  display: none;
+}
+
+/* The form arrives when the machine has booted. */
+[data-style='login'] .lg-panel {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+[data-style='login'] .lg-page:not(.is-booted) .lg-panel {
+  opacity: 0;
+  transform: translateY(12px);
+  visibility: hidden;
+}
+
+[data-style='login'] .lg-form {
+  display: grid;
+  gap: 14px;
+  max-width: 560px;
+}
+
+[data-style='login'] .lg-prompt {
+  margin: 0;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  color: var(--ug-accent);
+}
+
+[data-style='login'] .lg-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 0.3em;
+  vertical-align: -0.15em;
+  background: var(--ug-accent);
+  animation: blink 1.06s steps(1) infinite;
+}
+
+[data-style='login'] .lg-title {
+  margin: 0;
+  font-family: var(--ug-font-display);
+  font-size: clamp(2.3rem, calc(2vw + 1.2rem), 3.4rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+[data-style='login'] .lg-lede {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='login'] .lg-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+[data-style='login'] .lg-label {
+  font-weight: 700;
+}
+
+[data-style='login'] .lg-input {
+  min-height: 58px;
+  padding: 0 18px;
+  border: 2px solid var(--ug-line-strong);
+  border-radius: 16px;
+  background: var(--ug-surface);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-mono);
+  font-size: 1.3rem;
+}
+
+[data-style='login'] .lg-input:focus-visible {
+  border-color: var(--ug-accent);
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 2px;
+}
+
+[data-style='login'] .lg-input[aria-invalid='true'] {
+  border-color: var(--ug-bad);
+}
+
+[data-style='login'] .lg-rules {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='login'] .lg-error {
+  min-height: 1.4em;
+  margin: 0;
+  font-weight: 700;
+  color: var(--ug-bad);
+}
+
+[data-style='login'] .lg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+[data-style='login'] .lg-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+[data-style='login'] .lg-button--primary {
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  font-family: var(--ug-font-display);
+  box-shadow: 0 18px 36px -18px color-mix(in srgb, var(--ug-accent) 80%, transparent);
+}
+
+[data-style='login'] .lg-button--primary .icon {
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-style='login'] .lg-button--quiet {
+  padding: 0 12px;
+  background: transparent;
+  color: var(--ug-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+[data-style='login'] .lg-tip {
+  position: relative;
+  margin: 24px 0 0;
+  text-align: center;
+  color: var(--ug-ink-2);
+}
+
+[data-style='login'] .lg-tip kbd {
+  padding: 2px 8px;
+  border: 1px solid var(--ug-line-strong);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--ug-surface);
+  color: var(--ug-ink);
+}
+
+@media (max-width: 1000px) {
+  [data-style='login'] .lg-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='login'] .lg-screen {
+    min-height: 0;
+  }
+}

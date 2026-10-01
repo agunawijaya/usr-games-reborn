@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>trek — Deep Space · Procedural</title>
+  <meta name="description" content="BSD trek(6) as a turn-based space command sim where every visual and sound is generated from code.">
+  <!-- /usr/games Reborn: fonts are served from the game's own folder. -->
+  <link href="./src/fonts/fonts.css" rel="stylesheet">
+  <script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
+  <style>
+    /* Layout, panel positions and type scale mirror trek/fancy-web so the
+       two ports can be compared screen for screen. Only the finish differs:
+       glass panels with a lit top edge and corner ticks. */
+    :root {
+      --void: #06081a;
+      --void-deep: #020310;
+      --panel: rgba(8, 14, 34, 0.78);
+      --panel-line: #2a3d6e;
+      --panel-edge: rgba(0, 212, 255, 0.55);
+      --cyan: #00d4ff;
+      --cyan-dim: #4a8db5;
+      --amber: #ffb14f;
+      --red: #ff3838;
+      --gold: #ffd76a;
+      --white: #eaf4ff;
+      --text: #c8d8f2;
+      --text-dim: #7a8ba8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--void-deep);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    #stage { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+    #gl, #fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+    #fallback { display: none; }
+    body.in-title .hud, body.in-title .corner, body.in-title #ref-panel, body.in-title #cheat-panel,
+    body.in-title #override-panel, body.in-title #cmd-panel { visibility: hidden; }
+    body.hud-off .hud, body.hud-off #cmd-panel, body.hud-off #top-bezel, body.hud-off .corner,
+    body.hud-off #ref-panel, body.hud-off #cheat-panel, body.hud-off #override-panel { display: none !important; }
+
+    /* Strategic overlay (the chart itself is drawn in WebGL underneath) */
+    #strategic { position: absolute; inset: 0; z-index: 3; display: none; pointer-events: none; }
+    #strategic.shown { display: block; }
+    #strategic.armed { pointer-events: auto; cursor: crosshair; }
+    #chart-labels { position: absolute; inset: 0; pointer-events: none; }
+    .chart-label {
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+      font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 0.1em;
+      text-shadow: 0 0 6px currentColor;
+    }
+    .chart-label.coord { color: rgba(150, 190, 240, 0.5); font-size: 10px; text-shadow: none; }
+    .chart-label.k { color: #ff7a6a; font-weight: 600; }
+    .chart-label.sb { color: var(--gold); }
+    .chart-label.you { color: var(--white); font-weight: 900; letter-spacing: 0.25em; }
+
+    .hud {
+      position: absolute;
+      z-index: 10;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: var(--text);
+      backdrop-filter: blur(8px) saturate(1.2);
+      -webkit-backdrop-filter: blur(8px) saturate(1.2);
+      box-shadow: 0 0 22px rgba(0, 212, 255, 0.08), inset 0 0 24px rgba(10, 18, 42, 0.45);
+    }
+    .hud::before {
+      content: ''; position: absolute; left: 10px; right: 10px; top: -1px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--panel-edge), transparent);
+    }
+    .hud::after {
+      content: ''; position: absolute; inset: 3px; pointer-events: none;
+      background:
+        linear-gradient(var(--cyan-dim), var(--cyan-dim)) top left / 6px 1px no-repeat,
+        linear-gradient(var(--cyan-dim), var(--cyan-dim)) top left / 1px 6px no-repeat,
+        linear-gradient(var(--cyan-dim), var(--cyan-dim)) bottom right / 6px 1px no-repeat,
+        linear-gradient(var(--cyan-dim), var(--cyan-dim)) bottom right / 1px 6px no-repeat;
+      opacity: 0.8;
+    }
+    .hud h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--panel-line);
+      text-shadow: 0 0 4px rgba(0, 212, 255, 0.4);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* Top bezel */
+    #top-bezel {
+      position: absolute; top: 0; left: 0; right: 0; height: 46px; z-index: 15;
+      background: linear-gradient(180deg, rgba(6, 12, 30, 0.95) 0%, rgba(6, 12, 30, 0.4) 100%);
+      border-bottom: 1px solid var(--panel-line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      color: var(--cyan);
+      font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 0.2em;
+      text-shadow: 0 0 4px rgba(0, 212, 255, 0.5);
+    }
+    #top-bezel .ship-tag { color: var(--white); font-weight: 900; letter-spacing: 0.3em; }
+    #top-bezel .indicator {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--cyan); box-shadow: 0 0 8px var(--cyan); margin-right: 10px;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    #view-toggles { display: flex; gap: 6px; align-items: center; }
+    #view-toggles button {
+      background: transparent; color: var(--text-dim);
+      border: 1px solid var(--panel-line); border-radius: 3px;
+      padding: 4px 10px;
+      font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.18em;
+      cursor: pointer; text-transform: uppercase; transition: all 0.15s ease;
+    }
+    #view-toggles button:hover { color: var(--cyan); border-color: var(--cyan); }
+    #view-toggles button.active {
+      color: var(--white); background: rgba(0, 212, 255, 0.14); border-color: var(--cyan);
+      text-shadow: 0 0 3px rgba(0, 212, 255, 0.5);
+    }
+    #view-toggles .sep { width: 1px; height: 18px; background: var(--panel-line); margin: 0 2px; }
+    #override-btn.active { color: #ffe2a8; background: rgba(255, 177, 79, 0.16); border-color: var(--amber); }
+    #sound-btn.active { color: var(--white); border-color: var(--cyan); }
+
+    /* OVERRIDE ACTIVE badge */
+    #override-badge {
+      display: none; margin-left: 14px; padding: 3px 10px;
+      font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 900; letter-spacing: 0.25em;
+      color: #1a0c00; background: var(--amber); border-radius: 2px;
+      box-shadow: 0 0 14px rgba(255, 177, 79, 0.7);
+      animation: badge 1.1s ease-in-out infinite;
+    }
+    #override-badge.shown { display: inline-block; }
+    @keyframes badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    /* Ship status */
+    #ship-status { top: 60px; left: 20px; width: 280px; }
+    #ship-status-body .row { display: flex; align-items: center; justify-content: space-between; margin: 5px 0; font-size: 11px; }
+    #ship-status-body .label { color: var(--text-dim); letter-spacing: 0.1em; min-width: 70px; }
+    #ship-status-body .bar {
+      flex: 1; height: 8px; background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--panel-line); border-radius: 2px; margin: 0 8px;
+      position: relative; overflow: hidden;
+    }
+    #ship-status-body .bar::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0 9px, rgba(0, 0, 0, 0.35) 9px 10px);
+    }
+    #ship-status-body .fill {
+      height: 100%; background: linear-gradient(90deg, var(--cyan-dim) 0%, var(--cyan) 100%);
+      box-shadow: 0 0 6px var(--cyan); transition: width 0.3s ease;
+    }
+    #ship-status-body .fill.warn { background: linear-gradient(90deg, #a86f24 0%, var(--amber) 100%); box-shadow: 0 0 6px var(--amber); }
+    #ship-status-body .fill.crit { background: linear-gradient(90deg, #7a1414 0%, var(--red) 100%); box-shadow: 0 0 6px var(--red); }
+    #ship-status-body .fill.inf { background: linear-gradient(90deg, #a8801e 0%, var(--gold) 100%); box-shadow: 0 0 8px var(--gold); }
+    #ship-status-body .val { color: var(--white); font-weight: 600; min-width: 60px; text-align: right; font-family: 'Orbitron', monospace; font-size: 10px; }
+
+    /* Systems */
+    #systems { top: 60px; right: 20px; width: 220px; }
+    #systems-body .sys-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 11px; }
+    #systems-body .name { color: var(--text-dim); letter-spacing: 0.05em; }
+    #systems-body .state { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 1px 6px; border-radius: 2px; font-weight: 600; }
+    #systems-body .state.ok { color: var(--cyan); background: rgba(0, 212, 255, 0.1); }
+    #systems-body .state.warn { color: var(--amber); background: rgba(255, 177, 79, 0.15); }
+    #systems-body .state.crit { color: var(--red); background: rgba(255, 56, 56, 0.15); animation: pulse 1s infinite; }
+
+    /* Sector info */
+    #sector-info { top: 260px; right: 20px; width: 220px; }
+    #sector-info-body .row { display: flex; justify-content: space-between; font-size: 11px; margin: 4px 0; }
+    #sector-info-body .lbl { color: var(--text-dim); }
+    #sector-info-body .v { color: var(--white); font-family: 'Orbitron', monospace; letter-spacing: 0.1em; }
+    #sector-info-body .v.danger { color: var(--red); }
+
+    /* Event log */
+    #event-log { bottom: 100px; right: 20px; width: 340px; max-height: 200px; overflow: hidden; }
+    #event-log-body { max-height: 160px; overflow-y: auto; }
+    #event-log-body .evt { font-size: 11px; margin: 3px 0; padding: 2px 6px; border-left: 2px solid var(--panel-line); color: var(--text); line-height: 1.4; }
+    #event-log-body .evt.hit { color: var(--red); border-color: var(--red); }
+    #event-log-body .evt.ok { color: var(--cyan); border-color: var(--cyan); }
+    #event-log-body .evt.warn { color: var(--amber); border-color: var(--amber); }
+    #event-log-body .evt.ovr { color: var(--gold); border-color: var(--gold); background: rgba(255, 215, 106, 0.06); }
+    #event-log-body .evt small { color: var(--text-dim); }
+    #cheated-tag {
+      display: none; font-size: 9px; letter-spacing: 0.2em; padding: 1px 6px; border-radius: 2px;
+      color: #1a0c00; background: var(--amber); text-shadow: none;
+    }
+    #cheated-tag.shown { display: inline-block; }
+
+    /* Command console */
+    #cmd-panel {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 12;
+      background: linear-gradient(0deg, rgba(6, 12, 30, 0.98) 0%, rgba(6, 12, 30, 0.7) 100%);
+      border-top: 1px solid var(--panel-line);
+      padding: 12px 20px 14px;
+    }
+    #cmd-hint { color: var(--text-dim); font-size: 11px; letter-spacing: 0.05em; margin-bottom: 6px; min-height: 14px; white-space: pre-wrap; }
+    #cmd-line {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Share Tech Mono', monospace; font-size: 20px; color: var(--cyan);
+      text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
+    }
+    #cmd-line .prompt { color: var(--amber); font-weight: 600; }
+    #cmd-buffer { color: var(--white); letter-spacing: 0.06em; }
+    #cmd-line .cursor { display: inline-block; width: 10px; height: 20px; background: var(--cyan); margin-left: 2px; animation: cursor-blink 1s steps(2) infinite; }
+    @keyframes cursor-blink { 50% { opacity: 0; } }
+
+    .corner { position: absolute; z-index: 8; color: var(--cyan-dim); font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.25em; text-shadow: 0 0 4px rgba(0, 212, 255, 0.3); pointer-events: none; }
+    .corner.bl { bottom: 92px; left: 20px; }
+
+    /* Strategic map HUD */
+    #strategic-hud { position: absolute; top: 60px; left: 20px; color: var(--cyan); z-index: 15; }
+    #strategic-hud h2 { font-family: 'Orbitron', monospace; font-size: 14px; letter-spacing: 0.3em; text-transform: uppercase; text-shadow: 0 0 6px rgba(0, 212, 255, 0.5); margin-bottom: 4px; }
+    #strategic-hud .sub { color: var(--text-dim); font-size: 11px; letter-spacing: 0.1em; }
+    #warp-banner {
+      display: none; margin-top: 10px; padding: 5px 10px; border: 1px solid var(--amber); border-radius: 3px;
+      color: #ffe2a8; background: rgba(40, 24, 6, 0.8); font-size: 11px; letter-spacing: 0.12em;
+      box-shadow: 0 0 14px rgba(255, 177, 79, 0.3);
+    }
+    #strategic.armed #warp-banner { display: inline-block; }
+    #strategic-legend { position: absolute; bottom: 112px; left: 50%; transform: translateX(-50%); z-index: 15; color: var(--text-dim); font-size: 11px; display: flex; gap: 20px; align-items: center; }
+    #strategic-legend .legend-item { display: flex; align-items: center; gap: 6px; }
+    #strategic-legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.you { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .dot.klingon { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .dot.base { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+    .dot.fog { background: #203040; box-shadow: none; border: 1px solid #3a5070; }
+
+    /* Title screen — translucent: the procedural scene renders behind it */
+    #title-screen {
+      position: fixed; inset: 46px 0 0 0; z-index: 100;   /* bezel stays usable: sound / quality before launch */
+      background: radial-gradient(ellipse at 50% 40%, rgba(4, 8, 24, 0.15) 0%, rgba(2, 4, 12, 0.55) 70%, rgba(1, 2, 8, 0.8) 100%);
+      display: none; align-items: center; justify-content: center; padding: 30px;
+    }
+    #title-screen.shown { display: flex; }
+    #title-inner {
+      position: relative; width: min(760px, 92vw); max-height: 92vh;
+      border: 1px solid var(--panel-line); border-radius: 12px;
+      background: linear-gradient(180deg, rgba(6, 12, 30, 0.72) 0%, rgba(2, 6, 16, 0.82) 100%);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      box-shadow: inset 0 0 60px rgba(0, 212, 255, 0.05), 0 0 60px rgba(0, 212, 255, 0.18), 0 30px 60px rgba(0, 0, 0, 0.7);
+      padding: 44px 40px 32px; text-align: center; color: var(--text); overflow-y: auto;
+    }
+    #title-name {
+      font-family: 'Orbitron', monospace; font-size: clamp(66px, 12vw, 108px);
+      color: var(--white); letter-spacing: 0.28em; line-height: 1; margin-left: 0.28em;
+      text-shadow: 0 0 8px var(--cyan), 0 0 24px rgba(0, 212, 255, 0.55), 0 0 40px rgba(0, 212, 255, 0.3);
+      animation: title-pulse 3.4s ease-in-out infinite; font-weight: 900; margin-bottom: 4px;
+    }
+    @keyframes title-pulse {
+      0%, 100% { text-shadow: 0 0 8px var(--cyan), 0 0 24px rgba(0, 212, 255, 0.55), 0 0 40px rgba(0, 212, 255, 0.3); }
+      50% { text-shadow: 0 0 12px var(--cyan), 0 0 32px rgba(0, 212, 255, 0.75), 0 0 60px rgba(0, 212, 255, 0.5); }
+    }
+    #title-subtitle { font-family: 'Orbitron', monospace; font-size: 22px; color: var(--cyan); letter-spacing: 0.3em; text-shadow: 0 0 6px rgba(0, 212, 255, 0.4); margin-top: -4px; margin-bottom: 8px; }
+    #title-subtitle em { font-style: normal; color: var(--amber); text-shadow: 0 0 6px rgba(255, 177, 79, 0.45); }
+    #title-tagline { color: var(--text-dim); font-size: 12px; letter-spacing: 0.1em; line-height: 1.6; margin-top: 4px; margin-bottom: 30px; }
+    #title-tagline code { color: var(--amber); background: transparent; }
+    .title-block { margin-top: 12px; }
+    .title-label { color: var(--amber); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 12px; text-shadow: 0 0 3px rgba(255, 177, 79, 0.4); }
+    #difficulty-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .diff-btn {
+      background: rgba(4, 10, 20, 0.6); color: var(--text); border: 1px solid var(--panel-line); border-radius: 4px;
+      padding: 14px 8px; cursor: pointer; transition: all 0.15s ease;
+      display: flex; flex-direction: column; gap: 6px; align-items: center; font-family: 'Share Tech Mono', monospace;
+    }
+    .diff-btn:hover { background: rgba(0, 212, 255, 0.08); color: var(--cyan); }
+    .diff-btn.active { background: rgba(0, 212, 255, 0.14); color: var(--white); border-color: var(--cyan); box-shadow: 0 0 12px rgba(0, 212, 255, 0.3); }
+    .diff-label { font-family: 'Orbitron', monospace; font-size: 14px; letter-spacing: 0.2em; font-weight: 600; }
+    .diff-desc { font-size: 10px; color: var(--text-dim); letter-spacing: 0.05em; }
+    #start-btn {
+      margin-top: 24px;
+      background: linear-gradient(180deg, rgba(0, 212, 255, 0.15) 0%, rgba(60, 140, 180, 0.1) 100%);
+      color: var(--white); border: 1px solid var(--cyan); border-radius: 5px; padding: 14px 40px;
+      font-family: 'Orbitron', monospace; font-size: 20px; letter-spacing: 0.3em; cursor: pointer;
+      text-shadow: 0 0 6px rgba(0, 212, 255, 0.6); box-shadow: 0 0 15px rgba(0, 212, 255, 0.25);
+      animation: begin-pulse 2s ease-in-out infinite; font-weight: 600;
+    }
+    #start-btn:hover { background: linear-gradient(180deg, rgba(0, 212, 255, 0.3) 0%, rgba(60, 140, 180, 0.2) 100%); }
+    @keyframes begin-pulse { 0%, 100% { box-shadow: 0 0 15px rgba(0, 212, 255, 0.25); } 50% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.5); } }
+    #title-help { color: var(--text-dim); font-size: 11px; letter-spacing: 0.1em; margin-top: 18px; }
+    #title-help kbd, #gpu-note kbd {
+      display: inline-block; font-family: 'Share Tech Mono', monospace; background: #050d18; color: var(--white);
+      border: 1px solid var(--panel-line); border-bottom-width: 2px; border-radius: 2px; padding: 1px 6px; font-size: 11px;
+    }
+    #title-attribution { color: var(--text-dim); font-size: 10px; letter-spacing: 0.15em; margin-top: 12px; opacity: 0.7; }
+    #gpu-note { color: var(--text-dim); font-size: 10px; letter-spacing: 0.08em; margin-top: 8px; opacity: 0.8; }
+
+    /* Floating side panels */
+    #ref-panel, #cheat-panel, #override-panel {
+      position: absolute; z-index: 20; width: 320px; max-height: calc(100vh - 220px);
+      border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 12px; line-height: 1.4;
+      overflow: hidden; display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    #ref-panel { top: 60px; left: 20px; background: rgba(4, 8, 20, 0.9); border: 1px solid var(--panel-line); box-shadow: 0 0 25px rgba(0, 212, 255, 0.15); transform: translateX(-8px); color: var(--text); }
+    #cheat-panel { top: 60px; right: 20px; background: rgba(20, 8, 8, 0.88); border: 1px solid var(--amber); box-shadow: 0 0 25px rgba(255, 177, 79, 0.18); transform: translateX(8px); color: var(--text); }
+    #override-panel { z-index: 22; bottom: 100px; left: 20px; max-height: calc(100vh - 260px); background: rgba(22, 14, 4, 0.9); border: 1px solid var(--gold); box-shadow: 0 0 30px rgba(255, 215, 106, 0.22); transform: translateY(8px); color: var(--text); }
+    #ref-panel.shown, #cheat-panel.shown, #override-panel.shown { transform: none; opacity: 1; pointer-events: auto; }
+    #ref-panel header, #cheat-panel header, #override-panel header {
+      display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--panel-line);
+    }
+    #ref-panel header { background: linear-gradient(180deg, #0d1830 0%, #050818 100%); }
+    #cheat-panel header { background: linear-gradient(180deg, #2a1e0e 0%, #14100a 100%); }
+    #override-panel header { background: linear-gradient(180deg, #33260c 0%, #1a1206 100%); }
+    .panel-title { letter-spacing: 0.15em; font-size: 11px; text-transform: uppercase; font-family: 'Orbitron', monospace; }
+    #ref-panel .panel-title { color: var(--cyan); text-shadow: 0 0 3px rgba(0, 212, 255, 0.4); }
+    #cheat-panel .panel-title { color: var(--amber); text-shadow: 0 0 3px rgba(255, 177, 79, 0.4); }
+    #override-panel .panel-title { color: var(--gold); text-shadow: 0 0 4px rgba(255, 215, 106, 0.5); }
+    .panel-close { background: transparent; color: var(--text-dim); border: 1px solid var(--panel-line); border-radius: 3px; font-family: inherit; font-size: 11px; padding: 2px 8px; cursor: pointer; line-height: 1; }
+    .panel-close:hover { color: var(--cyan); border-color: var(--cyan); }
+    .ref-body, .cheat-body, .override-body { padding: 10px 12px 12px; overflow-y: auto; flex: 1; }
+    .ref-body::-webkit-scrollbar, .cheat-body::-webkit-scrollbar { width: 6px; }
+    .ref-body::-webkit-scrollbar-thumb, .cheat-body::-webkit-scrollbar-thumb { background: var(--panel-line); border-radius: 3px; }
+    .ref-section { margin-bottom: 12px; }
+    .ref-h { color: var(--amber); letter-spacing: 0.2em; font-size: 10px; text-transform: uppercase; margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px dashed var(--panel-line); }
+    .ref-row { display: flex; gap: 10px; align-items: baseline; margin: 3px 0; }
+    .ref-row span { color: var(--text-dim); font-size: 11px; flex: 1; }
+    .ref-body code, .override-body code {
+      display: inline-block; font-family: 'Share Tech Mono', monospace; background: #04080a; color: var(--white);
+      border: 1px solid var(--panel-line); border-radius: 2px; padding: 1px 6px; font-size: 13px; min-width: 56px; text-align: center;
+      text-shadow: 0 0 3px rgba(0, 212, 255, 0.4);
+    }
+    .ref-body kbd { display: inline-block; font-family: 'Share Tech Mono', monospace; background: #04080a; color: var(--white); border: 1px solid var(--panel-line); border-bottom-width: 2px; border-radius: 2px; padding: 1px 6px; font-size: 11px; }
+    .ref-bearing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0; text-align: center; }
+    .ref-bearing .cell { background: #04080a; border: 1px solid var(--panel-line); border-radius: 2px; padding: 4px; font-size: 10px; color: var(--text-dim); }
+    .ref-bearing .cell b { color: var(--cyan); font-family: 'Orbitron', monospace; font-size: 12px; display: block; }
+    .ref-bearing .cell.mid { color: var(--amber); background: transparent; border: none; }
+
+    /* Cheat hints (parity with fancy-web) */
+    .cheat-empty { color: var(--text-dim); font-style: italic; text-align: center; padding: 16px 0; }
+    .hint-row { display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start; padding: 9px; margin-bottom: 6px; border-radius: 3px; background: #050d08; border-left: 3px solid var(--panel-line); }
+    .hint-row.priority-urgent { border-left-color: var(--red); background: #180404; animation: hint-pulse 1.6s ease-in-out infinite; }
+    .hint-row.priority-normal { border-left-color: var(--cyan); }
+    .hint-row.priority-ok { border-left-color: var(--panel-line); opacity: 0.7; }
+    @keyframes hint-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(255, 56, 56, 0); } 50% { box-shadow: 0 0 12px rgba(255, 56, 56, 0.4); } }
+    .hint-badge { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: var(--cyan); text-align: center; text-shadow: 0 0 4px rgba(0, 212, 255, 0.4); line-height: 1; padding-top: 4px; }
+    .hint-row.priority-urgent .hint-badge { color: var(--red); text-shadow: 0 0 6px var(--red); }
+    .hint-row.priority-ok .hint-badge { color: var(--text-dim); text-shadow: none; }
+    .hint-content { min-width: 0; }
+    .hint-line { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 3px; }
+    .hint-tag { display: inline-block; font-size: 9px; letter-spacing: 0.18em; padding: 1px 5px; border-radius: 2px; background: rgba(0, 212, 255, 0.14); color: var(--cyan); font-family: 'Orbitron', monospace; font-weight: 700; }
+    .hint-row.priority-urgent .hint-tag { background: rgba(255, 56, 56, 0.18); color: var(--red); }
+    .hint-row.priority-ok .hint-tag { background: rgba(120, 130, 140, 0.12); color: var(--text-dim); }
+    .hint-cmd { font-family: 'Share Tech Mono', monospace; font-size: 14px; color: var(--white); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--cyan); border-radius: 2px; padding: 1px 8px; display: inline-block; letter-spacing: 0.06em; text-shadow: 0 0 3px rgba(0, 212, 255, 0.4); }
+    .hint-row.priority-urgent .hint-cmd { color: #ffdcdc; background: rgba(255, 56, 56, 0.16); border-color: var(--red); text-shadow: 0 0 3px var(--red); }
+    .hint-done { font-size: 12px; color: var(--text-dim); font-style: italic; }
+    .hint-explain { color: var(--text); font-size: 11px; margin-top: 3px; line-height: 1.4; }
+
+    /* Captain's Override panel */
+    .override-warning { color: #ffe2a8; font-size: 11px; margin-bottom: 10px; line-height: 1.45; }
+    .ovr-row {
+      display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center;
+      padding: 6px 8px; margin-bottom: 5px; border-radius: 3px; cursor: pointer;
+      background: rgba(10, 8, 4, 0.6); border: 1px solid rgba(255, 215, 106, 0.18);
+    }
+    .ovr-row:hover { border-color: rgba(255, 215, 106, 0.55); }
+    .ovr-switch { width: 30px; height: 16px; border-radius: 8px; background: #2a2418; border: 1px solid #5a4a26; position: relative; }
+    .ovr-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: #7a6a44; transition: all 0.15s ease; }
+    .ovr-row.on .ovr-switch { background: rgba(255, 215, 106, 0.3); border-color: var(--gold); }
+    .ovr-row.on .ovr-switch::after { left: 16px; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+    .ovr-name { color: var(--white); font-size: 12px; }
+    .ovr-name small { display: block; color: var(--text-dim); font-size: 10px; }
+    .ovr-action {
+      width: 100%; margin-top: 6px; padding: 8px; border-radius: 3px; cursor: pointer;
+      background: rgba(255, 215, 106, 0.12); border: 1px solid var(--gold); color: #ffe9b8;
+      font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.2em;
+    }
+    .ovr-action:hover { background: rgba(255, 215, 106, 0.24); }
+    .ovr-foot { color: var(--text-dim); font-size: 10px; margin-top: 10px; line-height: 1.5; }
+
+    /* Help modal */
+    #help-overlay { position: fixed; inset: 0; z-index: 250; background: rgba(0, 0, 0, 0.88); display: none; align-items: center; justify-content: center; padding: 20px; }
+    #help-overlay.shown { display: flex; }
+    #help-inner {
+      max-width: 860px; width: 100%; max-height: 92vh;
+      background: radial-gradient(ellipse at top, #0a1230 0%, #030510 100%);
+      border: 2px solid var(--cyan); border-radius: 8px; box-shadow: 0 0 40px rgba(0, 212, 255, 0.35);
+      padding: 32px 40px; overflow-y: auto; color: var(--text); line-height: 1.6; position: relative;
+    }
+    #help-close { position: sticky; float: right; top: 0; background: transparent; color: var(--cyan); border: 1px solid var(--cyan); border-radius: 3px; font-family: inherit; font-size: 14px; padding: 4px 12px; cursor: pointer; z-index: 2; }
+    #help-inner h1 { font-family: 'Orbitron', monospace; font-size: 34px; color: var(--white); text-shadow: 0 0 10px var(--cyan); letter-spacing: 0.15em; margin-bottom: 4px; text-align: center; }
+    #help-inner .subtitle { color: var(--cyan); text-align: center; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 22px; }
+    #help-inner h2 { color: var(--amber); font-size: 15px; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 26px; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid var(--panel-line); }
+    #help-inner p { margin-bottom: 10px; }
+    #help-inner code, #help-inner kbd { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 13px; background: #04080a; color: var(--white); border: 1px solid var(--panel-line); border-radius: 2px; padding: 1px 6px; margin: 0 2px; }
+    #help-inner kbd { border-bottom-width: 2px; }
+    #help-inner .cmd-table { display: grid; grid-template-columns: 170px 1fr; gap: 6px 14px; margin: 12px 0; font-size: 13px; }
+    #help-inner .cmd-table .cmd { color: var(--white); background: #04080a; border-left: 3px solid var(--cyan); padding: 4px 10px; font-size: 14px; }
+    #help-inner .cmd-table .cmd.gold { border-left-color: var(--gold); }
+    #help-inner .cmd-table .desc { padding: 4px 0; }
+    #help-inner .enemy-table { display: grid; grid-template-columns: 210px 1fr 110px 110px; gap: 6px 12px; margin: 12px 0; font-size: 12px; align-items: center; }
+    #help-inner .enemy-table .h { color: var(--amber); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1px solid var(--panel-line); padding-bottom: 3px; }
+    #help-inner .enemy-table .n { color: var(--white); font-family: 'Orbitron', monospace; }
+    #help-inner .enemy-table .d { color: var(--text-dim); font-size: 11px; }
+    #help-inner .enemy-table .s { color: var(--cyan); }
+    #help-inner .bearing-chart { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 4px; justify-content: center; margin: 12px auto; }
+    #help-inner .bearing-chart .b { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #04080a; border: 1px solid var(--panel-line); border-radius: 3px; color: var(--cyan); font-family: 'Orbitron', monospace; font-size: 14px; }
+    #help-inner .bearing-chart .b small { color: var(--text-dim); font-size: 9px; }
+    #help-inner .bearing-chart .b.mid { background: transparent; border: none; color: var(--amber); }
+    #help-inner ul.lose-list { list-style: none; padding: 0; margin: 10px 0; }
+    #help-inner ul.lose-list li { padding: 6px 12px; margin-bottom: 4px; border-left: 3px solid var(--red); background: rgba(255, 56, 56, 0.06); font-size: 13px; }
+    #help-inner ul.win-list li { border-left-color: var(--cyan); background: rgba(0, 212, 255, 0.06); }
+    #help-inner ul.tips-list { margin-left: 22px; }
+    #help-inner .footer-hint { margin-top: 30px; text-align: center; color: var(--text-dim); font-size: 12px; letter-spacing: 0.15em; padding-top: 20px; border-top: 1px solid var(--panel-line); }
+
+    /* Game over */
+    #game-over { position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, 0.72); display: none; align-items: center; justify-content: center; }
+    #game-over.shown { display: flex; }
+    #game-over-inner {
+      position: relative; max-width: 520px; text-align: center; padding: 40px; border: 2px solid var(--panel-line); border-radius: 8px;
+      background: radial-gradient(circle at center, rgba(10, 18, 48, 0.92) 0%, rgba(5, 8, 24, 0.95) 100%);
+      box-shadow: 0 0 60px rgba(0, 212, 255, 0.2); backdrop-filter: blur(4px);
+    }
+    #game-over-title { font-family: 'Orbitron', monospace; font-size: 44px; letter-spacing: 0.2em; margin-bottom: 16px; }
+    #game-over-title.win { color: var(--cyan); text-shadow: 0 0 15px var(--cyan); }
+    #game-over-title.loss { color: var(--red); text-shadow: 0 0 15px var(--red); }
+    #game-over-text { color: var(--white); font-size: 18px; margin-bottom: 16px; }
+    #game-over-stats { color: var(--text); font-size: 13px; letter-spacing: 0.05em; margin-bottom: 24px; }
+    #game-over-cheated {
+      display: none; margin: -6px auto 20px; padding: 6px 14px; width: fit-content;
+      border: 2px solid var(--amber); color: var(--amber); transform: rotate(-3deg);
+      font-family: 'Orbitron', monospace; font-weight: 900; letter-spacing: 0.3em; font-size: 16px;
+      text-shadow: 0 0 8px rgba(255, 177, 79, 0.6); box-shadow: 0 0 16px rgba(255, 177, 79, 0.25);
+    }
+    #game-over-cheated.shown { display: block; }
+    #game-over-cheated small { display: block; font-family: 'Share Tech Mono', monospace; font-weight: 400; letter-spacing: 0.05em; font-size: 11px; color: #ffd9a8; text-shadow: none; margin-top: 2px; }
+    #game-over-hint { color: var(--text-dim); font-size: 12px; letter-spacing: 0.15em; animation: cursor-blink 1.4s infinite; }
+
+    /* No-WebGL notice */
+    #nogl-note { display: none; position: absolute; top: 54px; left: 50%; transform: translateX(-50%); z-index: 16; padding: 4px 12px; border: 1px solid var(--amber); border-radius: 3px; color: #ffe2a8; background: rgba(30, 20, 4, 0.85); font-size: 11px; letter-spacing: 0.08em; }
+    body.nogl #nogl-note { display: block; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #title-name, #start-btn, #override-badge, .hint-row.priority-urgent, #top-bezel .indicator { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="gl"></canvas>
+    <canvas id="fallback"></canvas>
+
+    <div id="strategic">
+      <div id="chart-labels"></div>
+      <div id="strategic-hud">
+        <h2>Galaxy Chart</h2>
+        <div class="sub">USS Enterprise · Long-range scan</div>
+        <div id="warp-banner">⚠ CAPTAIN'S OVERRIDE · INSTANT WARP ARMED — click any quadrant</div>
+      </div>
+      <div id="strategic-legend">
+        <div class="legend-item"><span class="dot you"></span> your quadrant</div>
+        <div class="legend-item"><span class="dot klingon"></span> Klingon activity</div>
+        <div class="legend-item"><span class="dot base"></span> starbase</div>
+        <div class="legend-item"><span class="dot fog"></span> unscanned (fog of war)</div>
+      </div>
+    </div>
+
+    <div id="top-bezel">
+      <span>
+        <span class="indicator"></span>
+        <span class="ship-tag">USS ENTERPRISE</span>
+        &nbsp;·&nbsp; <span id="stardate">Stardate —</span>
+        &nbsp;·&nbsp; <span id="sector-label">Sector —</span>
+        <span id="override-badge" title="A Captain's Override is engaged">OVERRIDE ACTIVE</span>
+      </span>
+      <div id="view-toggles">
+        <button class="active" data-view="combat">Tactical</button>
+        <button data-view="strategic">Galaxy Chart</button>
+        <button id="cheat-btn" title="Toggle dynamic cheat (per-turn hints) — ` key">▶ cheat</button>
+        <button id="override-btn" title="Captain's Override (cheats) — ! key or type override">⚠ override</button>
+        <button id="ref-btn" title="Toggle command reference (\ key)">≡ ref</button>
+        <button id="help-btn" title="Show tutorial (? key)">? help</button>
+        <span class="sep"></span>
+        <button id="quality-btn" title="Rendering quality (High / Low)">◐ high</button>
+        <button id="sound-btn" title="Sound is off — click to turn it on">♪ sound off</button>
+      </div>
+    </div>
+    <div id="nogl-note">WebGL unavailable — running the 2D fallback view. The game plays the same.</div>
+
+    <div class="hud" id="ship-status">
+      <h3>Ship Status</h3>
+      <div id="ship-status-body"></div>
+    </div>
+    <div class="hud" id="systems">
+      <h3>Systems</h3>
+      <div id="systems-body"></div>
+    </div>
+    <div class="hud" id="sector-info">
+      <h3>Sector Contacts</h3>
+      <div id="sector-info-body"></div>
+    </div>
+    <div class="hud" id="event-log">
+      <h3>Bridge Log <span id="cheated-tag" title="A Captain's Override was used this mission">CHEATED</span></h3>
+      <div id="event-log-body"></div>
+    </div>
+
+    <div class="corner bl">TACTICAL · CHANNEL 121.9</div>
+
+    <div id="cmd-panel">
+      <div id="cmd-hint">phaser · torpedo · move · srscan · lrscan · shields · dock · damages · help · quit</div>
+      <div id="cmd-line">
+        <span class="prompt">Command &gt;</span>
+        <span id="cmd-buffer"></span>
+        <span class="cursor"></span>
+      </div>
+    </div>
+  </div>
+
+  <aside id="cheat-panel">
+    <header>
+      <span class="panel-title">▶ CHEAT · WHAT TO TYPE</span>
+      <button id="cheat-close" class="panel-close" title="Hide">✕</button>
+    </header>
+    <div class="cheat-body">
+      <div id="cheat-empty" class="cheat-empty" style="display:none;">— bridge quiet —</div>
+      <div id="cheat-list"></div>
+    </div>
+  </aside>
+
+  <aside id="override-panel">
+    <header>
+      <span class="panel-title">⚠ CAPTAIN'S OVERRIDE</span>
+      <button id="override-close" class="panel-close" title="Hide (! key)">✕</button>
+    </header>
+    <div class="override-body">
+      <div class="override-warning">Engaging any override marks this mission <b>CHEATED</b> on the end screen and in the bridge log. Releasing it does not undo the mark.</div>
+      <div id="override-list"></div>
+      <button class="ovr-action" id="ovr-resupply">⟳ FULL REPAIR / RESUPPLY NOW</button>
+      <button class="ovr-action" id="ovr-clear">RELEASE ALL OVERRIDES</button>
+      <div class="ovr-foot">Typed: <code>override</code> · <code>override energy on</code> · <code>override warp 3-5</code> · <code>override off</code><br>Instant warp: engage it, open the Galaxy Chart (<b>V</b>) and click a quadrant.</div>
+    </div>
+  </aside>
+
+  <aside id="ref-panel">
+    <header>
+      <span class="panel-title">≡ COMMAND REFERENCE</span>
+      <button id="ref-close" class="panel-close" title="Hide (\ key)">✕</button>
+    </header>
+    <div class="ref-body">
+      <div class="ref-section">
+        <div class="ref-h">Weapons</div>
+        <div class="ref-row"><code>phaser 500</code><span>fire phasers with N energy</span></div>
+        <div class="ref-row"><code>torpedo 3</code><span>fire torpedo at bearing (0..12)</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-h">Movement</div>
+        <div class="ref-row"><code>move 3 2</code><span>course + warp factor</span></div>
+        <div class="ref-row"><code>warp 4</code><span>warp factor shortcut</span></div>
+        <div class="ref-row"><code>impulse 3</code><span>short-range impulse move</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-h">Bearing Clock</div>
+        <div class="ref-bearing">
+          <div class="cell"><b>4.5</b>NW</div><div class="cell"><b>3</b>N</div><div class="cell"><b>1.5</b>NE</div>
+          <div class="cell"><b>6</b>W</div><div class="cell mid">·</div><div class="cell"><b>0/12</b>E</div>
+          <div class="cell"><b>7.5</b>SW</div><div class="cell"><b>9</b>S</div><div class="cell"><b>10.5</b>SE</div>
+        </div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-h">Scans &amp; Info</div>
+        <div class="ref-row"><code>srscan</code><span>short-range (current quadrant)</span></div>
+        <div class="ref-row"><code>lrscan</code><span>long-range (adjacent quadrants)</span></div>
+        <div class="ref-row"><code>damages</code><span>subsystem damage report</span></div>
+        <div class="ref-row"><code>computer</code><span>trajectory calculator</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-h">Defense &amp; Support</div>
+        <div class="ref-row"><code>shields up</code><span>raise shields</span></div>
+        <div class="ref-row"><code>shields down</code><span>lower shields</span></div>
+        <div class="ref-row"><code>shields 300</code><span>transfer N energy to shields</span></div>
+        <div class="ref-row"><code>dock</code><span>dock at adjacent starbase (refuel)</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-h">Special Keys</div>
+        <div class="ref-row"><kbd>Enter</kbd><span>execute command</span></div>
+        <div class="ref-row"><kbd>Backspace</kbd><span>delete last char</span></div>
+        <div class="ref-row"><kbd>Esc</kbd><span>clear buffer</span></div>
+        <div class="ref-row"><kbd>V</kbd><span>toggle view (only when buffer empty)</span></div>
+        <div class="ref-row"><kbd>?</kbd><span>full tutorial modal</span></div>
+        <div class="ref-row"><kbd>\</kbd><span>toggle this reference</span></div>
+        <div class="ref-row"><kbd>`</kbd><span>toggle dynamic cheat panel</span></div>
+        <div class="ref-row"><kbd>!</kbd><span>Captain's Override panel</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div id="help-overlay">
+    <div id="help-inner">
+      <button id="help-close">✕ close</button>
+      <h1>TREK — How to Play</h1>
+      <div class="subtitle">Deep Space · Procedural · BSD trek(6) spiritual successor</div>
+
+      <h2>The Mission</h2>
+      <p>You are captain of the <b>USS Enterprise</b>. Klingon warships have infiltrated Federation space across an <b>8×8 galaxy</b> of quadrants. Hunt down and destroy every Klingon before the stardate budget runs out — or the Federation falls.</p>
+      <p>Everything you see and hear in this version — nebulae, ships, the starbase, stars, beams, explosions, the chart, the sound — is generated by code at runtime. No images, no audio files.</p>
+
+      <h2>The Screen</h2>
+      <p><b>Your ship</b> is the long pale cruiser with a glowing cyan sensor band and three blue engines. When shields are up, a translucent bubble surrounds it; hits light up a ring of hexagons where they land.</p>
+      <p><b>Klingon ships</b> are dark bronze (or jade) hulls with red or teal engine glow; each turns its bow to face you. The <b>starbase</b> is the huge ring station with lit windows — dock next to it. <b>Stars</b> are navigation obstacles that swallow torpedoes and light up nearby hulls.</p>
+
+      <h2>Enemy Roster</h2>
+      <div class="enemy-table">
+        <div class="h">Enemy</div><div class="h">Look</div><div class="h">Energy</div><div class="h">Attack</div>
+        <div class="n">Klingon Warship</div><div class="d">Dagger hull, twin forward prongs — 65 %</div><div class="s">200–400</div><div class="s">25–65 dmg</div>
+        <div class="n">Klingon Battlecruiser</div><div class="d">Ribbed spine, hammer prow — 22 %</div><div class="s">450–700</div><div class="s">40–90 dmg</div>
+        <div class="n">Romulan Warbird</div><div class="d">Jade flying wing, teal drive — 10 %</div><div class="s">350–550</div><div class="s">35–80 dmg</div>
+        <div class="n">Klingon Super-Commander</div><div class="d">Three spines, twin reactor cores — 3 %</div><div class="s">900–1200</div><div class="s">70–130 dmg</div>
+      </div>
+
+      <h2>The HUD</h2>
+      <p><b>Ship Status</b> (top-left): shields / hull / energy / torpedoes. <b>Systems</b> (top-right): OK / WEAK / DAMAGED. <b>Sector Contacts</b> (right): what is in this quadrant. <b>Bridge Log</b> (bottom-right): recent events.</p>
+
+      <h2>Commands</h2>
+      <p>Type each command at the <code>Command &gt;</code> prompt and press <kbd>Enter</kbd>.</p>
+      <div class="cmd-table">
+        <div class="cmd">phaser 500</div><div class="desc">Fire phasers with 500 energy at all Klingons here. Damage split, weaker with distance.</div>
+        <div class="cmd">torpedo 3</div><div class="desc">Photon torpedo at bearing 3 (north). 50 energy + 1 torpedo. Hits the first thing on its path.</div>
+        <div class="cmd">move 3 2</div><div class="desc">Course 3, warp 2. Energy ≈ warp²×10, plus stardates. Warp &lt; 1 = impulse inside the quadrant.</div>
+        <div class="cmd">impulse 3</div><div class="desc">Short impulse move on bearing 3.</div>
+        <div class="cmd">srscan / lrscan</div><div class="desc">Short-range / long-range scan (lrscan lifts the fog on adjacent quadrants).</div>
+        <div class="cmd">damages</div><div class="desc">Subsystem damage report.</div>
+        <div class="cmd">dock</div><div class="desc">Dock at an adjacent starbase — full refuel, repair, rearm.</div>
+        <div class="cmd">shields up / down / 300</div><div class="desc">Raise / lower shields, or transfer energy into them.</div>
+        <div class="cmd">help · quit</div><div class="desc">Inline command list · end the mission.</div>
+      </div>
+
+      <h2>Bearing — Clock Face</h2>
+      <p><b>0 (or 12) = East</b>, <b>3 = North</b>, <b>6 = West</b>, <b>9 = South</b>. Fractions work (1.5 = NE).</p>
+      <div class="bearing-chart">
+        <div class="b">4.5<small>NW</small></div><div class="b">3<small>N</small></div><div class="b">1.5<small>NE</small></div>
+        <div class="b">6<small>W</small></div><div class="b mid">·</div><div class="b">0/12<small>E</small></div>
+        <div class="b">7.5<small>SW</small></div><div class="b">9<small>S</small></div><div class="b">10.5<small>SE</small></div>
+      </div>
+
+      <h2>Views</h2>
+      <p><b>Tactical</b>: the current quadrant. <b>Galaxy Chart</b>: an 8×8 hologram with fog of war. Toggle with <kbd>V</kbd> (only when the command line is empty) or the bezel buttons.</p>
+
+      <h2>Winning &amp; Losing</h2>
+      <ul class="lose-list win-list"><li>✓ Destroy every Klingon before the stardate budget expires.</li></ul>
+      <ul class="lose-list">
+        <li>✗ Stardate budget runs out.</li><li>✗ Hull destroyed.</li><li>✗ Life support fails.</li><li>✗ Energy exhausted.</li>
+      </ul>
+
+      <h2>Cheats</h2>
+      <p><kbd>`</kbd> opens the <b>dynamic cheat</b>: live hints for what to type next, exactly as in the painted port.</p>
+      <p><kbd>!</kbd> (or typing <code>override</code>) opens the <b>Captain's Override</b>: reveal the galaxy map, infinite energy, infinite torpedoes, invulnerable shields, freeze the stardate clock, one-shot kills, instant warp by clicking the chart, and a full repair/resupply. Using any of them marks the mission <b>CHEATED</b>.</p>
+      <div class="cmd-table">
+        <div class="cmd gold">override</div><div class="desc">Open / close the panel.</div>
+        <div class="cmd gold">override energy on</div><div class="desc">Flags: <code>map</code> <code>energy</code> <code>torps</code> <code>shields</code> <code>clock</code> <code>oneshot</code> <code>warp</code> — add on/off, or omit to toggle.</div>
+        <div class="cmd gold">override warp 3-5</div><div class="desc">Engage instant warp and jump to quadrant 3-5.</div>
+        <div class="cmd gold">override resupply</div><div class="desc">Full repair and resupply, anywhere.</div>
+        <div class="cmd gold">override off</div><div class="desc">Release every override (the mission stays marked).</div>
+      </div>
+
+      <div class="footer-hint">
+        <kbd>?</kbd> tutorial · <kbd>\</kbd> reference · <kbd>`</kbd> cheat · <kbd>!</kbd> override · <kbd>V</kbd> view (empty command line)
+      </div>
+    </div>
+  </div>
+
+  <div id="title-screen" class="shown">
+    <div id="title-inner">
+      <h1 id="title-name">TREK</h1>
+      <div id="title-subtitle">Deep Space <em>— Procedural</em></div>
+      <div id="title-tagline">
+        A spiritual successor to BSD <code>trek(6)</code><br>
+        Eric Allman · University of California · 1976 / 4BSD 1980<br>
+        every pixel and every sound generated from code
+      </div>
+      <div class="title-block">
+        <div class="title-label">SELECT DIFFICULTY</div>
+        <div id="difficulty-picker"></div>
+      </div>
+      <button id="start-btn">▶ BEGIN MISSION ◀</button>
+      <div id="title-help">type commands · <kbd>?</kbd> or <kbd>help</kbd> for reference · <kbd>V</kbd> to switch views · <kbd>!</kbd> override</div>
+      <div id="gpu-note"></div>
+      <div id="title-attribution">Port by Agun Wijaya · Claude Opus · MIT license</div>
+    </div>
+  </div>
+
+  <div id="game-over">
+    <div id="game-over-inner">
+      <h1 id="game-over-title">VICTORY</h1>
+      <div id="game-over-cheated">CHEATED<small>Captain's Override was used — this mission does not count.</small></div>
+      <div id="game-over-text"></div>
+      <div id="game-over-stats"></div>
+      <div id="game-over-hint">▸ ENTER / SPACE · NEW MISSION ◂</div>
+    </div>
+  </div>
+
+  <!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

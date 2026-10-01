@@ -1,0 +1,249 @@
+Version 4.2, fall 1984.
+First Adventure game written by His Lordship, the honorable
+Admiral D.W. Riggle
+
+
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway left. The bridal suite is
+right. Other rooms lie ahead and behind you.
+
+>-: 
+	This was once the first class lounge.
+There is much rubble and destruction here that was not apparent elsewhere.
+The walls and ceilings have broken in in some places. A staircase with
+red coral banisters leads up. It is impossible to go left or right.
+It seems a little clearer ahead.
+
+There are some matches here.
+>-: match book:
+Taken.
+>-: Your match splutters to life.
+>-: 
+	This was once the first class lounge.
+There is much rubble and destruction here that was not apparent elsewhere.
+The walls and ceilings have broken in in some places. A staircase with
+red coral banisters leads up. It is impossible to go left or right.
+It seems a little clearer ahead.
+
+
+Your match splutters out.
+>-: You are holding:
+
+	match book
+
+= 0 kilograms. (0%)
+Your arms are 0% full.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway left. The bridal suite is
+right. Other rooms lie ahead and behind you.
+
+>-: 
+	This is the maid's utility room.
+What a gruesome sight! The maid has been brutally drowned in a bucket of
+Pine Sol and repeatedly stabbed in the back with a knife.
+The hallway is behind you.
+
+There is a knife here.
+The maid's body is lying here. She was murdered!
+>-: knife:
+Taken.
+>-: maid's body:
+Taken.
+>-: maid's body:
+You're already holding a maid's body.
+>-: You are holding:
+
+	knife
+	maid's body
+	match book
+
+= 51 kilograms. (85%)
+Your arms are 60% full.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: maid's body:
+Dropped.
+>-: Your knife should do the trick.
+You can't kill the maid's body!
+>-: You aren't holding a shovel.
+>-: 
+	These are the executive suites of the battlestar.
+
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar ahead. The hallway
+goes back.
+
+There is a laser pistol here.
+>-: laser:
+Taken.
+>-: You are holding:
+
+	knife
+	laser
+	match book
+
+= 6 kilograms. (10%)
+Your arms are 50% full.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: You are now wearing a laser.
+>-: You are holding:
+
+	knife
+	match book
+
+= 1 kilogram. (1%)
+Your arms are 10% full.
+
+You are wearing:
+
+	pajamas
+	laser
+
+You are in perfect health.
+>-: laser:
+Taken.
+>-: pajamas:
+Taken.
+>-: You are now wearing a knife.
+>-: You are holding:
+
+	pajamas
+	laser
+	match book
+
+= 6 kilograms. (10%)
+Your arms are 50% full.
+
+You are wearing:
+
+	knife
+
+You are in perfect health.
+>-: 
+	These are the executive suites of the battlestar.
+
+>-: 
+	You are in what was once an elegant stateroom.
+Whoever lived in this stateroom, he and his female companion
+were mercilessly slain in their sleep. Clothes, trinkets and personal
+belongings are scattered all across the floor. Through a hole in the
+collapsed floor I can see a hallway below.  A door is behind you.
+
+There is a strange golden amulet on the floor here.
+>-: 
+	The hallway is very congested with rubble here.
+It is too choked with broken steel girders and other debris to continue
+on much farther. Above, the ceiling has caved in and it is possible to 
+climb up. There is not much chance to go back, ahead, or left.
+But the hallway seems clearer right.
+
+There are a few coins here.
+>-: 
+	You are in a wide hallway leading to the main hangar.
+The walls and ceiling here have been blasted through in several places.
+It looks as if quite a battle has been fought for possession of the landing bay
+Gaping corpses litter the floor.  The hallway continues behind you.
+The main hangar is ahead.
+
+>-: Explosions rock the battlestar.
+
+	You are in the main hangar.
+This is a huge bay where many fighters and cargo craft lie.  Alarms are 
+sounding and fighter pilots are running to their ships.  Above is a gallery
+overlooking the bay. The scream of turbo engines is coming from right. The rest
+of the hangar is left. There is an exit behind you.
+
+>-: Explosions rock the battlestar.
+
+	This is the landing bay.
+Ships are landing here, some heavily damaged. Enemy fighters continually
+strafe this vulnerable port. The main hangar is behind you. 
+There is an exit left.
+
+>-: Explosions rock the battlestar.
+
+	You are in a wide hallway leading to the landing bay.
+Most of the men and supplies needed in the main hangar come through this
+corridor, but the wounded are forced to use it too. It very dank and
+crowded here, and the floor is slippery with blood.
+The hallway continues ahead. The landing bay is behind you.
+
+>-: Explosions rock the battlestar.
+
+	A wide hallway and a more narrow walkway meet here.
+The intersection is crowded with the many wounded who have come up
+the wide hallway and continued left. The walkway is less crowded right.
+The wide hallway goes back.
+
+>-: Explosions rock the battlestar.
+
+	You're in the walkway.
+Most of the men and supplies were coming from the armory. The walkway
+continues back. The armory is ahead.
+
+>-: Explosions rock the battlestar.
+
+	You're in the armory.
+An armed guard is stationed here 365 sectars a yarn to protect the magazine.
+The walkway is behind you. The magazine is ahead.
+
+There is a thermonuclear warhead here.
+>-: warhead:
+The warhead is too heavy.
+>-: warhead:
+The warhead is too heavy.
+>-: You are holding:
+
+	pajamas
+	laser
+	match book
+
+= 6 kilograms. (10%)
+Your arms are 50% full.
+
+You are wearing:
+
+	knife
+
+You are in perfect health.
+>-: 
+	You're in the armory.
+An armed guard is stationed here 365 sectars a yarn to protect the magazine.
+The walkway is behind you. The magazine is ahead.
+
+There is a thermonuclear warhead here.
+>-: warhead:
+You aren't holding the warhead.
+>-: bye.
+Your rating was novice.

@@ -1,0 +1,507 @@
+/*
+ * Console Home's frames for Settings, About and the server closet. The shared content keeps
+ * its own structure; here it takes the Console shape: big rounded cards, the chrome colour for
+ * whatever is chosen, and roomy type.
+ */
+
+[data-style='console'] .ch-page-head {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+[data-style='console'] .ch-page-head .ch-back {
+  margin-bottom: 14px;
+}
+
+/* A quiet label above the title, so it never reads as a second button beside Back. */
+[data-style='console'] .ch-page-head .ch-eyebrow {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ch-chrome);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-style='console'] .ch-page-head__title {
+  font-family: var(--ug-font-display);
+  font-size: clamp(2.8rem, 4.2vw, 5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+[data-style='console'] .ch-page-head__lede {
+  max-width: 60ch;
+  color: var(--ug-ink-2);
+  font-size: clamp(1.1rem, calc(0.4vw + 0.9rem), 1.35rem);
+  line-height: 1.45;
+}
+
+/* ---------- Settings ---------- */
+
+[data-style='console'] .ch-settings__layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(28px, 3vw, 56px);
+}
+
+[data-style='console'] .ch-settings-nav {
+  position: sticky;
+  top: 110px;
+  display: grid;
+  gap: 18px;
+}
+
+[data-style='console'] .ch-settings-nav ul {
+  display: grid;
+  gap: 4px;
+}
+
+[data-style='console'] .ch-settings-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ug-ink-2);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+[data-style='console'] .ch-settings-nav__link:hover {
+  background: color-mix(in srgb, var(--ug-surface-2) 70%, transparent);
+  color: var(--ug-ink);
+}
+
+[data-style='console'] .ch-settings-nav__link.is-current {
+  background: var(--ug-surface);
+  color: var(--ug-ink);
+  box-shadow: 0 10px 24px -18px var(--ug-shadow);
+}
+
+[data-style='console'] .ch-settings-nav__link.is-current::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 999px;
+  background: var(--ch-chrome-fill);
+}
+
+[data-style='console'] .ch-settings-nav__about {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  color: var(--ug-ink);
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+/* The shared panel, in Console's shape. */
+[data-style='console'] .ch-settings .set-panel {
+  gap: 18px;
+}
+
+[data-style='console'] .ch-settings .set-section {
+  gap: 16px;
+  padding: 28px 32px 30px;
+  border-color: var(--ug-line);
+  border-radius: 28px;
+  background: var(--ug-surface);
+  box-shadow: 0 30px 60px -50px var(--ug-shadow);
+  scroll-margin-top: 110px;
+}
+
+[data-style='console'] .ch-settings .set-section:focus {
+  outline: none;
+}
+
+[data-style='console'] .ch-settings .set-section__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+[data-style='console'] .ch-settings .set-group__legend {
+  font-size: 1.05rem;
+}
+
+[data-style='console'] .ch-settings .set-choice {
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: var(--ug-surface-2);
+  transition:
+    border-color 0.16s var(--ch-ease),
+    transform 0.16s var(--ch-ease);
+}
+
+[data-style='console'] .ch-settings .set-group--cards .set-choice {
+  padding: 16px 18px;
+}
+
+/* Choices share one row when they fit (three styles, five skins), instead of leaving a gap. */
+[data-style='console'] .ch-settings .set-group--cards .set-choices {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+[data-style='console'] .ch-settings .set-choice:not(.is-locked):hover {
+  transform: translateY(-1px);
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='console'] .ch-settings .set-group--pills .set-choice {
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+}
+
+[data-style='console'] .ch-settings .set-choice.is-selected {
+  border-color: var(--ch-chrome);
+  background: color-mix(in srgb, var(--ch-chrome) 12%, var(--ug-surface-2));
+  box-shadow: none;
+}
+
+/* A drawn tick: the text one is too thin in the display face. */
+[data-style='console'] .ch-settings .set-choice.is-selected .set-choice__label::before {
+  content: '';
+  display: inline-block;
+  width: 0.32em;
+  height: 0.62em;
+  margin: 0 0.55em 0.18em 0.1em;
+  border: solid var(--ch-chrome);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+[data-style='console'] .ch-settings .set-choice.is-locked {
+  border: 2px dashed var(--ug-line-strong);
+  background: transparent;
+}
+
+[data-style='console'] .ch-settings .set-choice__label {
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-settings .set-choice .ch-swatch {
+  height: 56px;
+  margin-bottom: 6px;
+}
+
+[data-style='console'] .ch-settings .set-choice.is-locked .ch-swatch {
+  filter: saturate(0.35);
+  opacity: 0.75;
+}
+
+[data-style='console'] .ch-settings .set-range__input::-webkit-slider-runnable-track {
+  height: 10px;
+  background: linear-gradient(
+    to right,
+    var(--ch-chrome) var(--set-fill, 50%),
+    color-mix(in srgb, var(--ug-line-strong) 45%, transparent) var(--set-fill, 50%)
+  );
+}
+
+[data-style='console'] .ch-settings .set-range__input::-webkit-slider-thumb {
+  width: 26px;
+  height: 26px;
+  margin-top: -8px;
+  background: var(--ch-chrome);
+}
+
+[data-style='console'] .ch-settings .set-range__input::-moz-range-progress {
+  background: var(--ch-chrome);
+}
+
+[data-style='console'] .ch-settings .set-toggle__track {
+  width: 56px;
+  height: 32px;
+}
+
+[data-style='console'] .ch-settings .set-toggle__thumb {
+  width: 24px;
+  height: 24px;
+}
+
+[data-style='console'] .ch-settings .set-toggle__input:checked + .set-toggle__track {
+  border-color: transparent;
+  background: var(--ch-chrome-fill);
+}
+
+[data-style='console']
+  .ch-settings
+  .set-toggle__input:checked
+  + .set-toggle__track
+  .set-toggle__thumb {
+  background: var(--ch-chrome-ink);
+}
+
+[data-style='console'] .ch-settings .set-button,
+[data-style='console'] .ch-settings .set-select {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+}
+
+[data-style='console'] .ch-settings .set-control {
+  border-radius: 16px;
+}
+
+[data-style='console'] .set-dialog {
+  padding: 32px 34px;
+  border-radius: 28px;
+}
+
+[data-style='console'] .set-dialog__title {
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .set-dialog .set-button {
+  min-height: 48px;
+  padding: 0 22px;
+}
+
+/* ---------- About ---------- */
+
+[data-style='console'] .ch-about__body .ab-content {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 18px;
+  max-width: none;
+}
+
+[data-style='console'] .ch-about__body .ab-section {
+  align-content: start;
+  gap: 14px;
+  padding: 30px 34px;
+  border: 1px solid var(--ug-line);
+  border-radius: 28px;
+  background: var(--ug-surface);
+  box-shadow: 0 30px 60px -50px var(--ug-shadow);
+}
+
+[data-style='console'] .ch-about__body .ab-section:nth-child(n + 3) {
+  grid-column: 1 / -1;
+}
+
+[data-style='console'] .ch-about__body .ab-section__title {
+  font-size: clamp(1.5rem, calc(0.6vw + 1.1rem), 2rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+[data-style='console'] .ch-about__body .ab-lede {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-about__body .ab-section p,
+[data-style='console'] .ch-about__body .ab-list {
+  font-size: 1.08rem;
+}
+
+[data-style='console'] .ch-about__body .ab-list {
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+[data-style='console'] .ch-about__body .ab-list li {
+  position: relative;
+  padding-left: 28px;
+}
+
+[data-style='console'] .ch-about__body .ab-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.6em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ch-chrome-fill);
+}
+
+/* Columns pack the groups, which differ a lot in length, without gaps under the short ones. */
+[data-style='console'] .ch-about__body .ab-credits {
+  display: block;
+  margin-top: 6px;
+  column-gap: 14px;
+  column-width: 380px;
+}
+
+[data-style='console'] .ch-about__body .ab-credits__group {
+  break-inside: avoid;
+  margin-bottom: 14px;
+  gap: 12px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: var(--ug-surface-2);
+}
+
+[data-style='console'] .ch-about__body .ab-credits__heading {
+  justify-self: start;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ug-ink);
+  color: var(--ug-bg);
+  font-size: 0.95rem;
+}
+
+[data-style='console'] .ch-about__body .ab-credit__title b {
+  font-size: 1.05rem;
+}
+
+/* ---------- The server closet ---------- */
+
+[data-style='console'] .ch-closet__room {
+  padding: clamp(24px, 2.4vw, 40px);
+  border: 1px solid var(--ug-line);
+  border-radius: 32px;
+  background:
+    radial-gradient(
+      50% 80% at 0% 0%,
+      color-mix(in srgb, var(--ch-chrome) 14%, transparent),
+      transparent 70%
+    ),
+    var(--ug-surface);
+  box-shadow: 0 40px 80px -56px var(--ug-shadow);
+}
+
+/* The page heading already names the room. */
+[data-style='console'] .ch-closet .cl-title {
+  display: none;
+}
+
+[data-style='console'] .ch-closet .ch-page-head {
+  margin-bottom: 24px;
+}
+
+[data-style='console'] .ch-closet .ch-page-head__title {
+  font-size: clamp(2.4rem, 3.4vw, 4rem);
+}
+
+[data-style='console'] .ch-closet .cl-status {
+  max-width: none;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+[data-style='console'] .ch-closet .cl-room {
+  gap: 18px;
+}
+
+[data-style='console'] .ch-closet .cl-canvas {
+  height: clamp(300px, 46vh, 540px);
+}
+
+/* The locked door: a narrower card, and warm light leaking from under the door. */
+[data-style='console'] .ch-closet__room:has(.cl-locked) {
+  max-width: 1080px;
+}
+
+[data-style='console'] .ch-closet .cl-door {
+  overflow: visible;
+}
+
+[data-style='console'] .ch-closet .cl-door::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: -14px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #ffb86b, rgba(255, 184, 107, 0));
+  animation: ch-hum 3.2s ease-in-out infinite;
+}
+
+@keyframes ch-hum {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+[data-style='console'] .ch-closet .cl-hint {
+  font-size: 1.05rem;
+}
+
+[data-style='console'] .ch-closet .cl-canvas {
+  border-radius: 22px;
+}
+
+[data-style='console'] .ch-closet .cl-door {
+  border-radius: 16px 16px 6px 6px;
+}
+
+/* The shared closet's progress bar is only styled by the Machine Room; Console draws its own. */
+[data-style='console'] .ch-closet .cl-bar {
+  position: relative;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+}
+
+[data-style='console'] .ch-closet .cl-bar .bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ch-chrome-fill);
+}
+
+[data-style='console'] .ch-closet .cl-switch {
+  min-height: 52px;
+  padding: 0 22px 0 14px;
+  border-color: var(--ug-line-strong);
+  background: var(--ug-surface-2);
+}
+
+[data-style='console'] .ch-closet .cl-switch.is-on .cl-switch__lever {
+  background: var(--ch-chrome);
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 1100px) {
+  [data-style='console'] .ch-settings__layout,
+  [data-style='console'] .ch-about__body .ab-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='console'] .ch-settings-nav {
+    position: static;
+  }
+
+  [data-style='console'] .ch-settings-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  [data-style='console'] .ch-settings-nav__link {
+    width: auto;
+  }
+}

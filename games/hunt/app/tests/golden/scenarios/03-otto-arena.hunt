@@ -1,0 +1,15 @@
+# Four Classic Ottos, re-entering after every death (otto's quit()).
+seed 20260924
+init
+join otto1 - c
+join otto2 - c
+join otto3 - c
+join otto4 - c
+bot otto1 1
+bot otto2 2
+bot otto3 3
+bot otto4 4
+autorejoin 1
+fullstep 3
+step 1500
+full

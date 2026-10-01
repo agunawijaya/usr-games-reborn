@@ -1,0 +1,39 @@
+{
+  "id": "sail",
+  "title": "Age-of-sail battles",
+  "tagline": "Command a wooden warship in the age of sail.",
+  "teaser": "Trim your sails to the wind, choose your broadside and close to boarding range. Historic sea battles, one ship at a time.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 40],
+  "status": "adopting",
+  "accent": "#3a86c8",
+  "emblem": "M7 34h34l-6 8H13zM24 34V6M24 8l13 22H24M22 11L11 30h11",
+  "inspiredBy": {
+    "program": "sail",
+    "originalTitle": "sail",
+    "uiTitle": "sail",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/sail/app",
+    "output": "play/sail/"
+  },
+  "manPage": {
+    "synopsis": "sail — steer by the wind, load your guns, win the engagement.",
+    "description": "Dave Riggle wrote the first version on a PDP-11/70 in 1980, with Ed Wang as co-author and Craig Leres refitting it later. Its scenarios are drawn from real engagements.",
+    "seeAlso": ["trek", "hunt"]
+  },
+  "howToPlay": [
+    "Choose a ship and a battle.",
+    "Turn with the wind and pick when to fire your broadside.",
+    "Close in to board, or keep your distance and outsail them."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@bsdgames/hunt-fancy-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Hunt — Ricochet: hunt(6), the 1985 maze deathmatch, as a zero-raster neon arena. Engine ported function by function from huntd and golden-tested against the real daemon code.",
+  "author": "Agun Wijaya",
+  "license": "MIT",
+  "scripts": {
+    "serve": "node scripts/serve.mjs 5206",
+    "test": "node --test tests/*.test.js",
+    "check:raster": "node scripts/check-no-raster.mjs",
+    "oracle": "node scripts/oracle/capture.mjs",
+    "shots": "node scripts/shots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

@@ -1,0 +1,60 @@
+# Crafted open arena: mirrors, a door, walls; shots in every direction.
+seed 4242
+maze
++-------------------------------------------------+
+|                                                 |
+|                                                 |
+|                                           /     |
+|                                                 |
+|         \                   /                   |
+|                                                 |
+|                                                 |
+|                       |                         |
+|                                                 |
+|                                       /    \    |
+|                                                 |
+|                   +-+                           |
+|                                                 |
+|                                                 |
+|         \                   /                   |
+|                                                 |
+|                                                 |
+|                                           \     |
+|                   #                             |
+|                                                 |
+|                                                 |
++-------------------------------------------------+
+join east - c
+join south - c
+join west - c
+join north - c
+join dummy - c
+place east 5 2 >
+place south 7 40 v
+place west 10 48 <
+place north 20 44 ^
+place dummy 20 2 ^
+set east ammo 300
+set south ammo 300
+set west ammo 300
+set north ammo 300
+full
+key east f
+key south f
+key west f
+key north f
+fullstep 18
+key east jf
+key south lf
+key west kf
+key north hf
+fullstep 18
+key east kgjg
+key west LfHf
+key north Kf
+step 30
+key south LlffhJf
+key east jjjjjjjjjjjjjjlllllllllllllllllf
+step 60
+key west hhhhhhhhhhhhhhhhhhhhhhhhhhhoKOfkkf
+step 50

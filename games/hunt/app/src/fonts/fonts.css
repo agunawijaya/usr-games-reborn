@@ -1,0 +1,36 @@
+/* The two families this game used to fetch from Google Fonts, served from the game's own
+   folder so it makes no network requests (/usr/games Reborn, hard rule 4). Latin subsets of the
+   @fontsource builds, all under the SIL Open Font License 1.1; see LICENSES/FONTS.md at the
+   repository root. Family names match the game's own styles, so nothing else changes. */
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./chakra-petch-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./chakra-petch-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./chakra-petch-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('./jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+}

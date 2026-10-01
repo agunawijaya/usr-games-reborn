@@ -1,0 +1,263 @@
+/* The man page: a manual entry set like the real thing, with a run panel beside it. */
+
+[data-style='machine-room'] .screen__back {
+  margin: 4px 0 var(--gap);
+}
+
+[data-style='machine-room'] .manpage {
+  --man-indent: clamp(150px, 10.5vw, 210px);
+  padding: clamp(20px, 2.4vw, 44px) clamp(22px, 3vw, 56px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+}
+
+[data-style='machine-room'] .manpage__header,
+[data-style='machine-room'] .manpage__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .manpage__header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ug-line);
+}
+
+[data-style='machine-room'] .manpage__footer {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ug-line);
+  font-weight: 400;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .manpage__book {
+  font-family: var(--title-font);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-style='machine-room'] .manpage__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 22vw, 400px);
+  gap: clamp(28px, 3.4vw, 64px);
+  margin-top: 26px;
+}
+
+[data-style='machine-room'] .man-section {
+  display: grid;
+  grid-template-columns: var(--man-indent) minmax(0, 1fr);
+  gap: 8px 20px;
+  padding: 14px 0 18px;
+}
+
+[data-style='machine-room'] .man-section + .man-section {
+  border-top: 1px dotted color-mix(in srgb, var(--ug-line) 80%, transparent);
+}
+
+[data-style='machine-room'] .man-section__heading {
+  font-family: var(--ug-font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ug-ink);
+  scroll-margin-top: 24px;
+}
+
+[data-style='machine-room'] .man-section__heading::before {
+  content: var(--mark);
+  margin-right: 0.4em;
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'] .man-section__body {
+  display: grid;
+  gap: 12px;
+  max-width: 68ch;
+  line-height: 1.6;
+}
+
+[data-style='machine-room'] .man-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.4em;
+}
+
+[data-style='machine-room'] .man-name b {
+  font-family: var(--ug-font-mono);
+}
+
+[data-style='machine-room'] .man-name__title {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  font-size: calc(var(--fs-display) * var(--title-scale));
+  line-height: 1.1;
+  color: var(--ug-ink);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .man-name__tagline {
+  flex-basis: 100%;
+  margin-top: 6px;
+  color: var(--ug-ink-2);
+  font-size: 1.08rem;
+}
+
+[data-style='machine-room'] .man-synopsis code {
+  color: var(--ug-accent);
+}
+
+[data-style='machine-room'] .man-lede {
+  font-size: 1.1rem;
+}
+
+[data-style='machine-room'] .man-note {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .man-note code {
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .man-xrefs {
+  font-family: var(--ug-font-mono);
+}
+
+[data-style='machine-room'] .man-xref {
+  color: var(--ug-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+[data-style='machine-room'] .pkg-list {
+  display: grid;
+  gap: 6px;
+}
+
+[data-style='machine-room'] .pkg {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  grid-template-areas: 'state title xp' 'state desc xp';
+  column-gap: 12px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ug-surface-2) 60%, transparent);
+}
+
+[data-style='machine-room'] .pkg__state {
+  grid-area: state;
+  font-family: var(--ug-font-mono);
+  font-weight: 700;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .pkg--installed .pkg__state {
+  color: var(--ug-good);
+}
+
+[data-style='machine-room'] .pkg__title {
+  grid-area: title;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  font-weight: 700;
+}
+
+[data-style='machine-room'] .pkg__name {
+  color: var(--ug-ink-2);
+  font-size: var(--fs-meta);
+  font-weight: 400;
+}
+
+[data-style='machine-room'] .pkg__desc {
+  grid-area: desc;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .pkg__xp {
+  grid-area: xp;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+  white-space: nowrap;
+}
+
+[data-style='machine-room'] .man-aside {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+
+[data-style='machine-room'] .monitor--man {
+  aspect-ratio: 4 / 3;
+}
+
+[data-style='machine-room'] .monitor--man .monitor__emblem {
+  width: 46%;
+}
+
+[data-style='machine-room'] .button--run {
+  width: 100%;
+  min-height: 58px;
+  font-size: 1.2rem;
+}
+
+[data-style='machine-room'] .man-aside__status {
+  color: var(--ug-ink-2);
+  font-size: 1rem;
+}
+
+[data-style='machine-room'] .facts {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--ug-line);
+}
+
+[data-style='machine-room'] .facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ug-line);
+}
+
+[data-style='machine-room'] .facts dt {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .facts dd {
+  text-align: right;
+}
+
+@media (max-width: 1100px) {
+  [data-style='machine-room'] .manpage__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='machine-room'] .man-aside {
+    position: static;
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  [data-style='machine-room'] .man-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='machine-room'] .man-aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

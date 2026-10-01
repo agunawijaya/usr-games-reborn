@@ -1,0 +1,136 @@
+{
+  "id": "atc",
+  "title": "Skyloom",
+  "tagline": "Weave the sky. Land them all.",
+  "teaser": "Jets and props pour into your airspace. Draw their routes through beacons, stack their altitudes, and thread them onto the runway in a perfect string of lights. Born on Berkeley terminals in 1986 — now with a sky you can tilt.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "shipped",
+  "accent": "#c2337a",
+  "emblem": "M24 7a17 17 0 1 0 0 34a17 17 0 1 0 0-34M24 13v22M24 21l-11 9M24 21l11 9M24 32l-5 4M24 32l5 4",
+  "inspiredBy": {
+    "program": "atc",
+    "originalTitle": "atc",
+    "uiTitle": "the 1986 Berkeley air traffic control game",
+    "year": 1986
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "skyloom — weave routes through a busy sky; land every plane and send the rest out at 9 000 ft.",
+    "description": "Ed James wrote atc at UC Berkeley in 1986–87, working, as its manual cheerfully admits, from a secondhand account of an older PC game. Skyloom keeps its tick-by-tick rules exactly and lets you draw routes, see conflicts coming, tilt the radar to read altitude, and fly a campaign, an endless ladder and a shared daily sky.",
+    "seeAlso": ["atc-classic", "trek", "robots"]
+  },
+  "howToPlay": [
+    "Drag from a plane to draw its route through beacons to its gate or runway.",
+    "Keep every pair more than a cell apart, or two thousand feet; the ring warns you ticks ahead.",
+    "Land at 0 ft along the runway, leave at 9 000 ft through the right gate."
+  ],
+  "cronGoals": [
+    {
+      "id": "planes-safe",
+      "stat": "planesSafe",
+      "label": "Bring {n} planes home safely",
+      "min": 15,
+      "max": 40
+    },
+    {
+      "id": "landings",
+      "stat": "landings",
+      "label": "Land {n} planes",
+      "min": 8,
+      "max": 25
+    }
+  ],
+  "controls": [
+    { "action": "next-plane", "label": "Most urgent plane", "keys": ["Tab"] },
+    { "action": "next-tick", "label": "Next tick now", "keys": ["Space"] },
+    { "action": "tilt", "label": "Altitude Tilt (hold)", "keys": ["KeyT"] },
+    { "action": "terminal", "label": "Terminal mode", "keys": ["Backquote"] },
+    { "action": "hold-left", "label": "Hold left", "keys": ["BracketLeft"] },
+    { "action": "hold-right", "label": "Hold right", "keys": ["BracketRight"] }
+  ],
+  "packages": [
+    {
+      "id": "first-light",
+      "title": "First light",
+      "description": "Land your first plane.",
+      "tier": "core"
+    },
+    {
+      "id": "beacon-weaver",
+      "title": "Beacon weaver",
+      "description": "Send five planes through the same beacon in one sky.",
+      "tier": "core"
+    },
+    {
+      "id": "left-turn-at-last",
+      "title": "Left turn at last",
+      "description": "Fly a full hold to the left, the turn the 1986 manual promised.",
+      "tier": "core"
+    },
+    {
+      "id": "typist",
+      "title": "Typist",
+      "description": "Give fifty orders in Terminal mode.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Fly seven Daily Skies.",
+      "tier": "core"
+    },
+    {
+      "id": "shell-escape",
+      "title": "Shell escape",
+      "description": "Find the way out the 1986 game left open.",
+      "tier": "core",
+      "hidden": true
+    },
+    {
+      "id": "string-of-pearls",
+      "title": "String of pearls",
+      "description": "Land three planes on three ticks in a row.",
+      "tier": "extra"
+    },
+    {
+      "id": "running-on-fumes",
+      "title": "Running on fumes",
+      "description": "Land a plane with two moves of fuel or less to spare.",
+      "tier": "extra"
+    },
+    {
+      "id": "alphabet-soup",
+      "title": "Alphabet soup",
+      "description": "Fly all twenty-six letters in one sky.",
+      "tier": "extra"
+    },
+    {
+      "id": "clean-shift",
+      "title": "Clean shift",
+      "description": "Earn all three stars on a shift.",
+      "tier": "extra"
+    },
+    {
+      "id": "night-owl",
+      "title": "Night owl",
+      "description": "Finish the shift in the tower at midnight.",
+      "tier": "rare"
+    },
+    {
+      "id": "killer-instinct",
+      "title": "Overdrive",
+      "description": "Bring 25 planes home safely on Overdrive, the fastest classic sky.",
+      "tier": "rare"
+    }
+  ]
+}

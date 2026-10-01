@@ -1,0 +1,35 @@
+/* The two families this game used to fetch from Google Fonts, bundled with the game so it makes
+   no network requests (/usr/games Reborn, hard rule 4). Latin subsets of the @fontsource builds,
+   both under the SIL Open Font License 1.1; see LICENSES/FONTS.md at the repository root. */
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('./orbitron-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./rajdhani-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./rajdhani-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./rajdhani-latin-700-normal.woff2') format('woff2');
+}

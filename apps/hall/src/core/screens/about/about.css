@@ -1,0 +1,82 @@
+/* The shared About content; styles restyle `.ab-*` inside their own scope when they want to. */
+
+.ab-content {
+  display: grid;
+  gap: 28px;
+  max-width: 1100px;
+  color: var(--ug-ink);
+  font-family: var(--ug-font-body);
+  line-height: 1.6;
+}
+
+.ab-section {
+  display: grid;
+  gap: 12px;
+}
+
+.ab-section__title {
+  margin: 0;
+  font-family: var(--ug-font-display);
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+
+.ab-section p {
+  max-width: 72ch;
+  margin: 0;
+}
+
+.ab-lede {
+  font-size: 1.15rem;
+}
+
+.ab-list {
+  display: grid;
+  gap: 8px;
+  max-width: 72ch;
+  margin: 0;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+
+.ab-credits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px 28px;
+}
+
+.ab-credits__group {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.ab-credits__heading {
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ug-line);
+  font-size: 1.05rem;
+}
+
+.ab-credits__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ab-credit__title {
+  font-size: 1rem;
+}
+
+.ab-credit__origin {
+  color: var(--ug-ink-2);
+  font-family: var(--ug-font-mono);
+  font-size: 0.9rem;
+}
+
+.ab-credit__text {
+  color: var(--ug-ink-2);
+  font-size: 1rem;
+}

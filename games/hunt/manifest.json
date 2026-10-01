@@ -1,0 +1,129 @@
+{
+  "id": "hunt",
+  "title": "Hunt — Ricochet",
+  "tagline": "A maze, a few rivals and nowhere to hide.",
+  "teaser": "The 1980s maze free-for-all, as a neon arena lit by line of sight. Bank shots off mirrors, roll slime down the corridors, grab boots and charges, and outplay the bots — the rules come straight from the original game server.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "shipped",
+  "accent": "#ff6b4a",
+  "emblem": "M7 7h34v34H7zM7 17h12M29 7v14h-8M17 17v14M17 31h14M29 31v10M37 17v14",
+  "inspiredBy": {
+    "program": "hunt",
+    "originalTitle": "hunt",
+    "uiTitle": "hunt",
+    "year": 1983
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/hunt/app",
+    "output": "play/hunt/"
+  },
+  "manPage": {
+    "synopsis": "hunt — move through the maze, find rivals, be the last one standing.",
+    "description": "Conrad Huang, Ken Arnold and Greg Couch built hunt at the UCSF Computer Graphics Lab as a game played across many terminals in one shared maze.",
+    "seeAlso": ["robots", "worm"]
+  },
+  "howToPlay": [
+    "Move with WASD, turn with the arrows or the mouse; Space fires.",
+    "Bank shots off mirrors and use charges to break walls.",
+    "End the match from the pause menu (Esc) to have it count."
+  ],
+  "cronGoals": [
+    {
+      "id": "tags",
+      "stat": "tags",
+      "label": "Tag {n} rivals",
+      "min": 10,
+      "max": 30
+    },
+    {
+      "id": "bank-shots",
+      "stat": "bankShots",
+      "label": "Bank {n} shots off mirrors",
+      "min": 3,
+      "max": 10
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-tag",
+      "title": "First tag",
+      "description": "Tag a rival for the first time.",
+      "tier": "core"
+    },
+    {
+      "id": "bank-shot",
+      "title": "Bank shot",
+      "description": "Bounce a shot off a mirror.",
+      "tier": "core"
+    },
+    {
+      "id": "defuser",
+      "title": "Defuser",
+      "description": "Step on a mine and turn it into ammunition.",
+      "tier": "core"
+    },
+    {
+      "id": "wall-breaker",
+      "title": "Wall breaker",
+      "description": "Launch a seven-by-seven charge.",
+      "tier": "core"
+    },
+    {
+      "id": "green-tide",
+      "title": "Green tide",
+      "description": "Send out a wave of slime.",
+      "tier": "core"
+    },
+    {
+      "id": "hat-trick",
+      "title": "Hat trick",
+      "description": "Tag three rivals without being hit out in between.",
+      "tier": "core"
+    },
+    {
+      "id": "good-shield",
+      "title": "Good shield",
+      "description": "Catch a charge you were facing.",
+      "tier": "extra"
+    },
+    {
+      "id": "two-boots",
+      "title": "Two boots",
+      "description": "Pick up the second boot of a pair.",
+      "tier": "extra"
+    },
+    {
+      "id": "ace-tamer",
+      "title": "Ace tamer",
+      "description": "Tag a sharpshooter bot.",
+      "tier": "extra"
+    },
+    {
+      "id": "top-board",
+      "title": "Top of the board",
+      "description": "Lead the scoreboard with five tags against four or more rivals.",
+      "tier": "extra"
+    },
+    {
+      "id": "hall-of-mirrors",
+      "title": "Hall of mirrors",
+      "description": "Bank one shot off three mirrors or more.",
+      "tier": "rare"
+    },
+    {
+      "id": "lift-off",
+      "title": "Lift-off",
+      "description": "Get thrown when a wall grows back under your feet.",
+      "tier": "rare"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hunt — Ricochet</title>
+  <meta name="description" content="hunt(6), the 1985 BSD maze deathmatch, as a zero-raster neon arena: line-of-sight light, mirror ricochets, slime and Otto bots — engine golden-tested against the original daemon.">
+  <!-- /usr/games Reborn: fonts are served from the game's own folder. -->
+  <link href="./src/fonts/fonts.css" rel="stylesheet">
+  <script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
+  <style>
+    :root {
+      --void: #020307;
+      --ink: #d9e4f5;
+      --dim: #7f8ca3;
+      --faint: #3b4558;
+      --panel: rgba(6, 9, 18, 0.72);
+      --line: rgba(120, 160, 255, 0.18);
+      --mint: #5cffc8;
+      --gold: #ffc83a;
+      --ultra: #6f8cff;
+      --red: #ff4d5e;
+      --slime: #7cff4f;
+      --term: #39ff14;
+      --termbg: #070b10;
+      --ui: 'Chakra Petch', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--void); color: var(--ink); font-family: var(--ui); overflow: hidden; }
+    body { user-select: none; -webkit-user-select: none; }
+    #stage { position: fixed; inset: 0; }
+    #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    body.view-classic #gl { visibility: hidden; }
+
+    /* --- the terminal (classic view) ------------------------------------ */
+    #term {
+      position: absolute; margin: 0; padding: 14px 16px;
+      font-family: var(--mono); color: var(--term); background: var(--termbg);
+      line-height: 1.18; white-space: pre; display: none;
+      border: 1px solid rgba(57, 255, 20, 0.25); border-radius: 6px;
+      box-shadow: 0 0 40px rgba(57, 255, 20, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.6);
+      text-shadow: 0 0 4px rgba(57, 255, 20, 0.55);
+    }
+    #term .c-me { color: #eaffea; text-shadow: 0 0 6px #b6ffa8; }
+    #term .c-foe { color: #ffe066; }
+    #term .c-shot { color: #ffffff; }
+    #term .c-goo { color: #a8ff7a; }
+    body.view-classic #term { display: block; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    body.view-split #term { display: block; left: 1.5%; top: 50%; transform: translateY(-50%); }
+    body.view-split #gl { left: 50%; width: 50%; }
+    body.view-split .hud-right, body.view-classic .hud-right { display: none; }
+    body.view-split #card, body.view-classic #card, body.view-classic #weapons, body.view-classic #feed { display: none; }
+    .split-label { position: absolute; top: 12px; font: 600 11px var(--ui); letter-spacing: .22em; color: var(--dim); display: none; }
+    body.view-split .split-label { display: block; }
+
+    /* --- HUD ------------------------------------------------------------ */
+    .hud { position: absolute; pointer-events: none; }
+    body.in-menu .hud, body.in-menu #term { visibility: hidden; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(6px); }
+    #card { left: 16px; top: 14px; width: 272px; padding: 10px 12px 11px; }
+    #card .who { display: flex; align-items: baseline; gap: 8px; font-weight: 700; letter-spacing: .06em; }
+    #card .who .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--mint); box-shadow: 0 0 10px currentColor; }
+    #card .who .name { font-size: 16px; }
+    #card .who .tag { font-size: 11px; color: var(--dim); font-weight: 600; letter-spacing: .14em; }
+    .meter { margin-top: 7px; }
+    .meter .lab { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .12em; color: var(--dim); }
+    .meter .lab b { color: var(--ink); font-family: var(--mono); font-weight: 400; letter-spacing: 0; }
+    .bar { position: relative; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; margin-top: 3px; }
+    .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; transition: width .15s; }
+    #dmgbar i { background: linear-gradient(90deg, #ff9d2e, #ff4d5e); box-shadow: 0 0 10px #ff4d5e; }
+    #ammobar i { background: linear-gradient(90deg, #6f8cff, #5cffc8); box-shadow: 0 0 10px #5cffc8; }
+    #ammobar .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.25); }
+    #cloakbar i { background: linear-gradient(90deg, #8a7bff, #d6c8ff); }
+    .row { display: flex; gap: 10px; align-items: center; margin-top: 8px; font-size: 11px; letter-spacing: .12em; color: var(--dim); }
+    .pips { display: inline-flex; gap: 3px; }
+    .pips span { width: 9px; height: 9px; border-radius: 2px; background: rgba(255,255,255,0.1); }
+    .pips span.on { background: #ffb34a; box-shadow: 0 0 6px #ffb34a; }
+    .chip { padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); color: var(--ink); font-size: 10px; letter-spacing: .1em; }
+    .chip.on { border-color: rgba(92,255,200,.5); color: var(--mint); }
+
+    #scores { right: 16px; top: 14px; width: 262px; padding: 9px 10px; font-size: 12px; }
+    #scores h3, #feed h3 { margin: 0 0 5px; font-size: 10px; letter-spacing: .24em; color: var(--dim); font-weight: 600; }
+    #scores table { width: 100%; border-collapse: collapse; }
+    #scores td { padding: 2px 3px; white-space: nowrap; }
+    #scores td.n { font-family: var(--mono); text-align: right; color: var(--dim); font-size: 11px; }
+    #scores td.s { font-family: var(--mono); text-align: right; }
+    #scores tr.me td { color: #fff; }
+    #scores tr.dead td { opacity: .45; }
+    #scores .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+    #scores .kind { font-size: 9px; color: var(--dim); letter-spacing: .1em; margin-left: 4px; }
+    #scores .cheat { color: var(--red); font-size: 9px; margin-left: 4px; letter-spacing: .1em; }
+
+    #feed { left: 16px; bottom: 16px; width: 380px; padding: 8px 11px; font-size: 12px; }
+    #feed .k { opacity: 1; transition: opacity .6s; margin: 2px 0; font-family: var(--mono); font-size: 11px; }
+    #feed .k.old { opacity: .45; }
+    #msg { margin-top: 6px; min-height: 16px; font-family: var(--mono); font-size: 12px; color: #fff; }
+
+    #radar { right: 16px; bottom: 16px; width: 170px; height: 170px; border-radius: 50%; }
+    #weapons { left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px 8px; font-size: 11px; }
+    #weapons .w { padding: 3px 7px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink); white-space: nowrap; }
+    #weapons .w kbd { font: 700 10px var(--mono); color: var(--mint); margin-right: 4px; }
+    #weapons .w.no { opacity: .35; }
+    #weapons .w .c { color: var(--dim); font-family: var(--mono); margin-left: 3px; }
+
+    #badges { left: 50%; top: 14px; transform: translateX(-50%); display: flex; gap: 8px; }
+    .badge { padding: 4px 10px; border-radius: 6px; font: 700 11px var(--ui); letter-spacing: .2em; display: none; }
+    .badge.on { display: block; }
+    #b-override { background: rgba(255, 50, 70, .15); border: 1px solid rgba(255, 77, 94, .7); color: var(--red); box-shadow: 0 0 18px rgba(255,77,94,.35); }
+    #b-coach { background: rgba(92, 255, 200, .08); border: 1px solid rgba(92,255,200,.45); color: var(--mint); }
+    #b-slow { background: rgba(111,140,255,.1); border: 1px solid rgba(111,140,255,.5); color: var(--ultra); }
+
+    #flashred { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 40, 60, .45)); opacity: 0; transition: opacity .25s; }
+
+    /* --- overlays ------------------------------------------------------- */
+    .overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 40%, rgba(4,7,16,.55), rgba(2,3,7,.92)); }
+    .overlay.on { display: flex; }
+    .sheet { width: min(760px, 94vw); max-height: 92vh; overflow: auto; padding: 22px 26px; }
+    .title { font: 700 44px var(--ui); letter-spacing: .12em; margin: 0; text-shadow: 0 0 24px rgba(92,255,200,.45); }
+    .title span { color: var(--mint); }
+    .sub { color: var(--dim); margin: 4px 0 16px; font-size: 13px; letter-spacing: .04em; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+    .field label { display: block; font-size: 11px; letter-spacing: .18em; color: var(--dim); margin-bottom: 5px; font-weight: 600; }
+    .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+    .seg button, .btn {
+      font: 600 12px var(--ui); letter-spacing: .08em; color: var(--ink); background: rgba(255,255,255,.04);
+      border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer;
+    }
+    .seg button.on { border-color: rgba(92,255,200,.65); color: var(--mint); background: rgba(92,255,200,.08); }
+    .seg button:focus-visible, .btn:focus-visible, input:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+    .note { font-size: 11px; color: var(--dim); margin-top: 5px; min-height: 14px; }
+    input[type=text], input[type=number] { font: 400 13px var(--mono); color: var(--ink); background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; width: 100%; }
+    .actions { display: flex; gap: 10px; margin-top: 18px; align-items: center; }
+    .btn.primary { background: rgba(92,255,200,.14); border-color: rgba(92,255,200,.7); color: #eafff7; font-size: 15px; padding: 9px 22px; box-shadow: 0 0 22px rgba(92,255,200,.25); }
+    .credit { margin-top: 14px; font-size: 11px; color: var(--faint); }
+    .credit a { color: var(--dim); }
+    .keys-grid { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 5px 12px; font-size: 13px; align-items: center; }
+    .keys-grid button { font: 700 12px var(--mono); color: var(--mint); background: rgba(92,255,200,.06); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; cursor: pointer; min-width: 64px; }
+    .keys-grid button.wait { color: #fff; border-color: var(--gold); }
+    #help .keys { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 4px 12px; font-size: 13px; }
+    #help kbd { font: 700 12px var(--mono); color: var(--mint); }
+    #help p { color: var(--dim); font-size: 13px; line-height: 1.5; }
+
+    #respawn { background: radial-gradient(ellipse at center, rgba(40,4,10,.35), rgba(2,3,7,.55)); }
+    #respawn .box { text-align: center; padding: 18px 26px; }
+    #respawn .cause { font: 700 22px var(--mono); color: #fff; letter-spacing: .02em; }
+    #respawn .cd { color: var(--dim); margin: 8px 0 12px; font-size: 13px; }
+
+    .side { position: absolute; top: 90px; width: 300px; padding: 12px 14px; display: none; pointer-events: auto; font-size: 12px; }
+    .side.on { display: block; }
+    .side h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .2em; }
+    #coachp { left: 16px; top: 250px; }
+    #coachp h3 { color: var(--mint); }
+    #overp { right: 16px; top: 250px; }
+    #overp h3 { color: var(--red); }
+    #overp label { display: flex; gap: 8px; align-items: center; margin: 5px 0; cursor: pointer; }
+    #overp label small { color: var(--dim); margin-left: auto; }
+    #coachp .line { font-family: var(--mono); margin: 3px 0; }
+
+    #sound { position: absolute; right: 196px; bottom: 18px; pointer-events: auto; }
+    #fps { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); font: 10px var(--mono); color: var(--faint); }
+
+    #nogl { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); color: var(--dim); font-size: 12px; display: none; }
+    body.nogl #nogl { display: block; }
+
+    @media (max-width: 900px) {
+      #scores, #radar, #weapons { display: none; }
+      #card { width: 220px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="in-menu">
+  <div id="stage">
+    <canvas id="gl" aria-label="The arena"></canvas>
+    <pre id="term" aria-label="Classic terminal view"></pre>
+    <div class="split-label" style="left:2%">CLASSIC · hunt(6) terminal</div>
+    <div class="split-label" style="left:51%">MODERN · Ricochet</div>
+    <div id="flashred"></div>
+
+    <div id="card" class="hud panel hud-left">
+      <div class="who"><span class="dot" id="c-dot"></span><span class="name" id="c-name">you</span><span class="tag" id="c-tag">FREE FOR ALL</span></div>
+      <div class="meter" id="m-dmg"><div class="lab"><span>DAMAGE</span><b id="c-dmg">0 / 10</b></div><div class="bar" id="dmgbar"><i></i></div></div>
+      <div class="meter"><div class="lab"><span>AMMO</span><b id="c-ammo">15</b></div><div class="bar" id="ammobar"><i></i></div></div>
+      <div class="meter" id="m-cloak"><div class="lab"><span id="c-cloaklab">CLOAK</span><b id="c-cloak">20 moves</b></div><div class="bar" id="cloakbar"><i></i></div></div>
+      <div class="row"><span>GUN</span><span class="pips" id="c-gun"><span></span><span></span><span></span></span><span class="chip" id="c-boots">BOOTS</span><span class="chip" id="c-face">FACING &rarr;</span></div>
+    </div>
+
+    <div id="scores" class="hud panel hud-right"><h3>SCOREBOARD · KILLS ÷ ENTRIES</h3><table id="s-table"></table></div>
+    <div id="feed" class="hud panel"><h3>KILL FEED</h3><div id="f-list"></div><div id="msg"></div></div>
+    <canvas id="radar" class="hud panel hud-right" width="340" height="340" aria-label="Gunshot radar"></canvas>
+    <div id="weapons" class="hud panel"></div>
+    <div id="badges" class="hud"><div class="badge" id="b-override">OVERRIDE ACTIVE</div><div class="badge" id="b-coach">COACH</div><div class="badge" id="b-slow">SLOW MOTION</div></div>
+    <button id="sound" class="btn hud" style="visibility:visible" aria-pressed="false">SOUND: OFF</button>
+    <div id="fps" class="hud"></div>
+    <div id="nogl">WebGL is not available here — playing in the classic terminal view.</div>
+
+    <div id="coachp" class="side panel" aria-live="polite"><h3>COACH · RICOCHET PREVIEW</h3><div id="coach-body"></div><div class="note">Backtick toggles. Shows where your next shot goes, every mirror flip included.</div></div>
+    <div id="overp" class="side panel"><h3>OVERRIDE</h3><div id="over-body"></div><div class="note">Backslash toggles. Any flag marks your score as cheated for this match.</div></div>
+
+    <div id="respawn" class="overlay"><div class="box panel"><div class="cause" id="r-cause"></div><div class="cd" id="r-cd"></div>
+      <div class="seg" style="justify-content:center"><button data-enter="c">Enter cloaked <kbd>C</kbd></button><button data-enter="s">Scanning <kbd>S</kbd></button><button data-enter="f">Flying <kbd>F</kbd></button></div></div></div>
+
+    <div id="setup" class="overlay on"><div class="sheet panel">
+      <h1 class="title">HUNT <span>—</span> RICOCHET</h1>
+      <p class="sub">hunt(6), the maze deathmatch of 4.3BSD (Conrad Huang, Greg Couch, Ken Arnold — UCSF, 1985), in a neon arena built only from code.</p>
+      <div class="grid">
+        <div class="field"><label>NAME</label><input id="o-name" type="text" maxlength="10" value="you" spellcheck="false"></div>
+        <div class="field"><label>MODE</label><div class="seg" data-opt="mode"><button data-v="ffa">Free for all</button><button data-v="teams">Two teams</button></div><div class="note" data-note="mode"></div></div>
+        <div class="field"><label>BOTS</label><div class="seg" data-opt="bots"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button><button data-v="8">8</button></div></div>
+        <div class="field"><label>DIFFICULTY</label><div class="seg" data-opt="difficulty"><button data-v="novice">Novice</button><button data-v="otto">Classic Otto</button><button data-v="sharp">Sharpshooter</button><button data-v="mixed">Mixed</button></div><div class="note" data-note="difficulty"></div></div>
+        <div class="field"><label>ARENA</label><div class="seg" data-opt="arena"><button data-v="classic">Classic</button><button data-v="veteran">Veteran</button><button data-v="ricochet">Ricochet</button></div><div class="note" data-note="arena"></div></div>
+        <div class="field"><label>MAP SEED</label><div style="display:flex;gap:6px"><input id="o-seed" type="number" value="1985"><button class="btn" id="o-rand" title="Random seed">Random</button></div></div>
+        <div class="field"><label>SPEED</label><div class="seg" data-opt="speed"><button data-v="relaxed">Relaxed</button><button data-v="standard">Standard</button><button data-v="frantic">Frantic</button></div><div class="note" data-note="speed"></div></div>
+        <div class="field"><label>ENTER AS</label><div class="seg" data-opt="enter"><button data-v="c">Cloaked</button><button data-v="s">Scanning</button><button data-v="f">Flying</button></div></div>
+        <div class="field"><label>CONTROLS</label><div class="seg" data-opt="scheme"><button data-v="modern">Modern · WASD + mouse</button><button data-v="classic">Classic · hjkl</button></div></div>
+        <div class="field"><label>VIEW · QUALITY</label><div class="seg" data-opt="view"><button data-v="modern">3D</button><button data-v="split">Split</button><button data-v="classic">Terminal</button></div><div class="seg" data-opt="quality" style="margin-top:4px"><button data-v="auto">Auto</button><button data-v="high">High</button><button data-v="low">Low</button></div></div>
+      </div>
+      <div class="actions"><button class="btn primary" id="o-start">ENTER THE MAZE</button><button class="btn" id="o-help">How to play</button><button class="btn" id="o-keys">Controls</button></div>
+      <div class="credit">Engine: a function-by-function port of huntd and otto.c, golden-tested against the original. Original source: <a href="https://github.com/vattam/BSDGames/tree/master/hunt" target="_blank" rel="noopener">vattam/BSDGames</a>. BSDGames Reborn · MIT.</div>
+    </div></div>
+
+    <div id="pause" class="overlay"><div class="sheet panel" style="width:min(520px,94vw)">
+      <h2 class="title" style="font-size:30px">PAUSED</h2>
+      <div class="field" style="margin-top:12px"><label>VIEW</label><div class="seg" data-opt="view"><button data-v="modern">3D</button><button data-v="split">Split</button><button data-v="classic">Terminal</button></div></div>
+      <div class="field" style="margin-top:10px"><label>CAMERA</label><div class="seg" data-opt="camera"><button data-v="overview">Overview</button><button data-v="follow">Follow</button></div></div>
+      <div class="field" style="margin-top:10px"><label>QUALITY</label><div class="seg" data-opt="quality"><button data-v="auto">Auto</button><button data-v="high">High</button><button data-v="low">Low</button></div></div>
+      <div class="actions"><button class="btn primary" id="p-resume">Resume</button><button class="btn" id="p-restart">Restart seed</button><button class="btn" id="p-new">New match</button><button class="btn" id="p-help">Help</button><button class="btn" id="p-keys">Controls</button></div>
+    </div></div>
+
+    <div id="keys" class="overlay"><div class="sheet panel" style="width:min(640px,94vw)">
+      <h2 class="title" style="font-size:26px">CONTROLS</h2>
+      <p class="sub">Modern keys can be remapped: click a key, then press the new one (Esc cancels). Classic keys are hunt's own and stay as they are. Every action is still one hunt keystroke.</p>
+      <div id="keys-list" class="keys-grid"></div>
+      <div class="actions"><button class="btn primary" id="k-close">Done</button><button class="btn" id="k-reset">Reset to defaults</button></div>
+    </div></div>
+
+    <div id="help" class="overlay"><div class="sheet panel">
+      <h2 class="title" style="font-size:28px">HOW TO PLAY</h2>
+      <p>Kill the others before they kill you. Your score is kills per entry. You <b>move without turning</b> — facing is separate, and you only fire the way you face. You only see ahead and to your sides, never behind; what you saw stays on your map as a ghost. Firing shows every player where you are. Shots move five cells per step, bounce 90° off mirrors — and every hit <b>flips the mirror</b>. Any blast destroys interior walls; they grow back, sometimes as mirrors or doors. Doors scatter shots.</p>
+      <div class="keys" id="help-keys"></div>
+      <p>Esc pause · <kbd>?</kbd> help · <kbd>`</kbd> Coach (ricochet preview) · <kbd>\</kbd> Override (cheats) · <kbd>Tab</kbd> scores · <kbd>F2</kbd> view · <kbd>F3</kbd> camera</p>
+      <div class="actions"><button class="btn primary" id="h-close">Got it</button></div>
+    </div></div>
+  </div>
+  <!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

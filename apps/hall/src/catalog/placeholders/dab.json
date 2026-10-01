@@ -1,0 +1,37 @@
+{
+  "id": "dab",
+  "title": "Dots and boxes",
+  "tagline": "Draw lines, close boxes, claim the grid.",
+  "teaser": "Take turns joining dots. Close a box and it is yours, and you move again. Give away as little as you can.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 10],
+  "status": "coming-soon",
+  "accent": "#b05cd6",
+  "emblem": "M10 10h.01M24 10h.01M38 10h.01M10 24h.01M24 24h.01M38 24h.01M10 38h.01M24 38h.01M38 38h.01M10 10h14v14H10zM24 24h14M38 24v14",
+  "inspiredBy": {
+    "program": "dab",
+    "originalTitle": "dab",
+    "uiTitle": "dab",
+    "year": 2003
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "dab — draw a line; complete a box to score and go again.",
+    "description": "Christos Zoulas’s dots and boxes, the youngest game in the directory, with its manual by Thomas Klausner.",
+    "seeAlso": ["gomoku", "letters"]
+  },
+  "howToPlay": [
+    "Take turns drawing a line between two dots.",
+    "Close the fourth side of a box to claim it and go again.",
+    "Own the most boxes when the grid is full."
+  ]
+}

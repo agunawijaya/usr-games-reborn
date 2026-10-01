@@ -1,0 +1,37 @@
+{
+  "id": "snake",
+  "title": "Snake escape",
+  "tagline": "Grab the cash, dodge the snake, reach the exit.",
+  "teaser": "Collect money around the room while a snake slithers after you, then slip out through the exit before it catches up.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 6],
+  "status": "coming-soon",
+  "accent": "#2fbf71",
+  "emblem": "M37 10H18a7 7 0 0 0 0 14h12a7 7 0 0 1 0 14H10M41 10h.01",
+  "inspiredBy": {
+    "program": "snake",
+    "originalTitle": "snake",
+    "uiTitle": "snake",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "snake — collect, keep clear of the snake, escape.",
+    "description": "A chase from the 1980 BSD games: a six-square snake follows you while you pick up money and look for the way out.",
+    "seeAlso": ["robots", "worm"]
+  },
+  "howToPlay": [
+    "Move around the room collecting money.",
+    "Keep away from the snake chasing you.",
+    "Slip out through the exit before it catches you."
+  ]
+}

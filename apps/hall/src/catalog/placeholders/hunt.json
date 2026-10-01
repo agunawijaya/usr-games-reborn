@@ -1,0 +1,39 @@
+{
+  "id": "hunt",
+  "title": "Maze arena",
+  "tagline": "A maze, a few rivals and nowhere to hide.",
+  "teaser": "Prowl a maze against rivals, pick your moment and outlast everyone else in the arena.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "adopting",
+  "accent": "#ff6b4a",
+  "emblem": "M7 7h34v34H7zM7 17h12M29 7v14h-8M17 17v14M17 31h14M29 31v10M37 17v14",
+  "inspiredBy": {
+    "program": "hunt",
+    "originalTitle": "hunt",
+    "uiTitle": "hunt",
+    "year": 1983
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/hunt/app",
+    "output": "play/hunt/"
+  },
+  "manPage": {
+    "synopsis": "hunt — move through the maze, find rivals, be the last one standing.",
+    "description": "Conrad Huang, Ken Arnold and Greg Couch built hunt at the UCSF Computer Graphics Lab as a game played across many terminals in one shared maze.",
+    "seeAlso": ["robots", "worm"]
+  },
+  "howToPlay": [
+    "Move through the maze and scout for rivals.",
+    "Pick your moment to strike, then slip away.",
+    "Be the last one left in the arena."
+  ]
+}

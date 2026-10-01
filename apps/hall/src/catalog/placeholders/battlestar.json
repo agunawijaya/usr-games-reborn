@@ -1,0 +1,39 @@
+{
+  "id": "battlestar",
+  "title": "Starship adventure",
+  "tagline": "Wake up aboard a starship and find your way home.",
+  "teaser": "A text adventure that starts aboard a starship and leads to a tropical world. Explore, collect and puzzle your way out.",
+  "category": "stories",
+  "directory": "/usr/games/stories",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [20, 60],
+  "status": "adopting",
+  "accent": "#c77dff",
+  "emblem": "M24 5c7 6 9 17 6 29H18C15 22 17 11 24 5zM18 34l-6 7h8M30 34l6 7h-8M24 16a3 3 0 1 0 0 6a3 3 0 1 0 0-6",
+  "inspiredBy": {
+    "program": "battlestar",
+    "originalTitle": "battlestar",
+    "uiTitle": "battlestar",
+    "year": 1979
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/battlestar/app",
+    "output": "play/battlestar/"
+  },
+  "manPage": {
+    "synopsis": "battlestar — type what you want to do: explore, take, use, escape.",
+    "description": "David Riggle wrote the original in 1979 to try out the C language, with help from Chris Guthrie, Peter Da Silva, Kevin Brown and Edward Wang.",
+    "seeAlso": ["adventure", "hack", "phantasia"]
+  },
+  "howToPlay": [
+    "Type short commands like \"go north\" or \"take lamp\".",
+    "Explore the ship, collect useful things and solve puzzles.",
+    "Find your way off the ship and to the island."
+  ]
+}

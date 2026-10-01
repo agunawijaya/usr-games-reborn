@@ -1,0 +1,360 @@
+/* The console header, the prompt, the top line and shared controls. */
+
+[data-style='machine-room'] .console {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 2vw, 36px);
+  padding-top: clamp(14px, 1.6vh, 24px);
+  padding-bottom: 10px;
+}
+
+[data-style='machine-room'] .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .brand__mark {
+  width: 36px;
+  height: 36px;
+  color: var(--ug-accent);
+  filter: var(--emblem-filter);
+}
+
+[data-style='machine-room'] .brand__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+[data-style='machine-room'] .brand__path {
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+[data-style='machine-room'] .brand__reborn {
+  font-family: var(--ug-font-display);
+  font-size: 1.05rem;
+  color: var(--ug-accent);
+  text-shadow: var(--text-glow);
+}
+
+/* The prompt: the signature line of the room. */
+[data-style='machine-room'] .prompt {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--prompt-font);
+  font-size: calc(clamp(1.2rem, calc(0.95vw + 0.55rem), 1.9rem) * var(--prompt-scale));
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .prompt__user {
+  color: var(--ug-accent);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .prompt__host {
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .prompt__punct {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .prompt__cwd {
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .prompt__cmd {
+  margin-left: 0.5em;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .cursor {
+  display: inline-block;
+  width: 0.58em;
+  height: 1.02em;
+  margin-left: 0.18em;
+  vertical-align: -0.16em;
+  background: var(--ug-accent);
+  box-shadow: var(--text-glow);
+  animation: blink 1.06s steps(1) infinite;
+}
+
+[data-style='machine-room'] .console__tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-style='machine-room'] .rank-chip {
+  display: grid;
+  grid-template-columns: auto 88px;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  min-height: 46px;
+  padding: 6px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  text-decoration: none;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .rank-chip__rank {
+  grid-row: 1 / span 2;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ug-accent);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .rank-chip__xp {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+  line-height: 1.1;
+}
+
+[data-style='machine-room'] .tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+[data-style='machine-room'] .tool:hover,
+[data-style='machine-room'] .rank-chip:hover {
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='machine-room'] .tool--icon {
+  width: 46px;
+  justify-content: center;
+  padding: 0;
+}
+
+[data-style='machine-room'] .tool__swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ug-accent) 0 33%, var(--ug-accent-2) 0 66%, var(--ug-mark) 0);
+  box-shadow: 0 0 0 2px var(--ug-surface-2);
+}
+
+[data-style='machine-room'] .topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--ug-line);
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .topline__clock {
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .topline__tasks b {
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .topline__tasks .is-running {
+  color: var(--ug-accent);
+}
+
+/* Panels, buttons, meters and other shared pieces. */
+
+[data-style='machine-room'] .panel {
+  position: relative;
+  padding: clamp(14px, 1.2vw, 22px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+}
+
+[data-style='machine-room'] .panel__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--ug-line);
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--label-color);
+}
+
+[data-style='machine-room'] .panel__label > :first-child {
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--ug-radius) + 2px);
+  font-weight: 700;
+  font-size: 1.02rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.18s var(--ease),
+    box-shadow 0.18s var(--ease),
+    filter 0.18s var(--ease);
+}
+
+[data-style='machine-room'] .button .icon {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+[data-style='machine-room'] .button--primary {
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  box-shadow: var(--button-shadow, none);
+}
+
+[data-style='machine-room'] .button--primary .icon {
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-style='machine-room'] .button--primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+[data-style='machine-room'] .button kbd {
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 4px;
+  font-size: var(--fs-meta);
+  font-weight: 500;
+}
+
+[data-style='machine-room'] .button--sleeping {
+  border: 1px dashed var(--ug-line-strong);
+  color: var(--ug-ink-2);
+  background: transparent;
+  cursor: default;
+}
+
+[data-style='machine-room'] .link-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+  text-decoration: none;
+}
+
+[data-style='machine-room'] .link-back:hover {
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .monitor {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--screen-border);
+  border-radius: var(--screen-radius);
+  background: var(--screen-bg);
+  box-shadow: var(--screen-shadow);
+}
+
+[data-style='machine-room'] .monitor__emblem {
+  width: 62%;
+  height: auto;
+}
+
+[data-style='machine-room'] .meter {
+  display: inline-flex;
+  gap: 3px;
+}
+
+[data-style='machine-room'] .meter__cell {
+  width: 10px;
+  height: 14px;
+  border: 1px solid var(--ug-line-strong);
+  border-radius: 2px;
+}
+
+[data-style='machine-room'] .meter__cell--on {
+  border-color: var(--ug-accent);
+  background: var(--ug-accent);
+  box-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .bar {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line) 70%, transparent);
+}
+
+[data-style='machine-room'] .bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ug-accent);
+  box-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .bar--chip {
+  height: 6px;
+}
+
+[data-style='machine-room'] .flag {
+  padding: 0 7px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+}
+
+[data-style='machine-room'] .flag--daily {
+  color: var(--ug-accent);
+}
+
+[data-style='machine-room'] .flag--cron {
+  color: var(--ug-accent-2);
+}

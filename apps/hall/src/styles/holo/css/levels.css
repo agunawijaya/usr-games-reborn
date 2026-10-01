@@ -1,0 +1,679 @@
+/*
+ * Level cards, the closet door and the rank-up reveal. A level card is a normal holo card with a
+ * big level number in its art window, framed and foiled in the finish its level unlocks.
+ */
+
+[data-style='holo'] .hc-card--level,
+[data-style='holo'] .hc-card--door {
+  container-type: inline-size;
+}
+
+[data-style='holo'] .hc-card--level .hc-card__art,
+[data-style='holo'] .hc-card--door .hc-card__art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 2;
+}
+
+[data-style='holo'] .hc-levelcard__art--user {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 45%),
+    linear-gradient(145deg, #ffd1ec, #d8c9ff 50%, #c4ecff);
+}
+
+[data-style='holo'] .hc-levelcard__art--staff {
+  background:
+    radial-gradient(circle, #fff 0 0.8px, transparent 1.4px) 0 0 / 13px 15px,
+    radial-gradient(circle, #cfe3ff 0 1px, transparent 1.6px) 6px 8px / 27px 23px,
+    linear-gradient(160deg, #1d1a5e, #4b39b5 60%, #9a6bff);
+}
+
+[data-style='holo'] .hc-levelcard__art--wheel {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 252, 230, 0.9), transparent 45%),
+    linear-gradient(145deg, #fff3c4, #f0c75a 55%, #b8861f);
+}
+
+[data-style='holo'] .hc-levelcard__art--root {
+  background:
+    radial-gradient(circle at 28% 18%, #fff, transparent 42%),
+    linear-gradient(160deg, #fdfdff, #c3cad6 40%, #f2f4f8 55%, #8a94a6);
+}
+
+[data-style='holo'] .hc-levelcard__number {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  font: 700 30cqi / 0.9 var(--ug-font-display);
+  letter-spacing: -0.02em;
+  color: #3a1d5c;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* In the album the card is small: the rank chip keeps the corner and the number sits below it. */
+[data-style='holo'] .hc-card--album .hc-levelcard__number {
+  padding-top: 12%;
+}
+
+[data-style='holo'] .hc-card--album .hc-levelcard__number small {
+  display: none;
+}
+
+[data-style='holo'] .hc-levelcard__number small {
+  font-size: 0.26em;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+[data-style='holo'] .hc-levelcard--staff .hc-levelcard__number {
+  color: #fff;
+  text-shadow: 0 3px 12px rgba(20, 10, 60, 0.7);
+}
+
+[data-style='holo'] .hc-levelcard--wheel .hc-levelcard__number {
+  color: #5a3b00;
+}
+
+[data-style='holo'] .hc-levelcard--root .hc-levelcard__number {
+  color: #283040;
+}
+
+/* Locked: the number stays readable (it is the goal); the lock and the faded frame say "not yet". */
+[data-style='holo'] .hc-card--level.hc-card--locked .hc-levelcard__number {
+  color: var(--ug-ink-2);
+  text-shadow: none;
+}
+
+[data-style='holo'] .hc-card--level .hc-card__lock {
+  top: auto;
+  bottom: 8px;
+  left: auto;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  transform: none;
+}
+
+[data-style='holo'] .hc-foil--chrome {
+  mix-blend-mode: overlay;
+  opacity: calc(0.5 + var(--hc-active, 0) * 0.45);
+  background-image: repeating-linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #9aa3b2 9%,
+    #ffffff 18%,
+    #6b7486 27%,
+    #ffffff 36%
+  );
+  background-size: 240% 240%;
+  background-position: calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%);
+}
+
+/* Level cards sit in the album beside the achievements, so they share its compact type. */
+[data-style='holo'] .hc-card--level.hc-card--album .hc-card__name,
+[data-style='holo'] .hc-card--door .hc-card__name {
+  margin: 2px 12px 0;
+  font-size: 18px;
+}
+
+[data-style='holo'] .hc-card--level.hc-card--album .hc-card__tagline,
+[data-style='holo'] .hc-card--door .hc-card__tagline {
+  margin: 4px 12px 0;
+  font-size: 14px;
+}
+
+[data-style='holo'] .hc-card--level.hc-card--album .hc-card__stats,
+[data-style='holo'] .hc-card--door .hc-card__stats {
+  margin-inline: 10px;
+  padding: 7px 2px 9px;
+  font-size: 13px;
+}
+
+[data-style='holo'] .hc-card--level .hc-card__stat {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-style='holo'] .hc-album__page--levels {
+  --hc-set-bar: linear-gradient(90deg, #ff7ac6, #5b5bff, #f0c75a, #8a94a6);
+}
+
+/* The closet door, drawn in the art window. */
+
+[data-style='holo'] .hc-door__art {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0, 0, 0, 0.06) 13px 14px),
+    linear-gradient(160deg, #3b3552, #221c33);
+}
+
+[data-style='holo'] .hc-door {
+  position: relative;
+  width: 36%;
+  height: 84%;
+  margin-top: 16%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(90deg, #5b5476, #484062);
+  box-shadow:
+    inset 0 0 0 3px #6e678c,
+    0 0 0 2px #17121f;
+  transform-origin: 0 50%;
+}
+
+[data-style='holo'] .hc-door__plate {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #e8e2f5;
+  color: #231c35;
+  font: 700 7cqi var(--ug-font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+}
+
+[data-style='holo'] .hc-door__handle {
+  position: absolute;
+  top: 52%;
+  right: 12%;
+  width: 4px;
+  height: 14%;
+  border-radius: 2px;
+  background: #c9c2df;
+}
+
+[data-style='holo'] .hc-door__light {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  box-shadow: 0 0 8px #ff6b6b;
+}
+
+/* Open at the top level: the door stands ajar and warm light spills out. */
+[data-style='holo'] .hc-card--door.is-open .hc-door__art {
+  background:
+    radial-gradient(60% 70% at 50% 100%, rgba(255, 196, 120, 0.75), transparent 70%),
+    repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0, 0, 0, 0.06) 13px 14px),
+    linear-gradient(160deg, #3b3552, #221c33);
+}
+
+[data-style='holo'] .hc-card--door.is-open .hc-door {
+  background: linear-gradient(90deg, #ffe2b0, #ffb86b);
+}
+
+[data-style='holo'] .hc-card--door.is-open .hc-door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5b5476, #484062);
+  box-shadow: inset 0 0 0 3px #6e678c;
+  transform: perspective(160px) rotateY(-38deg);
+  transform-origin: 0 50%;
+}
+
+[data-style='holo'] .hc-card--door.is-open .hc-door__plate,
+[data-style='holo'] .hc-card--door.is-open .hc-door__handle {
+  z-index: 1;
+  opacity: 0;
+}
+
+[data-style='holo'] .hc-card--door.is-open .hc-door__light {
+  z-index: 1;
+  background: #7af0a8;
+  box-shadow: 0 0 10px #7af0a8;
+}
+
+[data-style='holo'] .hc-card--door.is-open .hc-card__frame {
+  background: linear-gradient(145deg, #ffcf8a, #b98cff);
+}
+
+[data-style='holo'] .hc-card--door.hc-card--locked .hc-card__art {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0, 0, 0, 0.05) 13px 14px),
+    color-mix(in srgb, var(--ug-line) 70%, var(--ug-surface));
+}
+
+[data-style='holo'] .hc-card--door.hc-card--locked .hc-door {
+  opacity: 0.85;
+}
+
+/* The album's own door, beside its title, for players who reached the top. */
+[data-style='holo'] .hc-album-head__door {
+  min-height: 46px;
+  padding: 0 22px;
+  font-size: 17px;
+}
+
+[data-style='holo'] .hc-button--primary .hc-icon--line {
+  fill: none;
+  stroke: currentColor;
+}
+
+/* The rank-up reveal */
+
+[data-style='holo'] .hc-rankup {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ug-bg) 74%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+  cursor: pointer;
+}
+
+[data-style='holo'] .hc-rankup__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      34vmax 30vmax at 38% 48%,
+      color-mix(in srgb, var(--hc-frame-from) 42%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      30vmax 26vmax at 62% 52%,
+      color-mix(in srgb, var(--hc-frame-to) 34%, transparent),
+      transparent 70%
+    );
+}
+
+[data-style='holo'] .hc-rankup__rays {
+  position: absolute;
+  top: 48%;
+  left: 36%;
+  width: 150vmax;
+  height: 150vmax;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--hc-frame-from) 22%, transparent) 0deg 5deg,
+    transparent 5deg 15deg
+  );
+  mask-image: radial-gradient(closest-side, #000 8%, transparent 62%);
+  transform: translate(-50%, -50%);
+}
+
+[data-style='holo'] .hc-rankup__stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 480px);
+  gap: clamp(36px, 4.5vw, 88px);
+  align-items: center;
+  padding: 0 var(--hc-gutter);
+}
+
+[data-style='holo'] .hc-rankup__card {
+  position: relative;
+  width: clamp(240px, 21vw, 360px);
+  aspect-ratio: 5 / 7;
+  perspective: 1400px;
+}
+
+[data-style='holo'] .hc-rankup__spin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+[data-style='holo'] .hc-rankup__back,
+[data-style='holo'] .hc-rankup__front {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  backface-visibility: hidden;
+}
+
+[data-style='holo'] .hc-rankup__front {
+  filter: drop-shadow(0 40px 60px color-mix(in srgb, var(--hc-frame-from) 55%, transparent));
+}
+
+[data-style='holo'] .hc-rankup__front .hc-card {
+  width: 100%;
+}
+
+[data-style='holo'] .hc-rankup__front .hc-foil {
+  --hc-px: 62;
+  --hc-py: 36;
+  --hc-active: 1;
+}
+
+[data-style='holo'] .hc-rankup__back {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: 10px;
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0 2px, transparent 2px 12px),
+    conic-gradient(from 210deg, #ff9ecf, #ffe08a, #9ff0d2, #a8c8ff, #d6b4ff, #ff9ecf);
+  box-shadow:
+    inset 0 0 0 8px rgba(255, 255, 255, 0.7),
+    0 30px 60px -30px var(--ug-shadow);
+}
+
+[data-style='holo'] .hc-rankup__mark {
+  width: 34%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+[data-style='holo'] .hc-rankup__back-name {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(29, 21, 48, 0.8);
+  color: #fff;
+  font: 600 16px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-rankup__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+[data-style='holo'] .hc-rankup__shine::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -70%;
+  width: 30%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.4) 44%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent
+  );
+  mix-blend-mode: overlay;
+  transform: skewX(-14deg);
+}
+
+[data-style='holo'] .hc-rankup__burst {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Four-pointed sparkles thrown past the card's edges. */
+[data-style='holo'] .hc-rankup__burst > span {
+  --hc-angle: calc(var(--hc-i) * 360deg / var(--hc-n) + 8deg);
+  --hc-reach: -104cqmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  background: linear-gradient(135deg, #fff 30%, var(--hc-frame-from) 60%, var(--hc-frame-to));
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 6px var(--hc-frame-from));
+  opacity: 0;
+}
+
+[data-style='holo'] .hc-rankup__burst > span:nth-child(3n) {
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  --hc-reach: -86cqmin;
+}
+
+[data-style='holo'] .hc-rankup__burst > span:nth-child(3n + 1) {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  --hc-reach: -122cqmin;
+}
+
+[data-style='holo'] .hc-rankup__card {
+  container-type: size;
+}
+
+[data-style='holo'] .hc-rankup__copy {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  padding: 30px 34px 32px;
+  border-radius: 30px;
+  background: color-mix(in srgb, var(--ug-surface) 90%, transparent);
+  border: 1px solid var(--ug-line);
+  box-shadow: var(--hc-shadow-soft);
+  color: var(--ug-ink);
+  cursor: default;
+}
+
+[data-style='holo'] .hc-rankup__title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  font: 700 clamp(48px, 4vw, 72px) / 1 var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-rankup__rank {
+  font-size: 20px;
+}
+
+[data-style='holo'] .hc-rankup__line {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-rankup__unlocks {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-style='holo'] .hc-rankup__unlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: var(--ug-surface-2);
+  font-size: 16px;
+}
+
+[data-style='holo'] .hc-rankup__unlock b {
+  font: 600 17px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-rankup__unlock--foil {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--ug-surface-2), var(--ug-surface-2)) padding-box,
+    linear-gradient(120deg, var(--hc-frame-from), var(--hc-frame-to)) border-box;
+}
+
+[data-style='holo'] .hc-rankup__note {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-rankup__skip {
+  position: absolute;
+  right: var(--hc-gutter);
+  bottom: 36px;
+  gap: 12px;
+}
+
+[data-style='holo'] .hc-rankup__skip kbd {
+  padding: 1px 8px;
+  border: 1px solid var(--ug-line-strong);
+  border-radius: 6px;
+  font: 600 13px var(--ug-font-body);
+}
+
+/* Playing: rise face down, turn over, shine, sparkle. About two seconds in all. */
+
+[data-style='holo'] .hc-rankup.is-playing {
+  animation: hc-rankup-in 0.26s ease-out both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__rays {
+  animation: hc-rankup-turn 24s linear infinite;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__card {
+  animation: hc-rankup-rise 0.62s cubic-bezier(0.2, 0.9, 0.25, 1.12) both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__spin {
+  animation: hc-rankup-flip 0.56s 0.56s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__shine::before {
+  animation: hc-rankup-shine 0.7s 1.1s ease-in-out both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__burst > span {
+  animation: hc-rankup-spark 0.9s 1.02s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__copy {
+  animation: hc-rankup-copy 0.45s 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+[data-style='holo'] .hc-rankup.is-playing .hc-rankup__unlock {
+  animation: hc-rankup-copy 0.4s both;
+  animation-delay: calc(1.15s + var(--hc-k, 0) * 0.1s);
+}
+
+[data-style='holo'] .hc-rankup__unlock:nth-child(2) {
+  --hc-k: 1;
+}
+
+[data-style='holo'] .hc-rankup__unlock:nth-child(3) {
+  --hc-k: 2;
+}
+
+[data-style='holo'] .hc-rankup.is-leaving {
+  animation: hc-rankup-out 0.38s ease-in forwards;
+}
+
+@keyframes hc-rankup-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hc-rankup-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes hc-rankup-turn {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes hc-rankup-rise {
+  from {
+    transform: translateY(60vh) scale(0.6) rotate(-7deg);
+  }
+}
+
+@keyframes hc-rankup-flip {
+  from {
+    transform: rotateY(180deg);
+  }
+  55% {
+    transform: rotateY(60deg) scale(1.08);
+  }
+  to {
+    transform: rotateY(0deg);
+  }
+}
+
+@keyframes hc-rankup-shine {
+  to {
+    left: 130%;
+  }
+}
+
+@keyframes hc-rankup-spark {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--hc-angle)) translateY(0) scale(0.3);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--hc-angle)) translateY(var(--hc-reach)) scale(1);
+  }
+}
+
+@keyframes hc-rankup-copy {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* Frozen for screenshots: the brightest moment, held. */
+
+[data-style='holo'] .hc-rankup.is-frozen .hc-rankup__shine::before {
+  left: 58%;
+}
+
+[data-style='holo'] .hc-rankup.is-frozen .hc-rankup__burst > span {
+  opacity: 0.9;
+  transform: rotate(var(--hc-angle)) translateY(calc(var(--hc-reach) * 0.82)) scale(0.9);
+}
+
+/* Reduced motion: the card is simply there, and the whole moment fades in and out. */
+
+[data-style='holo'] .hc-rankup.is-calm {
+  animation: hc-rankup-in 0.2s ease-out both;
+}
+
+[data-style='holo'] .hc-rankup.is-calm .hc-rankup__burst,
+[data-style='holo'] .hc-rankup.is-calm .hc-rankup__shine {
+  display: none;
+}
+
+[data-style='holo'] .hc-rankup.is-calm.is-leaving {
+  animation: hc-rankup-out 0.2s ease-in forwards;
+}
+
+@media (max-width: 900px) {
+  [data-style='holo'] .hc-rankup__stage {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  [data-style='holo'] .hc-rankup__card {
+    width: min(58vw, 260px);
+  }
+}

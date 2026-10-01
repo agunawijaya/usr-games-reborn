@@ -1,0 +1,136 @@
+/*
+ * The fixture styles itself from the Hall's tokens (written onto :root by the bridge), with
+ * its own light and dark fallbacks for when it is opened on its own.
+ */
+:root {
+  --fx-bg: var(--ug-bg, #f4f1ea);
+  --fx-surface: var(--ug-surface, #fffdf8);
+  --fx-ink: var(--ug-ink, #1c1a17);
+  --fx-ink-2: var(--ug-ink-2, #4a453d);
+  --fx-line: var(--ug-line-strong, #8a7f6c);
+  --fx-accent: var(--ug-accent, #1d5c9e);
+  --fx-accent-ink: var(--ug-accent-ink, #ffffff);
+  --fx-focus: var(--ug-focus, #b3261e);
+  --fx-radius: var(--ug-radius, 6px);
+  --fx-font: var(--ug-font-body, system-ui, sans-serif);
+  --fx-mono: var(--ug-font-mono, ui-monospace, Consolas, monospace);
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-ug-appearance]) {
+    --fx-bg: #11141a;
+    --fx-surface: #1a1f28;
+    --fx-ink: #eef1f6;
+    --fx-ink-2: #b6bfcc;
+    --fx-line: #56627a;
+    --fx-accent: #8cc4ff;
+    --fx-accent-ink: #0b1420;
+    --fx-focus: #ffc857;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--fx-bg);
+  color: var(--fx-ink);
+  font: 18px/1.5 var(--fx-font);
+}
+
+main {
+  width: min(560px, calc(100vw - 32px));
+  padding: 32px;
+  border: 1px solid var(--fx-line);
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+header svg {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  stroke: var(--fx-accent);
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+
+.meta,
+.hint,
+#log {
+  margin: 4px 0 0;
+  color: var(--fx-ink-2);
+  font-family: var(--fx-mono);
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+button {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 2px solid var(--fx-accent);
+  border-radius: var(--fx-radius);
+  background: transparent;
+  color: var(--fx-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--fx-accent);
+  color: var(--fx-accent-ink);
+}
+
+button:hover {
+  border-color: var(--fx-ink);
+}
+
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--fx-focus);
+  outline-offset: 3px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body.paused main {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition: border-color 120ms ease;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "phantasia",
+  "title": "Fantasy realm",
+  "tagline": "Rise through a sprawling fantasy realm, one encounter at a time.",
+  "teaser": "Roam a vast realm, meet strange creatures, gather power and climb toward the throne.",
+  "category": "stories",
+  "directory": "/usr/games/stories",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 45],
+  "status": "coming-soon",
+  "accent": "#d18ee0",
+  "emblem": "M9 41V21h6v5h5v-5h8v5h5v-5h6v20zM20 41v-8a4 4 0 0 1 8 0v8M24 21V9l7 3-7 3",
+  "inspiredBy": {
+    "program": "phantasia",
+    "originalTitle": "phantasia",
+    "uiTitle": "phantasia",
+    "year": 1986
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "phantasia — travel the realm, survive encounters, grow in power.",
+    "description": "Edward Estes at AT&T Information Systems wrote phantasia as an interterminal fantasy game, left explicitly uncopyrighted.",
+    "seeAlso": ["hack", "adventure", "battlestar"]
+  },
+  "howToPlay": [
+    "Travel the realm and meet its creatures.",
+    "Win encounters to grow stronger.",
+    "Climb the ranks of the realm as you gain power."
+  ]
+}

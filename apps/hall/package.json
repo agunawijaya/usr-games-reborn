@@ -1,0 +1,27 @@
+{
+  "name": "@usr-games/hall",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Machine Room: the front door of /usr/games Reborn.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --port 5173 --strictPort",
+    "e2e": "playwright test",
+    "shots": "tsx e2e/shots/hero.ts",
+    "shots:all": "tsx e2e/shots/hall.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/fredoka": "^5.3.0",
+    "@fontsource-variable/source-serif-4": "^5.3.0",
+    "@fontsource/atkinson-hyperlegible-next": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/vt323": "^5.3.0",
+    "@usr-games/bridge": "workspace:*",
+    "@usr-games/kit": "workspace:*"
+  }
+}

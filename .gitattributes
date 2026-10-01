@@ -1,0 +1,2 @@
+# Prettier and the repository checks expect LF everywhere, also in Windows checkouts.
+* text=auto eol=lf

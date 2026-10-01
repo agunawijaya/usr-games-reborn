@@ -1,0 +1,1076 @@
+/*
+ * Skyloom's screens. Two looks, each designed on its own: Day Chart (a printed chart on a desk)
+ * and Night Scope (a radar room at night). The radar canvas takes its colours from
+ * src/render/look.ts; everything around it takes them from here.
+ */
+
+.skyloom {
+  --sk-font-ui: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --sk-font-data: 'IBM Plex Mono', ui-monospace, monospace;
+  --sk-font-title: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --sk-bar: clamp(52px, 5.9vh, 64px);
+  --sk-foot: clamp(42px, 4.8vh, 52px);
+  --sk-strips: clamp(330px, 23vw, 430px);
+  --sk-gap: clamp(10px, 0.9vw, 16px);
+  --sk-radius: 10px;
+
+  position: relative;
+  display: grid;
+  grid-template-rows: var(--sk-bar) minmax(0, 1fr) var(--sk-foot);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sk-bg);
+  color: var(--sk-ink);
+  font-family: var(--sk-font-ui);
+  font-size: clamp(15px, 1vw, 17px);
+  line-height: 1.35;
+}
+
+:is(.skyloom, .sk-app)[data-look='chart'] {
+  --sk-bg: #e5dbc5;
+  --sk-desk: radial-gradient(120% 90% at 30% 20%, #ece4d0 0%, #e3d8bf 55%, #d9cdb1 100%);
+  --sk-panel: #f4eddc;
+  --sk-panel-2: #eae0c8;
+  --sk-ink: #1c2a44;
+  --sk-ink-2: #4a5670;
+  --sk-line: rgba(28, 42, 68, 0.16);
+  --sk-line-strong: rgba(28, 42, 68, 0.42);
+  --sk-accent: #b0247a;
+  --sk-accent-ink: #fff8f2;
+  --sk-conflict: #c23a0f;
+  --sk-conflict-wash: rgba(201, 60, 16, 0.1);
+  --sk-good: #1d774b;
+  --sk-warn: #8f5300;
+  --sk-letter: #1c2a44;
+  --sk-strip: #fbf7ec;
+  --sk-strip-edge: rgba(28, 42, 68, 0.22);
+  --sk-strip-rule: rgba(28, 42, 68, 0.13);
+  --sk-strip-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 2px 4px rgba(64, 46, 18, 0.16);
+  --sk-holder-arrival: #dcb563;
+  --sk-holder-departure: #7fa7d1;
+  --sk-holder-transit: #97ba86;
+  --sk-board: #d7cbaf;
+  --sk-focus: #1f5fbf;
+  --sk-key-bg: #fffaf0;
+  --sk-shadow: 0 10px 30px rgba(70, 50, 20, 0.18);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] {
+  --sk-bg: #020a0a;
+  --sk-desk: radial-gradient(120% 90% at 30% 10%, #06191a 0%, #031010 55%, #010808 100%);
+  --sk-panel: #061b1b;
+  --sk-panel-2: #0a2626;
+  --sk-ink: #d5eee8;
+  --sk-ink-2: #92b8af;
+  --sk-line: rgba(110, 222, 196, 0.14);
+  --sk-line-strong: rgba(110, 222, 196, 0.38);
+  --sk-accent: #6cd5ff;
+  --sk-accent-ink: #03161c;
+  --sk-conflict: #ff7a5c;
+  --sk-conflict-wash: rgba(255, 122, 92, 0.12);
+  --sk-good: #80f0aa;
+  --sk-warn: #ffc266;
+  --sk-letter: #ffc266;
+  --sk-strip: #0b2423;
+  --sk-strip-edge: rgba(110, 222, 196, 0.2);
+  --sk-strip-rule: rgba(110, 222, 196, 0.11);
+  --sk-strip-shadow: 0 1px 0 rgba(160, 255, 228, 0.06) inset, 0 3px 8px rgba(0, 0, 0, 0.5);
+  --sk-holder-arrival: #c99a3d;
+  --sk-holder-departure: #3e88bd;
+  --sk-holder-transit: #4c9b7b;
+  --sk-board: #041313;
+  --sk-focus: #8fe8ff;
+  --sk-key-bg: #0d2c2c;
+  --sk-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+.sk-app {
+  --sk-font-ui: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --sk-font-data: 'IBM Plex Mono', ui-monospace, monospace;
+  --sk-font-title: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --sk-gap: clamp(10px, 0.9vw, 16px);
+  --sk-radius: 10px;
+
+  background: var(--sk-bg);
+  color: var(--sk-ink);
+  font-family: var(--sk-font-ui);
+  font-size: clamp(15px, 1vw, 17px);
+  line-height: 1.35;
+}
+
+.skyloom *,
+.sk-app * {
+  box-sizing: border-box;
+}
+
+.sk-app :focus-visible,
+.skyloom :focus-visible {
+  outline: 3px solid var(--sk-focus);
+  outline-offset: 2px;
+}
+
+/* —— top bar —— */
+
+.sk-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sk-gap);
+  padding: 0 calc(var(--sk-gap) * 1.2);
+  background: var(--sk-panel);
+  border-bottom: 1px solid var(--sk-line);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-bar {
+  background: linear-gradient(180deg, #082222 0%, #051818 100%);
+}
+
+.sk-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 40px;
+  padding: 0 0.95em;
+  border: 1px solid var(--sk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sk-ink);
+  font: 600 0.95em/1 var(--sk-font-ui);
+  cursor: pointer;
+}
+
+.sk-button:hover {
+  background: var(--sk-panel-2);
+}
+
+.sk-button--primary {
+  background: var(--sk-accent);
+  border-color: var(--sk-accent);
+  color: var(--sk-accent-ink);
+}
+
+.sk-button--primary:hover {
+  background: var(--sk-accent);
+  filter: brightness(1.06);
+}
+
+.sk-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7em;
+  height: 1.55em;
+  padding: 0 0.35em;
+  border: 1px solid var(--sk-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--sk-key-bg);
+  color: var(--sk-ink-2);
+  font: 600 0.78em/1 var(--sk-font-data);
+}
+
+.sk-button--primary .sk-key {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: inherit;
+}
+
+.sk-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7em;
+  min-width: 0;
+  margin-left: 0.4em;
+}
+
+.sk-wordmark {
+  font: 600 1.45em/1 var(--sk-font-title);
+  letter-spacing: 0.01em;
+  font-variation-settings:
+    'SOFT' 100,
+    'WONK' 0;
+}
+
+.sk-wordmark span {
+  color: var(--sk-accent);
+}
+
+.sk-shift {
+  color: var(--sk-ink-2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sk-shift strong {
+  color: var(--sk-ink);
+}
+
+.sk-arena {
+  margin-left: 0.7em;
+  padding: 0.2em 0.6em;
+  border: 1px solid var(--sk-line-strong);
+  border-radius: 999px;
+  color: var(--sk-ink-2);
+  font-size: 0.86em;
+}
+
+.sk-tick-ring {
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 0.3em;
+  vertical-align: -0.05em;
+  transform: rotate(-90deg);
+}
+
+.sk-tick-ring__track,
+.sk-tick-ring__fill {
+  fill: none;
+  stroke-width: 3;
+}
+
+.sk-tick-ring__track {
+  stroke: var(--sk-line-strong);
+}
+
+.sk-tick-ring__fill {
+  stroke: var(--sk-accent);
+  stroke-linecap: round;
+}
+
+.sk-stats {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sk-gap) * 1.6);
+  margin-left: auto;
+}
+
+.sk-stat {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+
+.sk-stat__label {
+  color: var(--sk-ink-2);
+  font: 600 0.72em/1 var(--sk-font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sk-stat__value {
+  /* Inline flex, so a host page that makes every svg a block cannot drop the ring below. */
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font: 600 1.3em/1 var(--sk-font-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.sk-stat__value small {
+  color: var(--sk-ink-2);
+  font-size: 0.7em;
+}
+
+.sk-pearls {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 0.45em;
+  vertical-align: middle;
+}
+
+.sk-pearls i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sk-line-strong);
+}
+
+.sk-pearls i.is-lit {
+  background: var(--sk-accent);
+  border-color: var(--sk-accent);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-pearls i.is-lit {
+  background: #ffd88a;
+  border-color: #ffd88a;
+  box-shadow: 0 0 8px rgba(255, 216, 138, 0.8);
+}
+
+.sk-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--sk-ink-2);
+  font: 600 0.85em/1 var(--sk-font-ui);
+}
+
+/* —— main area —— */
+
+.sk-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--sk-strips);
+  gap: var(--sk-gap);
+  padding: var(--sk-gap);
+  min-height: 0;
+  background: var(--sk-desk);
+}
+
+.sk-radar {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sk-radar canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 6px;
+}
+
+:is(.skyloom, .sk-app)[data-look='chart'] .sk-radar canvas {
+  filter: drop-shadow(0 6px 14px rgba(70, 50, 20, 0.22));
+}
+
+.sk-overlay {
+  position: absolute;
+  pointer-events: none;
+}
+
+.sk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.45em 0.85em;
+  border-radius: 999px;
+  background: var(--sk-panel);
+  border: 1px solid var(--sk-line-strong);
+  box-shadow: var(--sk-shadow);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-chip {
+  background: rgba(6, 27, 27, 0.92);
+}
+
+.sk-chip--accent {
+  background: var(--sk-accent);
+  border-color: var(--sk-accent);
+  color: var(--sk-accent-ink);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-chip--accent {
+  background: var(--sk-accent);
+}
+
+.sk-chip--pearls {
+  gap: 0.7em;
+  padding: 0.55em 1.1em;
+  font-size: 1.05em;
+}
+
+.sk-chip--pearls strong {
+  font-family: var(--sk-font-data);
+}
+
+.sk-chip__note {
+  color: var(--sk-ink-2);
+  font-weight: 600;
+}
+
+.sk-chip__beads {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.sk-chip__beads i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0 18%, #f6ecd8 45%, #d6c19a 100%);
+  box-shadow: 0 0 0 1px rgba(28, 42, 68, 0.35);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-chip__beads i {
+  box-shadow: 0 0 8px rgba(255, 216, 138, 0.85);
+}
+
+.sk-chip svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* —— flight strips —— */
+
+.sk-board {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  border-radius: var(--sk-radius);
+  background: var(--sk-board);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-board {
+  border: 1px solid var(--sk-line);
+}
+
+.sk-board__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.75em 0.9em 0.55em;
+}
+
+.sk-board__title {
+  margin: 0;
+  font: 600 1.15em/1 var(--sk-font-title);
+}
+
+.sk-board__count {
+  color: var(--sk-ink-2);
+  font-size: 0.86em;
+  font-weight: 600;
+}
+
+.sk-strips {
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 5px;
+  margin: 0;
+  padding: 0 0.6em 0.8em;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sk-strips__fields {
+  display: grid;
+  grid-template-columns: 12px 3.3em minmax(0, 1fr) 3.5em 3.9em;
+  padding: 0 0.5em 0.15em 0;
+  color: var(--sk-ink-2);
+  font: 600 0.7em/1 var(--sk-font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sk-strips__fields span:nth-child(4),
+.sk-strips__fields span:nth-child(5) {
+  text-align: center;
+}
+
+.sk-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12px 3.3em minmax(0, 1fr) 3.5em 3.9em;
+  grid-template-rows: minmax(clamp(40px, 4.3vh, 47px), auto) auto;
+  align-items: stretch;
+  border-radius: 4px;
+  background: var(--sk-strip);
+  box-shadow: var(--sk-strip-shadow);
+  overflow: hidden;
+}
+
+.sk-strip > * + * {
+  border-left: 1px solid var(--sk-strip-rule);
+}
+
+.sk-strip__holder {
+  grid-row: 1 / -1;
+  background: var(--sk-holder-transit);
+}
+
+.sk-strip[data-type='arrival'] .sk-strip__holder {
+  background: var(--sk-holder-arrival);
+}
+
+.sk-strip[data-type='departure'] .sk-strip__holder {
+  background: var(--sk-holder-departure);
+}
+
+/* Shape cues: the holder also says arriving, departing or passing through by a pointer's shape. */
+.has-shapes .sk-strip__holder {
+  display: grid;
+  place-items: center;
+}
+
+.has-shapes .sk-strip__holder::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+}
+
+.has-shapes .sk-strip[data-type='arrival'] .sk-strip__holder::after {
+  border-top-color: var(--sk-strip);
+  transform: translateY(3px);
+}
+
+.has-shapes .sk-strip[data-type='departure'] .sk-strip__holder::after {
+  border-bottom-color: var(--sk-strip);
+  transform: translateY(-3px);
+}
+
+.has-shapes .sk-strip[data-type='transit'] .sk-strip__holder::after {
+  border-left-color: var(--sk-strip);
+  transform: translateX(3px);
+}
+
+.sk-strip__id {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.sk-strip__letter {
+  color: var(--sk-letter);
+  font: 700 1.6em/1 var(--sk-font-data);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-strip__letter {
+  text-shadow: 0 0 10px rgba(255, 194, 102, 0.45);
+}
+
+.sk-strip__id svg {
+  width: 20px;
+  height: 20px;
+  color: var(--sk-ink-2);
+}
+
+.sk-strip__flight {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 0 0.6em;
+}
+
+.sk-strip__callsign {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sk-strip__route {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--sk-ink-2);
+  font: 600 0.84em/1 var(--sk-font-data);
+  white-space: nowrap;
+}
+
+.sk-role {
+  padding: 2px 5px;
+  border-radius: 3px;
+  font: 700 0.76em/1 var(--sk-font-data);
+  letter-spacing: 0.04em;
+}
+
+.sk-role[data-role='medical'] {
+  background: var(--sk-conflict-wash);
+  color: var(--sk-conflict);
+  border: 1px solid currentColor;
+}
+
+.sk-role[data-role='mail'] {
+  border: 1px solid var(--sk-line-strong);
+  color: var(--sk-ink-2);
+}
+
+.sk-strip__alt,
+.sk-strip__fuel {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  font: 600 1.25em/1 var(--sk-font-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.sk-strip__alt small {
+  color: var(--sk-ink-2);
+  font-size: 0.66em;
+}
+
+.sk-strip__fuel {
+  font-size: 1em;
+}
+
+.sk-fuel {
+  position: relative;
+  width: 2.8em;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--sk-strip-rule);
+  overflow: hidden;
+}
+
+.sk-fuel i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--sk-good);
+}
+
+.sk-strip.is-low-fuel .sk-fuel i {
+  background: var(--sk-warn);
+}
+
+.sk-strip.is-low-fuel .sk-strip__fuel {
+  color: var(--sk-warn);
+}
+
+.sk-strip.is-selected {
+  outline: 2px solid var(--sk-accent);
+  outline-offset: -1px;
+}
+
+.sk-strip.is-conflict {
+  background: linear-gradient(90deg, var(--sk-conflict-wash), transparent 70%), var(--sk-strip);
+  box-shadow:
+    inset 0 0 0 1.5px var(--sk-conflict),
+    var(--sk-strip-shadow);
+}
+
+.sk-strip.is-ready {
+  opacity: 0.86;
+}
+
+.sk-strip__flag {
+  grid-column: 2 / -1;
+  padding: 3px 0.7em 4px;
+  border-left: 0;
+  background: var(--sk-conflict);
+  font: 700 0.8em/1.25 var(--sk-font-ui);
+}
+
+:is(.skyloom, .sk-app)[data-look='chart'] .sk-strip__flag {
+  color: #fff8f2;
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-strip__flag {
+  color: #1a0a06;
+}
+
+.sk-bay {
+  padding: 0.55em 0.6em 0.7em;
+  border-top: 1px dashed var(--sk-line-strong);
+}
+
+.sk-bay__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 0 0.3em 0.45em;
+  font: 700 0.86em/1.2 var(--sk-font-ui);
+}
+
+.sk-bay__title span {
+  color: var(--sk-ink-2);
+  font-weight: 600;
+}
+
+.sk-bay__list {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sk-ready {
+  display: grid;
+  grid-template-columns: 8px 2.2em minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 36px;
+  padding-right: 0.7em;
+  border-radius: 4px;
+  background: var(--sk-strip);
+  box-shadow: var(--sk-strip-shadow);
+  opacity: 0.92;
+}
+
+.sk-ready .sk-strip__holder {
+  align-self: stretch;
+  border-radius: 4px 0 0 4px;
+}
+
+.sk-ready[data-type='departure'] .sk-strip__holder {
+  background: var(--sk-holder-departure);
+}
+
+.sk-ready__letter {
+  color: var(--sk-letter);
+  font: 700 1.25em/1 var(--sk-font-data);
+  text-align: center;
+}
+
+.sk-ready__flight {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* —— command bar —— */
+
+.sk-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sk-gap);
+  padding: 0 calc(var(--sk-gap) * 1.2);
+  background: var(--sk-panel);
+  border-top: 1px solid var(--sk-line);
+  color: var(--sk-ink-2);
+  font-weight: 600;
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-foot {
+  background: linear-gradient(0deg, #082222 0%, #051818 100%);
+}
+
+.sk-hints {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sk-gap) * 1.5);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sk-hints span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.sk-terminal {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--sk-font-data);
+}
+
+.sk-terminal__prompt {
+  color: var(--sk-accent);
+  font-weight: 700;
+}
+
+.sk-terminal__echo {
+  color: var(--sk-ink);
+  white-space: pre;
+}
+
+.sk-terminal__echo b {
+  color: var(--sk-letter);
+}
+
+.sk-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  margin-left: 1px;
+  vertical-align: -0.2em;
+  background: var(--sk-accent);
+}
+
+.sk-terminal__choices {
+  display: flex;
+  gap: 0.4em;
+  margin-left: 0.6em;
+  color: var(--sk-ink-2);
+}
+
+.sk-terminal__choices span {
+  padding: 0.18em 0.5em;
+  border: 1px dashed var(--sk-line-strong);
+  border-radius: 5px;
+}
+
+.sk-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* —— cards (results, shift complete) —— */
+
+.sk-scrim {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--sk-gap);
+  background: rgba(30, 24, 14, 0.18);
+}
+
+.sk-scrim--focus {
+  background: rgba(40, 30, 16, 0.32);
+  backdrop-filter: blur(5px) saturate(0.85);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-scrim--focus {
+  background: rgba(0, 6, 6, 0.6);
+}
+
+.sk-scrim--left {
+  justify-items: start;
+  padding-left: calc(var(--sk-gap) * 3);
+}
+
+.sk-scrim--left .sk-card {
+  width: min(860px, 56%);
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-scrim {
+  background: rgba(0, 6, 6, 0.38);
+}
+
+.sk-card {
+  width: min(880px, 92%);
+  padding: clamp(18px, 2vw, 30px);
+  border-radius: 14px;
+  background: var(--sk-panel);
+  border: 1px solid var(--sk-line-strong);
+  box-shadow: var(--sk-shadow);
+}
+
+.sk-card__kicker {
+  margin: 0 0 0.35em;
+  color: var(--sk-ink-2);
+  font: 700 0.78em/1 var(--sk-font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sk-card__title {
+  margin: 0;
+  font: 600 clamp(26px, 2.2vw, 38px) / 1.1 var(--sk-font-title);
+}
+
+.sk-card__title b {
+  font-family: var(--sk-font-data);
+  font-weight: 700;
+  color: var(--sk-conflict);
+}
+
+.sk-card__lede {
+  margin: 0.55em 0 1em;
+  max-width: 60ch;
+  color: var(--sk-ink-2);
+}
+
+.sk-replay {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sk-replay figure {
+  position: relative;
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--sk-line);
+  aspect-ratio: 16 / 10;
+}
+
+.sk-replay canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sk-replay figcaption {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+}
+
+.sk-scrub {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: 12px;
+  color: var(--sk-ink-2);
+  font: 600 0.9em/1 var(--sk-font-data);
+}
+
+.sk-scrub ol {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sk-scrub li {
+  flex: 1;
+  border-radius: 6px;
+  border: 1px solid var(--sk-line);
+  text-align: center;
+}
+
+.sk-scrub button {
+  width: 100%;
+  padding: 0.5em 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sk-scrub li.is-current {
+  background: var(--sk-accent);
+  border-color: var(--sk-accent);
+  color: var(--sk-accent-ink);
+}
+
+.sk-scrub li.is-loss {
+  border-color: var(--sk-conflict);
+  color: var(--sk-conflict);
+  font-weight: 700;
+}
+
+.sk-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9em 2.2em;
+  margin: 1.1em 0;
+}
+
+.sk-results dd {
+  margin: 0;
+}
+
+.sk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+}
+
+/* The way on stands alone above the standard three, so their row never breaks. */
+.sk-card--shift .sk-actions > :is([data-action='next'], [data-action='share']) {
+  flex: 1 0 100%;
+  justify-content: center;
+}
+
+/* —— shift complete and the tapestry —— */
+
+.sk-card--simple {
+  width: min(640px, 92%);
+}
+
+.sk-card--shift {
+  display: grid;
+  /* The side keeps room for the three standard buttons on one row; the tapestry takes the rest. */
+  grid-template-columns: minmax(0, 1fr) minmax(470px, 0.7fr);
+  gap: clamp(18px, 2vw, 32px);
+  align-items: center;
+  width: min(1320px, 94%);
+}
+
+.sk-card__art {
+  min-width: 0;
+}
+
+.sk-tapestry {
+  display: block;
+  width: 100%;
+  aspect-ratio: 32 / 26;
+}
+
+.sk-starlist {
+  display: grid;
+  gap: 0.4em;
+  margin: 0 0 0.6em;
+  padding: 0;
+  list-style: none;
+  font-weight: 600;
+}
+
+.sk-starlist li {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+}
+
+.sk-starlist li.is-missed {
+  color: var(--sk-ink-2);
+}
+
+.sk-starlist svg {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.sk-starlist svg.is-earned {
+  color: #d99a1e;
+}
+
+:is(.skyloom, .sk-app)[data-look='scope'] .sk-starlist svg.is-earned {
+  color: #ffd27a;
+  filter: drop-shadow(0 0 6px rgba(255, 210, 122, 0.7));
+}
+
+.sk-logbook {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 0 0 1.1em;
+  color: var(--sk-ink-2);
+  font-weight: 600;
+}
+
+.sk-logbook svg {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--sk-accent);
+}
+
+.sk-stars {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 0.4em;
+  vertical-align: -0.12em;
+}
+
+.sk-stars svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skyloom * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.sk-confirm .sk-card {
+  width: min(460px, 92%);
+}
+
+.sk-strips:focus-visible,
+.sk-bay__list:focus-visible {
+  outline: 3px solid var(--sk-focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.sk-strip.is-quiet:not(.is-selected, .is-conflict) {
+  opacity: 0.55;
+}

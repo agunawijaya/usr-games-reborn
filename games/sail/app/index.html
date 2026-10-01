@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Broadside — Wooden Walls</title>
+<meta name="description" content="A cinematic, procedurally generated 3D port of BSD sail (Dave Riggle, 1980): command a Napoleonic warship against computer captains. Every pixel is drawn by code.">
+<style>
+  :root {
+    --paper: #efe3c6;
+    --paper-2: #e2d2ac;
+    --ink: #2b2117;
+    --ink-soft: #5b4a36;
+    --brass-1: #f3d98b;
+    --brass-2: #b88a2e;
+    --brass-3: #6d4f16;
+    --sea-dark: #0b141b;
+    --accent: #8f2a1c;
+    --ok: #2f6b3a;
+    --warn: #a0521a;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --mono: "Courier New", Courier, ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--sea-dark); color: var(--ink); font-family: var(--serif); overflow: hidden; }
+  canvas#scene { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  button, select, input { font-family: var(--serif); font-size: 14px; }
+  :focus-visible { outline: 3px solid #ffd97a; outline-offset: 2px; }
+
+  /* ---- parchment panel with a brass frame (pure CSS) ---- */
+  .panel {
+    position: fixed;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(120,80,30,.18), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(90,60,20,.035) 0 2px, transparent 2px 5px),
+      linear-gradient(160deg, var(--paper), var(--paper-2));
+    border: 3px solid transparent;
+    border-image: linear-gradient(135deg, var(--brass-1), var(--brass-2) 40%, var(--brass-3) 60%, var(--brass-1)) 1;
+    box-shadow: 0 6px 24px rgba(0,0,0,.45), inset 0 0 18px rgba(110,70,20,.25);
+    padding: 8px 10px;
+    color: var(--ink);
+  }
+  .panel h2 { margin: 0 0 4px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .rivets::before, .rivets::after { content: ""; position: absolute; top: 4px; width: 6px; height: 6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff3c4, #b88a2e 55%, #4a3410); }
+  .rivets::before { left: 4px; } .rivets::after { right: 4px; }
+
+  #topbar { top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; padding: 5px 12px; white-space: nowrap; z-index: 5; }
+  #topbar .title { font-weight: 700; letter-spacing: .06em; }
+  #topbar .meta { color: var(--ink-soft); font-size: 13px; }
+  .btn {
+    background: linear-gradient(180deg, #f6e7bd, #d4b673); color: var(--ink); border: 1px solid #7a5a22; border-radius: 3px;
+    padding: 3px 9px; cursor: pointer; box-shadow: inset 0 1px 0 #fff6d6, 0 1px 2px rgba(0,0,0,.3);
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { transform: translateY(1px); }
+  .btn[aria-pressed="true"] { background: linear-gradient(180deg, #c89b43, #9c7327); color: #fff8e6; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.primary { background: linear-gradient(180deg, #a93a28, #7a2216); color: #fff4e0; border-color: #4a120a; font-weight: 700; letter-spacing: .05em; }
+
+  #slate { top: 56px; left: 10px; width: 250px; font-size: 13px; z-index: 4; }
+  #slate .shipname { font-size: 17px; font-weight: 700; }
+  #slate .sub { color: var(--ink-soft); font-size: 12px; margin-bottom: 4px; }
+  #slate table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 13px; }
+  #slate td { padding: 1px 3px; }
+  #slate td:first-child { font-family: var(--serif); color: var(--ink-soft); width: 46px; }
+  .bar { display: inline-block; height: 7px; background: #7d6a4c; border-radius: 2px; vertical-align: middle; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, #6e1f14, #b3452c); border-radius: 2px; }
+  .glyph { font-family: var(--mono); font-weight: 700; padding: 0 3px; border-radius: 2px; color: #fff; }
+
+  #vane { top: 56px; right: 10px; width: 190px; z-index: 4; text-align: center; }
+  #vane svg { width: 170px; height: 170px; }
+  #vane .wind { font-size: 13px; }
+
+  #log { right: 10px; top: 262px; width: 300px; max-height: calc(100vh - 560px); min-height: 110px; overflow-y: auto; font-size: 12.5px; line-height: 1.35; z-index: 4; }
+  #log p { margin: 0 0 3px; }
+  #log p.me { color: #1d3f6b; }
+  #log p.hit { color: var(--accent); }
+  #log p.turn { color: var(--ink-soft); border-top: 1px dashed #b39b6c; padding-top: 2px; margin-top: 4px; font-style: italic; }
+
+  #roster { left: 10px; top: 330px; width: 250px; max-height: calc(100vh - 620px); min-height: 70px; overflow-y: auto; font-size: 12.5px; z-index: 4; }
+  #roster li { list-style: none; display: flex; gap: 6px; align-items: center; padding: 1px 0; cursor: pointer; }
+  #roster ul { margin: 0; padding: 0; }
+  #roster li.gone { opacity: .45; text-decoration: line-through; }
+
+  #orders { left: 50%; bottom: 8px; transform: translateX(-50%); width: auto; max-width: calc(100vw - 16px); z-index: 6; padding: 5px 9px 6px; }
+  #orders .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+  #orders fieldset { border: 1px solid #b89c62; border-radius: 3px; padding: 1px 6px 4px; margin: 0; }
+  #orders legend { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); padding: 0 3px; }
+  #orders .btn { padding: 1px 6px; font-size: 12.5px; }
+  #orders .helm { font-family: var(--mono); font-size: 14px; min-width: 64px; display: inline-block; padding: 0 5px; background: rgba(255,255,255,.4); border: 1px inset #b89c62; }
+  #orders .hint { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  #orders .fireinfo { font-size: 11px; color: var(--ink-soft); max-width: 178px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cmdrow { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  #cmd { flex: 1; min-width: 200px; font-family: var(--mono); font-size: 14px; padding: 2px 7px; background: #fbf5e3; border: 1px solid #7a5a22; color: var(--ink); }
+  #prompt { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+  #queued { font-size: 12px; color: var(--ink); min-height: 16px; margin-top: 2px; max-width: 900px; }
+  #queued span { display: inline-block; background: rgba(120,80,20,.12); border-radius: 3px; padding: 0 5px; margin: 0 4px 2px 0; }
+
+  #labels { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+  .shiplabel { position: absolute; transform: translate(-50%, -100%); font-family: var(--mono); font-size: 12px; color: #fff; text-shadow: 0 1px 3px #000, 0 0 2px #000; white-space: nowrap; pointer-events: auto; cursor: pointer; }
+  .shiplabel .g { font-weight: 700; padding: 0 4px; border-radius: 2px; margin-right: 4px; color: #fff; }
+
+  /* cinematic letterbox + captions */
+  #cine { position: fixed; inset: 0; pointer-events: none; z-index: 7; opacity: 0; transition: opacity .6s; }
+  #cine.on { opacity: 1; }
+  #cine::before, #cine::after { content: ""; position: absolute; left: 0; right: 0; height: 7vh; background: #000; }
+  #cine::before { top: 0; } #cine::after { bottom: 0; }
+  #caption { position: absolute; left: 50%; bottom: 9vh; transform: translateX(-50%); max-width: 70vw; text-align: center; color: #f4ead0; font-size: 20px; text-shadow: 0 2px 6px #000; font-style: italic; }
+  #skiphint { position: absolute; right: 16px; bottom: calc(7vh + 8px); color: #d8ccaa; font-size: 12px; }
+  #orders, #slate, #roster, #log, #vane { transition: opacity .5s; }
+  body.cinematic #orders, body.cinematic #slate, body.cinematic #roster, body.cinematic #log { opacity: 0; pointer-events: none; }
+  body.cinematic #vane { opacity: 0; }
+  body.chart #log { opacity: .9; }
+  body.nobattle #orders, body.nobattle #slate, body.nobattle #roster, body.nobattle #log, body.nobattle #vane { display: none; }
+  body.photo #orders, body.photo #slate, body.photo #roster, body.photo #log, body.photo #vane, body.photo #topbar, body.photo #fps, body.photo #skiphint, body.photo #labels { display: none; }
+
+  /* overlays: title, menus, end screen, help */
+  .overlay { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(8,14,20,.35), rgba(8,14,20,.85)); }
+  .overlay.open { display: flex; }
+  .overlay .panel { position: relative; max-width: min(980px, 94vw); max-height: 90vh; overflow-y: auto; padding: 18px 22px; }
+  .overlay h1 { margin: 0; font-size: 34px; letter-spacing: .04em; }
+  .overlay .tag { color: var(--ink-soft); margin: 2px 0 14px; font-style: italic; }
+  .scen { display: grid; grid-template-columns: 40px 44px 1fr; gap: 2px 8px; font-size: 14px; }
+  .scen button { text-align: left; background: none; border: 0; padding: 3px 4px; color: var(--ink); cursor: pointer; font-size: 14px; border-radius: 2px; }
+  .scen button:hover:not(:disabled), .scen button:focus-visible { background: rgba(160,110,30,.18); }
+  .scen button:disabled { color: #8c7b60; cursor: default; }
+  .featured { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .card { border: 1px solid #b89c62; padding: 8px 10px; background: rgba(255,255,255,.25); cursor: pointer; text-align: left; font-family: var(--serif); color: var(--ink); }
+  .card:hover, .card:focus-visible { background: rgba(255,240,200,.6); }
+  .card .n { font-family: var(--mono); color: var(--ink-soft); }
+  .card b { font-size: 16px; }
+  .card small { display: block; color: var(--ink-soft); margin-top: 4px; }
+  .more { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; margin: 8px 0 12px; }
+  .card.small { padding: 5px 8px; font-size: 13px; }
+  .card.small b { font-size: 14px; }
+  .card.small .n { font-size: 11px; white-space: nowrap; }
+  details > summary { cursor: pointer; margin: 6px 0; }
+  table.ships { border-collapse: collapse; width: 100%; font-size: 14px; }
+  table.ships td, table.ships th { padding: 4px 8px; border-bottom: 1px solid rgba(120,90,40,.25); text-align: left; }
+  table.ships tr:hover td { background: rgba(160,110,30,.12); }
+  .kbd { font-family: var(--mono); background: rgba(0,0,0,.08); padding: 0 4px; border-radius: 2px; }
+  #fps { position: fixed; left: 8px; bottom: 8px; color: #9fb0bf; font: 11px var(--mono); z-index: 2; text-shadow: 0 1px 2px #000; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 1100px) {
+    #log { display: none; }
+    #roster { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #cine { transition: none; }
+    * { scroll-behavior: auto !important; }
+  }
+</style>
+<script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
+</head>
+<body class="nobattle">
+<canvas id="scene" aria-label="3D view of the battle" role="img"></canvas>
+<div id="labels" aria-hidden="true"></div>
+
+<header id="topbar" class="panel rivets" role="banner">
+  <span class="title">Broadside</span>
+  <span class="meta" id="meta">— Wooden Walls</span>
+  <button class="btn" id="btnView" aria-pressed="false" title="Toggle tactical chart (T)">Chart</button>
+  <button class="btn" id="btnQuality" title="Rendering quality (Q)">High</button>
+  <button class="btn" id="btnSound" aria-pressed="false" title="Sound (M)">Sound</button>
+  <button class="btn" id="btnHelp" title="Help (?)">?</button>
+</header>
+
+<section id="slate" class="panel rivets" aria-label="Your ship"></section>
+<section id="vane" class="panel rivets" aria-label="Wind"></section>
+<section id="roster" class="panel" aria-label="Ships in the battle"><h2>The Fleet</h2><ul id="rosterList"></ul></section>
+<section id="log" class="panel" aria-label="Signal log" aria-live="polite"></section>
+
+<section id="orders" class="panel rivets" aria-label="Orders for this turn"></section>
+
+<div id="cine" aria-hidden="true"><div id="caption"></div><div id="skiphint">Space — skip</div></div>
+<div id="status" class="sr-only" aria-live="assertive"></div>
+
+<div id="menu" class="overlay open" role="dialog" aria-modal="true" aria-labelledby="menuTitle"></div>
+<div id="help" class="overlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle"></div>
+<div id="end" class="overlay" role="dialog" aria-modal="true" aria-labelledby="endTitle"></div>
+<div id="fps"></div>
+<noscript><p style="color:#fff;padding:20px">Broadside needs JavaScript and WebGL2.</p></noscript>
+<!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

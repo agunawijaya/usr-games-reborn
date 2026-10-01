@@ -1,0 +1,37 @@
+{
+  "id": "backgammon",
+  "title": "Backgammon",
+  "tagline": "Race your checkers home, and hit when it counts.",
+  "teaser": "The ancient race game: roll the dice, move your checkers around the board and bear them all off first.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [10, 25],
+  "status": "coming-soon",
+  "accent": "#b0784a",
+  "emblem": "M8 8l4 15 4-15M20 8l4 15 4-15M32 8l4 15 4-15M8 40l4-15 4 15M20 40l4-15 4 15M32 40l4-15 4 15",
+  "inspiredBy": {
+    "program": "backgammon",
+    "originalTitle": "backgammon",
+    "uiTitle": "backgammon",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "backgammon — roll, move checkers, bear off before your opponent.",
+    "description": "Alan Char’s backgammon for BSD, which came with its own tutorial program for newcomers.",
+    "seeAlso": ["gomoku", "cribbage", "pig"]
+  },
+  "howToPlay": [
+    "Roll the dice and move your checkers around the board.",
+    "Land on a lone enemy checker to send it back.",
+    "Bring all your checkers home and off the board first."
+  ]
+}

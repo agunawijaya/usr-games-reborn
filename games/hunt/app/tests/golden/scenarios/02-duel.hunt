@@ -1,0 +1,13 @@
+# Two humans on a real maze: moving, turning, firing every weapon they can
+# afford, scanning and cloaking. Full dumps check memories and screens.
+seed 7
+init
+join alice - c
+join bob - s
+full
+key alice hhhhjjjjkkkkllllHfffJfLgKf
+key bob lllljjjjhhhhkkkksKfffLfcHo
+fullstep 30
+key alice fffffffff1111gggg2222
+key bob FFFF3333oooOOOpppPPP
+step 40

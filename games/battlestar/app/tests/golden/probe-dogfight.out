@@ -1,0 +1,136 @@
+Version 4.2, fall 1984.
+First Adventure game written by His Lordship, the honorable
+Admiral D.W. Riggle
+
+
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway left. The bridal suite is
+right. Other rooms lie ahead and behind you.
+
+>-: 
+	This is the maid's utility room.
+What a gruesome sight! The maid has been brutally drowned in a bucket of
+Pine Sol and repeatedly stabbed in the back with a knife.
+The hallway is behind you.
+
+There is a knife here.
+The maid's body is lying here. She was murdered!
+>-: knife:
+Taken.
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway right. The bridal suite is
+left. Other rooms lie back and ahead.
+
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar ahead. The hallway
+goes back.
+
+There is a laser pistol here.
+>-: laser:
+Taken.
+>-: 
+	These are the executive suites of the battlestar.
+
+>-: 
+	You are in what was once an elegant stateroom.
+Whoever lived in this stateroom, he and his female companion
+were mercilessly slain in their sleep. Clothes, trinkets and personal
+belongings are scattered all across the floor. Through a hole in the
+collapsed floor I can see a hallway below.  A door is behind you.
+
+There is a strange golden amulet on the floor here.
+>-: The amulet is warm to the touch, and its beauty catches your breath.
+A mist falls over your eyes, but then it is gone.  Sounds seem clearer
+and sharper but far away as if in a dream.  The sound of purling water
+reaches you from afar.  The mist falls again, and your heart leaps in horror.
+The gold freezes your hands and fathomless darkness engulfs your soul.
+amulet:
+Taken.
+>-: 
+	The hallway is very congested with rubble here.
+It is too choked with broken steel girders and other debris to continue
+on much farther. Above, the ceiling has caved in and it is possible to 
+climb up. There is not much chance to go back, ahead, or left.
+But the hallway seems clearer right.
+
+There are a few coins here.
+>-: 
+	You are in a wide hallway leading to the main hangar.
+The walls and ceiling here have been blasted through in several places.
+It looks as if quite a battle has been fought for possession of the landing bay
+Gaping corpses litter the floor.  The hallway continues behind you.
+The main hangar is ahead.
+
+>-: 
+	You are in the main hangar.
+This is a huge bay where many fighters and cargo craft lie.  Alarms are 
+sounding and fighter pilots are running to their ships.  Above is a gallery
+overlooking the bay. The scream of turbo engines is coming from right. The rest
+of the hangar is left. There is an exit behind you.
+
+>-: 
+	This is the launch room.
+From the launch tubes here fighters blast off into space. Only one is left,
+and it is guarded by two fierce men. A staircase leads up from here.
+There is a cluttered workbench ahead. From the main hangar come sounds of great
+explosions.  The main hangar is behind you. The viper launch tubes are right.
+
+>-: 
+	You are in the viper launch tube.
+The two guards are eyeing you warily! 
+
+There is a Viper ready for launch here.
+>-: You climb into the viper and prepare for launch.
+With a touch of your thumb the turbo engines ignite, thrusting you back into
+your seat.
+
+	You are in space.
+
+
+>-: 
+	You are in space.
+
+
+>-: 
+	You are in space.
+
+
+>-: Oh my God, you're being shot at by an alien spacecraft!
+The targeting computer says we have 120 seconds to attack!
+(B)0[1;24r[m[?7h[H[J[1B    .[2;15H.[2;31H.[2;49H.[30C.[3;46H.[1B   .  .[4;21H.     .   .[4;42H.[36C.[5;25H. .[5;52H.   .   .[13C.[1B.[6;17H.     .  ..[46C.[1B[69D.[7;51H.[1B.[8;26H. .   .[8;42H.[8;59H.[14C.[1B   . .[9;26H.[9;36H. .[9;57H.[9;71H.[11;14H.[11;30H.   .[11;69H.[1B .[12;27H.[12;52H.[12;65H.[13;14H.[13;29H.[13;41H.[13;68H.[14;19H.[14;60H.[7C.[1B[61D.[15;51H.[1B[46D.  .[16;30H.[16;48H.[28C.[17;63H.[18;11H.[18;58H.[19;24H.[19;50H.[20;18H..[7C.[21;11H.[21;26H..  .[1B[5D.[22;64H.[23;22HTORPEDOES[23;42HFUEL[23;57HTIME[22;16H/-\[24;26H10[24;43H243[24;58H119[24;1H[?1l>[23BLaser blasts sear the cockpit, and the alien veers off in a victory roll.
+The viper shudders under a terrible explosion.
+I'm afraid you have suffered a fractured skull and mashed face.
+
+	You are in space.
+
+
+>-: Please type in something.
+>-: Please type in something.
+>-: 
+	You are in space.
+
+
+A planet is nearby.
+>-: 	PLEASURE	POWER		EGO
+	  0		  0		  0
+
+This gives you the rating of novice in 19 turns.
+You have visited 15 out of 275 rooms this run (5%).
+>-: bye.
+Your rating was novice.

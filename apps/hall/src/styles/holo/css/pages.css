@@ -1,0 +1,878 @@
+/*
+ * The Hall's quieter pages in the Holo Collection (settings, about, the server closet) and the
+ * footer. The shared panels paint themselves from tokens; here they get the album's soft paper
+ * panels, rounded Fredoka headings, pill controls and a little foil where a choice is made.
+ */
+
+/* The page frame */
+
+[data-style='holo'] .hc-page {
+  display: grid;
+  gap: 28px;
+  padding-top: 8px;
+}
+
+[data-style='holo'] .hc-page__head {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  max-width: 1000px;
+}
+
+[data-style='holo'] .hc-page__topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-bottom: 6px;
+}
+
+[data-style='holo'] .hc-page__back {
+  min-height: 46px;
+  padding: 0 20px;
+  font-size: 17px;
+}
+
+[data-style='holo'] .hc-page__title {
+  position: relative;
+  margin: 0 0 6px;
+  font: 700 clamp(42px, 3.3vw, 64px) / 1.02 var(--ug-font-display);
+  letter-spacing: -0.01em;
+}
+
+[data-style='holo'] .hc-page__title::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  bottom: -10px;
+  width: 84px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #ff6fb1, #ffcf5c, #7af0c4, #6fb8ff, #b98cff);
+}
+
+[data-style='holo'] .hc-page__lede {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-page__body--aside {
+  display: grid;
+  grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+  gap: clamp(26px, 3vw, 60px);
+  align-items: start;
+}
+
+[data-style='holo'] .hc-page__aside {
+  position: sticky;
+  top: 124px;
+}
+
+[data-style='holo'] .hc-page__content {
+  min-width: 0;
+}
+
+/* Settings: the sample card and the section list */
+
+[data-style='holo'] .hc-settings-aside {
+  display: grid;
+  gap: 22px;
+}
+
+[data-style='holo'] .hc-settings-sample {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  margin: 0;
+  padding: 26px 22px 20px;
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      260px 200px at 50% 0%,
+      color-mix(in srgb, var(--ug-accent) 16%, transparent),
+      transparent 70%
+    ),
+    var(--hc-surface);
+  border: 1px solid var(--ug-line);
+  box-shadow: var(--hc-shadow-soft);
+}
+
+[data-style='holo'] .hc-settings-sample .hc-card {
+  width: min(200px, 100%);
+}
+
+[data-style='holo'] .hc-settings-sample figcaption {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+
+[data-style='holo'] .hc-settings-sample__label {
+  font-size: 14px;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-settings-sample__caption {
+  margin: 0;
+  font: 700 20px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-settings-index ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--hc-surface);
+  border: 1px solid var(--ug-line);
+  list-style: none;
+}
+
+[data-style='holo'] .hc-settings-index__link {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ug-ink);
+  font: 600 16px var(--ug-font-display);
+  text-align: left;
+  cursor: pointer;
+}
+
+[data-style='holo'] .hc-settings-index__link:hover {
+  background: var(--ug-surface-2);
+}
+
+/* The shared settings panel, restyled as album pages */
+
+[data-style='holo'] .hc-page .set-panel {
+  gap: 22px;
+}
+
+[data-style='holo'] .hc-page .set-section {
+  gap: 16px;
+  padding: 26px 30px 28px;
+  border-radius: 28px;
+  background: var(--hc-surface);
+  box-shadow: var(--hc-shadow-soft);
+  scroll-margin-top: 124px;
+}
+
+[data-style='holo'] .hc-page .set-section__title {
+  position: relative;
+  justify-self: start;
+  margin-bottom: 4px;
+  font: 700 28px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-section__title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--hc-sticker);
+}
+
+[data-style='holo'] .hc-page .set-group__legend,
+[data-style='holo'] .hc-page .set-field__label,
+[data-style='holo'] .hc-page .set-toggle__label {
+  font: 600 18px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-hint {
+  font-size: 16px;
+}
+
+[data-style='holo'] .hc-page .set-group--cards .set-choices {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+[data-style='holo'] .hc-page .set-choice {
+  gap: 6px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--ug-line);
+  border-radius: 20px;
+  background: var(--ug-surface);
+  transition:
+    transform 0.2s var(--hc-ease),
+    border-color 0.2s var(--hc-ease),
+    box-shadow 0.2s var(--hc-ease);
+}
+
+[data-style='holo'] .hc-page .set-choice:not(.is-locked):hover {
+  transform: translateY(-2px);
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='holo'] .hc-page .set-choice__label {
+  font: 600 19px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-choice__detail {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* The chosen card gets a foil rim instead of a plain outline. */
+[data-style='holo'] .hc-page .set-choice.is-selected {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--ug-surface), var(--ug-surface)) padding-box,
+    linear-gradient(120deg, #ff6fb1, #ffcf5c, #7af0c4, #6fb8ff, #b98cff) border-box;
+  border-width: 3px;
+  padding: 12.5px 16.5px;
+  box-shadow: 0 16px 30px -20px var(--ug-accent);
+}
+
+[data-style='holo'] .hc-page .set-choice.is-selected .set-choice__label::before {
+  content: none;
+}
+
+/* A round tick in the corner of the chosen card, drawn with borders. */
+[data-style='holo'] .hc-page .set-group--cards .set-choice.is-selected::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ug-accent);
+}
+
+[data-style='holo'] .hc-page .set-group--cards .set-choice.is-selected .set-choice__label::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 17px;
+  right: 22px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--ug-accent-ink);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+[data-style='holo'] .hc-page .set-group--cards .set-choice {
+  padding-right: 48px;
+}
+
+[data-style='holo'] .hc-page .set-group--cards .set-choice.is-selected {
+  padding-right: 46.5px;
+}
+
+[data-style='holo'] .hc-page .set-choice.is-locked {
+  border-style: dashed;
+  border-color: var(--ug-line-strong);
+  background: color-mix(in srgb, var(--ug-surface-2) 60%, transparent);
+}
+
+[data-style='holo'] .hc-page .set-choice.is-locked .set-choice__label,
+[data-style='holo'] .hc-page .set-choice.is-locked .set-choice__detail {
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-page .set-choice__note {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--ug-surface-2);
+  border: 1px solid var(--ug-line);
+  color: var(--ug-ink);
+  font: 600 13px var(--ug-font-display);
+}
+
+/* Focus rings for the keyboard only; the shared panel draws them on any focus. */
+[data-style='holo'] .hc-page .set-choice:focus-within {
+  outline: none;
+}
+
+[data-style='holo'] .hc-page .set-choice:has(:focus-visible) {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 3px;
+}
+
+/* A swatch for each style, and the foil each finish gives the cards. */
+[data-style='holo'] .hc-page .set-section--style .set-choice,
+[data-style='holo'] .hc-page .set-section--palette .set-choice {
+  padding-left: 76px;
+}
+
+[data-style='holo'] .hc-page .set-section--style .set-choice.is-selected,
+[data-style='holo'] .hc-page .set-section--palette .set-choice.is-selected {
+  padding-left: 74.5px;
+}
+
+[data-style='holo'] .hc-page .set-section--style .set-choice::before,
+[data-style='holo'] .hc-page .set-section--palette .set-choice::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 44px;
+  height: 58px;
+  border-radius: 9px;
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.55),
+    0 6px 14px -8px var(--ug-shadow);
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='console'])::before {
+  background:
+    radial-gradient(circle at 70% 30%, #ffd3a8, transparent 50%),
+    linear-gradient(145deg, #3d3a8f, #98a6ff);
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='holo'])::before {
+  background: linear-gradient(135deg, #ff9ecf, #ffe08a, #9ff0d2, #a8c8ff, #d6b4ff);
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='machine-room'])::before {
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 3px, rgba(0, 0, 0, 0.25) 3px 4px),
+    linear-gradient(145deg, #0d2a1a, #1f6b42);
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='default'])::before {
+  background:
+    repeating-linear-gradient(
+      115deg,
+      #ff9ecf 0 8px,
+      #ffe08a 8px 16px,
+      #9ff0d2 16px 24px,
+      #a8c8ff 24px 32px
+    ),
+    #fff;
+  opacity: 0.85;
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='finish-prism'])::before {
+  background: repeating-linear-gradient(
+    115deg,
+    #ff4fa0 0 6px,
+    #ffc43d 6px 12px,
+    #3fe8b0 12px 18px,
+    #4aa8ff 18px 24px,
+    #a46bff 24px 30px
+  );
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='finish-galaxy'])::before {
+  background:
+    radial-gradient(circle, #fff 0 1px, transparent 1.6px) 0 0 / 9px 11px,
+    radial-gradient(circle, #cfe3ff 0 1.2px, transparent 1.8px) 4px 6px / 17px 15px,
+    linear-gradient(160deg, #1b1650, #5b3fb8 60%, #b07bff);
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='finish-gold'])::before {
+  background: repeating-linear-gradient(
+    115deg,
+    #fff6c9 0%,
+    #f5c84b 18%,
+    #b8861f 36%,
+    #fff1b0 54%,
+    #d9a632 72%,
+    #fff6c9 90%
+  );
+}
+
+[data-style='holo'] .hc-page .set-choice:has(input[value='finish-chrome'])::before {
+  background: linear-gradient(
+    160deg,
+    #fdfdff 0%,
+    #b8c1cf 30%,
+    #f4f6fa 48%,
+    #7c8698 70%,
+    #e8ecf2 100%
+  );
+}
+
+[data-style='holo'] .hc-page .set-choice.is-locked::before {
+  filter: grayscale(0.7);
+  opacity: 0.55;
+}
+
+[data-style='holo'] .hc-page .set-group--pills .set-choice {
+  min-height: 48px;
+  padding: 0 22px;
+  font-family: var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-group--pills .set-choice.is-selected {
+  border: 1.5px solid var(--ug-ink);
+  padding: 0 22px;
+  background: var(--ug-ink);
+  color: var(--ug-bg);
+  box-shadow: none;
+}
+
+[data-style='holo'] .hc-page .set-group--pills .set-choice.is-selected .set-choice__label {
+  color: var(--ug-bg);
+}
+
+[data-style='holo'] .hc-page .set-range__input::-webkit-slider-runnable-track {
+  height: 12px;
+  background:
+    linear-gradient(90deg, #ff6fb1, #ffcf5c 40%, #7af0c4 70%, #6fb8ff) 0 0 / var(--set-fill, 50%)
+      100% no-repeat,
+    color-mix(in srgb, var(--ug-line-strong) 45%, transparent);
+}
+
+[data-style='holo'] .hc-page .set-range__input::-webkit-slider-thumb {
+  width: 28px;
+  height: 28px;
+  margin-top: -8px;
+  border: 4px solid var(--ug-surface);
+  background: var(--ug-accent);
+}
+
+[data-style='holo'] .hc-page .set-range__value {
+  font-family: var(--ug-font-display);
+  font-size: 18px;
+}
+
+[data-style='holo'] .hc-page .set-toggle__track {
+  width: 56px;
+  height: 32px;
+}
+
+[data-style='holo'] .hc-page .set-toggle__thumb {
+  width: 24px;
+  height: 24px;
+}
+
+[data-style='holo'] .hc-page .set-toggle__input:checked + .set-toggle__track .set-toggle__thumb {
+  transform: translateX(24px);
+}
+
+[data-style='holo'] .hc-page .set-button,
+[data-style='holo'] .set-dialog .set-button {
+  min-height: 48px;
+  padding: 0 22px;
+  font: 600 17px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-select {
+  min-height: 48px;
+  border-radius: 999px;
+  font-family: var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .set-control {
+  border-radius: 16px;
+}
+
+[data-style='holo'] .set-dialog {
+  padding: 30px 32px;
+  border-radius: 28px;
+  border-color: var(--ug-line);
+}
+
+[data-style='holo'] .set-dialog__title {
+  font-size: 28px;
+}
+
+/* About */
+
+[data-style='holo'] .hc-page .ab-content {
+  gap: 22px;
+  max-width: none;
+}
+
+/* Wide screens set the story and the how-to side by side, like the two flaps of a box. */
+@media (min-width: 1440px) {
+  [data-style='holo'] .hc-page .ab-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  [data-style='holo'] .hc-page .ab-section:nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+}
+
+[data-style='holo'] .hc-page .ab-section {
+  padding: 28px 32px 30px;
+  border-radius: 28px;
+  background: var(--hc-surface);
+  border: 1px solid var(--ug-line);
+  box-shadow: var(--hc-shadow-soft);
+}
+
+[data-style='holo'] .hc-page .ab-section__title {
+  position: relative;
+  justify-self: start;
+  margin-bottom: 8px;
+  font: 700 30px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .ab-section__title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 48px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--hc-sticker);
+}
+
+[data-style='holo'] .hc-page .ab-section p,
+[data-style='holo'] .hc-page .ab-list {
+  font-size: 17px;
+}
+
+[data-style='holo'] .hc-page .ab-lede {
+  font-size: 20px;
+}
+
+[data-style='holo'] .hc-page .ab-list {
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+[data-style='holo'] .hc-page .ab-list li {
+  position: relative;
+  padding-left: 30px;
+}
+
+[data-style='holo'] .hc-page .ab-list li::before {
+  content: '';
+  position: absolute;
+  top: 0.45em;
+  left: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--hc-sticker);
+  transform: rotate(12deg);
+}
+
+[data-style='holo'] .hc-page .ab-credits {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 18px;
+  margin-top: 8px;
+}
+
+[data-style='holo'] .hc-page .ab-credits__group {
+  gap: 12px;
+  padding: 18px 20px 20px;
+  border-radius: 22px;
+  background: var(--ug-surface);
+  border: 1px solid var(--ug-line);
+}
+
+[data-style='holo'] .hc-page .ab-credits__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  font: 700 21px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .ab-credits__heading::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--hc-sticker);
+}
+
+[data-style='holo'] .hc-page .ab-credit__title {
+  font-size: 16px;
+}
+
+[data-style='holo'] .hc-page .ab-credit__title b {
+  font: 600 17px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page .ab-credit__origin {
+  font-family: var(--ug-font-body);
+  font-size: 15px;
+}
+
+[data-style='holo'] .hc-page .ab-credit__text {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+[data-style='holo'] .hc-about-fan {
+  display: grid;
+  gap: 14px;
+  padding: 22px 18px 26px;
+  border-radius: 28px;
+  background: var(--hc-surface);
+  border: 1px solid var(--ug-line);
+  box-shadow: var(--hc-shadow-soft);
+}
+
+[data-style='holo'] .hc-about-fan__label {
+  margin: 0;
+  font: 700 18px var(--ug-font-display);
+  text-align: center;
+}
+
+[data-style='holo'] .hc-about-fan__cards {
+  position: relative;
+  height: 250px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-style='holo'] .hc-about-fan__cards > li {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 142px;
+  margin-left: -71px;
+  transform-origin: 50% 130%;
+}
+
+[data-style='holo'] .hc-about-fan__cards > li:nth-child(1) {
+  transform: rotate(-9deg) translateX(-34px);
+}
+
+[data-style='holo'] .hc-about-fan__cards > li:nth-child(2) {
+  z-index: 1;
+  transform: rotate(9deg) translateX(34px);
+}
+
+[data-style='holo'] .hc-about-fan__cards > li:nth-child(3) {
+  z-index: 2;
+  transform: translateY(-6px);
+}
+
+[data-style='holo'] .hc-about-fan__cards > li:not(:last-child) .hc-card__name,
+[data-style='holo'] .hc-about-fan__cards > li:not(:last-child) .hc-card__tagline {
+  visibility: hidden;
+}
+
+[data-style='holo'] .hc-about-fan .hc-card__stats {
+  display: none;
+}
+
+[data-style='holo'] .hc-about-fan .hc-card__name {
+  margin: 8px 10px 0;
+  font-size: 17px;
+}
+
+[data-style='holo'] .hc-about-fan .hc-card__tagline {
+  margin: 4px 10px 0;
+  font-size: 13px;
+}
+
+/* The server closet */
+
+[data-style='holo'] .hc-page--closet .cl-room,
+[data-style='holo'] .hc-page--closet .cl-locked {
+  padding: 28px 32px 32px;
+  border-radius: 30px;
+  background: var(--hc-surface);
+  border: 1px solid var(--ug-line);
+  box-shadow: var(--hc-shadow-soft);
+}
+
+[data-style='holo'] .hc-page--closet .cl-room {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'copy controls'
+    'canvas canvas';
+  align-items: center;
+  gap: 22px 28px;
+}
+
+[data-style='holo'] .hc-page--closet .cl-room__copy {
+  grid-area: copy;
+}
+
+[data-style='holo'] .hc-page--closet .cl-controls {
+  grid-area: controls;
+  justify-content: flex-end;
+}
+
+[data-style='holo'] .hc-page--closet .cl-canvas {
+  grid-area: canvas;
+  height: clamp(280px, 50vh, 560px);
+}
+
+[data-style='holo'] .hc-page--closet .cl-locked {
+  grid-template-columns: auto minmax(0, 560px);
+  justify-content: center;
+  gap: clamp(32px, 5vw, 96px);
+  padding-block: 44px 48px;
+}
+
+[data-style='holo'] .hc-page--closet .cl-locked__copy {
+  gap: 16px;
+}
+
+/* The progress bar the shared closet draws; only the Machine Room styled it before. */
+[data-style='holo'] .hc-page--closet .bar {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line) 85%, transparent);
+}
+
+[data-style='holo'] .hc-page--closet .bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff6fb1, #ffcf5c, #7af0c4, #6fb8ff, #b98cff);
+}
+
+/* The page's own heading names the room; the panel's copy of it would repeat it. */
+[data-style='holo'] .hc-page--closet .cl-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-style='holo'] .hc-page--closet .cl-status {
+  margin: 0;
+  font: 600 24px / 1.35 var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page--closet .cl-hint {
+  font-size: 17px;
+}
+
+[data-style='holo'] .hc-page--closet .cl-canvas {
+  border: 0;
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--ug-line) 80%, transparent),
+    0 30px 60px -30px var(--ug-shadow);
+}
+
+[data-style='holo'] .hc-page--closet .cl-switch {
+  min-height: 52px;
+  padding: 0 22px 0 14px;
+  border-color: var(--ug-line);
+  background: var(--ug-surface);
+  font: 600 17px var(--ug-font-display);
+}
+
+[data-style='holo'] .hc-page--closet .cl-switch.is-on {
+  border-color: var(--ug-accent);
+}
+
+[data-style='holo'] .hc-page--closet .cl-door {
+  border-radius: 20px 20px 8px 8px;
+  border-color: var(--ug-line-strong);
+  box-shadow:
+    inset 0 0 0 10px color-mix(in srgb, var(--ug-surface) 40%, transparent),
+    0 26px 50px -26px var(--ug-shadow);
+}
+
+/* Warm light leaks under the door: something in there is humming. */
+[data-style='holo'] .hc-page--closet .cl-door::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -4px;
+  height: 4px;
+  border-radius: 2px;
+  background: #ffc27a;
+  box-shadow:
+    0 0 14px 3px rgba(255, 184, 107, 0.75),
+    0 0 40px 8px rgba(255, 184, 107, 0.35);
+}
+
+[data-style='holo'][data-motion='full']:not([data-frozen='true']) .hc-page--closet .cl-door::after {
+  animation: hc-hum 3.2s ease-in-out infinite;
+}
+
+@keyframes hc-hum {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* The footer */
+
+[data-style='holo'] .hc-footer {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: min(100% - 2 * var(--hc-gutter), 1840px);
+  margin: 0 auto;
+  padding: 30px 0 48px;
+  border-top: 1px solid var(--ug-line);
+  text-align: center;
+}
+
+[data-style='holo'] .hc-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+[data-style='holo'] .hc-footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ug-line);
+  background: var(--hc-surface);
+  color: var(--ug-ink);
+  font: 600 16px var(--ug-font-display);
+  text-decoration: none;
+}
+
+[data-style='holo'] .hc-footer__link:hover {
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='holo'] .hc-footer__badge {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--ug-surface-2);
+  color: var(--ug-ink-2);
+  font-size: 13px;
+}
+
+[data-style='holo'] .hc-footer__badge.is-open {
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+}
+
+[data-style='holo'] .hc-footer__note {
+  max-width: 70ch;
+  margin: 0;
+  font-size: 15px;
+  color: var(--ug-ink-2);
+}
+
+@media (max-width: 1000px) {
+  [data-style='holo'] .hc-page__body--aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='holo'] .hc-page__aside {
+    position: static;
+  }
+
+  [data-style='holo'] .hc-settings-index {
+    display: none;
+  }
+}

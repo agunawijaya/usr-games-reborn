@@ -1,0 +1,533 @@
+Version 4.2, fall 1984.
+First Adventure game written by His Lordship, the honorable
+Admiral D.W. Riggle
+
+
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway left. The bridal suite is
+right. Other rooms lie ahead and behind you.
+
+>-: 
+	You are in what was once an elegant stateroom.
+Whoever lived in this stateroom, he and his female companion
+were mercilessly slain in their sleep. Clothes, trinkets and personal
+belongings are scattered all across the floor. Through a hole in the
+collapsed floor I can see a hallway below.  A door is behind you.
+
+There is a strange golden amulet on the floor here.
+>-: The amulet is warm to the touch, and its beauty catches your breath.
+A mist falls over your eyes, but then it is gone.  Sounds seem clearer
+and sharper but far away as if in a dream.  The sound of purling water
+reaches you from afar.  The mist falls again, and your heart leaps in horror.
+The gold freezes your hands and fathomless darkness engulfs your soul.
+amulet:
+Taken.
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway ahead. The bridal suite is
+behind you. Other rooms lie right and left.
+
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar ahead. The hallway
+goes back.
+
+There is a laser pistol here.
+>-: laser:
+Taken.
+>-: 
+	These are the executive suites of the battlestar.
+
+>-: 
+	This is the maid's utility room.
+What a gruesome sight! The maid has been brutally drowned in a bucket of
+Pine Sol and repeatedly stabbed in the back with a knife.
+The hallway is behind you.
+
+There is a knife here.
+The maid's body is lying here. She was murdered!
+>-: knife:
+Taken.
+>-: 
+	These are the executive suites of the battlestar.
+
+>-: 
+	You are in what was once an elegant stateroom.
+Whoever lived in this stateroom, he and his female companion
+were mercilessly slain in their sleep. Clothes, trinkets and personal
+belongings are scattered all across the floor. Through a hole in the
+collapsed floor I can see a hallway below.  A door is behind you.
+
+>-: 
+	The hallway is very congested with rubble here.
+It is too choked with broken steel girders and other debris to continue
+on much farther. Above, the ceiling has caved in and it is possible to 
+climb up. There is not much chance to go back, ahead, or left.
+But the hallway seems clearer right.
+
+There are a few coins here.
+>-: 
+	You are in a wide hallway leading to the main hangar.
+The walls and ceiling here have been blasted through in several places.
+It looks as if quite a battle has been fought for possession of the landing bay
+Gaping corpses litter the floor.  The hallway continues behind you.
+The main hangar is ahead.
+
+>-: 
+	You are in the main hangar.
+This is a huge bay where many fighters and cargo craft lie.  Alarms are 
+sounding and fighter pilots are running to their ships.  Above is a gallery
+overlooking the bay. The scream of turbo engines is coming from right. The rest
+of the hangar is left. There is an exit behind you.
+
+>-: 
+	This is the launch room.
+From the launch tubes here fighters blast off into space. Only one is left,
+and it is guarded by two fierce men. A staircase leads up from here.
+There is a cluttered workbench ahead. From the main hangar come sounds of great
+explosions.  The main hangar is behind you. The viper launch tubes are right.
+
+>-: 
+	You are in the viper launch tube.
+The two guards are eyeing you warily! 
+
+There is a Viper ready for launch here.
+>-: You climb into the viper and prepare for launch.
+With a touch of your thumb the turbo engines ignite, thrusting you back into
+your seat.
+
+	You are in space.
+
+
+>-: 
+	You are in space.
+
+
+>-: 
+	You are in space.
+
+
+>-: Oh my God, you're being shot at by an alien spacecraft!
+The targeting computer says we have 120 seconds to attack!
+(B)0[1;24r[m[?7h[H[J[2;13H.[2;23H.[2;60H.[1B[56D.[7C.[3;67H.[4;35H.[4;47H.[28C.[5;15H.[5;29H.  .[5;53H.[5;63H.[13C.[1B   .[6;18H.[6;58H.[7;9H.[7;47H.[7;63H.[6C.[8;15H.[8;45H.[9;28H.[9;52H.[9;61H.[13C.[10;22H.[10;37H.   .[10;60H.[11;10H.[11;23H.[11;34H.  .[11;63H.[11C.[12;27H.[12;43H.[12;58H.[7C.[12C.[1B .[13;31H.     .[13;59H.    .[14;17H..[14;27H.  .[14;42H.[15;26H.[15;68H.[1B .     .[16;25H. . .[16;44H..  .[16;60H.[15C.[17;14H.[17;53H.[18;12H.[18;70H.[19;21H.[52C.[20;22H.[20;34H.[20;44H.[32C.[1B[70D. . .[21;34H.[21;47H.   .[22;38H.[6C.[23;22HTORPEDOES[23;42HFUEL[23;57HTIME[8A  /-\[24;26H10[24;43H243[24;58H119[24;1H[?1l>[23BLaser blasts sear the cockpit, and the alien veers off in a victory roll.
+The viper shudders under a terrible explosion.
+I'm afraid you have suffered some minor abrasions.
+
+	You are in space.
+
+
+>-: Please type in something.
+>-: 
+	You are in space.
+
+
+A planet is nearby.
+>-: 
+	You are orbiting a tropical planet.
+
+
+>-: 
+	You are approaching an island.
+Coconut palms, sword ferns, orchids, and other lush vegetation drape this
+jagged island carved seemingly from pure emerald and set in a turquoise
+sea. The land rises sharply behind you. There is a nice beach left.
+
+>-: 
+	You are flying over the beach.
+A warm gentle surf caresses the white coral beach here. The land rises
+sharply left. The beach is lost in low cliffs and rocks ahead.
+
+>-: You are down.
+
+	This is a beautiful coral beach.
+Fine silver sand kissed lightly by warm tropical waters stretches at least
+30 meters here from the ocean to under gently swaying palms left.
+
+There is a Viper ready for launch here.
+>-: The amulet begins to glow.
+A light mist falls over your eyes and the sound of purling water trickles in
+your ears.   When the mist lifts you are standing beside a cool stream.
+
+	You are on the bank of a stream.
+The stream falls over several small boulders here and continues on ahead.
+
+>-: 
+	The thermal pools flow into a stream here.
+The gurgling hot waters pour over boulders into a swiftly flowing
+stream behind you. The pools are ahead.
+
+>-: 
+	You are at the thermal pools.
+Several steaming fumaroles and spluttering geysers drenched by icy mountain
+waters from a nearby waterfall heat half a dozen natural pools to a
+delicious 42 degrees. Enchantingly beautiful singing seems to flow from the
+water itself as it tumbles down the falls. There is a mossy entrance
+to a cave ahead.
+
+A flower-like young goddess is bathing in the hot mineral pools. She is 
+watching you, but continues to steep and sing softly.
+>-: She offers a delicate hand, and you help her out of the sparkling springs.
+Water droplets like liquid silver bedew her golden skin, but when they part
+from her, they fall as teardrops.  She wraps a single cloth around her and
+ties it at the waist.  Around her neck hangs a golden amulet.
+She bids you to follow her, and walks away.
+>-: The goddess leads you down a steamy tunnel and into a high, wide chamber.
+She sits down on a throne.
+
+	You are in a rather large chamber.
+Beds of ferns and palm leaves make several cozy nests along the walls. In the
+center of the room is a throne of gold and silver which pulls out into a bed
+of enormous size.  A passageway ahead leads down.
+
+A kerosene lantern is burning luridly here.
+The goddess is reclining on a bed of ferns and studying you intently.
+>-: Kissed.
+She squirms and avoids your advances.
+>-: Kissed.
+She is coming around; she didn't fight it as much.
+>-: She cuddles up to you, and her mouth starts to work:
+'That was my sister's amulet.  The lovely goddess, Purl, was she.  The Empire
+captured her just after the Darkness came.  My other sister, Vert, was killed
+by the Dark Lord himself.  He took her amulet and warped its power.
+Your quest was foretold by my father before he died, but to get the Dark Lord's
+amulet you must use cunning and skill.  I will leave you my amulet,
+which you may use as you wish.  As for me, I am the last goddess of the
+waters.  My father was the Island King, and the rule is rightfully mine.'
+
+She pulls the throne out into a large bed.
+Her kisses revive you; your wounds are healed.
+
+Goddess:
+Loved.
+>-: It's too dark to see anything in here!
+>-: 
+	You are just inside the cave.
+A steamy hot breath is belching from the depths of the earth within. The
+cave  continues back.
+
+>-: 
+	You are at the entrance to a cave.
+A tall narrow fissure in the rock cliffs here has become a well traveled
+passage way. A hoof beaten dirt path leads directly into it. A curl of
+steam is trailing from a corner of the fissure's gaping mouth. The path
+leads ahead and back. The pools are right.
+
+>-: 
+	You are on a dirt trail.
+The trail seems to start here and head ahead. High cliffs border the 
+trail left.
+
+>-: 
+	You are on a dirt path along the wash.
+This path looks more like a deer trail. It scampers away left.
+
+>-: 
+	The trail is lost in the woods here.
+I suppose the animals that use this trail all depart in different directions
+when they get this far into the woods. The trail goes back.
+
+>-: 
+	You are on a dirt road.
+The road continues ahead and back.
+
+>-: 
+	You are on a dirt road.
+The road winds through a coconut grove here. The road continues on ahead
+and back.
+
+>-: 
+	You are on a dirt road.
+The road winds through a coconut palm grove here. It continues on ahead 
+and back.
+
+There are some coconuts here.
+>-: 
+	You are on a dirt road.
+There is a large village ahead. The road cleaves a coconut plantation behind you.
+A small dirt road goes right, and a driveway peels off left.
+
+>-: 
+	This is the front lawn.
+There is a small fountain here where the driveway meets the lawn.
+Across the driveway, right, is an ornate white house with and elegant 
+woodworking.  The bargeboards are carved with fylfots, the ancient 
+symbols of luck.  Even a bell tower has been built here.  There is a 
+road behind you which turns into the driveway.
+
+>-: 
+	You are on the front porch of the cottage.
+Several giggling native girls came running down the steps as you approached
+and headed on down the road.  On the fern rimmed porch is a small table with
+matching white wrought iron chairs cushioned with red velvet.  The front
+door leads ahead.  The lawn and fountain are behind you.
+
+>-: 
+	You are in the drawing room.
+Exquisitely decorated with plants and antique furniture of superb
+craftsmanship, the parlor reflects its owner's impeccable taste.  The tropical
+sun is streaming in through open shutters behind you.  There doesn't seem 
+to be anybody around.  A large immaculate oaken desk is visible in the
+study and it even has a old fashioned telephone to complete the decor.
+
+There is an unwieldy two-handed sword here.
+There is a colorful pink potion in a small crystal vial here.
+>-: You are now wearing a laser.
+>-: You are now wearing a knife.
+>-: You are now wearing an amulet.
+>-: two-handed sword:
+Taken.
+>-: potion:
+Taken.
+>-: 
+	You are on the front porch of the cottage.
+Several giggling native girls came running down the steps as you approached
+and headed on down the road.  On the fern rimmed porch is a small table with
+matching white wrought iron chairs cushioned with red velvet.  The front
+door leads back.  The lawn and fountain are ahead.
+
+>-: 
+	This is the front lawn.
+There is a small fountain here where the driveway meets the lawn.
+Across the driveway, behind you, is an ornate white house with and elegant 
+woodworking.  The bargeboards are carved with fylfots, the ancient 
+symbols of luck.  Even a bell tower has been built here.  There is a 
+road left which turns into the driveway.
+
+>-: 
+	You are on a dirt road.
+There is a large village left. The road cleaves a coconut plantation right.
+A small dirt road goes ahead, and a driveway peels off behind you.
+
+>-: 
+	You are on a dirt road.
+The road goes left and back.
+
+>-: 
+	You are in a coconut grove.
+The grove ends in a clearing behind you.
+
+There are some coconuts here.
+>-: 
+	You are in a palm grove.
+There are palm trees all around us.
+
+>-: 
+	You are in a coconut grove.
+
+
+>-: 
+	You are in a coconut grove.
+
+
+There are some coconuts here.
+>-: 
+	You are in a coconut grove.
+The grove ends ahead.
+
+There are some coconuts here.
+>-: 
+	You are in a coconut grove.
+There is a dirt road ahead.
+
+>-: 
+	You are on a dirt road.
+The road runs left and right.
+
+>-: 
+	You are in the forest near the road.
+There are many thorny bushes here!
+
+>-: 
+	You are in the woods near the road.
+These thorny bushes are killing me.
+
+An old pair of shoes has been discarded here.
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: two-handed sword:
+Dropped.
+>-: coat of mail:
+Taken.
+>-: You are now wearing a coat of mail.
+>-: plumed helmet:
+Taken.
+>-: You are now wearing a plumed helmet.
+>-: two-handed sword:
+Taken.
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: It's too dark to see anything in here!
+>-: <zzz>..............................................
+>-: It's too dark to see anything in here!
+>-: Out from the shadows a figure leaps!  His black cape swirls around, and he
+holds a laser sword at your chest.  'So, you have come to fulfill the Quest.
+Ha! Your weapons are no match for me!'
+<fight!>-: He checked your blow. CLASH! CLANG!
+He attacks...
+I'm afraid you have suffered a broken arm and dislocated shoulder.
+<fight!>-: A bloody gash opens up on his left side.
+He attacks...
+I'm afraid you have suffered a few broken ribs.
+<fight!>-: He's bleeding.
+He attacks...
+I'm afraid you have suffered a broken back and ruptured spleen.
+<fight!>-: His filthy tunic hangs by one less thread.
+He attacks...
+I'm afraid you have suffered some minor abrasions.
+<fight!>-: Clutching his blood drenched shirt, he collapses stunned.
+He attacks...
+I'm afraid you have suffered a broken leg and torn ligaments.
+<fight!>-: The force of your blow sends him to his knees.
+His arm swings lifeless at his side.
+He attacks...
+I'm afraid you have suffered a minor puncture wound.
+<fight!>-: two-handed sword:
+Dropped.
+He attacks...
+I'm afraid you have suffered some minor lacerations.
+<fight!>-: He throws you back against the rock and pummels your face.
+Lifting the amulet from you, he flees down the dark caverns.
+It's too dark to see anything in here!
+>-: The Dark Lord leaps away and runs down secret tunnels and corridors.
+You chase him through the darkness and splash in pools of water.
+You have cornered him.  His laser sword extends as he steps forward.
+<fight!>-: You escape stunned and disoriented from the fight.
+A victorious bellow echoes from the battlescene.
+It's too dark to see anything in here!
+>-: The cool liquid runs down your throat but turns to fire and you choke.
+The heat reaches your limbs and tingles your spirit.  You feel like falling
+asleep.
+<zzz>............
+>-: The talisman is cold to the touch, and it sends a chill down your spine.
+talisman:
+Taken.
+>-: The amulet is warm to the touch, and its beauty catches your breath.
+A mist falls over your eyes, but then it is gone.  Sounds seem clearer
+and sharper but far away as if in a dream.  The sound of purling water
+reaches you from afar.  The mist falls again, and your heart leaps in horror.
+The gold freezes your hands and fathomless darkness engulfs your soul.
+amulet:
+Taken.
+>-: The amulet begins to glow.
+A light mist falls over your eyes and the sound of purling water trickles in
+your ears.   When the mist lifts you are standing beside a cool stream.
+
+	You are on the bank of a stream.
+The stream falls over several small boulders here and continues on ahead.
+
+>-: 
+	The thermal pools flow into a stream here.
+The gurgling hot waters pour over boulders into a swiftly flowing
+stream behind you. The pools are ahead.
+
+>-: 
+	You are at the thermal pools.
+Odd spluttering and belching water splashes up around the rocks here.
+A spectacular waterfall nearby tumbles down as a river of effervescent
+bubbles.  The air is quite warm and a cave entrance ahead spews steam.
+
+>-: 
+	You are at the entrance to a cave.
+A torch lights the entrance to the cave.  Deep inside I can see shadows moving.
+A path goes right from here.  The entrance is left.
+
+A kerosene lantern is burning luridly here.
+>-: 
+	You are just inside the cave.
+A steamy hot breath is belching from the depths of the earth within. The
+cave  continues ahead.
+
+>-: It's too dark to see anything in here!
+>-: 
+	You are in a rather large chamber.
+Beds of ferns and palm leaves make several cozy nests along the walls. In the
+center of the room is a throne of gold and silver which pulls out into a bed
+of enormous size.  A passageway right leads down.
+
+A kerosene lantern is burning luridly here.
+A medallion of solid gold shimmers on the ground nearby.
+The goddess is reclining on a bed of ferns and studying you intently.
+>-: The medallion is warm, and it rekindles your spirit with the warmth of life.
+Your amulet begins to glow as the medallion is brought near to it, and together
+they radiate.
+medallion:
+Taken.
+>-: amulet:
+Given.
+>-: medallion:
+Given.
+>-: talisman:
+Given.
+The powers of the earth are now legitimate.  You have destroyed the Darkness
+and restored the goddess to her throne.  The entire island celebrates with
+dancing and spring feasts.  As a measure of her gratitude, the goddess weds you
+in the late summer and crowns you Prince Liverwort, Lord of Fungus.
+
+But, as the year wears on and autumn comes along, you become restless and
+yearn for adventure.  The goddess, too, realizes that the marriage can't last.
+She becomes bored and takes several more natives as husbands.  One evening,
+after having been out drinking with the girls, she kicks the throne particularly
+hard and wakes you up.  (If you want to win this game, you're going to have to
+shoot her!)
+>-: laser:
+Taken.
+>-: The blast catches the goddess in the stomach, knocking her to the ground.
+She writhes in the dirt as the agony of death taunts her.
+She has stopped moving.
+
+You win!

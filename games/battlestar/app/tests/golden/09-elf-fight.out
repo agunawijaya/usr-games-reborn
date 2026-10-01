@@ -1,0 +1,82 @@
+Version 4.2, fall 1984.
+First Adventure game written by His Lordship, the honorable
+Admiral D.W. Riggle
+
+You are the Great wizard edward.
+
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: laser:
+Zap! Taken from thin air.
+>-: knife:
+Zap! Taken from thin air.
+>-: 
+Room (was 22) = Time (was 2) = Fuel (was 250) = Torps (was 10) = CUMBER (was 10) = WEIGHT (was 60) = Clock (was 120) = Wizard (was 1, 0) = 
+DONE.
+A woodland Elf armed with a shield and deadly halberd lunges toward you!
+<fight!>-: You don't have a chance; he is too quick.
+He attacks...
+I'm afraid you have suffered a sprained wrist.
+<fight!>-: You don't have a chance; he is too quick.
+He attacks...
+You emerge unscathed.
+<fight!>-: You swung wide and missed.
+He attacks...
+I'm afraid you have suffered a broken arm and dislocated shoulder.
+<fight!>-: knife:
+Dropped.
+He attacks...
+You emerge unscathed.
+<fight!>-: laser:
+You're already holding a laser.
+He attacks...
+I'm afraid you have suffered a few broken ribs.
+<fight!>-: You escape stunned and disoriented from the fight.
+A victorious bellow echoes from the battlescene.
+
+	This is a walk in closet.
+A wardrobe of immense magnitude greets the eye.  Furs and robes of kings
+hang on rack after rack.  Silken gowns, capes woven with spun gold, and 
+delicate synthetic fabrics are stowed here.  The bedroom is behind you.
+
+A kingly robe of royal purple and spun gold is draped here.
+>-: 
+Room (was 8) = Time (was 8) = Fuel (was 250) = Torps (was 10) = CUMBER (was 3) = WEIGHT (was 45) = Clock (was 120) = Wizard (was 1, 0) = 
+DONE.
+A woodland Elf armed with a shield and deadly halberd lunges toward you!
+<fight!>-: The Elf took a direct hit!
+You have killed the Elf.
+A watery black smoke consumes his body and then vanishes with a peal of thunder!
+
+	You are in the forest.
+This is a shallow depression sheltered from the wind by a thick growth of 
+thorny shrubs. It looks like someone has camped here. There is a fire pit
+with some dry sticks and grass nearby. The beach is ahead. The thorny
+shrubs block the way right.
+
+There is a knife here.
+There is a shield of some native tribe here.
+A long, sharp halberd is propped up here.
+>-: 
+	You are in the forest.
+This is a shallow depression sheltered from the wind by a thick growth of 
+thorny shrubs. It looks like someone has camped here. There is a fire pit
+with some dry sticks and grass nearby. The beach is ahead. The thorny
+shrubs block the way right.
+
+There is a knife here.
+There is a shield of some native tribe here.
+A long, sharp halberd is propped up here.
+>-: 	PLEASURE	POWER		EGO
+	  0		  2		  0
+
+This gives you the rating of serf in 9 turns.
+You have visited 3 out of 275 rooms this run (1%).
+>-: bye.
+Your rating was serf.

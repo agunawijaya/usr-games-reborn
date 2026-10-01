@@ -1,0 +1,39 @@
+{
+  "id": "pom",
+  "title": "Moon phase",
+  "tagline": "Tonight’s moon, drawn live from the sky’s own clock.",
+  "teaser": "The phase of the moon for today or any date you pick, drawn live on your screen. A quiet toy for sky-watchers and night owls.",
+  "category": "toys",
+  "directory": "/usr/games/toys",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [1, 5],
+  "status": "adopting",
+  "accent": "#b8c7ff",
+  "emblem": "M24 8a16 16 0 1 0 0 32a16 16 0 1 0 0-32M24 8a8 16 0 0 0 0 32",
+  "inspiredBy": {
+    "program": "pom",
+    "originalTitle": "pom",
+    "uiTitle": "pom",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/pom/app",
+    "output": "play/pom/"
+  },
+  "manPage": {
+    "synopsis": "pom — see the moon’s phase for today or any date you choose.",
+    "description": "Keith E. Brandt’s pom printed the phase of the moon as a line of text, using formulas from Peter Duffett-Smith’s Practical Astronomy with Your Calculator. This version draws the moon itself.",
+    "seeAlso": ["rain", "worms"]
+  },
+  "howToPlay": [
+    "Pick any date, past or future.",
+    "Watch the moon grow and shrink through its phases.",
+    "Find the next full moon, or the next new one."
+  ]
+}

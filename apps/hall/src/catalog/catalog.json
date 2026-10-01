@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "games": [
+    { "id": "pom", "source": "game" },
+    { "id": "worms", "source": "game" },
+    { "id": "rain", "source": "game" },
+    { "id": "sail", "source": "game" },
+    { "id": "trek", "source": "game" },
+    { "id": "hunt", "source": "game" },
+    { "id": "robots", "source": "game" },
+    { "id": "zoomies", "source": "game" },
+    { "id": "battlestar", "source": "game" },
+    { "id": "atc", "source": "game" },
+    { "id": "atc-classic", "source": "game" },
+    { "id": "wump", "source": "placeholder" },
+    { "id": "worm", "source": "placeholder" },
+    { "id": "snake", "source": "placeholder" },
+    { "id": "blocks", "source": "placeholder" },
+    { "id": "gomoku", "source": "placeholder" },
+    { "id": "dab", "source": "placeholder" },
+    { "id": "backgammon", "source": "placeholder" },
+    { "id": "monop", "source": "placeholder" },
+    { "id": "cribbage", "source": "placeholder" },
+    { "id": "canfield", "source": "placeholder" },
+    { "id": "fish", "source": "placeholder" },
+    { "id": "mille", "source": "placeholder" },
+    { "id": "pig", "source": "placeholder" },
+    { "id": "letters", "source": "placeholder" },
+    { "id": "hangman", "source": "placeholder" },
+    { "id": "quiz", "source": "placeholder" },
+    { "id": "arithmetic", "source": "placeholder" },
+    { "id": "signal", "source": "placeholder" },
+    { "id": "adventure", "source": "placeholder" },
+    { "id": "hack", "source": "placeholder" },
+    { "id": "phantasia", "source": "placeholder" }
+  ],
+  "fixtures": [
+    { "id": "fixture", "manifest": "packages/bridge/fixture/manifest.json" },
+    { "id": "fixture-vite", "manifest": "packages/bridge/fixture-vite/manifest.json" },
+    { "id": "fixture-native", "manifest": "apps/hall/src/fixtures/native/manifest.json" }
+  ]
+}

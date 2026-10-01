@@ -1,0 +1,1009 @@
+{
+ "screens": [
+  {
+   "cols": 80,
+   "rows": 24,
+   "args": "-d 150",
+   "pane": "80x24",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "   #",
+      "   #",
+      "  #",
+      "  #    *",
+      " #  OOO*",
+      " # O  * O",
+      " #O***",
+      "#**",
+      "#"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "           #",
+      "           #",
+      "           #",
+      "          #",
+      "   *    ##",
+      "  *    #",
+      "  *    #",
+      "   *  #",
+      "    ***",
+      "     # *",
+      "    #   *",
+      "   #     *",
+      "   #     *",
+      "  #     *",
+      "  #OO  *",
+      "  O  OO*",
+      "  O   * O",
+      "   OO*  O",
+      "     O  O",
+      "      OO"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      "***##",
+      "*##* #",
+      "#   * ##",
+      "#   *",
+      " ###*",
+      "    #***",
+      "    #   ***",
+      "    #",
+      "   #",
+      "",
+      "",
+      "",
+      " O",
+      " O",
+      "  O",
+      "  O",
+      " O",
+      " O",
+      "  O",
+      "   O",
+      "   O",
+      "  O",
+      " OO",
+      "OO O"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "",
+      "          *",
+      "           *      ***   *",
+      "            *   **   *  *",
+      "             ***      **",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "            O",
+      "            O",
+      "           O",
+      "           O",
+      "          O",
+      "         O",
+      "         O",
+      "        #O",
+      "       OO #",
+      "      O   #",
+      "# ## O    #",
+      "##  #O   #",
+      "     ####"
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 80,
+   "rows": 24,
+   "args": "-n 8 -l 5 -d 150",
+   "pane": "80x24",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      " O#*",
+      "O#*",
+      "O#*     @",
+      "#  *  @@",
+      "#  * @",
+      "  ~~@",
+      "    ~0%%%",
+      "    ~ 0$",
+      "     ~ 00"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "    #",
+      "  ##",
+      " #",
+      "#",
+      "  **",
+      "**",
+      "*",
+      " OO",
+      "O     ~~",
+      "O       ~",
+      " O  @   ~",
+      "    @   ~00  %",
+      "  @@       0  %%",
+      " @          0   %",
+      "                %",
+      "                    $",
+      "                   $",
+      "                $$$"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      "         ~",
+      "         ~",
+      "          ~",
+      "           ~",
+      "            ~",
+      "",
+      "",
+      "",
+      "",
+      "                  %%",
+      "                    %",
+      "                     %        $$",
+      "                     %          $",
+      "                                $",
+      "                               $",
+      "              #        0",
+      "          ####         0",
+      "         OO **         0",
+      "           O  *         0",
+      "            O *         0",
+      "             O *",
+      "",
+      "        @   @",
+      "         @@@"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "              @",
+      "OO           @",
+      "O            @",
+      "O            @",
+      "O             @",
+      "",
+      "",
+      "",
+      "            ~",
+      "           ~",
+      "           ~",
+      "           ~                                 0    **",
+      "      #   ~                                 0   **  *",
+      "      #                                     0",
+      "     #                                       0",
+      "    #                                         0",
+      "    #                     $",
+      "                          $",
+      "                           $$$",
+      "",
+      "",
+      "",
+      "  %   %",
+      "   %%%"
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 60,
+   "rows": 20,
+   "args": "-f -d 150",
+   "pane": "60x20",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO#MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO#MWOR*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W#RMOOO*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W#ROWO*MOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W#O***RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "#**MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "#ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      "WORMWORMWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWO#MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR*WORM##RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO*MWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO*MWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR*WO#MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM***MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMW#R*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM#ORM*ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR#WORMW*RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR#WORMW*RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO#MWORM*ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO#OOOR*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W OM OO*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W O WO*MOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W  OO*RMOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "   MWORMOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      " ORMWOOOWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      "* RMWO***O  WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "* RMWORM* R WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W* MWOR*W R WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W*R WOR*WO #WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO**WOR*  RM#ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO M*** WORM#ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO MWOR WORM#ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR WO MWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM   MWOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMW R WOR#WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM ORM O#MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR WORMOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR WOROW#RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO M##RO #RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO   O###ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W  MO   WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W   OO M ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W   O  M ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      " OOOW RM ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "OORO O  WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "  RMWO   O  WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "  RMW RM  R WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W  MW R W R WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W R WO  WO  WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO  WO    RM ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO M      RM ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WO MWOR WO M ORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WOR WO MWO  WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM   MW R*WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMW R W * WORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORM ORM O*MWORMWORMWORM#ORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "  R WOR***RMWORMWORMWO##WORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "*** WO* W  M###MWOR###RMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "*   **R   R#WOR#WO#MWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W***     OR#   M##RMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "W  M    W #MWOROOORMWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "     O M ORMWOO WOOOWORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "         ORMWOOMW RMOORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "    W  M ORMWO OW RM ORMOORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "        WORMWOR OO  WOOOWORMWORMWORMWORMWORMWORMWORMWORMWORM"
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 60,
+   "rows": 20,
+   "args": "-t -n 5 -l 32 -d 150",
+   "pane": "60x20",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "$ #",
+      "$ #",
+      "$ #",
+      "$#  **",
+      "#$ *  **",
+      "#$ *    %",
+      "#$*OO  %",
+      "#$ O%%%",
+      "%%%%OO"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      " #",
+      "#",
+      "#",
+      " #",
+      " #",
+      "  #        *",
+      "  #       *",
+      "  #       *",
+      " #         *",
+      " #          *",
+      " $$$        *",
+      "$ # $      *",
+      "$ OO$    $ *",
+      "$O# O$$  $*",
+      "$O  O* $$",
+      "#OOO  **",
+      "#$O*    %%",
+      "#$OOO  %  %",
+      "#$ %%%%%% %",
+      "%%%%O%%  %%"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      " ##OO          $$",
+      "#  O O        $  $",
+      "#  *O*OOO*   $    $",
+      " ** O *#  * $",
+      "*# O    #  *$",
+      "* #O    #  * $$",
+      " ** O ## #*    $",
+      "  #*O#   #*    $",
+      " # O#    # *   $",
+      " #O *   #  $$  $",
+      " O** ###  $ *$$",
+      "$O# $    $ *",
+      "% OO$    $ *",
+      "%O. O$$  $*",
+      ".%  O. $$",
+      ".O%O  .*",
+      "..%%%   %%",
+      ".%%..% .  %",
+      "%%%%%%.%% %",
+      "%%%%%%%  %%"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      " ....   %%%%   ..      $$$$$",
+      ".  . . %  # % .  .    .     $$",
+      ".  ....%..  %#    .  .        $",
+      " .. . %. ..%. #    ..         $",
+      ".%%. %  ...%.  #             # $",
+      "% .%%   . %. ..#             # $",
+      "%.. . .. .%.   #             #  $",
+      " %....   ..%   #        $     # $",
+      " . .**   . O%  #  ##    $      #",
+      " .. . *%.  .%OO.##  #   $      #",
+      " ... ..%* . %..OOO   #   $    # $",
+      "... .   %. .%     O   ###$#  #   $",
+      ". ..**** %%%       O     $ ##    $",
+      "..****.  ..         O     $      $",
+      ".* *.. ..           O      $$  $$",
+      "*.*.  ..          OO         $$",
+      "****.   ..      OO",
+      "*OO.*. OO .    O",
+      "*..O*.O..O.   O",
+      "****OOO  .OOOO"
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 40,
+   "rows": 12,
+   "args": "-f -t -n 12 -l 3 -d 150",
+   "pane": "40x12",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "WORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "0ORMWORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "0ORM@ORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "0$$$@%RMWORMWORMWORMWORMWORMWORMWORMWORM",
+      ".O.$.@%MWORMWORMWORMWORMWORMWORMWORMWORM",
+      "....~.OMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "..R.~ORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      ".....ORMWORMWORMWORMWORMWORMWORMWORMWORM",
+      "...M..O##ORMWORMWORMWORMWORMWORMWORMWORM",
+      ".....##**ORMWORMWORMWORMWORMWORMWORMWORM"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      ".ORM....OOO.$$RMWORMWORMWORMWORMWORMWORM",
+      "....W..MW..$W@RMWORMWORMWORMWORMWORMWORM",
+      ".......%.O.MWO@MWORMWORMWORMWORMWORMWORM",
+      ".O...OR%..RMWOOMWOR*WORMWORMWORMWORMWORM",
+      ".OR.0.%MWORMWORMWO*MWORMWORMWORMWORMWORM",
+      "..$0~..MWORMOORMW*RMWORMWORMWORMWORMWORM",
+      "$$0~...MWO...ORM.ORMWORMWORMWORMWORMWORM",
+      "..~....M.....OR.WORMWORMWORMWORMWORMWORM",
+      "..R...R.W.RM...MWORMWORMWORMWORMWORMWORM",
+      ".....OR.W.RM*.##WOR#WORMWORMWORMWORMWORM",
+      ".............**M###MWORMWORMWORMWORMWORM",
+      ".................ORMWORMWORMWORMWORMWORM"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      ".ORM.............ORM..RMWORMWORMWORMWORM",
+      "....W...........W...W.RMWORMWORMWORMWORM",
+      ".........O..WO.M..R.WO.MWORMWORMWORMWORM",
+      "............W@.M.O...O.MWORMWORMWORMWORM",
+      "......$MW....@R.WO....R.WORMWORMWORMWORM",
+      ".....$%%OOR.@O.MW.R...~M.ORMWORMWORMWORM",
+      "0...$..M%O...O.M.O.#...~.ORMWORM..RMW*RM",
+      "0##......O..OOR.WO.M#..~WORMWOR.WO..W*RM",
+      "#.$$............WO.M.#.M.ORMWOR.WORM.*RM",
+      "..........*M....WOR....M.ORMWO.MWORM.O.M",
+      ".........*..............W..MWO.MWORMW.R.",
+      "........*.................R...RMWORMWO.."
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "......O..........O....$$$..MWORMWORMWO..",
+      ".....O......%%........R...R#*ORMWORMWO..",
+      "....O....O.%........WO.MW.RM#ORMWORMW.R.",
+      "...$$.......W...........W.RMW#RMWORMW.R.",
+      "0....$.M...*.............O.MW.RMWORM.O.M",
+      ".00.......*....M.......M.O.M.ORMWORM.O.M",
+      "..........*....M..........R.WORM..R@@@R.",
+      ".............O...........OR.WOR.....W.R.",
+      "...........O....W........ORM.OR.WORM...M",
+      "...........O....~.R............MWORM.O.M",
+      "#..........O....~..........MWO..WO..W.R.",
+      "##..............~.........R...RM..RM...."
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 100,
+   "rows": 30,
+   "args": "-n 20 -l 64 -d 150",
+   "pane": "100x30",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "*~0",
+      "O~0 *#",
+      "O$ 0 *",
+      "@@ 0 *",
+      "$*@**%#O",
+      "*$0@O*%%$",
+      "*OO@  $$#",
+      "*$%OO@ O#",
+      "$@~~~OO#%"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "   *     ~",
+      "   *    ~",
+      "    *  ~  *",
+      "    *  ~OO",
+      "     *~O*",
+      "    ~*O  O",
+      "   ~OO* O",
+      "  OO*00 O       #",
+      " O~*0 *0O     ##",
+      " O* 0 *0 O   #",
+      "*O00~~0  O  #",
+      "O@@~$$~  O #     O",
+      "@~~@*@$~ O#     O",
+      "@$~@@*$#@ #$$$ ##",
+      "@~@%%%$ %%O000#O",
+      "*@@@*%%%OO%   #O",
+      "*$@$O$$$% 0% OO#$%##",
+      "@@$$$$$$$% %O  0 %",
+      "@@%O$$ *$#%O%%#0%$",
+      "$@****$$%O%%#00%# $$"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      "        ****  **OOOO",
+      "            ** O    OO",
+      "               O",
+      "    **         O",
+      "   *  *** ##  * O",
+      "   *     #  # * O",
+      "    *   # * # *O      #",
+      "    * ## ~~*** O       ##",
+      "   *   $$  #* O          #",
+      " 0000 $    #* O          #     O",
+      "   * $0  ~~*#O            #O   O",
+      "   $$~ 0~ **#            O# O  O",
+      "  $ *~ 0  * *          OOO%% OO",
+      "  $ *~0~OOOO*###      O O%  %",
+      " $ @@*0$*       #     O##%  %",
+      "$ @~~$$  OOO*    #   O# %  %    #",
+      "$0@~$***O    *   #  O  %      ##",
+      "0@@~$00 **   *  #  #OOO%     #",
+      "0@~~@$*0O *** O#  #O   %     #       $",
+      "0@~@@ $0 O   #O   O   %       #     $",
+      "*~0$@~0$ O  #  OOOO %%         #   $",
+      "O~@@@$~$ O #     #%%           #  $",
+      "@@$@@@$~ O#     O%   ~       ##  $",
+      "@@00@$$#~~~$$$ ##%   ~#     #   $",
+      "00@@0$$ %%O~00#O %  # ~#  ##    $",
+      "0%$@@0%%OO% ~ #O %  # ~ ##   $$$",
+      "0$@0O$00% 0%~OO#$%## ~     $$",
+      "0@$0$@$%%% %O~%0 %   ~    $",
+      "@00@$%%*$%%%%%%0%$  ~$    $",
+      "$@$%%*$$%O%0%%0~~~~~  $$$$"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "**$  $$@****  **OOOO    OOO ###",
+      "* *$@$*$@######O    OOOO   #   ##",
+      "$* *$  $@      #           #O    #",
+      " $$**$$ $      O#         #  O   #",
+      " @**  #$$@##  * #         #  O    #",
+      "** * $$$$#@@# *#O          ####  OO#",
+      "#@  *#  $$* @ #O    ###       O### O#",
+      "#*  * #$ $~**@ O   #   ## OO   %% #O#",
+      "###* $$$$$ #*#@    #     O  O%%O % ##",
+      " *0##$@   $## O@  #     O#  %O OO %##",
+      "0*~* ##$ ~~$#O  @#      O #O%  O O%##",
+      "~* ~~$ ##$$*#   @# %% 00OOOOO%%O  %%#",
+      "*~$ *~@0 ###0  @  %# 0 O00%% OO%  O%O#",
+      "**~ *~00O$$$*0#@  %00 0 O%0 %   % %% %",
+      "*$~0~00$0~$$* 0000% # 0#O%0 %   %%#%%",
+      "* @~~0**~O$O$~~ %%   ##000 %    #%%OO",
+      "$*@~~*$~*$   $$% #~ O  O#  %  %%%   O",
+      "0*0~*~~$$*  %%%$# ~#OOOO #  %%       OO                 $$",
+      "0*0@*$ *~~~~* O$  ~O   %O #  #       $OO               $  $",
+      "0*~*@ $~ %% ~#O $ O~~ %  O #  #     $  $O  OO             $",
+      "*@0*@@~$%O  #~ O$OO %~   O #   #OO $    OOO  OO           $",
+      "*@*@00~$%O # ~   #%OOO    O #  #  OOO    O     O          $",
+      "@*@@@~0% O#   ~ O%   ~O   O  ##  $   OO  O      O          $",
+      "@*@@@~0 ~~~  $~##%   ~O    O##  $   #  OO $     O          $",
+      "~**%%~0 %% ~00#~ %  # O#  #O  # $    #    $   OO          $",
+      "*%@*@0~000% ~ #O~~~~# O ## O $$#     #     $$$           $",
+      "***@@$0~  0%%%O#$%## ~ O  O$$   #     #       $$         $",
+      "***0$@$%~***O~%0 %   ~ O  O      ##   #         $        $",
+      "**%**@0*@@%0%%%0%$  ~$  OO$        #  #         $  $$   $",
+      "*@$%0@@@00@0%%0~~~~~  $$$$          ##           $$  $$$"
+     ]
+    }
+   ]
+  },
+  {
+   "cols": 23,
+   "rows": 7,
+   "args": "-n 4 -l 40 -d 150",
+   "pane": "23x7",
+   "captures": [
+    {
+     "t": 1.3,
+     "lines": [
+      "$$## **",
+      " $$ #  *",
+      " $  *",
+      "#$ * OO",
+      "#$*OO  O",
+      "#$O     O",
+      "$"
+     ]
+    },
+    {
+     "t": 3.1,
+     "lines": [
+      "$$## **######     OO",
+      " $$ ###***   # OOO",
+      "$$$ *        #O",
+      "$$$* OO    O*#",
+      "$$*$O  O  O *",
+      "$$O$    OO *",
+      "$$$        *"
+     ]
+    },
+    {
+     "t": 6.2,
+     "lines": [
+      "$$$$$**$#####  O$OOOOO",
+      " $$ ###***   #OOO$$$# #",
+      "$$$ *   $**  $O  O#  ##",
+      "$$$* OO**$ **$O   #   O",
+      "$$*$O *O *$*$ #   ###O",
+      "$$O$ *  ****  #  # #O#",
+      " $$  ***  **  ###   ##O"
+     ]
+    },
+    {
+     "t": 11.7,
+     "lines": [
+      "  $$$$O   OO### OOO##**",
+      "  $ O $$  O OOO####$*#*",
+      " $$O   O$O  O  ## $#*#$",
+      "O$ $   OOO  OO##$$* **",
+      "$   $ O  $OO  O#** * **",
+      "$O  $O ***$ ****# #* **",
+      " $$$***    $$$***** ##*"
+     ]
+    }
+   ]
+  }
+ ],
+ "cli": [
+  {
+   "args": [
+    "-d",
+    "2000"
+   ],
+   "stderr": "worms: invalid delay (1-1000)\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "0"
+   ],
+   "stderr": "worms: invalid delay (1-1000)\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "abc"
+   ],
+   "stderr": "worms: invalid delay (1-1000)\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "1000",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "4294967297",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "-1"
+   ],
+   "stderr": "worms: invalid delay (1-1000)\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d",
+    "5x",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-x"
+   ],
+   "stderr": "worms: invalid option -- 'x'\nusage: worms [-ft] [-d delay] [-l length] [-n number]\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-q",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid option -- 'q'\nusage: worms [-ft] [-d delay] [-l length] [-n number]\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "1"
+   ],
+   "stderr": "worms: invalid length (2 - 1024).\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "1025"
+   ],
+   "stderr": "worms: invalid length (2 - 1024).\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "2",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "4294967298",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    " 7",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "-5"
+   ],
+   "stderr": "worms: invalid length (2 - 1024).\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-n",
+    "-3"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-n",
+    "abc"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d"
+   ],
+   "stderr": "worms: option requires an argument -- 'd'\nusage: worms [-ft] [-d delay] [-l length] [-n number]\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l"
+   ],
+   "stderr": "worms: option requires an argument -- 'l'\nusage: worms [-ft] [-d delay] [-l length] [-n number]\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-n"
+   ],
+   "stderr": "worms: option requires an argument -- 'n'\nusage: worms [-ft] [-d delay] [-l length] [-n number]\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-ft",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-fn0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-fl1"
+   ],
+   "stderr": "worms: invalid length (2 - 1024).\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-d10x",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "--",
+    "-n",
+    "0"
+   ],
+   "stderr": "",
+   "code": 124
+  },
+  {
+   "args": [
+    "foo",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-"
+   ],
+   "stderr": "",
+   "code": 124
+  },
+  {
+   "args": [
+    "-dn"
+   ],
+   "stderr": "worms: invalid delay (1-1000)\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-l",
+    "99999999999999999999",
+    "-n",
+    "0"
+   ],
+   "stderr": "worms: invalid length (2 - 1024).\n",
+   "code": 1
+  },
+  {
+   "args": [
+    "-n",
+    "2147483648"
+   ],
+   "stderr": "worms: invalid number of worms.\n",
+   "code": 1
+  }
+ ]
+}

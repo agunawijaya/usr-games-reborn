@@ -1,0 +1,83 @@
+{
+  "id": "pom",
+  "title": "Selene",
+  "tagline": "A living Moon, painted from pom’s own numbers.",
+  "teaser": "The phase of the Moon for tonight or any hour you choose, painted live from the same arithmetic the old Berkeley program used. Scrub through a month, run a timelapse, or type a date the old way and watch the shadow line slide across seas and craters.",
+  "category": "toys",
+  "directory": "/usr/games/toys",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [1, 5],
+  "status": "shipped",
+  "accent": "#b8c7ff",
+  "emblem": "M24 8a16 16 0 1 0 0 32a16 16 0 1 0 0-32M24 8a8 16 0 0 0 0 32",
+  "inspiredBy": {
+    "program": "pom",
+    "originalTitle": "pom",
+    "uiTitle": "pom",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/pom/app",
+    "output": "play/pom/"
+  },
+  "manPage": {
+    "synopsis": "pom — see the Moon’s phase now, or at any moment you choose.",
+    "description": "Keith E. Brandt’s pom printed the phase of the moon as a line of text, using formulas from Peter Duffett-Smith’s Practical Astronomy with Your Calculator. This version draws the moon itself.",
+    "seeAlso": ["rain", "worms"]
+  },
+  "howToPlay": [
+    "Drag the time bar or press ← → to travel through time.",
+    "Space plays a month in timelapse; C opens the calendar.",
+    "Or type a date after pom, the way the old program took it."
+  ],
+  "packages": [
+    {
+      "id": "full-lunation",
+      "title": "A whole lunation",
+      "description": "Watch the Moon wax and wane through a whole month in timelapse, start to finish.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "next-full-moon",
+      "title": "Next full moon",
+      "description": "Travel to the coming full moon.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "next-new-moon",
+      "title": "Dark of the Moon",
+      "description": "Travel to the coming new moon, when the Moon hides in the Sun’s glare.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "ask-pom",
+      "title": "In pom’s own words",
+      "description": "Or type a date after pom, the way the old program took it.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "two-full-moons",
+      "title": "Twice in one month",
+      "description": "Find a month that holds two full moons.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "century-hop",
+      "title": "A century away",
+      "description": "Visit the Moon more than a hundred years from today.",
+      "tier": "core",
+      "xp": 15
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": "atc-classic",
+  "title": "Control Room 1986",
+  "tagline": "Type the orders that bring every flight home.",
+  "teaser": "Clock in at a green phosphor radar and talk planes through your sector one typed order at a time: climb, turn, circle, land. Jets and props arrive from the edges and the airports, the radio reads back every call, and the shift runs until a plane is lost. How many can you bring home?",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "shipped",
+  "accent": "#5eff8a",
+  "emblem": "M8 9h32a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4M15 23a9 9 0 1 0 18 0a9 9 0 1 0-18 0M24 23l6-6M19 27h.01M24 37v5M17 42h14",
+  "inspiredBy": {
+    "program": "atc",
+    "originalTitle": "atc",
+    "uiTitle": "atc",
+    "year": 1986
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/atc-classic/app",
+    "output": "play/atc-classic/"
+  },
+  "manPage": {
+    "synopsis": "atc — type a plane’s letter and an order; land it or send it out, and keep every pair apart.",
+    "description": "The owner’s earlier typed-radar port of Ed James’s atc, kept as it was built: a phosphor console, the original’s command letters and a radio that reads back every order. A second interpretation beside the collection’s own atc.",
+    "seeAlso": ["atc", "robots"]
+  },
+  "howToPlay": [
+    "Type a plane’s letter, then an order: Aa9 climbs plane A to 9,000 feet, Atd turns it east.",
+    "Land at altitude 0 along the runway arrow; leave by the right exit at 9,000 feet.",
+    "Keep planes apart and fuelled: the shift ends when one is lost."
+  ],
+  "cronGoals": [
+    {
+      "id": "planes-safe",
+      "stat": "planesSafe",
+      "label": "Guide {n} planes home",
+      "min": 10,
+      "max": 30
+    }
+  ],
+  "packages": [
+    {
+      "id": "wheels-down",
+      "title": "Wheels down",
+      "description": "Land a plane on its runway, flying along the arrow.",
+      "tier": "core"
+    },
+    {
+      "id": "handed-off",
+      "title": "Handed off",
+      "description": "See a plane out through its own exit at 9,000 feet.",
+      "tier": "core"
+    },
+    {
+      "id": "cleared-for-takeoff",
+      "title": "Cleared for takeoff",
+      "description": "Send a plane waiting at an airport up into your sector.",
+      "tier": "core"
+    },
+    {
+      "id": "holding-pattern",
+      "title": "Holding pattern",
+      "description": "Park a plane in a circle, then bring it home.",
+      "tier": "core"
+    },
+    {
+      "id": "on-the-beacon",
+      "title": "On the beacon",
+      "description": "Steer a plane toward a beacon, then bring it home.",
+      "tier": "core"
+    },
+    {
+      "id": "steady-hands",
+      "title": "Steady hands",
+      "description": "Bring five planes home in one shift.",
+      "tier": "core"
+    },
+    {
+      "id": "reference-sector",
+      "title": "Reference sector",
+      "description": "Bring five planes home in one shift on the Default sector.",
+      "tier": "extra"
+    },
+    {
+      "id": "minimum-fuel",
+      "title": "Minimum fuel",
+      "description": "Bring a plane home after its pilot has asked for priority.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-board",
+      "title": "Full board",
+      "description": "Bring ten planes home in one shift.",
+      "tier": "extra"
+    },
+    {
+      "id": "fast-lane",
+      "title": "Fast lane",
+      "description": "Bring a plane home on Killer, the fastest sector.",
+      "tier": "extra"
+    },
+    {
+      "id": "rush-hour",
+      "title": "Rush hour",
+      "description": "Bring five planes home in one shift on Killer.",
+      "tier": "rare"
+    },
+    {
+      "id": "double-shift",
+      "title": "Double shift",
+      "description": "Bring 25 planes home in one shift.",
+      "tier": "rare"
+    }
+  ]
+}

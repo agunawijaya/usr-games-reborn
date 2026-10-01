@@ -1,0 +1,37 @@
+{
+  "id": "atc",
+  "title": "Air traffic control",
+  "tagline": "Guide every flight home, one heading at a time.",
+  "teaser": "Planes enter your airspace needing new headings and altitudes. Keep them apart and bring every one of them home.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "coming-soon",
+  "accent": "#f2b541",
+  "emblem": "M24 8a16 16 0 1 0 0 32a16 16 0 1 0 0-32M24 24l11-9M24 18a6 6 0 1 0 0 12a6 6 0 1 0 0-12M33 31h.01",
+  "inspiredBy": {
+    "program": "atc",
+    "originalTitle": "atc",
+    "uiTitle": "atc",
+    "year": 1986
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "atc — give planes headings and heights; land them and keep them apart.",
+    "description": "Ed James wrote atc at UC Berkeley, based, as its manual admits, on someone’s description of a game for an unknown PC.",
+    "seeAlso": ["robots", "trek"]
+  },
+  "howToPlay": [
+    "Planes enter your airspace from the edges.",
+    "Give each one a new heading and height.",
+    "Land them or send them out safely, and never let two meet."
+  ]
+}

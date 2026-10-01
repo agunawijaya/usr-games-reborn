@@ -1,0 +1,37 @@
+{
+  "id": "monop",
+  "title": "Property trading",
+  "tagline": "Buy streets, build houses, trade your way to the top.",
+  "teaser": "Roll around the board buying property, striking trades and building up your streets while the computer players do the same.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [20, 60],
+  "status": "coming-soon",
+  "accent": "#4caf6d",
+  "emblem": "M7 24L24 9l17 15M12 20v19h24V20M20 39v-9h8v9",
+  "inspiredBy": {
+    "program": "monop",
+    "originalTitle": "Monopoly",
+    "uiTitle": "monop",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "monop — roll, buy, trade and build; outlast the other players.",
+    "description": "Ken Arnold’s property-trading board game for BSD, played against the computer.",
+    "seeAlso": ["backgammon", "mille"]
+  },
+  "howToPlay": [
+    "Roll the dice and move around the board.",
+    "Buy streets, then build houses to earn more.",
+    "Trade with the computer players and outlast them all."
+  ]
+}

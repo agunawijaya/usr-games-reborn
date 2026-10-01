@@ -1,0 +1,196 @@
+/*
+ * Shared base for every Hall style: reset, root type size, focus and motion rules. Each style
+ * brings its own stylesheet, scoped under [data-style='…'] so styles never leak into each other.
+ */
+
+:root {
+  /* 16px body at 1280 wide, growing gently to 19px on large screens. */
+  font-size: clamp(16px, calc(0.55vw + 9px), 19px);
+  color-scheme: light dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ug-bg);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd,
+blockquote,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--ug-font-mono);
+  font-size: 0.95em;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+svg {
+  display: block;
+}
+
+.icon {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.emblem {
+  fill: none;
+  stroke: var(--emblem-stroke, currentColor);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: var(--emblem-filter, none);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus rings for keyboard users only. */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 100;
+  transform: translate(-50%, -160%);
+  padding: 10px 18px;
+  border: 2px solid var(--ug-focus);
+  border-radius: 8px;
+  background: var(--ug-surface-2);
+  color: var(--ug-ink);
+  font-weight: 700;
+}
+
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
+.theme-switching,
+.theme-switching * {
+  transition:
+    background-color 0.45s var(--ease),
+    color 0.45s var(--ease),
+    border-color 0.45s var(--ease),
+    box-shadow 0.45s var(--ease),
+    stroke 0.45s var(--ease),
+    fill 0.45s var(--ease) !important;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translate(0, 4px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(6px, -8px);
+    opacity: 0;
+  }
+}
+
+/* Scenes pinned for screenshots: every loop holds still on a pleasing frame. */
+[data-frozen='true'] *,
+[data-frozen='true'] *::before,
+[data-frozen='true'] *::after {
+  animation-play-state: paused !important;
+}
+
+/*
+ * The frame is an early one, unless a moment picks its own: inside [data-hold-frame] (a rank-up
+ * held at its peak, say) the style sets negative animation delays itself.
+ */
+[data-frozen='true'] :not([data-hold-frame], [data-hold-frame] *),
+[data-frozen='true'] :not([data-hold-frame], [data-hold-frame] *)::before,
+[data-frozen='true'] :not([data-hold-frame], [data-hold-frame] *)::after {
+  animation-delay: -0.2s !important;
+}
+
+[data-motion='reduce'] *,
+[data-motion='reduce'] *::before,
+[data-motion='reduce'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}

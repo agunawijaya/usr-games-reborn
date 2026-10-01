@@ -1,0 +1,37 @@
+{
+  "id": "canfield",
+  "title": "Solitaire",
+  "tagline": "A tricky solitaire with a stubborn reserve pile.",
+  "teaser": "Build the foundations from the reserve, the tableau and the stock. Harder than the solitaire you know, and more satisfying.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "coming-soon",
+  "accent": "#e5646e",
+  "emblem": "M8 13h16v24H8zM26 9l13 4-6 23-13-4zM13 18h.01M19 32h.01",
+  "inspiredBy": {
+    "program": "canfield",
+    "originalTitle": "canfield",
+    "uiTitle": "canfield",
+    "year": 1983
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "canfield — move cards to the foundations; empty the reserve.",
+    "description": "Steve Levine’s solitaire for BSD, with later hacking by Steve Feldman, Kirk McKusick, Mikey Olson and Eric Allman.",
+    "seeAlso": ["cribbage", "fish"]
+  },
+  "howToPlay": [
+    "Deal the layout: a reserve pile, a tableau and the stock.",
+    "Build the foundations up by suit from the starting rank.",
+    "Empty the reserve and get every card home to win."
+  ]
+}

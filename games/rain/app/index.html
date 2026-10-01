@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rain on Still Water</title>
+<meta name="description" content="BSD rain(6), 1980, as a night pond: a GPU wave-equation simulation driven by a byte-faithful port of the original.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="src/ui/style.css">
+</head>
+<body data-view="modern">
+<main id="stage">
+  <section id="modern-pane" class="pane" aria-label="Modern view">
+    <canvas id="pond" role="img" aria-label="A night pond in the rain; each drop comes from the original program"></canvas>
+    <p class="caption">Rain on Still Water</p>
+  </section>
+  <section id="classic-pane" class="pane" aria-label="Classic view">
+    <pre id="term" aria-label="The original rain(6) screen, 80 by 24 characters"></pre>
+    <p class="caption">rain(6) · 1980 · 80×24</p>
+  </section>
+</main>
+
+<header id="title" class="chrome">
+  <h1>Rain on Still Water</h1>
+  <p>BSD <code>rain(6)</code>, 1980 — every drop comes from the original loop</p>
+</header>
+
+<button id="sound" class="chrome sound" type="button" aria-pressed="false" title="Sound (M)">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="off" d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  <span>Sound off</span>
+</button>
+
+<footer id="bar" class="chrome bar">
+  <div class="group intensity">
+    <label for="delay">Intensity</label>
+    <input type="range" id="delay" min="0" max="1000" step="1" aria-describedby="readout">
+    <output id="readout" for="delay"><code>rain -d 120</code><span>8.3 drops/s</span></output>
+  </div>
+  <div class="group presets" role="group" aria-label="Presets">
+    <button type="button" data-d="400">Drizzle</button>
+    <button type="button" data-d="120" title="The man page's suggestion">Rain</button>
+    <button type="button" data-d="10">Downpour</button>
+    <button type="button" data-d="1">Deluge</button>
+    <button type="button" data-d="0" title="-d 0: as fast as a 9600-baud terminal could draw">9600 baud</button>
+  </div>
+  <div class="group seg" role="group" aria-label="View">
+    <button type="button" data-view="modern" title="Modern (1)">Modern</button>
+    <button type="button" data-view="split" title="Split (2)">Split</button>
+    <button type="button" data-view="classic" title="Classic (3)">Classic</button>
+  </div>
+  <div class="group tools">
+    <button type="button" id="quality" title="Quality (Q)">High</button>
+    <button type="button" id="fullscreen" class="icon" aria-label="Fullscreen" title="Fullscreen (F)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button type="button" id="help-btn" class="icon" aria-label="Keyboard shortcuts" title="Help (?)">?</button>
+  </div>
+</footer>
+
+<div id="help" class="panel" role="dialog" aria-modal="false" aria-labelledby="help-title" hidden>
+  <h2 id="help-title">Rain on Still Water</h2>
+  <p>A screensaver from 1980, redrawn. Each drop the original program would
+  have drawn — <code>.</code> then <code>o</code>, <code>O</code>, two rings,
+  then gone — lands here as a real splash whose rings spread, cross and fade.</p>
+  <dl>
+    <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>lighter / heavier rain (the <code>-d</code> delay)</dd>
+    <dt><kbd>0</kbd></dt><dd><code>-d 0</code>: paced like a 9600-baud terminal</dd>
+    <dt><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></dt><dd>modern · split · classic</dd>
+    <dt><kbd>M</kbd></dt><dd>sound on / off</dd>
+    <dt><kbd>F</kbd></dt><dd>fullscreen</dd>
+    <dt><kbd>Q</kbd></dt><dd>quality: high / low</dd>
+    <dt><kbd>H</kbd></dt><dd>hide the controls</dd>
+    <dt><kbd>?</kbd></dt><dd>this help</dd>
+  </dl>
+  <button type="button" id="help-close">Close</button>
+</div>
+
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+<!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

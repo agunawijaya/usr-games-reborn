@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+pnpm-lock.yaml
+
+# Parallel sessions each edit their own row here; a formatter pass would touch every row.
+docs/PROGRESS.md
+
+# Written by the owner and the architect, never reformatted by sessions.
+prompts/
+CLAUDE.md
+.claude/
+
+# Hosted games keep their own formatting as adopted, and so do their ADRs (moved unchanged).
+games/*/app/
+games/*/docs/adr/

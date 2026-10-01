@@ -1,0 +1,37 @@
+{
+  "id": "cribbage",
+  "title": "Cribbage",
+  "tagline": "Count fifteens, pairs and runs; first to 121.",
+  "teaser": "The card-and-pegboard classic: build the crib, peg as you play, and count every hand on the way to 121.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [10, 20],
+  "status": "coming-soon",
+  "accent": "#d9a441",
+  "emblem": "M6 17h36v14H6zM12 24h.01M18 24h.01M24 24h.01M30 24h.01M36 24h.01M18 17V8M16 8h4",
+  "inspiredBy": {
+    "program": "cribbage",
+    "originalTitle": "cribbage",
+    "uiTitle": "cribbage",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "cribbage — discard to the crib, play for points, count your hand.",
+    "description": "Earl T. Cohen wrote the game logic and Ken Arnold the screen interface for BSD’s cribbage.",
+    "seeAlso": ["canfield", "fish", "mille"]
+  },
+  "howToPlay": [
+    "Keep four cards and put two in the crib.",
+    "Take turns playing cards, scoring as the count builds.",
+    "Count your hand and peg your way to 121."
+  ]
+}

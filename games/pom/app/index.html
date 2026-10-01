@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Selene — A Living Moon · BSD pom(6)</title>
+<meta name="description" content="The phase of the Moon, computed by the original BSD pom algorithm and rendered entirely from code: no images, just shaders.">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305070d'/%3E%3Cpath d='M40 12a20 20 0 1 0 0 40 16 20 0 0 1 0-40z' fill='%23e9edf5'/%3E%3C/svg%3E">
+<!-- Fonts are served from the game's own folder; until they arrive the page
+     shows the system fallbacks (see --serif/--sans/--mono). -->
+<link rel="stylesheet" href="./src/ui/fonts/fonts.css">
+<link rel="stylesheet" href="./src/ui/styles.css">
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="veil" aria-hidden="true"><span id="veil-text">Accreting the Moon…</span><small id="veil-note" hidden>No GPU found: drawing a lighter Moon on the CPU</small></div>
+
+<header class="brand">
+  <h1><span class="brand-name">Selene</span><span class="brand-sub">A living Moon · after BSD <code>pom(6)</code></span></h1>
+</header>
+
+<nav class="tools" aria-label="View options">
+  <button type="button" class="icon-btn" id="btn-calendar" aria-pressed="false" aria-controls="calendar" title="Moon calendar (C)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14.5" r="1.4" class="fill"/><path d="M15.2 13.1a1.6 1.6 0 1 0 0 3.2 2 2 0 0 1 0-3.2z" class="fill"/></svg>
+    <span class="label">Calendar</span>
+  </button>
+  <button type="button" class="icon-btn" id="btn-contrast" aria-pressed="false" title="High contrast (H)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" class="fill"/></svg>
+    <span class="label">Contrast</span>
+  </button>
+  <button type="button" class="icon-btn" id="btn-help" aria-controls="help" title="About and shortcuts (?)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><circle cx="12" cy="16.8" r=".9" class="fill"/></svg>
+    <span class="label">About</span>
+  </button>
+</nav>
+
+<section class="readout" aria-live="polite" aria-atomic="true">
+  <p class="eyebrow" id="r-date">—</p>
+  <h2 class="phase" id="r-phase">—</h2>
+  <dl class="stats">
+    <div><dt>Illuminated</dt><dd id="r-illum">—</dd></div>
+    <div><dt>Age</dt><dd id="r-age">—</dd></div>
+    <div><dt>Elongation</dt><dd id="r-elong">—</dd></div>
+  </dl>
+  <p class="next" id="r-next">—</p>
+</section>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<footer class="dock" aria-label="Time travel">
+  <div class="scrub" id="scrub">
+    <div class="scrub-track" id="scrub-track">
+      <div class="scrub-ticks" id="scrub-ticks" aria-hidden="true"></div>
+      <div class="scrub-thumb" id="scrub-thumb" role="slider" tabindex="0"
+           aria-label="Time" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" aria-valuetext=""></div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="group">
+      <button type="button" class="step" id="btn-prev" title="Back one day (Shift+←)" aria-label="Back one day">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg>
+      </button>
+      <label class="field field-date">
+        <span class="sr">Date and hour</span>
+        <input type="datetime-local" id="in-date" step="3600">
+      </label>
+      <button type="button" class="step" id="btn-next" title="Forward one day (Shift+→)" aria-label="Forward one day">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+    <form class="group pomform" id="pom-form" autocomplete="off">
+      <label class="field field-pom">
+        <span class="prompt" aria-hidden="true">pom</span>
+        <span class="sr">Compressed date, as the original pom accepts it</span>
+        <input type="text" id="in-pom" inputmode="numeric" spellcheck="false"
+               placeholder="[[[[[cc]yy]mm]dd]HH]" aria-describedby="caption">
+      </label>
+    </form>
+    <div class="group">
+      <button type="button" class="pill" id="btn-now" title="Back to now (N)">Now</button>
+      <button type="button" class="pill play" id="btn-play" aria-pressed="false" title="Timelapse one lunar month (Space)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play fill" d="M8 5.5v13l10.5-6.5z"/><path class="i-pause fill" d="M7 5.5h3.6v13H7zM13.4 5.5H17v13h-3.6z"/></svg>
+        <span>Timelapse</span>
+      </button>
+    </div>
+  </div>
+  <output class="caption" id="caption" for="in-pom in-date"><span class="cmd" id="cap-cmd"></span><span class="out" id="cap-out"></span></output>
+</footer>
+
+<aside class="drawer" id="calendar" aria-label="Moon calendar" hidden>
+  <header class="drawer-head">
+    <button type="button" class="step" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg></button>
+    <h3 id="cal-title">—</h3>
+    <button type="button" class="step" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button>
+    <button type="button" class="step close" id="cal-close" aria-label="Close calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+  </header>
+  <div class="cal-grid" id="cal-grid" role="grid" aria-labelledby="cal-title"></div>
+  <h4 class="events-title">Principal phases</h4>
+  <ol class="events" id="events"></ol>
+  <p class="drawer-note">Every little Moon here is rendered by the same shader as the big one, from pom’s own numbers.</p>
+</aside>
+
+<div class="help" id="help" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+  <div class="help-card">
+    <button type="button" class="step close" id="help-close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <h3 id="help-title">Selene</h3>
+    <p>The phase of the Moon, computed by <strong>pom</strong>, the BSD program Keith E. Brandt wrote in 1984 from Peter Duffett-Smith’s <em>Practical Astronomy with Your Calculator</em>. This port reproduces its output byte for byte, then paints the answer.</p>
+    <p><strong>No images were used.</strong> The Moon, its seas and craters, the stars, the Milky Way, the hills and the lake are all computed by shaders at load time. The seas and named craters sit at their real coordinates; the lit fraction and the terminator come straight from pom’s <code>potm()</code>.</p>
+    <h4>Shortcuts</h4>
+    <dl class="keys">
+      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>One hour</dd></div>
+      <div><dt><kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd></dt><dd>One day</dd></div>
+      <div><dt><kbd>PgUp</kbd> <kbd>PgDn</kbd></dt><dd>One lunar month</dd></div>
+      <div><dt><kbd>Space</kbd></dt><dd>Timelapse</dd></div>
+      <div><dt><kbd>N</kbd></dt><dd>Now</dd></div>
+      <div><dt><kbd>C</kbd></dt><dd>Calendar</dd></div>
+      <div><dt><kbd>H</kbd></dt><dd>High contrast</dd></div>
+      <div><dt>Drag the Moon</dt><dd>Rock it on its axis</dd></div>
+    </dl>
+    <p class="credit" id="render-info"></p>
+    <p class="credit">Original <code>pom</code> © 1989, 1993 The Regents of the University of California. From <a href="https://github.com/vattam/BSDGames/tree/master/pom" target="_blank" rel="noopener">BSDGames</a>. Port: BSDGames Reborn, MIT.</p>
+  </div>
+</div>
+
+<div class="nogl" id="nogl" hidden>
+  <div class="nogl-moon" aria-hidden="true"></div>
+  <p>This browser can’t run WebGL2, so the Moon can’t be drawn here.<br>pom still answers below.</p>
+</div>
+
+<!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

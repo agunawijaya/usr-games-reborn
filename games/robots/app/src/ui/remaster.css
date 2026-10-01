@@ -1,0 +1,90 @@
+/* fancy-web-remastered HUD. Glass panels over deep space; cyan for you,
+   magenta-red for them. No image files. */
+:root { --cyan: #4cc9f0; --mag: #ff2a6d; --ink: #e8f6ff; --glass: rgba(8, 20, 34, 0.55); }
+html, body, #root { margin: 0; height: 100%; background: #02050b; overflow: hidden; }
+.rr-root { width: 100dvw; height: 100dvh; position: relative; color: var(--ink); font-family: "Rajdhani", "Inter", system-ui, sans-serif; background: #02050b; }
+.rr-root canvas { display: block; }
+
+.rr-title { position: absolute; top: 14px; left: 18px; z-index: 5; pointer-events: none; }
+.rr-logo { font-family: "Orbitron", "Rajdhani", sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 0.28em; color: #fff;
+  text-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 30px rgba(76, 201, 240, 0.35); }
+.rr-sub { font-size: 13px; opacity: 0.72; letter-spacing: 0.04em; margin-top: 2px; }
+.rr-link { pointer-events: auto; background: none; border: 0; color: var(--cyan); cursor: pointer; font: inherit; text-decoration: underline; padding: 0; }
+
+.rr-panel { background: var(--glass); border: 1px solid rgba(76, 201, 240, 0.35); border-radius: 10px; backdrop-filter: blur(10px);
+  box-shadow: 0 0 24px rgba(76, 201, 240, 0.15), inset 0 0 18px rgba(76, 201, 240, 0.08); }
+.rr-stats { position: absolute; top: 14px; right: 16px; z-index: 5; display: flex; gap: 18px; padding: 10px 18px; pointer-events: none; }
+.rr-stat { display: flex; flex-direction: column; align-items: flex-end; min-width: 56px; }
+.rr-stat span { font-size: 11px; letter-spacing: 0.22em; opacity: 0.65; }
+.rr-stat b { font-family: "Orbitron", sans-serif; font-size: 24px; font-weight: 700; color: #fff; text-shadow: 0 0 10px rgba(76, 201, 240, 0.6); display: inline-block; }
+.rr-bump { animation: rr-bump 0.45s ease-out; }
+@keyframes rr-bump { 0% { transform: scale(1.35); color: #ffd36a; } 100% { transform: scale(1); } }
+.rr-robots b { color: #ffd0dc; text-shadow: 0 0 10px rgba(255, 42, 109, 0.7); }
+.rr-bar { width: 72px; height: 3px; background: rgba(255, 255, 255, 0.12); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.rr-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ffb703, var(--mag)); box-shadow: 0 0 8px var(--mag); transition: width 0.5s; }
+.rr-bonus b { color: #ffd36a; }
+
+.rr-controls { position: absolute; right: 16px; bottom: 16px; z-index: 5; display: flex; gap: 8px; }
+.rr-btn { font-family: "Rajdhani", sans-serif; font-weight: 600; font-size: 15px; color: var(--cyan); background: var(--glass); border: 1px solid rgba(76, 201, 240, 0.45);
+  border-radius: 8px; min-width: 40px; height: 36px; padding: 0 10px; cursor: pointer; backdrop-filter: blur(8px); }
+.rr-btn.on { background: rgba(76, 201, 240, 0.22); color: #fff; box-shadow: 0 0 14px rgba(76, 201, 240, 0.4); }
+.rr-btn:hover { border-color: #fff; }
+
+.rr-pill { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5; padding: 8px 18px; border-radius: 999px; pointer-events: none;
+  background: rgba(76, 201, 240, 0.14); border: 1px solid rgba(76, 201, 240, 0.55); backdrop-filter: blur(6px); font-size: 15px; letter-spacing: 0.03em; }
+
+.rr-combo { position: absolute; top: 22%; left: 50%; transform: translateX(-50%); z-index: 6; text-align: center; pointer-events: none; animation: rr-pop 1.3s ease-out forwards; }
+.rr-combo-n { display: block; font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 72px; color: #fff;
+  text-shadow: 0 0 18px #ffb347, 0 0 42px #ff5a1f; }
+.rr-combo-l { font-family: "Orbitron", sans-serif; letter-spacing: 0.4em; font-size: 16px; color: #ffcf8a; }
+@keyframes rr-pop { 0% { transform: translateX(-50%) scale(2.2); opacity: 0; } 12% { transform: translateX(-50%) scale(1); opacity: 1; } 75% { opacity: 1; } 100% { transform: translateX(-50%) translateY(-24px); opacity: 0; } }
+
+/* Death: the scene stays visible in the middle (you, and what caught you);
+   the epitaph comes in above once the catch has played, the card below. */
+.rr-death { position: absolute; inset: 0; z-index: 7; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 11vh 16px 7vh; box-sizing: border-box; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(40, 0, 16, 0) 30%, rgba(0, 0, 0, 0.6)); animation: rr-fade 0.6s ease-out; }
+.rr-death > * { pointer-events: auto; }
+@keyframes rr-fade { from { opacity: 0; } }
+.rr-glitch { position: relative; font-family: "Orbitron", sans-serif; font-weight: 900; font-size: clamp(34px, 6vw, 84px); letter-spacing: 0.04em; color: #fff;
+  text-shadow: 0 0 20px var(--mag); animation: rr-in 0.25s 0.55s ease-out both, rr-shake 0.35s 0.8s steps(2) infinite; }
+@keyframes rr-in { from { opacity: 0; transform: scale(1.6); filter: blur(6px); } }
+.rr-glitch::before, .rr-glitch::after { content: attr(data-text); position: absolute; inset: 0; overflow: hidden; }
+.rr-glitch::before { color: var(--cyan); transform: translate(-3px, 0); clip-path: inset(0 0 55% 0); animation: rr-slice 1.1s infinite linear alternate; mix-blend-mode: screen; }
+.rr-glitch::after { color: var(--mag); transform: translate(3px, 0); clip-path: inset(50% 0 0 0); animation: rr-slice 0.8s infinite linear alternate-reverse; mix-blend-mode: screen; }
+@keyframes rr-slice { 0% { clip-path: inset(10% 0 70% 0); } 25% { clip-path: inset(60% 0 10% 0); } 50% { clip-path: inset(30% 0 40% 0); } 75% { clip-path: inset(80% 0 5% 0); } 100% { clip-path: inset(0 0 85% 0); } }
+@keyframes rr-shake { 0% { transform: translate(0, 0); } 50% { transform: translate(1px, -1px); } 100% { transform: translate(-1px, 1px); } }
+
+.rr-card, .rr-clear { text-align: center; padding: 22px 34px; border-radius: 14px; background: rgba(6, 12, 22, 0.78); border: 1px solid rgba(76, 201, 240, 0.4);
+  box-shadow: 0 0 40px rgba(76, 201, 240, 0.18), 0 20px 60px rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); animation: rr-rise 0.5s ease-out; min-width: 280px; }
+@keyframes rr-rise { from { transform: translateY(24px); opacity: 0; } }
+.rr-card-sub { font-size: 15px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.7; }
+.rr-card-score { font-family: "Orbitron", sans-serif; font-weight: 800; font-size: 54px; color: #fff; text-shadow: 0 0 18px rgba(76, 201, 240, 0.7); margin: 4px 0 8px; }
+.rr-best { color: #ffd36a; font-weight: 700; letter-spacing: 0.12em; margin-bottom: 10px; }
+.rr-scores { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14px; margin: 6px auto 16px; max-width: 220px; text-align: left; }
+.rr-scores div { display: flex; justify-content: space-between; opacity: 0.8; }
+.rr-scores .cur { color: #ffd36a; opacity: 1; font-weight: 700; }
+.rr-primary { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.06em; color: #02121c; background: linear-gradient(180deg, #8ee6ff, var(--cyan));
+  border: 0; border-radius: 8px; padding: 10px 22px; cursor: pointer; box-shadow: 0 0 20px rgba(76, 201, 240, 0.5); }
+/* Level clear sits low, so the fireworks over the arena stay in view. */
+.rr-clear { position: absolute; bottom: 7vh; left: 50%; transform: translateX(-50%); z-index: 7; padding: 16px 30px; }
+.rr-clear-title { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 34px; letter-spacing: 0.16em; color: #fff; text-shadow: 0 0 20px var(--cyan), 0 0 50px rgba(76, 201, 240, 0.5); margin-bottom: 4px; }
+.rr-clear { animation: rr-rise-c 0.5s ease-out; }
+@keyframes rr-rise-c { from { transform: translate(-50%, 24px); opacity: 0; } }
+.rr-clear .rr-primary { margin-top: 12px; }
+.rr-hint { font-size: 13px; opacity: 0.6; margin-top: 8px; letter-spacing: 0.04em; }
+
+/* full-screen flashes: red when you are caught, white-cyan on the jump */
+.rr-flash { position: absolute; inset: 0; z-index: 6; pointer-events: none; mix-blend-mode: screen; }
+.rr-flash-death { background: radial-gradient(circle at center, rgba(255, 60, 110, 0.75), rgba(255, 20, 60, 0.35) 45%, rgba(120, 0, 30, 0.2)); animation: rr-flash 0.7s ease-out forwards; }
+.rr-flash-warp { background: radial-gradient(circle at center, rgba(235, 250, 255, 0.95), rgba(120, 210, 255, 0.55) 50%, rgba(40, 120, 200, 0.25)); animation: rr-flash 0.55s ease-out forwards; }
+@keyframes rr-flash { from { opacity: 1; } to { opacity: 0; } }
+
+.rr-nogl { display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+.rr-nogl .rr-card { max-width: 480px; text-align: left; line-height: 1.5; font-size: 16px; }
+.rr-nogl .rr-logo { margin-bottom: 10px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rr-glitch, .rr-glitch::before, .rr-glitch::after, .rr-combo, .rr-bump { animation: none !important; }
+}
+@media (max-width: 760px) { .rr-sub { display: none; } .rr-stats { gap: 10px; padding: 8px 10px; } .rr-stat b { font-size: 18px; } }

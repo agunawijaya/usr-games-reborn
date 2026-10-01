@@ -1,0 +1,37 @@
+{
+  "id": "adventure",
+  "title": "Colossal cave",
+  "tagline": "The original adventure. Bring a lamp.",
+  "teaser": "Explore a vast cave by typing what you want to do, gather its treasures and solve its puzzles. The original adventure, reborn.",
+  "category": "stories",
+  "directory": "/usr/games/stories",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [20, 60],
+  "status": "coming-soon",
+  "accent": "#c9955b",
+  "emblem": "M18 16h12v17H18zM20 16l4-7 4 7M15 33h18M21 39h6M24 21v6M24 9V5",
+  "inspiredBy": {
+    "program": "adventure",
+    "originalTitle": "Colossal Cave Adventure",
+    "uiTitle": "adventure",
+    "year": 1991
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "adventure — type short commands to explore the cave and collect its treasures.",
+    "description": "Will Crowther and Don Woods wrote the original in Fortran; Jim Gillogly translated it to C, and that version came to BSD.",
+    "seeAlso": ["battlestar", "hack", "phantasia"]
+  },
+  "howToPlay": [
+    "Type short commands like \"go north\" or \"get lamp\".",
+    "Explore the cave and gather its treasures.",
+    "Solve its puzzles and find your way back out."
+  ]
+}

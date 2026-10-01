@@ -1,0 +1,83 @@
+{
+  "id": "worms",
+  "title": "Abyssal Worms",
+  "tagline": "Glowing worms crawling the floor of a deep, dark sea.",
+  "teaser": "The worms of a 1980 terminal reborn as bioluminescent creatures of the deep, eight species of them, crawling exactly where the original program sent them. Change how many and how fast, let them leave glowing trails, or split the screen to watch the old terminal beside them.",
+  "category": "toys",
+  "directory": "/usr/games/toys",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [1, 10],
+  "status": "shipped",
+  "accent": "#ff7eb6",
+  "emblem": "M6 18c5-6 9 6 14 0s9-6 14 0M14 34c5-6 9 6 14 0s9-6 14 0M34 18h.01M42 34h.01",
+  "inspiredBy": {
+    "program": "worms",
+    "originalTitle": "worms",
+    "uiTitle": "worms",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/worms/app",
+    "output": "play/worms/"
+  },
+  "manPage": {
+    "synopsis": "worms — watch worms wander; change how many and how fast.",
+    "description": "Eric P. Scott’s worms animated little worms crawling around a display terminal. It returns as a smooth, colourful screensaver.",
+    "seeAlso": ["rain", "worm"]
+  },
+  "howToPlay": [
+    "Let the worms crawl; S opens the settings.",
+    "Change how many there are, how long and how fast.",
+    "C shows the 1980 terminal; V splits the screen."
+  ],
+  "packages": [
+    {
+      "id": "back-to-the-terminal",
+      "title": "Back to the terminal",
+      "description": "See the worms the way a 1980 terminal drew them.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "side-by-side",
+      "title": "Side by side",
+      "description": "Move the divider to compare the old screen with the new.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "luminous-trail",
+      "title": "Luminous trail",
+      "description": "Let the worms leave glowing trails behind them.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "plankton-feast",
+      "title": "Plankton feast",
+      "description": "Turn on the letter field and let the worms eat a thousand letters.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "full-spectrum",
+      "title": "Full spectrum",
+      "description": "Bring all eight species into the abyss at once.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "command-line",
+      "title": "From the command line",
+      "description": "Start the worms with a command line of your own.",
+      "tier": "core",
+      "xp": 15
+    }
+  ]
+}

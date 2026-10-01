@@ -1,0 +1,984 @@
+/*
+ * Console Home's profile: a glowing hero with the level ring, then calm cards for the week,
+ * achievements, games, looks and the closet door. The chrome colour (and so the skin) leads;
+ * each game's own accent shows on its achievements and rows.
+ */
+
+[data-style='console'] .ch-page__inner {
+  width: min(100%, 1680px);
+  margin: 0 auto;
+  padding: 0 var(--ch-gutter) 64px;
+}
+
+[data-style='console'] .ch-page__inner > .ch-back {
+  margin-bottom: 18px;
+}
+
+[data-style='console'] .ch-page__footer {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 64px;
+  color: var(--ug-ink-2);
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-page__footer a {
+  color: var(--ug-ink);
+  text-underline-offset: 4px;
+}
+
+/* ---------- The ring ---------- */
+
+[data-style='console'] .ch-ring {
+  display: block;
+  overflow: visible;
+}
+
+[data-style='console'] .ch-ring__track,
+[data-style='console'] .ch-ring__arc {
+  fill: none;
+  stroke-width: 7;
+}
+
+[data-style='console'] .ch-ring__track {
+  stroke: color-mix(in srgb, var(--ug-line-strong) 45%, transparent);
+}
+
+[data-style='console'] .ch-ring__arc {
+  stroke: var(--ch-chrome);
+  stroke-linecap: round;
+  stroke-dasharray: var(--ch-ring-fill) 100;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ch-chrome) 55%, transparent));
+}
+
+/* ---------- Hero ---------- */
+
+[data-style='console'] .ch-profile {
+  --ch-accent: var(--ch-chrome);
+  --ch-accent-raw: var(--ch-chrome);
+}
+
+[data-style='console'] .ch-profile-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(360px, 480px);
+  align-items: center;
+  gap: clamp(28px, 3vw, 56px);
+  overflow: hidden;
+  padding: clamp(30px, 3vw, 52px);
+  border: 1px solid var(--ch-glass-line);
+  border-radius: 36px;
+  background: var(--ug-surface);
+  box-shadow: 0 40px 80px -56px var(--ug-shadow);
+}
+
+[data-style='console'] .ch-profile-hero__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      42% 110% at 10% 50%,
+      color-mix(in srgb, var(--ch-chrome) 22%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      40% 90% at 100% 0%,
+      color-mix(in srgb, var(--ug-accent-2) 16%, transparent),
+      transparent 70%
+    );
+}
+
+[data-style='console'] .ch-profile-hero__ring {
+  position: relative;
+  width: clamp(170px, 12vw, 230px);
+  aspect-ratio: 1;
+}
+
+[data-style='console'] .ch-ring--profile {
+  width: 100%;
+  height: 100%;
+}
+
+[data-style='console'] .ch-profile-hero__level {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  line-height: 1;
+}
+
+[data-style='console'] .ch-profile-hero__level-word {
+  color: var(--ug-ink-2);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-style='console'] .ch-profile-hero__level b {
+  font-family: var(--ug-font-display);
+  font-size: clamp(3.6rem, 4.6vw, 5.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+[data-style='console'] .ch-profile-hero__who {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+[data-style='console'] .ch-profile-hero__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--ug-font-display);
+  font-size: clamp(3rem, 5vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-style='console'] .ch-profile-hero__rank {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-rank-chip {
+  position: relative;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--ug-ink);
+  color: var(--ug-bg);
+  font-family: var(--ug-font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: help;
+}
+
+[data-style='console'] .ch-rank-chip .ch-tip {
+  font-family: var(--ug-font-body);
+  font-weight: 500;
+}
+
+[data-style='console'] .ch-rank-chip:hover .ch-tip,
+[data-style='console'] .ch-rank-chip:focus-visible .ch-tip {
+  opacity: 1;
+  transform: none;
+}
+
+[data-style='console'] .ch-xp-bar {
+  position: relative;
+  width: min(560px, 100%);
+  height: 12px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+}
+
+[data-style='console'] .ch-xp-bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ch-chrome-fill);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--ch-chrome) 55%, transparent);
+}
+
+[data-style='console'] .ch-profile-hero__xp {
+  color: var(--ug-ink-2);
+  font-size: 1.05rem;
+}
+
+[data-style='console'] .ch-profile-hero__xp b {
+  color: var(--ug-ink);
+}
+
+[data-style='console'] .ch-profile-hero__since {
+  color: var(--ug-ink-2);
+}
+
+[data-style='console'] .ch-profile-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+[data-style='console'] .ch-profile-stat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'icon value'
+    'icon label';
+  align-items: center;
+  column-gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--ch-glass-line);
+  border-radius: 22px;
+  background: var(--ch-glass);
+}
+
+[data-style='console'] .ch-profile-stat__icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ch-chrome) 16%, var(--ug-surface));
+  color: var(--ch-chrome);
+}
+
+[data-style='console'] .ch-profile-stat__value {
+  grid-area: value;
+  font-family: var(--ug-font-display);
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+[data-style='console'] .ch-profile-stat__label {
+  grid-area: label;
+  white-space: nowrap;
+  color: var(--ug-ink-2);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* ---------- Sections and cards ---------- */
+
+[data-style='console'] .ch-profile-section {
+  margin-top: 52px;
+}
+
+[data-style='console'] .ch-subtitle {
+  margin: 22px 0 12px;
+  color: var(--ug-ink-2);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-style='console'] .ch-card {
+  padding: 26px 28px;
+  border: 1px solid var(--ug-line);
+  border-radius: 28px;
+  background: var(--ug-surface);
+  box-shadow: 0 30px 60px -48px var(--ug-shadow);
+}
+
+[data-style='console'] .ch-card__title {
+  margin-bottom: 14px;
+  font-family: var(--ug-font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-card__text {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-card__note {
+  margin-top: 12px;
+  color: var(--ug-ink-2);
+  line-height: 1.5;
+}
+
+[data-style='console'] .ch-profile-empty {
+  padding: 22px 26px;
+  border: 2px dashed var(--ug-line-strong);
+  border-radius: 24px;
+  color: var(--ug-ink-2);
+  font-size: 1.05rem;
+}
+
+/* ---------- This week ---------- */
+
+[data-style='console'] .ch-profile-week__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(300px, 1fr);
+  gap: 18px;
+}
+
+[data-style='console'] .ch-quests-card .ch-quests__list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+[data-style='console'] .ch-quests-card .ch-quest {
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-content: start;
+}
+
+[data-style='console'] .ch-streak-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+[data-style='console'] .ch-streak-card .ch-card__title {
+  margin-bottom: 0;
+}
+
+[data-style='console'] .ch-streak-card__count {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+[data-style='console'] .ch-streak-card__count .ch-streak__flame {
+  align-self: center;
+}
+
+[data-style='console'] .ch-streak-card__count .ch-streak__flame .ch-icon {
+  width: 40px;
+  height: 40px;
+}
+
+[data-style='console'] .ch-streak-card__count b {
+  font-family: var(--ug-font-display);
+  font-size: 3.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+[data-style='console'] .ch-streak-card__count > span:last-child {
+  color: var(--ug-ink-2);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+[data-style='console'] .ch-streak__week--large {
+  gap: 12px;
+  padding: 4px 0;
+  border: 0;
+}
+
+[data-style='console'] .ch-streak__week--large .ch-streak__dot {
+  width: 22px;
+  height: 22px;
+  border-width: 2px;
+}
+
+[data-style='console'] .ch-streak__week--large .ch-streak__letter {
+  font-size: 0.9rem;
+}
+
+/* ---------- Achievements ---------- */
+
+[data-style='console'] .ch-profile .ch-achievement__from {
+  color: var(--ug-ink-2);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* On the profile the two rows share the width evenly instead of scrolling. */
+[data-style='console'] .ch-profile .ch-achievements {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: visible;
+}
+
+[data-style='console'] .ch-profile .ch-achievement {
+  min-height: 0;
+}
+
+[data-style='console'] .ch-achievements--next .ch-achievement {
+  border-style: dashed;
+  border-color: var(--ug-line-strong);
+  background: transparent;
+}
+
+[data-style='console'] .ch-sets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+[data-style='console'] .ch-set {
+  --ch-accent-raw: var(--ch-chrome);
+  border: 1px solid var(--ug-line);
+  border-radius: 22px;
+  background: var(--ug-surface);
+}
+
+[data-style='console'] .ch-set[open] {
+  grid-column: 1 / -1;
+  padding-bottom: 18px;
+}
+
+[data-style='console'] .ch-set__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'title count chevron'
+    'bar bar chevron';
+  align-items: center;
+  gap: 10px 14px;
+  padding: 18px 20px;
+  border-radius: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+
+[data-style='console'] .ch-set__summary::-webkit-details-marker {
+  display: none;
+}
+
+[data-style='console'] .ch-set__summary:focus-visible {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 2px;
+}
+
+[data-style='console'] .ch-set__title {
+  grid-area: title;
+  font-weight: 800;
+  font-size: 1.08rem;
+  line-height: 1.25;
+}
+
+[data-style='console'] .ch-set__count {
+  grid-area: count;
+  color: var(--ug-ink-2);
+  font-family: var(--ug-font-mono);
+  font-size: 0.92rem;
+}
+
+[data-style='console'] .ch-set__bar {
+  grid-area: bar;
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+}
+
+[data-style='console'] .ch-set__bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ch-accent-raw);
+}
+
+[data-style='console'] .ch-set__chevron {
+  grid-area: chevron;
+  transition: transform 0.2s var(--ch-ease);
+}
+
+[data-style='console'] .ch-set[open] .ch-set__chevron {
+  transform: rotate(180deg);
+}
+
+[data-style='console'] .ch-set.is-complete .ch-set__count {
+  color: var(--ug-ink);
+  font-weight: 700;
+}
+
+[data-style='console'] .ch-set__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 8px 18px;
+  padding: 0 20px;
+}
+
+[data-style='console'] .ch-set__item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-areas:
+    'mark text'
+    'mark meta';
+  gap: 2px 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--ug-surface-2);
+}
+
+[data-style='console'] .ch-set__mark {
+  grid-area: mark;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ug-surface);
+  color: var(--ug-ink-2);
+}
+
+[data-style='console'] .ch-set__mark .ch-icon {
+  width: 18px;
+  height: 18px;
+}
+
+[data-style='console'] .ch-set__item.is-earned .ch-set__mark {
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+}
+
+[data-style='console'] .ch-set__text {
+  grid-area: text;
+  display: grid;
+}
+
+[data-style='console'] .ch-set__text span {
+  color: var(--ug-ink-2);
+  font-size: 0.95rem;
+}
+
+[data-style='console'] .ch-set__meta {
+  grid-area: meta;
+  color: var(--ug-ink-2);
+  font-family: var(--ug-font-mono);
+  font-size: 0.82rem;
+}
+
+[data-style='console'] .ch-set__link {
+  display: inline-block;
+  margin: 14px 20px 0;
+  color: var(--ug-ink);
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Your games ---------- */
+
+[data-style='console'] .ch-games-card {
+  padding: 10px 18px 14px;
+}
+
+[data-style='console'] .ch-games {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-style='console'] .ch-games thead th {
+  padding: 10px 14px 4px;
+  color: var(--ug-ink-2);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+[data-style='console'] .ch-games thead th:first-child {
+  text-align: left;
+}
+
+[data-style='console'] .ch-games tbody th,
+[data-style='console'] .ch-games tbody td {
+  padding: 8px 14px;
+  background: var(--ug-surface-2);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+[data-style='console'] .ch-games tbody th {
+  width: 44%;
+  border-radius: 18px 0 0 18px;
+  text-align: left;
+}
+
+[data-style='console'] .ch-games tbody td:last-child {
+  border-radius: 0 18px 18px 0;
+  color: var(--ug-ink-2);
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-games__game {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--ug-ink);
+  text-decoration: none;
+}
+
+[data-style='console'] .ch-games__art {
+  position: relative;
+  flex: none;
+  width: 112px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--ug-surface);
+  box-shadow: 0 10px 20px -14px color-mix(in srgb, var(--ch-accent-raw) 70%, transparent);
+}
+
+[data-style='console'] .ch-games__name {
+  display: grid;
+  min-width: 0;
+}
+
+[data-style='console'] .ch-games__name b {
+  overflow: hidden;
+  font-size: 1.1rem;
+  text-overflow: ellipsis;
+}
+
+[data-style='console'] .ch-games__name span {
+  color: var(--ug-ink-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-games__game:hover b {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+[data-style='console'] .ch-profile-invite {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  border-style: dashed;
+  border-width: 2px;
+  border-color: var(--ug-line-strong);
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-style='console'] .ch-profile-invite__text {
+  max-width: 60ch;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+/* ---------- Looks and the closet door ---------- */
+
+[data-style='console'] .ch-skins {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+[data-style='console'] .ch-skin {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 6px;
+  padding: 12px 12px 14px;
+  border: 1px solid var(--ug-line);
+  border-radius: 22px;
+  background: var(--ug-surface);
+}
+
+[data-style='console'] .ch-skin.is-current {
+  border-color: var(--ch-chrome);
+  box-shadow: inset 0 0 0 1px var(--ch-chrome);
+}
+
+[data-style='console'] .ch-skin.is-locked {
+  border-style: dashed;
+  border-color: var(--ug-line-strong);
+  background: transparent;
+}
+
+[data-style='console'] .ch-skin__name {
+  margin-top: 6px;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+[data-style='console'] .ch-skin__text {
+  color: var(--ug-ink-2);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+[data-style='console'] .ch-skin__use,
+[data-style='console'] .ch-skin__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  margin-top: 6px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+[data-style='console'] .ch-skin__use {
+  border: 1px solid var(--ug-line-strong);
+  background: var(--ug-surface-2);
+  color: var(--ug-ink);
+  cursor: pointer;
+}
+
+[data-style='console'] .ch-skin__use.is-current {
+  border-color: transparent;
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+}
+
+[data-style='console'] .ch-skin__lock {
+  justify-content: flex-start;
+  padding: 0;
+  color: var(--ug-ink-2);
+}
+
+[data-style='console'] .ch-skin__lock .ch-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* A swatch paints a tiny slice of the chrome in one skin: the level ring, a button and a chip. */
+[data-style='console'] .ch-swatch[data-skin='default'] {
+  --ch-chrome: var(--ug-accent);
+  --ch-chrome-fill: var(--ug-accent);
+  --ch-chrome-ink: var(--ug-accent-ink);
+}
+
+[data-style='console'] .ch-swatch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 78px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      80% 120% at 0% 0%,
+      color-mix(in srgb, var(--ch-chrome) 22%, transparent),
+      transparent 70%
+    ),
+    var(--ug-surface-2);
+}
+
+[data-style='console'] .ch-swatch__ring {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--ug-surface-2) 70%, transparent 72%),
+    conic-gradient(
+      var(--ch-chrome) 250deg,
+      color-mix(in srgb, var(--ug-line-strong) 50%, transparent) 0
+    );
+}
+
+[data-style='console'] .ch-swatch__pill {
+  flex: 1;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--ch-chrome-fill);
+  box-shadow: 0 8px 16px -10px var(--ch-chrome);
+}
+
+[data-style='console'] .ch-swatch__chip {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--ch-chrome);
+  opacity: 0.55;
+}
+
+[data-style='console'] .ch-skin.is-locked .ch-swatch {
+  filter: saturate(0.35);
+  opacity: 0.75;
+}
+
+[data-style='console'] .ch-door {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 36px;
+  padding: 26px 40px 0;
+  color: var(--ug-ink);
+  text-decoration: none;
+  transition: transform 0.2s var(--ch-ease);
+}
+
+[data-style='console'] .ch-door:hover {
+  transform: translateY(-2px);
+}
+
+[data-style='console'] .ch-door__frame {
+  position: relative;
+  display: block;
+  align-self: end;
+  width: 124px;
+  height: 200px;
+  padding: 6px 6px 0;
+  border-radius: 14px 14px 4px 4px;
+  background: linear-gradient(180deg, var(--ug-line-strong), var(--ug-line));
+  perspective: 500px;
+}
+
+[data-style='console'] .ch-door__panel {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: 10px 10px 2px 2px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 20px,
+      color-mix(in srgb, var(--ug-ink) 7%, transparent) 20px 22px
+    ),
+    linear-gradient(
+      160deg,
+      var(--ug-surface-2),
+      color-mix(in srgb, var(--ug-surface-2) 70%, var(--ug-ink))
+    );
+  transform-origin: 0 50%;
+  transition: transform 0.5s var(--ch-ease);
+}
+
+[data-style='console'] .ch-door__knob {
+  position: absolute;
+  top: 54%;
+  right: 12px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ug-ink-2);
+}
+
+[data-style='console'] .ch-door__light {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ug-bad);
+  box-shadow: 0 0 12px var(--ug-bad);
+  transform: translateX(-50%);
+}
+
+/* Open at root: the door swings in and warm light spills out. */
+[data-style='console'] .ch-door.is-open .ch-door__frame {
+  background:
+    radial-gradient(90% 70% at 50% 60%, #ffcf7a, #ff9f43 60%, #b85a17), var(--ug-line-strong);
+}
+
+[data-style='console'] .ch-door.is-open .ch-door__panel {
+  transform: rotateY(-58deg);
+  box-shadow: 12px 0 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+[data-style='console'] .ch-door.is-open .ch-door__light {
+  background: var(--ug-good);
+  box-shadow: 0 0 12px var(--ug-good);
+}
+
+[data-style='console'] .ch-door__copy {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+  max-width: 720px;
+  padding-bottom: 26px;
+}
+
+[data-style='console'] .ch-door__title {
+  font-family: var(--ug-font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-door__text {
+  color: var(--ug-ink-2);
+  font-size: 1.08rem;
+  line-height: 1.45;
+}
+
+[data-style='console'] .ch-door__bar {
+  position: relative;
+  width: min(480px, 100%);
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+}
+
+[data-style='console'] .ch-door__bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ch-chrome-fill);
+}
+
+[data-style='console'] .ch-door__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  margin-top: 6px;
+  padding: 0 20px;
+  border: 1px solid var(--ug-line-strong);
+  border-radius: 999px;
+  background: var(--ug-surface-2);
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-door.is-open .ch-door__action {
+  border-color: transparent;
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+}
+
+[data-style='console'] .ch-door__action .ch-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 1240px) {
+  [data-style='console'] .ch-profile-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  [data-style='console'] .ch-profile-hero__stats {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  [data-style='console'] .ch-profile-week__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  [data-style='console'] .ch-quests-card .ch-quests__list,
+  [data-style='console'] .ch-skins {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='console'] .ch-profile-hero,
+  [data-style='console'] .ch-profile-hero__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='console'] .ch-games thead {
+    display: none;
+  }
+
+  [data-style='console'] .ch-games tbody td:nth-of-type(n + 3) {
+    display: none;
+  }
+}

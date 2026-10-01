@@ -1,0 +1,14447 @@
+# Keystroke fuzz: 6 players, 1200 steps.
+seed 606
+init
+join r1 1 c
+join r2 1 c
+join r3 1 c
+join b1 2 c
+join b2 2 c
+join b3 2 s
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 143
+set r2 ammo 68
+set r3 ammo 263
+set b1 ammo 16
+set b2 ammo 297
+set b3 ammo 267
+key r2 l
+key r3 c
+key b1 9
+key b2 J
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 @
+key b1 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key b1 O
+key b2 g
+key b3 J
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r3 4
+key b1 j
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r3 o
+key b1 c
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 l
+key r2 f
+key r3 f
+key b1 f
+key b2 @
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 o
+key r2 h
+key r3 L
+key b1 J
+key b2 f
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 K
+key r3 l
+key b1 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 f
+key r3 J
+key b1 l
+key b2 8
+key b3 s
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 k
+key b2 l
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r2 k
+key r3 J
+key b1 @
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 9
+key r2 l
+key b1 o
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 g
+key r2 J
+key b1 j
+key b2 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r3 g
+key b1 j
+key b2 f
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 k
+key r3 f
+key b1 l
+key b2 @
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 f
+key b2 g
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r3 L
+key b1 J
+key b2 K
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 8
+key r3 h
+key b1 1
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 s
+key r3 K
+key b1 @
+key b2 G
+key b3 c
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 h
+key b1 L
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 f
+key r3 h
+key b1 g
+key b2 4
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 0
+key r3 g
+key b1 g
+key b2 j
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r2 j
+key b1 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r3 s
+key b1 4
+key b2 4
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+set r1 ammo 26
+set r2 ammo 178
+set r3 ammo 198
+set b1 ammo 199
+set b2 ammo 142
+set b3 ammo 47
+key r1 K
+key r2 o
+key b1 k
+key b2 2
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 H
+key r2 1
+key r3 k
+key b1 h
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 K
+key r3 1
+key b1 F
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 J
+key r3 j
+key b1 k
+key b2 f
+key b3 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 8
+key r2 l
+key r3 L
+key b1 G
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 o
+key b1 F
+key b3 @
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 j
+key r2 l
+key r3 l
+key b2 @
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r3 7
+key b1 L
+key b2 G
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r2 f
+key b1 k
+key b2 j
+key b3 4
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 2
+key r3 L
+key b2 4
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 o
+key r2 c
+key r3 f
+key b1 j
+key b2 0
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r3 9
+key b1 O
+key b2 1
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 9
+key r3 h
+key b2 L
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r3 4
+key b1 f
+key b2 H
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 c
+key r2 K
+key b1 f
+key b2 h
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 c
+key b1 K
+key b2 1
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 s
+key r3 H
+key b1 1
+key b2 j
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 j
+key r3 K
+key b1 F
+key b2 f
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 4
+key b1 K
+key b2 l
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 j
+key r3 H
+key b1 h
+key b2 j
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 k
+key r3 g
+key b2 j
+key b3 G
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r3 h
+key b1 H
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 g
+key r2 2
+key r3 0
+key b1 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 8
+key r3 j
+key b1 l
+key b2 H
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 s
+key r2 h
+key r3 k
+key b1 G
+key b2 f
+key b3 L
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+set r1 ammo 146
+set r2 ammo 237
+set r3 ammo 101
+set b1 ammo 256
+set b2 ammo 305
+set b3 ammo 150
+key r1 K
+key r2 H
+key r3 l
+key b1 l
+key b2 j
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 k
+key r3 o
+key b1 K
+key b2 h
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 H
+key r3 L
+key b1 f
+key b2 o
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 F
+key r3 j
+key b1 O
+key b2 k
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 k
+key r3 f
+key b2 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 h
+key b1 j
+key b3 1
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 J
+key r3 O
+key b2 7
+key b3 4
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 g
+key r3 s
+key b1 f
+key b2 g
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 8
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 k
+key r3 @
+key b2 k
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 f
+key b1 k
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 J
+key r2 j
+key b1 J
+key b2 g
+key b3 J
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 l
+key r3 j
+key b1 f
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 l
+key r3 k
+key b1 h
+key b2 @
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 @
+key r3 J
+key b1 k
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 8
+key r3 1
+key b2 j
+key b3 H
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 c
+key r2 j
+key r3 o
+key b1 K
+key b2 j
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 K
+key r3 f
+key b1 s
+key b2 J
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 h
+key r3 8
+key b2 k
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 G
+key r2 f
+key r3 j
+key b1 @
+key b2 H
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 9
+key b1 j
+key b2 k
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 2
+key r2 G
+key r3 1
+key b1 H
+key b2 O
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r3 f
+key b1 k
+key b2 k
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 1
+key r3 J
+key b2 J
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 l
+key r3 k
+key b1 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+set r1 ammo 55
+set r2 ammo 156
+set r3 ammo 288
+set b1 ammo 21
+set b2 ammo 299
+set b3 ammo 142
+key r1 2
+key r2 o
+key r3 G
+key b2 K
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r2 c
+key r3 f
+key b1 k
+key b2 L
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 c
+key r2 k
+key r3 F
+key b2 j
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 7
+key r2 g
+key r3 h
+key b2 0
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 L
+key r3 g
+key b1 g
+key b2 l
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 j
+key b1 j
+key b2 F
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r2 k
+key r3 F
+key b1 f
+key b2 L
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 9
+key r3 G
+key b1 J
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 K
+key b1 h
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 8
+key r2 1
+key b1 l
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r2 K
+key b1 o
+key b3 O
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 f
+key r3 J
+key b1 J
+key b2 l
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 c
+key r2 l
+key r3 L
+key b1 c
+key b2 G
+key b3 2
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 o
+key r2 f
+key r3 s
+key b1 H
+key b2 f
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 s
+key r2 j
+key b1 f
+key b2 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 l
+key r3 9
+key b2 F
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 @
+key r2 7
+key b1 9
+key b2 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 @
+key r2 l
+key r3 h
+key b1 h
+key b2 o
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 O
+key r3 4
+key b1 l
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r3 f
+key b1 4
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 4
+key b1 f
+key b2 c
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 8
+key r3 F
+key b1 H
+key b2 1
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 h
+key r2 g
+key r3 k
+key b1 s
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 O
+key r3 l
+key b1 J
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 f
+key r3 j
+key b1 f
+key b3 o
+fullstep
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+set r1 ammo 24
+set r2 ammo 245
+set r3 ammo 225
+set b1 ammo 30
+set b2 ammo 293
+set b3 ammo 245
+key r1 j
+key r2 K
+key b2 f
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r2 G
+key r3 h
+key b2 J
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 J
+key r3 L
+key b1 g
+key b2 H
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 l
+key b1 g
+key b2 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 9
+key r2 h
+key r3 o
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 2
+key r3 2
+key b1 J
+key b2 f
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 j
+key r3 K
+key b1 O
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 9
+key r3 f
+key b2 h
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key b1 h
+key b2 1
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 H
+key r3 f
+key b1 l
+key b2 O
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 l
+key r2 2
+key b1 9
+key b2 2
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 j
+key r3 h
+key b1 9
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 f
+key r3 l
+key b1 h
+key b2 @
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 O
+key r3 k
+key b2 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 j
+key r2 k
+key r3 K
+key b1 f
+key b2 k
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r2 L
+key r3 4
+key b1 1
+key b2 l
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r2 4
+key r3 g
+key b1 f
+key b2 j
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 o
+key r3 o
+key b2 j
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 1
+key b1 l
+key b2 f
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 h
+key b2 j
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r2 9
+key r3 j
+key b1 j
+key b2 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 l
+key r3 2
+key b1 o
+key b2 j
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r2 h
+key r3 g
+key b1 f
+key b2 f
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key b1 J
+key b2 K
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+set r1 ammo 205
+set r2 ammo 153
+set r3 ammo 153
+set b1 ammo 67
+set b2 ammo 234
+set b3 ammo 218
+key r1 h
+key r2 K
+key b1 J
+key b2 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r3 f
+key b1 g
+key b2 O
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 h
+key r3 s
+key b1 8
+key b2 g
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r3 G
+key b2 O
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 l
+key r3 f
+key b1 f
+key b2 h
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 8
+key r2 o
+key r3 f
+key b3 @
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 f
+key b1 c
+key b2 f
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 j
+key b1 J
+key b2 f
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 L
+key r3 9
+key b1 h
+key b2 f
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 L
+key r2 0
+key r3 g
+key b1 J
+key b2 k
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 2
+key r2 c
+key r3 o
+key b1 g
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 7
+key r3 f
+key b1 o
+key b2 O
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 J
+key r3 h
+key b1 f
+key b2 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 G
+key r2 f
+key r3 J
+key b1 g
+key b2 g
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 l
+key r2 4
+key r3 f
+key b1 4
+key b2 j
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 f
+key r1 h
+key r3 f
+key b1 F
+key b2 k
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 o
+key r3 k
+key b1 J
+key b2 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r2 f
+key r3 k
+key b1 J
+key b2 J
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 H
+key r2 j
+key r3 c
+key b1 j
+key b2 @
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r3 H
+key b2 0
+key b3 @
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r2 9
+key r3 k
+key b2 O
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 F
+key r3 f
+key b1 f
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 O
+key r2 K
+key b1 K
+key b2 9
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 s
+key r3 h
+key b1 o
+key b2 G
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 9
+key r3 k
+key b1 @
+key b2 k
+fullstep
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 273
+set r2 ammo 55
+set r3 ammo 197
+set b1 ammo 95
+set b2 ammo 229
+set b3 ammo 290
+key r1 l
+key r2 l
+key r3 h
+key b2 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r3 4
+key b1 L
+key b2 f
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 H
+key b1 H
+key b2 f
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r3 9
+key b2 @
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 7
+key r2 k
+key r3 k
+key b1 J
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 j
+key r2 O
+key r3 l
+key b1 j
+key b2 g
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 7
+key r2 K
+key r3 j
+key b1 G
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 F
+key r2 f
+key r3 o
+key b1 k
+key b2 h
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r2 k
+key r3 k
+key b1 l
+key b2 9
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 l
+key b1 f
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 l
+key r2 h
+key r3 2
+key b2 o
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 0
+key r2 G
+key r3 s
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r2 f
+key r3 k
+key b1 2
+key b2 f
+key b3 7
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 J
+key r2 l
+key r3 f
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 8
+key r3 1
+key b1 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 H
+key r2 f
+key b1 h
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key b1 H
+key b2 2
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 K
+key r3 o
+key b1 j
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r2 L
+key r3 k
+key b1 L
+key b2 h
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 h
+key r3 L
+key b1 F
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 k
+key r3 j
+key b1 h
+key b2 f
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r3 4
+key b1 J
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r2 9
+key r3 h
+key b1 L
+key b2 o
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 F
+key b1 f
+key b2 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 k
+key b1 o
+key b2 F
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 70
+set r2 ammo 274
+set r3 ammo 129
+set b1 ammo 36
+set b2 ammo 123
+set b3 ammo 185
+key r1 h
+key r3 f
+key b2 f
+key b3 F
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 K
+key r3 O
+key b2 L
+key b3 8
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 G
+key r3 @
+key b1 l
+key b2 f
+key b3 H
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 h
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 s
+key b1 H
+key b2 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 l
+key r3 l
+key b1 f
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 7
+key r2 J
+key b1 1
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 H
+key r2 9
+key r3 f
+key b1 7
+key b2 2
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 L
+key b2 J
+key b3 J
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 H
+key r3 8
+key b2 G
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 o
+key b1 f
+key b2 f
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r2 9
+key b1 4
+key b2 K
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 l
+key r3 f
+key b1 9
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 K
+key r2 f
+key r3 7
+key b1 f
+key b2 J
+key b3 G
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r3 o
+key b2 1
+key b3 H
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 9
+key r2 H
+key r3 f
+key b2 f
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 2
+key r3 o
+key b1 9
+key b2 l
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r3 H
+key b1 h
+key b2 j
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 H
+key r3 J
+key b1 g
+key b2 h
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 K
+key r3 J
+key b1 s
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 h
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 2
+key r2 H
+key b1 H
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 s
+key b1 J
+key b2 K
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 O
+key r2 O
+key r3 k
+key b1 J
+key b2 h
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 c
+key r2 l
+key r3 s
+key b1 0
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+set r1 ammo 168
+set r2 ammo 219
+set r3 ammo 131
+set b1 ammo 198
+set b2 ammo 103
+set b3 ammo 170
+key r1 f
+key r3 o
+key b1 c
+key b2 h
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r3 l
+key b1 o
+key b2 g
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key b2 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 4
+key b2 J
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 h
+key r3 h
+key b1 4
+key b2 f
+key b3 9
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 g
+key r3 k
+key b1 o
+key b2 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 7
+key r2 o
+key b1 g
+key b2 k
+key b3 2
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 h
+key b2 j
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 f
+key r3 h
+key b2 j
+key b3 G
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 K
+key b2 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r2 l
+key r3 @
+key b2 f
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 4
+key r2 h
+key b1 F
+key b2 @
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r2 f
+key r3 s
+key b1 j
+key b2 h
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 L
+key r3 g
+key b1 L
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key b1 l
+key b2 k
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 s
+key r2 f
+key r3 9
+key b1 7
+key b2 j
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 O
+key r2 L
+key r3 h
+key b2 O
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 j
+key r3 o
+key b2 L
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 l
+key r3 f
+key b1 2
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 j
+key b1 J
+key b2 j
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 @
+key r3 4
+key b1 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 K
+key r3 h
+key b1 h
+key b2 2
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r2 l
+key r3 K
+key b1 f
+key b2 l
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 1
+key r3 f
+key b1 j
+key b2 7
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 8
+key r3 l
+key b1 l
+key b2 h
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 196
+set r2 ammo 22
+set r3 ammo 36
+set b1 ammo 162
+set b2 ammo 196
+set b3 ammo 142
+key r1 f
+key r3 h
+key b1 J
+key b2 L
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 h
+key r3 K
+key b1 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 g
+key b2 J
+key b3 7
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 J
+key r3 H
+key b2 G
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 g
+key r3 f
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 j
+key r3 f
+key b1 j
+key b2 H
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 4
+key b2 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 k
+key r3 g
+key b1 O
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 o
+key b1 7
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key b1 K
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 G
+key r2 h
+key r3 f
+key b1 9
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r3 7
+key b1 f
+key b2 s
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key b2 o
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 f
+key b1 K
+key b2 h
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 @
+key r3 k
+key b1 g
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 k
+key r2 K
+key b1 7
+key b2 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 G
+key r3 9
+key b1 o
+key b3 1
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r2 l
+key r3 K
+key b1 o
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r2 j
+key r3 c
+key b1 l
+key b2 J
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 4
+key r3 L
+key b2 L
+key b3 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 o
+key r3 f
+key b1 8
+key b2 8
+key b3 c
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 0
+key r3 j
+key b2 o
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 J
+key r3 g
+key b1 K
+key b2 L
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key b1 c
+key b2 J
+key b3 @
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 0
+key r2 l
+key b1 f
+key b2 k
+key b3 l
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 63
+set r2 ammo 220
+set r3 ammo 194
+set b1 ammo 259
+set b2 ammo 195
+set b3 ammo 36
+key r2 h
+key r3 0
+key b1 h
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 o
+key r3 l
+key b1 g
+key b2 o
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 F
+key r3 s
+key b1 l
+key b2 k
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 J
+key b2 7
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r3 o
+key b1 f
+key b2 9
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 F
+key b1 k
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 k
+key r3 O
+key b1 L
+key b2 g
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 1
+key r3 1
+key b1 j
+key b2 h
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 1
+key r2 h
+key b1 o
+key b2 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 j
+key r3 8
+key b1 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 g
+key b1 f
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 g
+key r2 h
+key r3 4
+key b1 g
+key b2 k
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 2
+key r3 l
+key b1 h
+key b2 L
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 l
+key b1 h
+key b2 J
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r3 J
+key b1 l
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key b1 2
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r2 @
+key r3 K
+key b1 f
+key b2 9
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r2 f
+key r3 2
+key b1 K
+key b2 2
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key b1 k
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 h
+key r2 F
+key r3 l
+key b2 f
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 j
+key b1 g
+key b2 h
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 J
+key r3 f
+key b1 K
+key b2 1
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 J
+key r3 f
+key b1 O
+key b2 s
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 0
+key r3 L
+key b1 h
+key b2 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 l
+key r3 L
+key b1 4
+key b2 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 40
+set r2 ammo 219
+set r3 ammo 172
+set b1 ammo 177
+set b2 ammo 143
+set b3 ammo 123
+key r1 l
+key r2 k
+key r3 k
+key b1 G
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 s
+key r2 K
+key r3 f
+key b1 F
+key b2 f
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r1 F
+key r3 j
+key b1 c
+key b2 7
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 G
+key r2 F
+key r3 f
+key b1 k
+key b2 K
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 h
+key r3 4
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 1
+key b2 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 s
+key r3 k
+key b1 h
+key b2 h
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 l
+key b1 f
+key b2 L
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 L
+key r2 f
+key r3 j
+key b1 l
+key b2 k
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 H
+key b1 L
+key b2 L
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 H
+key r3 h
+key b1 f
+key b2 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r3 s
+key b1 f
+key b2 h
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 f
+key b1 L
+key b2 c
+key b3 0
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r3 0
+key b1 G
+key b2 G
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r2 K
+key b2 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 K
+key b1 l
+key b2 F
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 2
+key r2 J
+key r3 G
+key b1 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 s
+key r3 J
+key b1 l
+key b2 f
+key b3 o
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 2
+key r2 l
+key r3 j
+key b1 O
+key b2 c
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r2 k
+key r3 f
+key b2 2
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 O
+key b2 8
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r2 K
+key r3 7
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 j
+key r2 k
+key r3 f
+key b1 H
+key b2 h
+key b3 G
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key b1 h
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 @
+key r3 L
+key b1 K
+key b2 1
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 174
+set r2 ammo 51
+set r3 ammo 202
+set b1 ammo 259
+set b2 ammo 187
+set b3 ammo 72
+key r1 l
+key r2 f
+key r3 j
+key b1 f
+key b2 @
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key b1 j
+key b2 l
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key r3 f
+key b1 k
+key b2 k
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 f
+key b1 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 j
+key r2 j
+key r3 L
+key b2 7
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 f
+key b1 g
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 s
+key b1 k
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r3 L
+key b2 f
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key b1 h
+key b2 l
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 H
+key r3 G
+key b1 f
+key b2 f
+key b3 @
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 8
+key r2 H
+key r3 9
+key b1 k
+key b2 4
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 g
+key r2 k
+key r3 h
+key b1 @
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 J
+key b1 f
+key b2 0
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 f
+key r3 1
+key b1 j
+key b2 J
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r2 J
+key r3 l
+key b1 k
+key b2 2
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 L
+key b1 f
+key b2 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 c
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r2 G
+key r3 k
+key b1 h
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 H
+key r3 f
+key b1 @
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 L
+key r3 k
+key b1 G
+key b2 0
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 J
+key r2 j
+key r3 g
+key b1 K
+key b2 H
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key b2 2
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 K
+key r2 o
+key r3 @
+key b1 @
+key b2 j
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 o
+key r3 4
+key b2 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 j
+key r3 9
+key b1 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 53
+set r2 ammo 114
+set r3 ammo 54
+set b1 ammo 174
+set b2 ammo 175
+set b3 ammo 18
+key r1 f
+key r2 o
+key b2 c
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 l
+key b1 L
+key b2 c
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 l
+key r3 H
+key b2 l
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r3 j
+key b1 J
+key b2 j
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 O
+key r2 k
+key r3 H
+key b2 j
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r3 H
+key b1 9
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 L
+key r3 l
+key b1 h
+key b2 k
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r3 J
+key b1 @
+key b2 o
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r3 h
+key b1 k
+key b2 L
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 9
+key r3 K
+key b1 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r2 l
+key r3 f
+key b2 l
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 4
+key r3 h
+key b2 7
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 o
+key r2 1
+key r3 h
+key b2 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 1
+key b2 o
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 c
+key b1 l
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r2 j
+key r3 j
+key b2 k
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key r3 G
+key b1 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 9
+key r2 c
+key r3 h
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 H
+key r2 @
+key r3 j
+key b1 L
+key b2 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 j
+key r3 L
+key b2 g
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 j
+key b1 l
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 g
+key b2 g
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 O
+key r3 h
+key b2 f
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 K
+key r2 4
+key b1 j
+key b2 l
+key b3 0
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 G
+key r2 9
+key b1 2
+key b2 8
+key b3 l
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 98
+set r2 ammo 282
+set r3 ammo 307
+set b1 ammo 308
+set b2 ammo 297
+set b3 ammo 134
+key r1 f
+key r3 f
+key b1 7
+key b2 k
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 o
+key r2 9
+key r3 2
+key b1 s
+key b2 8
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 9
+key r3 f
+key b1 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 7
+key b1 g
+key b2 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r3 k
+key b1 1
+key b2 l
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 4
+key r3 k
+key b1 F
+key b2 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 K
+key b1 l
+key b2 g
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 F
+key r3 4
+key b2 h
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 h
+key b1 L
+key b2 l
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r3 k
+key b1 h
+key b2 1
+key b3 F
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 l
+key r2 c
+key r3 f
+key b1 H
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 s
+key r2 @
+key r3 L
+key b1 l
+key b2 k
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 1
+key r3 2
+key b1 o
+key b2 9
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r2 f
+key b1 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 @
+key r3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 k
+key r3 f
+key b1 1
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r2 @
+key b1 h
+key b2 F
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 j
+key r2 f
+key r3 @
+key b1 f
+key b2 @
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 c
+key r3 c
+key b1 h
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r3 8
+key b2 k
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 K
+key r3 @
+key b1 f
+key b2 l
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 g
+key r2 O
+key r3 4
+key b1 s
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 L
+key r3 h
+key b2 8
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 J
+key b1 j
+key b2 g
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 h
+key b1 4
+key b2 4
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 253
+set r2 ammo 78
+set r3 ammo 159
+set b1 ammo 138
+set b2 ammo 265
+set b3 ammo 269
+key r1 h
+key r2 h
+key r3 l
+key b1 0
+key b2 j
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 l
+key r3 k
+key b1 c
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 9
+key r3 k
+key b1 o
+key b2 8
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 o
+key b1 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 J
+key r2 k
+key r3 l
+key b1 f
+key b2 K
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 K
+key b1 4
+key b2 h
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 G
+key b1 9
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r3 j
+key b1 f
+key b2 f
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 9
+key r3 K
+key b1 f
+key b2 l
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 f
+key r3 7
+key b1 l
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r3 H
+key b2 j
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 c
+key r3 s
+key b1 0
+key b2 f
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 o
+key r3 0
+key b1 H
+key b2 4
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r3 l
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 9
+key r2 s
+key r3 s
+key b2 j
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 4
+key r2 g
+key r3 f
+key b1 g
+key b2 G
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key r3 h
+key b1 h
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 l
+key r3 L
+key b1 1
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 j
+key r3 4
+key b1 h
+key b2 j
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 k
+key r3 7
+key b1 f
+key b2 s
+key b3 o
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 9
+key r3 l
+key b1 j
+key b2 l
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 L
+key r3 j
+key b1 l
+key b2 0
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 L
+key r2 j
+key r3 H
+key b1 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 l
+key b1 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r2 c
+key r3 f
+key b1 k
+key b2 h
+key b3 f
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+set r1 ammo 225
+set r2 ammo 120
+set r3 ammo 36
+set b1 ammo 168
+set b2 ammo 86
+set b3 ammo 269
+key r1 f
+key r2 k
+key r3 h
+key b1 9
+key b2 c
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 H
+key r2 L
+key r3 g
+key b1 f
+key b2 l
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 h
+key r3 f
+key b1 L
+key b2 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 J
+key b1 k
+key b2 l
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 2
+key r2 l
+key r3 f
+key b1 j
+key b2 l
+key b3 9
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 f
+key r3 H
+key b1 h
+key b2 9
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 G
+key r3 H
+key b1 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 g
+key r3 o
+key b1 f
+key b3 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 o
+key r3 l
+key b1 h
+key b2 f
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 H
+key b1 j
+key b2 f
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 j
+key r3 l
+key b2 o
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 K
+key r2 f
+key r3 k
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 f
+key r3 8
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 s
+key b1 1
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 H
+key b1 k
+key b2 F
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key b1 k
+key b2 c
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 7
+key r3 f
+key b1 H
+key b2 o
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 F
+key r3 F
+key b1 9
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r2 f
+key r3 8
+key b1 h
+key b2 l
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 h
+key r3 L
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r3 k
+key b1 k
+key b2 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r3 2
+key b1 j
+key b2 j
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 h
+key r3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 9
+key r3 4
+key b1 K
+key b2 k
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r2 4
+key r3 K
+key b1 F
+key b2 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 281
+set r2 ammo 183
+set r3 ammo 223
+set b1 ammo 139
+set b2 ammo 176
+set b3 ammo 129
+key r1 J
+key r2 K
+key b2 f
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r3 f
+key b2 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 h
+key r3 F
+key b1 j
+key b2 J
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 9
+key r2 2
+key r3 F
+key b2 9
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 k
+key r2 4
+key r3 1
+key b1 f
+key b2 f
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r3 L
+key b1 @
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 J
+key r3 f
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r2 h
+key b2 f
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 9
+key r2 4
+key b1 1
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 f
+key r3 f
+key b1 7
+key b2 g
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 g
+key r3 l
+key b2 H
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 h
+key b1 O
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 K
+key b1 7
+key b2 h
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 2
+key r2 7
+key r3 7
+key b1 s
+key b2 h
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 O
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 g
+key b1 c
+key b2 L
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 f
+key r3 j
+key b1 f
+key b2 g
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 o
+key r3 o
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 G
+key r2 f
+key r3 L
+key b1 j
+key b2 f
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 G
+key r2 4
+key b1 l
+key b2 k
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key b1 l
+key b2 8
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 K
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 8
+key r2 7
+key r3 2
+key b2 f
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 K
+key r3 f
+key b1 1
+key b2 2
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 G
+key r2 0
+key r3 k
+key b1 g
+key b2 O
+key b3 K
+fullstep
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 34
+set r2 ammo 298
+set r3 ammo 137
+set b1 ammo 87
+set b2 ammo 69
+set b3 ammo 295
+key r1 h
+key r2 l
+key r3 K
+key b1 0
+key b2 l
+key b3 0
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r2 l
+key r3 1
+key b1 J
+key b2 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 J
+key r2 f
+key r3 9
+key b1 L
+key b2 9
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 k
+key r3 l
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 F
+key r3 k
+key b1 j
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 g
+key b1 l
+key b2 2
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 s
+key r2 s
+key r3 9
+key b1 f
+key b2 j
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 @
+key r3 l
+key b1 h
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 K
+key b1 l
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 1
+key r2 s
+key b1 c
+key b2 l
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 J
+key r3 j
+key b1 J
+key b2 k
+key b3 o
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 k
+key r2 8
+key r3 k
+key b1 k
+key b2 J
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 j
+key b1 2
+key b2 f
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r3 k
+key b1 f
+key b2 1
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 1
+key r3 f
+key b1 s
+key b2 l
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r3 2
+key b1 f
+key b2 h
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 0
+key r2 f
+key r3 c
+key b2 0
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 f
+key r3 j
+key b2 0
+key b3 8
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 J
+key r3 j
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 8
+key b1 f
+key b2 g
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r3 f
+key b1 l
+key b2 k
+key b3 9
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r2 k
+key b2 L
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 k
+key r3 j
+key b1 h
+key b2 4
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 l
+key r3 f
+key b1 h
+key b2 j
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 7
+key r3 1
+key b1 9
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+set r1 ammo 49
+set r2 ammo 69
+set r3 ammo 109
+set b1 ammo 159
+set b2 ammo 90
+set b3 ammo 296
+key r1 s
+key r2 k
+key b1 k
+key b2 7
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 g
+key r3 f
+key b1 f
+key b2 l
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 f
+key r3 j
+key b1 f
+key b2 L
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 8
+key b1 l
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r3 f
+key b1 2
+key b2 H
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 l
+key r3 k
+key b1 g
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 g
+key b1 J
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 G
+key r3 9
+key b1 o
+key b2 c
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 g
+key r2 s
+key b1 l
+key b2 G
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 H
+key r3 l
+key b1 F
+key b2 4
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 L
+key b2 k
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r3 j
+key b1 8
+key b2 h
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 g
+key r3 L
+key b1 G
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 K
+key r3 k
+key b1 2
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r3 f
+key b1 h
+key b2 k
+key b3 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 0
+key b1 l
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key b1 2
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key b2 h
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 K
+key r3 H
+key b1 k
+key b2 @
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 H
+key b1 o
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r3 h
+key b1 h
+key b2 h
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 s
+key b1 k
+key b3 9
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 2
+key b1 f
+key b2 K
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 L
+key r3 H
+key b1 f
+key b2 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 9
+key r3 f
+key b1 c
+key b2 2
+key b3 h
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+set r1 ammo 170
+set r2 ammo 238
+set r3 ammo 64
+set b1 ammo 56
+set b2 ammo 188
+set b3 ammo 123
+key r1 h
+key r2 s
+key r3 k
+key b1 0
+key b2 H
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r3 2
+key b2 H
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 H
+key r3 k
+key b1 j
+key b2 h
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 9
+key r3 O
+key b1 @
+key b2 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 J
+key r2 9
+key r3 O
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r3 f
+key b2 0
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 j
+key r3 K
+key b1 o
+key b2 0
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 2
+key r2 7
+key r3 j
+key b1 h
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key b1 g
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 g
+key r3 l
+key b1 O
+key b2 2
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 4
+key r3 f
+key b3 J
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 K
+key r2 2
+key r3 l
+key b1 2
+key b2 H
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 j
+key r3 j
+key b1 o
+key b2 f
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 L
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r2 9
+key r3 j
+key b2 g
+key b3 O
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 k
+key r3 f
+key b1 2
+key b2 L
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 k
+key r2 L
+key r3 o
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 j
+key b2 f
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 f
+key r3 L
+key b1 f
+key b2 j
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key b1 0
+key b2 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 l
+key r2 J
+key r3 k
+key b1 f
+key b2 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 j
+key r3 k
+key b1 k
+key b2 L
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key r3 k
+key b1 0
+key b2 f
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r2 G
+key r3 o
+key b1 h
+key b2 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 L
+key b1 l
+key b2 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 59
+set r2 ammo 285
+set r3 ammo 121
+set b1 ammo 44
+set b2 ammo 184
+set b3 ammo 83
+key r1 l
+key r2 4
+key r3 H
+key b2 k
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 L
+key r3 j
+key b1 J
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 f
+key r2 K
+key r3 G
+key b2 l
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 K
+key r3 0
+key b1 f
+key b3 s
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key b1 F
+key b2 H
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r3 7
+key b1 O
+key b2 H
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 l
+key r3 l
+key b1 o
+key b2 2
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 h
+key r2 K
+key b1 K
+key b2 j
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 h
+key r2 l
+key r3 K
+key b1 j
+key b2 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 L
+key b2 l
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 h
+key b1 1
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 0
+key r3 f
+key b1 G
+key b2 l
+key b3 O
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 l
+key r3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 g
+key r3 0
+key b1 g
+key b2 h
+key b3 s
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 c
+key r3 J
+key b1 2
+key b2 8
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r2 @
+key r3 L
+key b1 k
+key b2 l
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 J
+key r3 h
+key b1 f
+key b2 k
+key b3 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 l
+key r3 J
+key b1 4
+key b2 j
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 L
+key r3 J
+key b1 f
+key b2 k
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 L
+key r3 c
+key b1 O
+key b2 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 1
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 4
+key b1 h
+key b2 @
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 J
+key r3 F
+key b2 l
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 k
+key r3 k
+key b1 k
+key b2 h
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 k
+key r2 j
+key r3 f
+key b1 h
+key b2 8
+fullstep
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 17
+set r2 ammo 162
+set r3 ammo 170
+set b1 ammo 70
+set b2 ammo 67
+set b3 ammo 178
+key r2 K
+key b1 @
+key b2 g
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 K
+key r3 j
+key b1 k
+key b2 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 @
+key r3 H
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 j
+key r2 j
+key b1 j
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 l
+key r3 j
+key b2 4
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r3 l
+key b1 8
+key b2 O
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 0
+key r2 o
+key r3 h
+key b1 k
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 g
+key r3 f
+key b1 k
+key b2 f
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 G
+key r3 c
+key b1 k
+key b2 l
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key b1 l
+key b2 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 j
+key b2 k
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 g
+key r3 g
+key b1 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 O
+key b2 K
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 o
+key r3 o
+key b1 @
+key b2 1
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 o
+key r3 f
+key b2 g
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 h
+key b1 9
+key b2 s
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 H
+key r3 j
+key b1 4
+key b2 c
+key b3 7
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 s
+key r3 o
+key b1 1
+key b2 f
+key b3 8
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 f
+key r3 h
+key b1 f
+key b2 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 2
+key r2 H
+key b1 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 j
+key r3 j
+key b1 j
+key b2 f
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 K
+key r3 l
+key b1 k
+key b2 h
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 f
+key r3 j
+key b2 H
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 4
+key r2 7
+key r3 j
+key b1 s
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 j
+key r2 f
+key r3 h
+key b1 K
+key b2 l
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 192
+set r2 ammo 94
+set r3 ammo 215
+set b1 ammo 221
+set b2 ammo 144
+set b3 ammo 143
+key r1 f
+key r2 8
+key r3 k
+key b2 8
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 J
+key r3 k
+key b1 j
+key b2 J
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 K
+key r2 f
+key r3 k
+key b1 j
+key b2 L
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 l
+key r3 f
+key b1 f
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 2
+key r2 h
+key r3 o
+key b1 j
+key b2 c
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 k
+key r3 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 h
+key r3 F
+key b1 9
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r3 j
+key b1 f
+key b2 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r2 o
+key r3 o
+key b1 l
+key b2 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key r2 o
+key r3 L
+key b1 f
+key b2 L
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 h
+key r3 j
+key b2 G
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 4
+key r2 s
+key r3 j
+key b1 O
+key b2 H
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r3 8
+key b1 k
+key b2 j
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 j
+key b1 j
+key b2 l
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r2 F
+key b1 2
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 J
+key b1 f
+key b2 c
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 g
+key r2 f
+key r3 h
+key b1 l
+key b2 o
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 o
+key r3 o
+key b2 j
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 l
+key r3 h
+key b1 f
+key b2 J
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 l
+key b1 J
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 1
+key r2 f
+key r3 0
+key b1 g
+key b2 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 G
+key r2 J
+key b1 f
+key b2 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r2 F
+key b1 8
+key b2 0
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 h
+key b2 9
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 j
+key b1 l
+key b2 L
+fullstep
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 153
+set r2 ammo 265
+set r3 ammo 260
+set b1 ammo 81
+set b2 ammo 250
+set b3 ammo 233
+key r1 o
+key r2 L
+key r3 o
+key b2 k
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 2
+key r3 0
+key b1 0
+key b2 j
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 j
+key r3 4
+key b1 j
+key b2 c
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 k
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 L
+key r3 j
+key b2 F
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 j
+key b1 k
+key b2 h
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 @
+key r2 9
+key r3 @
+key b1 4
+key b2 h
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 l
+key r3 k
+key b1 j
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 9
+key b2 H
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 H
+key r3 g
+key b1 k
+key b2 K
+key b3 s
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r3 j
+key b1 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r2 J
+key r3 k
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 h
+key r3 @
+key b1 k
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 s
+key r2 l
+key r3 j
+key b2 O
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r2 7
+key b2 L
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 f
+key b1 j
+key b2 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 g
+key r3 J
+key b1 2
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 G
+key r3 l
+key b1 0
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 h
+key r3 K
+key b1 O
+key b2 h
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 J
+key r3 8
+key b1 L
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 2
+key r3 L
+key b1 k
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 4
+key r3 J
+key b2 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 O
+key b1 L
+key b2 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 k
+key b1 l
+key b2 L
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r2 7
+key r3 2
+key b1 J
+key b2 4
+key b3 s
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 110
+set r2 ammo 226
+set r3 ammo 67
+set b1 ammo 187
+set b2 ammo 63
+set b3 ammo 136
+key r1 J
+key r2 1
+key b1 H
+key b2 j
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 k
+key r2 @
+key r3 K
+key b1 1
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 h
+key r3 s
+key b1 s
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r3 l
+key b1 l
+key b2 0
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 g
+key r2 k
+key b1 2
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 l
+key b1 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 L
+key r2 H
+key r3 j
+key b1 l
+key b2 f
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 l
+key r3 G
+key b1 f
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 j
+key r3 F
+key b1 7
+key b2 f
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 j
+key r3 h
+key b1 0
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 1
+key r2 9
+key b1 @
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 k
+key r2 s
+key r3 L
+key b1 s
+key b2 @
+key b3 0
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key b1 j
+key b2 H
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 k
+key r3 j
+key b1 H
+key b2 h
+key b3 0
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 o
+key r2 f
+key r3 9
+key b1 k
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 k
+key b1 O
+key b2 J
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r2 0
+key b1 l
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 c
+key r2 l
+key b1 g
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r2 h
+key r3 f
+key b1 h
+key b2 j
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 2
+key r2 f
+key r3 f
+key b1 0
+key b2 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key b1 2
+key b2 k
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 7
+key r3 l
+key b1 f
+key b2 1
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 H
+key r3 k
+key b1 0
+key b2 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 9
+key r3 8
+key b2 c
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 l
+key r3 G
+key b1 h
+key b2 2
+key b3 J
+fullstep
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 f
+set r1 ammo 22
+set r2 ammo 222
+set r3 ammo 166
+set b1 ammo 185
+set b2 ammo 187
+set b3 ammo 72
+key r1 L
+key b2 J
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 @
+key r2 k
+key r3 G
+key b1 k
+key b2 8
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 h
+key b1 7
+key b2 f
+key b3 1
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 J
+key b1 g
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 L
+key r2 l
+key r3 k
+key b1 f
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 8
+key r2 L
+key r3 g
+key b1 2
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 h
+key r3 s
+key b1 H
+key b2 f
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r3 s
+key b2 l
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 f
+key b1 F
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r2 k
+key r3 f
+key b1 c
+key b2 H
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 o
+key r3 @
+key b2 j
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 4
+key r3 o
+key b1 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 1
+key r2 o
+key r3 f
+key b1 j
+key b2 o
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 7
+key r2 j
+key r3 f
+key b1 @
+key b2 o
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 9
+key r2 j
+key r3 f
+key b1 2
+key b2 g
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 h
+key r3 g
+key b2 c
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 8
+key r2 F
+key r3 j
+key b1 F
+key b2 f
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 7
+key b1 @
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 j
+key r3 K
+key b1 k
+key b2 h
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 j
+key r3 g
+key b1 h
+key b2 G
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 O
+key r2 j
+key r3 h
+key b1 k
+key b2 F
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 l
+key r2 G
+key r3 4
+key b1 h
+key b2 s
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 F
+key r3 f
+key b1 j
+key b2 l
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key b1 f
+key b2 f
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 h
+key b1 s
+key b2 j
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 213
+set r2 ammo 26
+set r3 ammo 215
+set b1 ammo 82
+set b2 ammo 97
+set b3 ammo 53
+key r1 h
+key r2 g
+key r3 l
+key b1 K
+key b2 4
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 l
+key r2 1
+key r3 k
+key b1 k
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key b1 h
+key b2 1
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 O
+key r2 f
+key r3 h
+key b1 s
+key b2 4
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 h
+key r3 h
+key b1 k
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key b1 f
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r1 k
+key r2 h
+key r3 k
+key b1 j
+key b2 4
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 l
+key r3 K
+key b1 7
+key b2 K
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r3 F
+key b1 J
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key r2 f
+key b2 l
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 J
+key r2 F
+key r3 H
+key b1 o
+key b2 h
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 k
+key b1 f
+key b2 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 G
+key r3 f
+key b1 9
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 8
+key r3 l
+key b2 k
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 G
+key b1 j
+key b2 o
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 @
+key b1 L
+key b2 g
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r2 f
+key r3 g
+key b1 8
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 1
+key r3 O
+key b1 K
+key b2 f
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 j
+key r3 s
+key b1 G
+key b2 4
+key b3 2
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r3 h
+key b1 K
+key b2 s
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 l
+key r3 F
+key b1 J
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 l
+key r3 f
+key b1 l
+key b2 K
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 L
+key r3 k
+key b1 J
+key b2 k
+key b3 J
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r2 f
+key r3 h
+key b1 h
+key b2 2
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 k
+key r3 k
+key b1 g
+key b2 f
+key b3 @
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 140
+set r2 ammo 300
+set r3 ammo 228
+set b1 ammo 22
+set b2 ammo 33
+set b3 ammo 19
+key r1 H
+key r2 9
+key r3 j
+key b1 j
+key b2 J
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key b1 h
+key b2 f
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 2
+key r3 h
+key b1 g
+key b2 2
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 @
+key r3 o
+key b1 k
+key b2 1
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r3 @
+key b1 k
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 4
+key r3 h
+key b1 l
+key b2 L
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 f
+key b2 G
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 h
+key r3 4
+key b1 c
+key b2 g
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r3 f
+key b1 l
+key b2 O
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 c
+key r2 k
+key r3 H
+key b1 l
+key b2 o
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 8
+key r2 4
+key r3 f
+key b1 g
+key b2 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 c
+key r2 2
+key r3 k
+key b1 h
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key r3 h
+key b1 h
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 k
+key r3 J
+key b1 h
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 K
+key r3 7
+key b2 l
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 9
+key r2 K
+key r3 l
+key b2 L
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 c
+key r3 f
+key b2 7
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 f
+key r3 f
+key b1 l
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 K
+key r3 h
+key b1 o
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 O
+key r3 l
+key b1 2
+key b2 h
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r2 l
+key b1 h
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 4
+key b1 s
+key b2 7
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 k
+key r3 1
+key b2 4
+key b3 1
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r2 2
+key r3 O
+key b1 F
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 F
+key b2 9
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 195
+set r2 ammo 192
+set r3 ammo 117
+set b1 ammo 242
+set b2 ammo 199
+set b3 ammo 141
+key r1 c
+key r2 f
+key r3 H
+key b1 o
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 1
+key b1 9
+key b2 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 J
+key b1 f
+key b2 c
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 l
+key r3 k
+key b1 f
+key b2 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 l
+key b1 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 l
+key r3 L
+key b1 l
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 g
+key r3 H
+key b1 0
+key b2 H
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r2 H
+key b1 7
+key b2 j
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 K
+key r2 J
+key r3 L
+key b1 f
+key b2 l
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r2 1
+key b1 g
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 1
+key r3 K
+key b1 j
+key b2 j
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 k
+key b1 f
+key b2 l
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 f
+key r3 l
+key b1 h
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 1
+key r2 @
+key r3 9
+key b1 g
+key b2 h
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 f
+key r3 c
+key b1 l
+key b3 s
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 l
+key r3 9
+key b1 K
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 f
+key b1 h
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 @
+key r3 o
+key b1 l
+key b2 0
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 h
+key r3 9
+key b1 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 F
+key r3 2
+key b2 g
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 O
+key r2 g
+key r3 l
+key b1 H
+key b2 J
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 2
+key r3 G
+key b1 4
+key b2 2
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r3 @
+key b2 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r2 l
+key r3 k
+key b1 h
+key b2 0
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 4
+key r3 h
+key b2 J
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 105
+set r2 ammo 283
+set r3 ammo 273
+set b1 ammo 243
+set b2 ammo 142
+set b3 ammo 210
+key r1 l
+key r2 K
+key r3 K
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key b2 L
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 l
+key r3 h
+key b2 J
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r3 s
+key b1 o
+key b2 c
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r2 j
+key b1 l
+key b2 L
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 O
+key r3 L
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 J
+key r3 k
+key b1 j
+key b2 j
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key b1 K
+key b2 j
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 o
+key r3 L
+key b2 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 j
+key r3 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r2 k
+key r3 g
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 4
+key r2 c
+key r3 f
+key b1 K
+key b2 l
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 j
+key r3 h
+key b1 1
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r2 l
+key b1 K
+key b2 F
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 F
+key r2 k
+key b2 K
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r3 f
+key b1 j
+key b2 2
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 h
+key r3 o
+key b1 g
+key b2 J
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key r3 G
+key b1 j
+key b2 L
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 H
+key r2 K
+key r3 f
+key b1 k
+key b2 g
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key r3 F
+key b1 H
+key b2 j
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 c
+key r3 h
+key b1 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r2 o
+key r3 h
+key b1 K
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 2
+key r3 h
+key b1 F
+key b2 K
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r3 K
+key b1 s
+key b2 j
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 o
+key r3 2
+key b1 l
+key b2 g
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 101
+set r2 ammo 102
+set r3 ammo 109
+set b1 ammo 293
+set b2 ammo 309
+set b3 ammo 219
+key r1 c
+key r2 9
+key r3 K
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 h
+key r3 H
+key b1 l
+key b2 J
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 f
+key r3 l
+key b1 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r3 f
+key b1 h
+key b2 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 h
+key r3 G
+key b2 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 L
+key r2 K
+key b1 f
+key b2 K
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 f
+key r3 s
+key b1 4
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 J
+key r3 J
+key b1 g
+key b2 g
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 j
+key r3 9
+key b1 0
+key b2 k
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 9
+key r3 k
+key b1 f
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 s
+key r2 s
+key r3 o
+key b1 j
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 L
+key r3 h
+key b1 l
+key b2 1
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 f
+key r3 O
+key b1 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 k
+key r3 h
+key b2 f
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 8
+key r2 o
+key b1 j
+key b2 l
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 1
+key r3 g
+key b1 k
+key b2 @
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 o
+key r3 j
+key b1 F
+key b2 h
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 h
+key r3 k
+key b1 @
+key b2 j
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 4
+key r3 o
+key b2 H
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r3 l
+key b2 h
+key b3 1
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r3 l
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 1
+key r3 o
+key b1 0
+key b2 o
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 k
+key r2 k
+key r3 o
+key b1 l
+key b2 h
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r3 l
+key b1 F
+key b2 g
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 c
+key r2 L
+key r3 h
+key b1 f
+key b2 k
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 296
+set r2 ammo 292
+set r3 ammo 245
+set b1 ammo 74
+set b2 ammo 63
+set b3 ammo 124
+key r2 7
+key r3 g
+key b2 J
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 h
+key r3 G
+key b1 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r2 l
+key b1 K
+key b2 o
+key b3 1
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r3 H
+key b1 g
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 o
+key r3 k
+key b1 f
+key b2 J
+key b3 o
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 1
+key r2 G
+key r3 G
+key b2 j
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r2 K
+key r3 f
+key b1 s
+key b2 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 j
+key r3 F
+key b1 1
+key b2 f
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r3 k
+key b1 J
+key b2 4
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 g
+key b1 0
+key b2 J
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 h
+key r3 1
+key b1 c
+key b2 K
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 L
+key r2 9
+key r3 j
+key b1 s
+key b2 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 l
+key r3 H
+key b1 9
+key b2 7
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r3 k
+key b1 k
+key b2 l
+key b3 o
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 f
+key r3 l
+key b1 K
+key b2 f
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 7
+key r2 h
+key r3 k
+key b1 l
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 J
+key r3 j
+key b1 J
+key b2 L
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key r3 f
+key b2 g
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 f
+key r3 s
+key b1 0
+key b2 @
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 o
+key r3 j
+key b1 c
+key b3 @
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r3 O
+key b2 f
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 L
+key b1 j
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 f
+key r3 f
+key b2 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r3 o
+key b1 1
+key b2 L
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r2 f
+key r3 7
+key b1 0
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+set r1 ammo 64
+set r2 ammo 195
+set r3 ammo 207
+set b1 ammo 142
+set b2 ammo 52
+set b3 ammo 274
+key r1 j
+key r3 h
+key b1 o
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 O
+key r2 k
+key b1 g
+key b2 8
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 H
+key b1 f
+key b2 k
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 k
+key b1 7
+key b2 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 k
+key r3 2
+key b1 f
+key b2 l
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 G
+key b1 4
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 h
+key r2 l
+key r3 L
+key b1 j
+key b2 k
+key b3 s
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key b1 o
+key b2 h
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 H
+key r2 h
+key r3 J
+key b1 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r3 4
+key b1 f
+key b2 0
+key b3 @
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 K
+key r3 @
+key b1 J
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r3 j
+key b1 H
+key b2 k
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r3 @
+key b1 1
+key b2 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 o
+key r3 9
+key b1 j
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 L
+key r3 l
+key b1 H
+key b2 l
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key b1 9
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 f
+key r2 H
+key r3 k
+key b1 0
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 j
+key r3 K
+key b1 h
+key b2 J
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 f
+key r3 l
+key b1 0
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 8
+key r3 j
+key b1 k
+key b2 1
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 j
+key b3 9
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 H
+key r3 l
+key b1 o
+key b2 G
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r3 f
+key b1 O
+key b2 1
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 K
+key r2 k
+key r3 h
+key b1 j
+key b2 j
+key b3 0
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 8
+key r2 h
+key r3 h
+key b1 c
+key b2 k
+key b3 f
+fullstep
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+set r1 ammo 298
+set r2 ammo 298
+set r3 ammo 106
+set b1 ammo 252
+set b2 ammo 255
+set b3 ammo 169
+key r1 c
+key r2 L
+key r3 l
+key b2 h
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 f
+key r3 l
+key b1 h
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key b1 k
+key b2 f
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r2 f
+key r3 f
+key b1 f
+key b2 g
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 j
+key r3 g
+key b2 j
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 K
+key r3 f
+key b2 k
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 1
+key r2 L
+key r3 7
+key b1 2
+key b2 c
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 K
+key r3 k
+key b1 o
+key b2 8
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r3 h
+key b2 4
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 o
+key r3 f
+key b1 2
+key b2 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 K
+key r2 h
+key r3 k
+key b2 @
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 2
+key r3 s
+key b3 L
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 l
+key r3 K
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 h
+key b2 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 4
+key r3 h
+key b1 J
+key b2 l
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 g
+key r3 @
+key b1 g
+key b2 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 j
+key r3 f
+key b1 j
+key b3 1
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key b1 f
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 9
+key r3 l
+key b1 f
+key b2 J
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 j
+key r2 K
+key r3 9
+key b1 f
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r1 f
+key r3 k
+key b1 G
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 f
+key r2 k
+key r3 l
+key b1 k
+key b2 h
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 j
+key r3 s
+key b1 l
+key b2 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key b1 f
+key b2 9
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 2
+key r2 f
+key r3 f
+key b1 j
+key b2 h
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+set r1 ammo 125
+set r2 ammo 256
+set r3 ammo 50
+set b1 ammo 79
+set b2 ammo 269
+set b3 ammo 304
+key r1 1
+key r2 l
+key r3 9
+key b1 @
+key b2 H
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 f
+key r3 @
+key b1 0
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 h
+key b1 k
+key b2 g
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 0
+key r2 1
+key r3 f
+key b1 h
+key b2 j
+key b3 G
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 2
+key r2 8
+key r3 G
+key b1 7
+key b2 f
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 h
+key b2 j
+key b3 9
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 f
+key r2 l
+key b1 L
+key b2 j
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key b1 j
+key b2 0
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 c
+key r3 f
+key b1 L
+key b2 7
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 2
+key r3 l
+key b1 K
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 4
+key r3 k
+key b1 K
+key b2 j
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r2 j
+key r3 9
+key b1 j
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r3 j
+key b1 l
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r3 2
+key b1 f
+key b2 f
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 8
+key r3 2
+key b1 J
+key b2 l
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r3 2
+key b1 h
+key b2 J
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r3 l
+key b1 0
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 K
+key r3 f
+key b1 O
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 f
+key r1 g
+key r2 g
+key r3 1
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r3 h
+key b1 o
+key b2 L
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r3 f
+key b1 o
+key b2 L
+key b3 g
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 K
+key r3 o
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 f
+key r3 L
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 c
+key r3 f
+key b1 K
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 g
+key r3 K
+key b2 l
+key b3 l
+fullstep
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 240
+set r2 ammo 194
+set r3 ammo 182
+set b1 ammo 213
+set b2 ammo 261
+set b3 ammo 64
+key r2 @
+key r3 c
+key b1 L
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 s
+key r2 H
+key r3 k
+key b2 j
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key r2 f
+key r3 K
+key b1 h
+key b2 j
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r3 f
+key b1 J
+key b2 o
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 H
+key r3 J
+key b2 L
+key b3 @
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 J
+key r3 j
+key b1 @
+key b2 J
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 l
+key b1 j
+key b2 O
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 @
+key r3 f
+key b1 J
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 0
+key r3 k
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 h
+key r2 H
+key r3 l
+key b2 f
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 h
+key r3 c
+key b1 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 H
+key r3 j
+key b1 h
+key b2 j
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r3 l
+key b1 f
+key b2 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 g
+key r3 j
+key b1 j
+key b2 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 1
+key r3 g
+key b1 H
+key b3 s
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 f
+key r3 h
+key b1 1
+key b2 H
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r3 1
+key b2 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 O
+key r2 l
+key r3 K
+key b1 k
+key b2 1
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 k
+key b1 f
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r3 K
+key b1 f
+key b2 H
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 K
+key b1 h
+key b2 J
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r3 s
+key b1 f
+key b2 O
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 H
+key r3 f
+key b1 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 7
+key r2 2
+key r3 f
+key b1 k
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 H
+key r3 l
+key b1 k
+key b2 j
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 196
+set r2 ammo 12
+set r3 ammo 278
+set b1 ammo 10
+set b2 ammo 71
+set b3 ammo 255
+key r2 j
+key r3 j
+key b1 f
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 O
+key r2 j
+key r3 k
+key b1 9
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 4
+key r2 f
+key b1 J
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 j
+key r3 1
+key b1 f
+key b2 j
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 f
+key r3 L
+key b1 h
+key b2 k
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 H
+key r3 k
+key b1 f
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 K
+key r2 f
+key b1 O
+key b2 J
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r3 j
+key b2 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key r3 L
+key b1 l
+key b2 s
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 K
+key r3 l
+key b1 1
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r3 l
+key b1 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 j
+key r3 g
+key b1 0
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 K
+key r3 K
+key b1 g
+key b2 9
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key b2 J
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 K
+key r2 F
+key r3 @
+key b1 G
+key b2 J
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r1 k
+key r2 H
+key b1 @
+key b2 j
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 1
+key r2 g
+key b2 H
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 O
+key r2 l
+key r3 h
+key b1 l
+key b2 4
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 K
+key b2 h
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key b2 l
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key b1 0
+key b2 @
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 K
+key r3 j
+key b1 f
+key b2 c
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 g
+key r2 l
+key b1 f
+key b2 h
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 h
+key r3 J
+key b2 g
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 G
+key r2 K
+key r3 f
+key b2 9
+key b3 K
+fullstep
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+set r1 ammo 296
+set r2 ammo 158
+set r3 ammo 231
+set b1 ammo 304
+set b2 ammo 17
+set b3 ammo 247
+key r1 l
+key r2 c
+key r3 f
+key b1 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r3 F
+key b1 K
+key b2 j
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 h
+key r3 L
+key b1 @
+key b2 4
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r2 k
+key r3 F
+key b1 k
+key b2 h
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 g
+key r3 j
+key b1 K
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 1
+key r2 j
+key r3 H
+key b1 o
+key b2 o
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 0
+key r2 L
+key r3 j
+key b1 K
+key b2 7
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 h
+key b1 k
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 k
+key r3 l
+key b1 j
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 f
+key r3 8
+key b2 l
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 h
+key r3 o
+key b1 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r2 l
+key r3 2
+key b1 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 j
+key r3 J
+key b1 l
+key b2 l
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r3 j
+key b1 9
+key b2 K
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r2 l
+key r3 o
+key b1 L
+key b2 H
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 H
+key b1 o
+key b2 j
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 k
+key r3 h
+key b2 o
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 1
+key r3 f
+key b2 h
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r2 f
+key r3 j
+key b1 2
+key b2 g
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 K
+key b1 8
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 h
+key r2 O
+key r3 2
+key b2 f
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r3 L
+key b1 2
+key b2 1
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 s
+key r2 h
+key b1 2
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r2 g
+key r3 7
+key b1 f
+key b2 G
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 J
+key r2 j
+key r3 c
+key b1 K
+key b2 g
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 66
+set r2 ammo 261
+set r3 ammo 38
+set b1 ammo 31
+set b2 ammo 62
+set b3 ammo 71
+key r1 g
+key r2 @
+key r3 J
+key b2 f
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r3 l
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 0
+key r2 k
+key r3 H
+key b1 f
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 s
+key r1 o
+key r2 f
+key r3 k
+key b1 @
+key b2 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 8
+key r2 @
+key r3 f
+key b1 9
+key b2 j
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 f
+key r3 h
+key b1 o
+key b2 j
+key b3 O
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r3 f
+key b1 o
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r2 j
+key r3 s
+key b1 @
+key b2 h
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key b1 g
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 o
+key r3 j
+key b1 g
+key b2 9
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r2 L
+key r3 L
+key b1 K
+key b2 f
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 f
+key r3 j
+key b2 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r2 j
+key r3 K
+key b2 k
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 j
+key r2 f
+key r3 j
+key b2 9
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 h
+key b1 k
+key b2 k
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 j
+key b1 g
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r3 j
+key b1 f
+key b2 J
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r2 o
+key r3 k
+key b1 H
+key b3 F
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 @
+key r3 L
+key b1 8
+key b2 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 l
+key b1 j
+key b2 f
+key b3 F
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 9
+key r2 j
+key r3 h
+key b1 f
+key b2 F
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 j
+key r3 2
+key b1 L
+key b2 L
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 L
+key r2 o
+key r3 k
+key b1 f
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 @
+key r3 J
+key b1 L
+key b2 K
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 c
+key b1 j
+key b2 f
+key b3 f
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+set r1 ammo 98
+set r2 ammo 45
+set r3 ammo 265
+set b1 ammo 60
+set b2 ammo 36
+set b3 ammo 248
+key r1 4
+key r3 G
+key b2 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 F
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 l
+key r3 k
+key b1 l
+key b2 l
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 s
+key r2 H
+key b1 K
+key b2 k
+key b3 H
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r3 k
+key b1 L
+key b2 f
+key b3 F
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 f
+key r3 k
+key b1 l
+key b2 c
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 c
+key r2 j
+key r3 K
+key b1 f
+key b2 s
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 L
+key r3 J
+key b1 4
+key b2 f
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 G
+key r3 J
+key b1 L
+key b2 h
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r3 k
+key b1 0
+key b2 J
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 c
+key b1 H
+key b2 s
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 G
+key r2 c
+key r3 G
+key b1 j
+key b2 L
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 K
+key r2 8
+key b1 k
+key b2 l
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r2 g
+key r3 l
+key b1 k
+key b2 o
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r3 s
+key b1 g
+key b2 F
+key b3 c
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 2
+key r3 L
+key b1 J
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r2 f
+key r3 c
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 l
+key r2 g
+key r3 J
+key b1 f
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key b1 J
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r3 J
+key b1 2
+key b2 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 O
+key r3 h
+key b1 o
+key b2 l
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 o
+key r3 g
+key b2 2
+key b3 1
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r3 9
+key b1 f
+key b2 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 j
+key b1 1
+key b2 f
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r2 f
+key r3 F
+key b1 s
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 17
+set r2 ammo 108
+set r3 ammo 90
+set b1 ammo 286
+set b2 ammo 10
+set b3 ammo 197
+key r1 L
+key r2 k
+key r3 h
+key b1 j
+key b2 0
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 G
+key r3 j
+key b1 j
+key b2 l
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 f
+key r2 f
+key r3 l
+key b2 g
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 c
+key r2 J
+key r3 o
+key b1 2
+key b2 j
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 H
+key r2 o
+key r3 o
+key b1 K
+key b2 g
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 h
+key r2 @
+key r3 h
+key b1 0
+key b2 9
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 8
+key r2 9
+key r3 @
+key b1 g
+key b2 k
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r2 H
+key r3 j
+key b2 f
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 G
+key r2 l
+key r3 g
+key b1 h
+key b2 f
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 9
+key r2 f
+key r3 f
+key b1 4
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r2 J
+key b1 j
+key b2 h
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 k
+key r3 k
+key b1 L
+key b2 F
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 f
+key r2 k
+key b1 l
+key b2 f
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r3 j
+key b1 k
+key b2 8
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 f
+key r3 k
+key b1 F
+key b2 F
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 j
+key r2 k
+key b1 g
+key b2 H
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r3 f
+key b2 h
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 g
+key r2 9
+key r3 O
+key b2 k
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 k
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r3 g
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 k
+key r3 J
+key b1 g
+key b2 8
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r2 j
+key b1 f
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r2 h
+key r3 h
+key b2 c
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 s
+key r3 k
+key b2 G
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r1 F
+key r3 k
+key b1 f
+key b3 H
+fullstep
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+set r1 ammo 24
+set r2 ammo 88
+set r3 ammo 234
+set b1 ammo 167
+set b2 ammo 280
+set b3 ammo 259
+key r1 0
+key r2 s
+key r3 j
+key b1 4
+key b2 f
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 K
+key r3 h
+key b1 s
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r2 h
+key r3 j
+key b1 l
+key b2 L
+key b3 9
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 o
+key r3 H
+key b1 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 L
+key r2 g
+key r3 l
+key b2 8
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 f
+key r3 2
+key b2 k
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r3 j
+key b1 7
+key b2 h
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 k
+key r3 f
+key b1 j
+key b2 J
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 4
+key r3 7
+key b1 k
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 k
+key r3 g
+key b1 g
+key b2 g
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key b1 2
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key b2 f
+key b3 G
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key b1 s
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 F
+key r3 h
+key b1 K
+key b2 K
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 c
+key r2 H
+key b1 @
+key b2 j
+key b3 1
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r2 g
+key b1 o
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 j
+key r3 L
+key b1 k
+key b2 0
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 9
+key r2 G
+key r3 o
+key b1 7
+key b2 h
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r2 2
+key r3 2
+key b2 k
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key b2 K
+key b3 G
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 9
+key r3 f
+key b1 l
+key b2 k
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 k
+key r3 O
+key b2 1
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r2 7
+key r3 k
+key b2 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 h
+key r3 l
+key b1 l
+key b2 f
+key b3 K
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 f
+key r1 f
+key r2 h
+key b1 K
+key b2 O
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+set r1 ammo 229
+set r2 ammo 19
+set r3 ammo 286
+set b1 ammo 199
+set b2 ammo 266
+set b3 ammo 149
+key r1 f
+key r2 f
+key r3 G
+key b1 1
+key b2 f
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 0
+key r2 l
+key r3 L
+key b1 L
+key b2 F
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r3 2
+key b1 @
+key b2 O
+key b3 o
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 4
+key r2 l
+key r3 l
+key b1 o
+key b2 j
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r1 j
+key r2 7
+key r3 f
+key b1 o
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 k
+key r3 f
+key b1 k
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key b2 H
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 j
+key r3 G
+key b1 g
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 j
+key r3 9
+key b1 J
+key b2 l
+key b3 l
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 4
+key r2 c
+key r3 l
+key b1 4
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 l
+key r3 8
+key b1 H
+key b2 f
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 F
+key r2 l
+key r3 j
+key b1 h
+key b2 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 O
+key r3 k
+key b1 8
+key b3 O
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 J
+key r3 L
+key b1 l
+key b2 o
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 @
+key r2 h
+key r3 @
+key b1 s
+key b2 j
+key b3 2
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 s
+key r2 0
+key r3 l
+key b1 2
+key b2 j
+key b3 h
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 K
+key r2 j
+key r3 o
+key b2 H
+key b3 O
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 2
+key r3 l
+key b1 h
+key b2 H
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 o
+key r3 g
+key b1 j
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 h
+key r2 K
+key r3 f
+key b1 8
+key b2 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 j
+key r2 7
+key r3 J
+key b1 f
+key b2 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 H
+key r2 s
+key r3 h
+key b1 L
+key b2 4
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 o
+key r2 8
+key b1 j
+key b2 K
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 2
+key r2 f
+key r3 K
+key b1 g
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 H
+key r2 f
+key r3 O
+key b1 k
+key b2 O
+key b3 H
+fullstep
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+set r1 ammo 57
+set r2 ammo 251
+set r3 ammo 59
+set b1 ammo 159
+set b2 ammo 294
+set b3 ammo 100
+key r1 c
+key r2 g
+key r3 @
+key b1 4
+key b2 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 2
+key r2 h
+key r3 k
+key b1 f
+key b2 4
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 k
+key r3 h
+key b1 k
+key b2 j
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 K
+key r3 s
+key b1 O
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 s
+key r2 H
+key r3 L
+key b1 1
+key b2 g
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 h
+key b1 J
+key b2 @
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 9
+key r2 f
+key r3 K
+key b1 H
+key b2 s
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r3 @
+key b1 o
+key b2 l
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 f
+key r3 h
+key b1 j
+key b3 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r2 h
+key r3 J
+key b1 f
+key b2 f
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 f
+key r3 f
+key b1 2
+key b2 j
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key b1 l
+key b2 8
+key b3 H
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 j
+key b1 f
+key b2 h
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 c
+key r1 f
+key r2 @
+key r3 l
+key b2 o
+key b3 j
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key r3 L
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 j
+key r2 g
+key r3 k
+key b1 7
+key b2 h
+key b3 j
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 1
+key r2 j
+key b2 h
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 j
+key r3 o
+key b1 j
+key b2 1
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 L
+key r3 4
+key b1 H
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 H
+key r2 8
+key r3 k
+key b1 l
+key b2 f
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 k
+key r2 o
+key b1 o
+key b2 h
+key b3 f
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r3 f
+key b1 f
+key b2 9
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 7
+key r3 H
+key b1 F
+key b2 G
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 H
+key r2 2
+key r3 9
+key b1 f
+key b2 k
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 f
+key b1 f
+key b2 l
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+set r1 ammo 162
+set r2 ammo 68
+set r3 ammo 151
+set b1 ammo 228
+set b2 ammo 61
+set b3 ammo 200
+key r1 l
+key r2 2
+key r3 7
+key b1 k
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r1 o
+key r2 j
+key r3 h
+key b1 7
+key b2 l
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 J
+key r2 f
+key r3 h
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r1 8
+key r3 k
+key b1 j
+key b2 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 f
+key r2 j
+key b1 o
+key b2 l
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 L
+key r2 o
+key r3 K
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 k
+key r3 O
+key b1 g
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 c
+key r3 l
+key b1 K
+key b2 0
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 7
+key r2 f
+key r3 1
+key b1 k
+key b2 h
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 f
+key r2 8
+key r3 s
+key b1 2
+key b3 O
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 9
+key r3 9
+key b3 2
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r2 h
+key r3 f
+key b1 L
+key b2 s
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key r2 g
+key r3 f
+key b1 H
+key b2 K
+key b3 l
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r2 g
+key r3 k
+key b1 o
+key b2 f
+key b3 4
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 j
+key r3 j
+key b1 O
+key b2 k
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 h
+key b2 f
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 9
+key r3 g
+key b1 0
+key b2 2
+key b3 l
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 L
+key r2 j
+key r3 f
+key b1 F
+key b3 J
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 j
+key r2 f
+key r3 f
+key b1 s
+key b2 f
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 f
+key r2 L
+key r3 k
+key b2 0
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 s
+key r1 H
+key r3 g
+key b1 l
+key b2 l
+key b3 g
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 J
+key b1 l
+key b2 j
+key b3 k
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 o
+key r3 l
+key b1 O
+key b2 L
+key b3 L
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r2 1
+key r3 k
+key b2 h
+key b3 F
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 0
+key b1 J
+key b2 9
+fullstep
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 119
+set r2 ammo 26
+set r3 ammo 70
+set b1 ammo 234
+set b2 ammo 230
+set b3 ammo 33
+key r1 g
+key r2 K
+key r3 j
+key b1 1
+key b2 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 f
+key r1 L
+key r2 0
+key r3 f
+key b1 F
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r3 f
+key b1 J
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r3 f
+key b1 h
+key b3 c
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r2 j
+key r3 o
+key b1 k
+key b2 j
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 f
+key r1 o
+key r2 f
+key r3 f
+key b1 f
+key b2 7
+key b3 J
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 l
+key r2 h
+key b2 7
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r2 G
+key r3 k
+key b2 l
+key b3 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r3 @
+key b1 J
+key b2 K
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 s
+key r1 f
+key r2 h
+key r3 h
+key b1 l
+key b3 7
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 L
+key r2 j
+key b1 s
+key b2 O
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 s
+key r1 4
+key r3 o
+key b1 @
+key b2 s
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 h
+key b1 K
+key b3 f
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 h
+key r2 c
+key r3 j
+key b1 8
+key b3 7
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 s
+key r3 J
+key b1 k
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r2 f
+key r3 s
+key b1 j
+key b2 l
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key b1 J
+key b2 f
+key b3 h
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 g
+key r2 9
+key r3 K
+key b1 l
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 f
+ensure b3 2 c
+key r2 f
+key r3 l
+key b1 j
+key b3 K
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 o
+key r2 j
+key r3 @
+key b1 8
+key b2 4
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 k
+key r2 8
+key r3 l
+key b1 G
+key b2 k
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 g
+key b1 s
+key b2 H
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r1 k
+key r2 k
+key r3 L
+key b1 0
+key b2 g
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 s
+ensure b3 2 c
+key r1 l
+key r2 J
+key r3 j
+key b1 F
+key b2 o
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 j
+key r2 F
+key r3 f
+key b1 g
+key b2 j
+key b3 H
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+set r1 ammo 83
+set r2 ammo 181
+set r3 ammo 91
+set b1 ammo 89
+set b2 ammo 162
+set b3 ammo 183
+key r1 H
+key r2 k
+key r3 f
+key b1 J
+key b2 l
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 F
+key r2 g
+key r3 L
+key b1 h
+key b2 k
+key b3 @
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 j
+key r2 f
+key r3 f
+key b1 s
+key b2 f
+key b3 7
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 c
+key r2 f
+key r3 f
+key b1 L
+key b2 f
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r3 @
+key b1 G
+key b2 J
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 f
+key r1 o
+key r2 h
+key r3 O
+key b1 1
+key b2 f
+key b3 k
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r2 J
+key b2 h
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 s
+key r1 L
+key b1 l
+key b2 l
+key b3 K
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 4
+key r3 g
+key b1 2
+key b2 k
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 c
+ensure b2 2 f
+ensure b3 2 c
+key r1 h
+key r2 j
+key r3 0
+key b1 1
+key b2 o
+step
+ensure r1 1 f
+ensure r2 1 s
+ensure r3 1 s
+ensure b1 2 f
+ensure b2 2 s
+ensure b3 2 f
+key r1 8
+key b1 F
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r3 o
+key b1 o
+key b2 j
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 f
+ensure b3 2 c
+key r1 k
+key r2 O
+key r3 f
+key b1 j
+key b2 K
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 k
+key r3 0
+key b1 K
+key b3 g
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 j
+key r2 k
+key b1 G
+key b2 K
+key b3 8
+step
+ensure r1 1 s
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 s
+key r1 F
+key r2 K
+key b1 H
+key b2 o
+key b3 j
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 G
+key r2 l
+key r3 k
+key b1 o
+key b2 G
+key b3 8
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 f
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 s
+key r1 7
+key r2 h
+key r3 l
+key b1 o
+key b2 k
+key b3 0
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 c
+ensure b1 2 f
+ensure b2 2 c
+ensure b3 2 f
+key r1 k
+key r2 G
+key r3 k
+key b1 8
+key b2 1
+key b3 f
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 H
+key r3 L
+key b1 k
+key b3 h
+step
+ensure r1 1 c
+ensure r2 1 s
+ensure r3 1 f
+ensure b1 2 s
+ensure b2 2 c
+ensure b3 2 c
+key r1 g
+key r2 h
+key r3 7
+key b2 f
+key b3 @
+step
+ensure r1 1 c
+ensure r2 1 c
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 c
+key r1 l
+key r3 h
+key b1 l
+key b2 4
+key b3 o
+step
+ensure r1 1 f
+ensure r2 1 c
+ensure r3 1 s
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 f
+key r1 2
+key r2 f
+key r3 o
+key b1 H
+key b2 1
+key b3 H
+step
+ensure r1 1 s
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 s
+ensure b3 2 c
+key r1 L
+key r2 l
+key r3 k
+key b2 k
+key b3 L
+step
+ensure r1 1 c
+ensure r2 1 f
+ensure r3 1 c
+ensure b1 2 c
+ensure b2 2 c
+ensure b3 2 s
+key r1 f
+key r2 f
+key r3 h
+key b1 f
+key b2 4
+key b3 j
+fullstep

@@ -1,0 +1,83 @@
+{
+  "id": "rain",
+  "title": "Rain on Still Water",
+  "tagline": "Rain on a night pond, every drop from the 1980 loop.",
+  "teaser": "A quiet pond at night, lanterns on the far bank, and rain whose every drop falls where the 1980 program put it. Make it drizzle or pour, listen to the drops land, or split the screen to watch the old terminal draw the same storm.",
+  "category": "toys",
+  "directory": "/usr/games/toys",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [1, 10],
+  "status": "shipped",
+  "accent": "#6fa8ff",
+  "emblem": "M13 6l-3 8M25 6l-3 8M37 6l-3 8M8 34c0-3 7-5 16-5s16 2 16 5-7 5-16 5-16-2-16-5M17 34c0-1.5 3-2.5 7-2.5s7 1 7 2.5-3 2.5-7 2.5-7-1-7-2.5",
+  "inspiredBy": {
+    "program": "rain",
+    "originalTitle": "rain",
+    "uiTitle": "rain",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/rain/app",
+    "output": "play/rain/"
+  },
+  "manPage": {
+    "synopsis": "rain — watch raindrops ripple; nothing else required.",
+    "description": "Eric P. Scott’s rain drew expanding rings of characters to look like drops on a pond; its notes said it looked best at 9600 baud. This one needs no modem.",
+    "seeAlso": ["worms", "pom"]
+  },
+  "howToPlay": [
+    "Watch the drops land and their rings spread.",
+    "← and → make the rain lighter or heavier; M turns on the sound.",
+    "1, 2 and 3 switch between the pond, both, and the 1980 screen."
+  ],
+  "packages": [
+    {
+      "id": "hear-the-pond",
+      "title": "Hear the pond",
+      "description": "Turn the sound on and listen to each drop land.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "nine-six-hundred",
+      "title": "9600 baud",
+      "description": "Let the rain fall as fast as an old terminal could draw it.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "downpour",
+      "title": "Downpour",
+      "description": "Turn the rain all the way up to a downpour.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "side-by-side",
+      "title": "Side by side",
+      "description": "Watch the 1980 screen and the pond together.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "back-to-1980",
+      "title": "Back to 1980",
+      "description": "See the rain exactly as the original drew it.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "lights-out",
+      "title": "Lights out",
+      "description": "Hide every control and let only the rain remain.",
+      "tier": "core",
+      "xp": 15
+    }
+  ]
+}

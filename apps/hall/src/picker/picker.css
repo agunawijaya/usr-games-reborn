@@ -1,0 +1,391 @@
+/*
+ * The style picker. It belongs to no style: it borrows Console Home's calm palette for its own
+ * chrome and lets the three miniatures do the talking.
+ */
+
+[data-style='picker'] body {
+  background: var(--ug-bg);
+}
+
+[data-style='picker'] .sp-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 0 clamp(20px, 3.4vw, 72px) 40px;
+  outline: none;
+}
+
+/* Three soft lights, one per style, drifting behind everything. */
+[data-style='picker'] .sp-glow {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 120%;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      38vw 30vw at 18% 58%,
+      color-mix(in srgb, #98a6ff 30%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      34vw 28vw at 52% 64%,
+      color-mix(in srgb, #c6a4ff 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      34vw 28vw at 84% 58%,
+      color-mix(in srgb, #5dff9a 18%, transparent),
+      transparent 70%
+    );
+  filter: blur(8px);
+  animation: sp-drift 18s ease-in-out infinite alternate;
+}
+
+[data-style='picker'][data-appearance='light'] .sp-glow {
+  background:
+    radial-gradient(
+      38vw 30vw at 18% 58%,
+      color-mix(in srgb, #7d8cff 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      34vw 28vw at 52% 64%,
+      color-mix(in srgb, #d6b4ff 30%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      34vw 28vw at 84% 58%,
+      color-mix(in srgb, #7ee0a6 24%, transparent),
+      transparent 70%
+    );
+}
+
+@keyframes sp-drift {
+  to {
+    transform: translate3d(2vw, -2vh, 0) scale(1.04);
+  }
+}
+
+[data-style='picker'] .sp-header,
+[data-style='picker'] .sp-intro,
+[data-style='picker'] .sp-choices,
+[data-style='picker'] .sp-actions {
+  position: relative;
+}
+
+[data-style='picker'] .sp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 8px;
+}
+
+[data-style='picker'] .sp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  color: var(--ug-ink);
+}
+
+[data-style='picker'] .sp-brand b {
+  font-family: var(--ug-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ug-accent);
+}
+
+[data-style='picker'] .sp-brand__mark {
+  width: 30px;
+  height: 30px;
+  color: var(--ug-accent);
+}
+
+[data-style='picker'] .sp-radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+[data-style='picker'] .sp-appearance {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--ug-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-surface) 80%, transparent);
+}
+
+[data-style='picker'] .sp-appearance__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--ug-ink-2);
+  cursor: pointer;
+}
+
+[data-style='picker'] .sp-appearance__option.is-selected {
+  background: var(--ug-ink);
+  color: var(--ug-bg);
+}
+
+[data-style='picker'] .sp-appearance__option:focus-within {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 2px;
+}
+
+[data-style='picker'] .sp-intro {
+  max-width: 900px;
+  margin: clamp(16px, 4.4vh, 56px) auto clamp(24px, 5vh, 60px);
+  text-align: center;
+}
+
+[data-style='picker'] .sp-kicker {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ug-accent);
+}
+
+[data-style='picker'] .sp-title {
+  margin-top: 8px;
+  font-family: var(--ug-font-display);
+  font-size: clamp(2.6rem, calc(2.6vw + 1rem), 4.2rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ug-ink);
+}
+
+[data-style='picker'] .sp-lede {
+  max-width: 58ch;
+  margin: 18px auto 0;
+  font-size: 1.12rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='picker'] .sp-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 1.8vw, 36px);
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+}
+
+[data-style='picker'] .sp-card {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: 14px 14px 22px;
+  border: 1px solid var(--ug-line);
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--ug-surface) 86%, transparent);
+  cursor: pointer;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.25s,
+    border-color 0.25s,
+    opacity 0.25s;
+}
+
+[data-style='picker'] .sp-card:hover {
+  transform: translateY(-4px);
+}
+
+[data-style='picker'] .sp-card.is-selected {
+  border-color: var(--ug-accent);
+  box-shadow:
+    0 0 0 3px var(--ug-accent),
+    0 30px 60px -28px color-mix(in srgb, var(--ug-accent) 70%, transparent);
+  transform: translateY(-6px);
+}
+
+[data-style='picker'] .sp-card:focus-within {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 6px;
+}
+
+[data-style='picker'] .sp-choices:has(.is-selected) .sp-card:not(.is-selected) {
+  opacity: 0.86;
+}
+
+[data-style='picker'] .sp-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--ug-surface-2);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ug-ink) 8%, transparent),
+    0 18px 40px -26px var(--ug-shadow);
+}
+
+/* The real Home at desktop size, scaled down to fit its card. */
+[data-style='picker'] .sp-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform-origin: 0 0;
+  pointer-events: none;
+  background: var(--ug-bg);
+  color: var(--ug-ink);
+  font-family: var(--ug-font-body);
+  line-height: 1.5;
+}
+
+[data-style='picker'] .sp-card__copy {
+  display: grid;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+[data-style='picker'] .sp-card__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-style='picker'] .sp-card__name {
+  font-family: var(--ug-font-display);
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ug-ink);
+}
+
+[data-style='picker'] .sp-card__tag {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-accent) 16%, transparent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ug-accent);
+}
+
+[data-style='picker'] .sp-card__pitch {
+  font-size: 1.05rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='picker'] .sp-card__check {
+  position: absolute;
+  top: 26px;
+  right: 26px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  box-shadow: 0 8px 20px -8px var(--ug-shadow);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.2s,
+    transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+[data-style='picker'] .sp-card__check .icon {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.6;
+}
+
+[data-style='picker'] .sp-card.is-selected .sp-card__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+[data-style='picker'] .sp-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(24px, 5vh, 60px);
+}
+
+[data-style='picker'] .sp-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 0 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  font-family: var(--ug-font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 20px 40px -20px color-mix(in srgb, var(--ug-accent) 80%, transparent);
+  transition: transform 0.2s;
+}
+
+[data-style='picker'] .sp-start:hover {
+  transform: translateY(-2px);
+}
+
+[data-style='picker'] .sp-start .icon {
+  fill: currentColor;
+  stroke: none;
+}
+
+@media (max-width: 1100px) {
+  [data-style='picker'] .sp-choices {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 640px;
+  }
+}
+
+/* Short screens (1280×720): tighten the rhythm so the Start button stays in view. */
+@media (max-height: 820px) {
+  [data-style='picker'] .sp-header {
+    padding-top: 16px;
+  }
+
+  [data-style='picker'] .sp-intro {
+    margin: 4px auto 22px;
+  }
+
+  [data-style='picker'] .sp-title {
+    font-size: clamp(2.1rem, calc(2vw + 0.9rem), 3rem);
+  }
+
+  [data-style='picker'] .sp-lede {
+    margin-top: 10px;
+    font-size: 1rem;
+  }
+
+  [data-style='picker'] .sp-card {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  [data-style='picker'] .sp-card__name {
+    font-size: 1.4rem;
+  }
+
+  [data-style='picker'] .sp-card__pitch {
+    font-size: 1rem;
+  }
+
+  [data-style='picker'] .sp-actions {
+    margin-top: 22px;
+  }
+
+  [data-style='picker'] .sp-start {
+    min-height: 56px;
+    font-size: 1.2rem;
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "trek",
+  "title": "Deep-space command",
+  "tagline": "Clear the galaxy of hostile ships before time runs out.",
+  "teaser": "Warp between quadrants, balance energy and shields, and track down every hostile ship before the clock runs short.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 40],
+  "status": "adopting",
+  "accent": "#7c83ff",
+  "emblem": "M24 7l11 30-11-7-11 7zM8 12h.01M40 10h.01M40 38h.01M7 34h.01",
+  "inspiredBy": {
+    "program": "trek",
+    "originalTitle": "Star Trek",
+    "uiTitle": "trek",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/trek/app",
+    "output": "play/trek/"
+  },
+  "manPage": {
+    "synopsis": "trek — navigate the galaxy, manage energy, win the campaign.",
+    "description": "Eric Allman’s turn-based space command game, one of the earliest programs in the BSD games directory.",
+    "seeAlso": ["sail", "battlestar"]
+  },
+  "howToPlay": [
+    "Warp between sectors of the galaxy.",
+    "Share your energy between shields, engines and weapons.",
+    "Clear every hostile ship before time runs out."
+  ]
+}

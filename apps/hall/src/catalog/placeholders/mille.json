@@ -1,0 +1,37 @@
+{
+  "id": "mille",
+  "title": "Road-trip card race",
+  "tagline": "Race cross-country through hazards, remedies and miles.",
+  "teaser": "Play distance cards to cover the miles, drop hazards on your rival and fix your own flat tyres on the road to the finish.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 30],
+  "status": "coming-soon",
+  "accent": "#ff8a4c",
+  "emblem": "M17 42L22 8M31 42L26 8M24 38v-4M24 28v-4M24 18v-3M6 42h36",
+  "inspiredBy": {
+    "program": "mille",
+    "originalTitle": "Mille Bornes",
+    "uiTitle": "mille",
+    "year": 1983
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "mille — play distance, hazard and remedy cards; reach the goal first.",
+    "description": "Ken Arnold’s version of a French road-race card game, played against the computer.",
+    "seeAlso": ["monop", "cribbage"]
+  },
+  "howToPlay": [
+    "Play distance cards to travel toward the finish.",
+    "Slow your rival down with hazards like flat tyres.",
+    "Fix your own problems with remedy cards and reach the goal first."
+  ]
+}

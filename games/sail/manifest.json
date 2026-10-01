@@ -1,0 +1,117 @@
+{
+  "id": "sail",
+  "title": "Broadside",
+  "tagline": "Command a wooden warship in the age of sail.",
+  "teaser": "Choose one of history’s sea fights, take a ship and give your orders: trim the sails, load round or grape, and wait for the moment to rake. Every sea, sky, ship and flag is drawn by code, and the rules are the 1980 game’s own.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 40],
+  "status": "shipped",
+  "accent": "#3a86c8",
+  "emblem": "M7 34h34l-6 8H13zM24 34V6M24 8l13 22H24M22 11L11 30h11",
+  "inspiredBy": {
+    "program": "sail",
+    "originalTitle": "sail",
+    "uiTitle": "sail",
+    "year": 1980
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/sail/app",
+    "output": "play/sail/"
+  },
+  "manPage": {
+    "synopsis": "sail — steer by the wind, load your guns, win the engagement.",
+    "description": "Dave Riggle wrote the first version on a PDP-11/70 in 1980, with Ed Wang as co-author and Craig Leres refitting it later. Its scenarios are drawn from real engagements.",
+    "seeAlso": ["trek", "hunt"]
+  },
+  "howToPlay": [
+    "Choose a battle and a ship, then load your guns.",
+    "Type or click your orders, then “Make it so” to play the turn.",
+    "Fire when you can rake; close in to board, or outsail them."
+  ],
+  "cronGoals": [
+    {
+      "id": "ships-taken",
+      "stat": "shipsTaken",
+      "label": "Take {n} enemy ships",
+      "min": 2,
+      "max": 5
+    },
+    {
+      "id": "broadsides",
+      "stat": "broadsidesFired",
+      "label": "Fire {n} broadsides",
+      "min": 20,
+      "max": 60
+    }
+  ],
+  "packages": [
+    {
+      "id": "open-fire",
+      "title": "Open fire",
+      "description": "Fire your first broadside.",
+      "tier": "core"
+    },
+    {
+      "id": "down-her-length",
+      "title": "Down her length",
+      "description": "Rake an enemy ship.",
+      "tier": "core"
+    },
+    {
+      "id": "colours-come-down",
+      "title": "Colours come down",
+      "description": "Bring an enemy ship to strike to your guns.",
+      "tier": "core"
+    },
+    {
+      "id": "the-day-is-yours",
+      "title": "The day is yours",
+      "description": "Win any action.",
+      "tier": "core"
+    },
+    {
+      "id": "see-it-through",
+      "title": "See it through",
+      "description": "Fight an action to its end without giving up your command.",
+      "tier": "core"
+    },
+    {
+      "id": "stern-rake",
+      "title": "Stern rake",
+      "description": "Rake an enemy from astern.",
+      "tier": "extra"
+    },
+    {
+      "id": "prize-crew",
+      "title": "Prize crew aboard",
+      "description": "Take an enemy ship by boarding her.",
+      "tier": "extra"
+    },
+    {
+      "id": "heavy-weather",
+      "title": "Heavy weather",
+      "description": "Win an action in a gale or worse.",
+      "tier": "extra"
+    },
+    {
+      "id": "line-of-battle",
+      "title": "Line of battle",
+      "description": "Win a fleet action of ten ships or more.",
+      "tier": "rare"
+    },
+    {
+      "id": "a-brace-of-prizes",
+      "title": "A brace of prizes",
+      "description": "Take two enemy ships in one battle.",
+      "tier": "rare"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "fixture",
+  "title": "Bridge fixture",
+  "tagline": "A tiny test game for the bridge.",
+  "teaser": "Start a round, win or lose it, unlock a package and leave by every door. It exists so the Hall can prove hosted games work end to end.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": { "min": 1, "max": 1 },
+  "sessionMinutes": [1, 2],
+  "status": "unlisted",
+  "accent": "#4f8fd6",
+  "emblem": "M10 24h8M30 24h8M18 24a6 6 0 0 1 12 0a6 6 0 0 1-12 0M24 10v6M24 32v6",
+  "inspiredBy": {
+    "program": "fixture",
+    "originalTitle": "fixture",
+    "uiTitle": "fixture",
+    "year": 1970
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "packages/bridge/fixture",
+    "output": "play/fixture/"
+  },
+  "manPage": {
+    "synopsis": "fixture — start a round, then win, lose or leave.",
+    "description": "A plain HTML and JavaScript game that loads the classic bridge build with one script tag. Used by the end-to-end tests; never listed in the Hall.",
+    "seeAlso": []
+  },
+  "packages": [
+    {
+      "id": "fixture-first",
+      "title": "First contact",
+      "description": "Press the unlock button once.",
+      "tier": "core"
+    },
+    {
+      "id": "fixture-win",
+      "title": "Winning round",
+      "description": "Win a round of the fixture.",
+      "tier": "core"
+    }
+  ]
+}

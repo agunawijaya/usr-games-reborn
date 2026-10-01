@@ -1,0 +1,37 @@
+{
+  "id": "signal",
+  "title": "Signal lab",
+  "tagline": "Crack ciphers, tap Morse and punch cards like it’s 1970.",
+  "teaser": "A lab of old codes: shift ciphers, Morse, punch cards, paper tape and giant banners. Decode, encode and play with each one.",
+  "category": "numbers",
+  "directory": "/usr/games/numbers",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 10],
+  "status": "coming-soon",
+  "accent": "#8b6cf0",
+  "emblem": "M9 29a21 21 0 0 1 30 0M14 24a14 14 0 0 1 20 0M19 19a7 7 0 0 1 10 0M24 14h.01M7 40h4M15 40h9M28 40h4M36 40h5",
+  "inspiredBy": {
+    "program": "caesar, rot13, morse, bcd, ppt, banner",
+    "originalTitle": "caesar, rot13, morse, bcd, ppt, banner",
+    "uiTitle": "caesar, morse and friends",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "signal — encode and decode messages with classic ciphers and codes.",
+    "description": "Six BSD programs in one lab: caesar and rot13 for shift ciphers, morse, bcd and ppt for antique codes, and Mark Horton’s banner for big letters.",
+    "seeAlso": ["arithmetic", "quiz"]
+  },
+  "howToPlay": [
+    "Pick a code: shift ciphers, Morse, punch cards or banners.",
+    "Encode your own messages or crack the ones you are given.",
+    "Learn how each old code works as you play."
+  ]
+}

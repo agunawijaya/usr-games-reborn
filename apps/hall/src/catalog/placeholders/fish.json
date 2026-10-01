@@ -1,0 +1,37 @@
+{
+  "id": "fish",
+  "title": "Go fish",
+  "tagline": "Ask for cards, collect sets of four, go fish.",
+  "teaser": "Ask the computer for a rank you hold; if it has none, go fish. Collect the most books of four to win.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 10],
+  "status": "coming-soon",
+  "accent": "#3fb6e8",
+  "emblem": "M5 24c7-10 21-10 29 0-8 10-22 10-29 0zM34 24l9-7v14zM14 22h.01",
+  "inspiredBy": {
+    "program": "fish",
+    "originalTitle": "fish",
+    "uiTitle": "fish",
+    "year": 1990
+  },
+  "daily": false,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "fish — ask for ranks, draw when told, collect books of four.",
+    "description": "Muffy Barkocy’s go fish for BSD, the gentlest card game in the directory.",
+    "seeAlso": ["cribbage", "canfield"]
+  },
+  "howToPlay": [
+    "Ask the computer for a rank you already hold.",
+    "If it has none, go fish from the pile.",
+    "Collect the most sets of four to win."
+  ]
+}

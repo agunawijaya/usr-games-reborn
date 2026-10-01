@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+  - packages/bridge/fixture-vite
+  # Native games are workspace packages; hosted games that bring their own
+  # Vite build join through their app folder.
+  - games/*
+  - games/*/app
+allowBuilds:
+  # tsx runs on esbuild; its install step only verifies the platform binary.
+  esbuild: true

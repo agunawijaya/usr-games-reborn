@@ -1,0 +1,37 @@
+{
+  "id": "hack",
+  "title": "Dungeon descent",
+  "tagline": "Descend a dungeon, one careful step at a time.",
+  "teaser": "A turn-based descent through dungeon levels full of creatures, items and secrets. Every run is new and every choice matters.",
+  "category": "stories",
+  "directory": "/usr/games/stories",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [15, 60],
+  "status": "coming-soon",
+  "accent": "#8fa3b0",
+  "emblem": "M7 13h9v9h9v9h9v9h7M38 6v12M33 13l5 5 5-5",
+  "inspiredBy": {
+    "program": "hack",
+    "originalTitle": "hack",
+    "uiTitle": "hack",
+    "year": 1982
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "hack — explore each level, pick your fights, and go ever deeper.",
+    "description": "Jay Fenlason wrote the original hack with Kenny Woodland, Mike Thome and Jon Payne; Andries Brouwer at CWI Amsterdam reworked it into an almost entirely new game.",
+    "seeAlso": ["adventure", "phantasia", "battlestar"]
+  },
+  "howToPlay": [
+    "Explore each dungeon level one step at a time.",
+    "Pick up items and choose your fights carefully.",
+    "Go deeper and deeper and see how far you get."
+  ]
+}

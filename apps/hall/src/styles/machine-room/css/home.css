@@ -1,0 +1,562 @@
+/* Home: the today strip, the directory bar and the rack of processes. */
+
+[data-style='machine-room'] .today {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(0, 1.32fr) minmax(0, 1fr);
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+
+[data-style='machine-room'] .today__pick {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-style='machine-room'] .today__pick-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: clamp(120px, 8.6vw, 170px) minmax(0, 1fr);
+  gap: clamp(14px, 1.4vw, 26px);
+  align-items: center;
+}
+
+[data-style='machine-room'] .monitor--pick {
+  aspect-ratio: 1;
+}
+
+[data-style='machine-room'] .today__pick-copy {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+[data-style='machine-room'] .today__path {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .today__title {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  font-size: calc(var(--fs-h2) * 1.18 * var(--title-scale));
+  line-height: 1.05;
+  color: var(--ug-ink);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .today__text {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .today__note {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-accent);
+  margin-bottom: 6px;
+}
+
+[data-style='machine-room'] .today__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+[data-style='machine-room'] .today__man {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+  text-underline-offset: 3px;
+}
+
+[data-style='machine-room'] .today__man:hover {
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .today__fortune {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-style='machine-room'] .uptime-block {
+  margin-top: auto;
+}
+
+[data-style='machine-room'] .week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px;
+}
+
+[data-style='machine-room'] .week__day {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .week__mark {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--ug-line);
+}
+
+[data-style='machine-room'] .week__day--played .week__mark {
+  border-color: var(--ug-accent);
+  background: var(--ug-accent);
+  box-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .week__day--frozen .week__mark {
+  border-style: dashed;
+  border-color: var(--ug-accent-2);
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .week__day--future .week__mark {
+  border-style: dotted;
+  opacity: 0.6;
+}
+
+[data-style='machine-room'] .week__day.is-today .week__letter {
+  color: var(--ug-ink);
+  font-weight: 700;
+}
+
+[data-style='machine-room'] .week__day.is-today .week__mark {
+  outline: 2px solid var(--ug-accent-2);
+  outline-offset: 2px;
+}
+
+[data-style='machine-room'] .week__snow {
+  width: 14px;
+  height: 14px;
+}
+
+[data-style='machine-room'] .today__foot {
+  margin-top: 10px;
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cron-list {
+  display: grid;
+  gap: 8px;
+}
+
+[data-style='machine-room'] .cron-job {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'when progress'
+    'label progress';
+  column-gap: 16px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: calc(var(--ug-radius) - 2px);
+  background: color-mix(in srgb, var(--ug-surface-2) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ug-line) 70%, transparent);
+}
+
+[data-style='machine-room'] .cron-job__when {
+  grid-area: when;
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cron-job__label {
+  grid-area: label;
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .cron-job__progress {
+  grid-area: progress;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-style='machine-room'] .cron-job__count {
+  min-width: 3.4em;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  text-align: right;
+}
+
+[data-style='machine-room'] .cron-job__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ug-good);
+}
+
+[data-style='machine-room'] .cron-job--done .cron-job__label {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .fortune {
+  font-family: var(--title-font);
+  font-size: calc(1.22rem * var(--title-scale));
+  line-height: 1.35;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .fortune p::before {
+  content: '“';
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'] .fortune p::after {
+  content: '”';
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'] .uptime {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ug-line);
+}
+
+[data-style='machine-room'] .uptime dt {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .uptime dd {
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  color: var(--ug-ink);
+}
+
+/* Directories and sorting, written as a path you can click. */
+[data-style='machine-room'] .dirs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: calc(var(--gap) * 1.4);
+  padding: 10px 0;
+  border-top: 1px solid var(--ug-line);
+  border-bottom: 1px solid var(--ug-line);
+  font-family: var(--ug-font-mono);
+}
+
+[data-style='machine-room'] .dirs__path,
+[data-style='machine-room'] .dirs__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-style='machine-room'] .dirs__root {
+  color: var(--ug-ink-2);
+  margin-right: 4px;
+}
+
+[data-style='machine-room'] .dirs__sort-label {
+  color: var(--ug-ink-2);
+  margin-right: 4px;
+}
+
+[data-style='machine-room'] .dirs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+[data-style='machine-room'] .dirs__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--ug-ink);
+  text-decoration: none;
+}
+
+[data-style='machine-room'] .dirs__link:hover {
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='machine-room'] .dirs__link.is-current {
+  background: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  font-weight: 600;
+}
+
+/* The rack: shelves of processes, one per directory. */
+[data-style='machine-room'] .rack {
+  display: grid;
+  gap: calc(var(--gap) * 1.6);
+  margin-top: calc(var(--gap) * 1.4);
+}
+
+[data-style='machine-room'] .shelf__label {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+[data-style='machine-room'] .shelf__path {
+  font-family: var(--ug-font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .shelf__path::before {
+  content: var(--mark);
+  margin-right: 0.45em;
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'] .shelf__count {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .shelf__label::after {
+  content: '';
+  flex: 1;
+  align-self: center;
+  height: 1px;
+  background: var(--ug-line);
+}
+
+[data-style='machine-room'] .shelf__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(226px, 14.2vw, 300px), 1fr));
+  gap: var(--gap);
+}
+
+[data-style='machine-room'] .shelf__tiles > li {
+  display: flex;
+  min-width: 0;
+}
+
+/* A process tile. */
+[data-style='machine-room'] .proc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr auto;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--tile-bg);
+  box-shadow: var(--panel-shadow);
+  color: var(--ug-ink);
+  text-decoration: none;
+  transition:
+    transform 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+[data-style='machine-room'] .proc:hover,
+[data-style='machine-room'] .proc:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--ug-line-strong);
+}
+
+[data-style='machine-room'] .proc__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--led-off);
+}
+
+[data-style='machine-room'] .proc--running .led {
+  background: var(--led-on);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--led-on) 70%, transparent);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+[data-style='machine-room'] .proc--arriving .led {
+  background: var(--led-arriving);
+  animation: blink 1.4s steps(1) infinite;
+}
+
+[data-style='machine-room'] .proc__stat {
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .proc__time {
+  margin-left: auto;
+}
+
+[data-style='machine-room'] .proc__screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border: 1px solid var(--screen-border);
+  border-radius: var(--screen-radius);
+  background: var(--screen-bg);
+  box-shadow: var(--screen-shadow);
+}
+
+[data-style='machine-room'] .proc__emblem {
+  width: 34%;
+  height: auto;
+  transition: opacity 0.25s var(--ease);
+}
+
+[data-style='machine-room'] .proc__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+[data-style='machine-room'] .proc__screen.is-previewing .proc__emblem {
+  opacity: 0;
+}
+
+[data-style='machine-room'] .proc--sleeping .proc__emblem {
+  opacity: 0.32;
+}
+
+[data-style='machine-room'] .proc--sleeping .proc__screen {
+  filter: saturate(0.35);
+}
+
+[data-style='machine-room'] .proc--sleeping .proc__title {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .proc__zz {
+  position: absolute;
+  right: 12%;
+  top: 14%;
+  color: var(--ug-ink-2);
+  animation: float-up 3.2s ease-in-out infinite;
+}
+
+[data-style='machine-room'] .proc__zz .icon {
+  width: 30px;
+  height: 30px;
+  stroke-width: 2;
+}
+
+[data-style='machine-room'] .proc__body {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+
+[data-style='machine-room'] .proc__title {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  font-size: calc(var(--fs-h3) * var(--title-scale));
+  line-height: 1.2;
+}
+
+[data-style='machine-room'] .proc__tagline {
+  color: var(--ug-ink-2);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+[data-style='machine-room'] .proc__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ug-line);
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .proc__flags {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+[data-style='machine-room'] .proc__flags .flag {
+  background: color-mix(in srgb, var(--ug-surface) 88%, transparent);
+  font-family: var(--ug-font-mono);
+}
+
+[data-style='machine-room'] .proc__path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-style='machine-room'] .proc__best {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+[data-style='machine-room'] .proc--running .proc__best {
+  color: var(--ug-ink);
+}
+
+@media (max-width: 1180px) {
+  [data-style='machine-room'] .today {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  [data-style='machine-room'] .today__fortune {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  [data-style='machine-room'] .today {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='machine-room'] .console {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  [data-style='machine-room'] .console .prompt {
+    display: none;
+  }
+
+  [data-style='machine-room'] .rank-chip {
+    grid-template-columns: auto;
+  }
+
+  [data-style='machine-room'] .rank-chip .bar,
+  [data-style='machine-room'] .tool__label {
+    display: none;
+  }
+}

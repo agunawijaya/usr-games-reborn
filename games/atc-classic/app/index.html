@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>atc — Control Room 1986</title>
+  <!-- /usr/games Reborn: fonts are served from the game's own folder. -->
+  <link rel="stylesheet" href="./src/fonts/fonts.css">
+  <style>
+    :root {
+      --room-bg: #0a0d0a;
+      --console-bg: #131a13;
+      --console-border: #2a3830;
+      --phosphor: #5eff8a;
+      --phosphor-dim: #2a8a45;
+      --phosphor-bright: #c8ffdc;
+      --amber: #ffb14f;
+      --red: #ff5252;
+      --text: #b8dcc4;
+      --text-dim: #6a8478;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--room-bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', 'VT323', monospace;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Ambient control-room haze — dark warm glow around the console */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(30,45,35,0.35) 0%, rgba(0,0,0,0.85) 70%, black 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #app {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      grid-template-rows: auto 1fr auto auto;
+      grid-template-areas:
+        "bezel   sidebar"
+        "screen  sidebar"
+        "info    sidebar"
+        "cmd     sidebar";
+      height: 100vh;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    /* -------- Bezel (top strip) -------- */
+    #bezel-top {
+      grid-area: bezel;
+      background: linear-gradient(180deg, #1c2a1e 0%, #0f180f 100%);
+      border: 1px solid var(--console-border);
+      border-radius: 8px 8px 4px 4px;
+      padding: 10px 18px;
+      color: var(--amber);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-shadow: 0 0 4px rgba(255, 177, 79, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      overflow: hidden;
+    }
+    #bezel-top .bezel-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    #bezel-top .bezel-sep { color: var(--phosphor-dim); }
+    #bezel-metar {
+      color: var(--phosphor);
+      text-shadow: 0 0 3px rgba(94, 255, 138, 0.4);
+      font-family: 'VT323', monospace;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+    }
+    #bezel-sector { font-family: 'Share Tech Mono', monospace; }
+    #bezel-atis { color: var(--amber); }
+    #bezel-top .indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--phosphor);
+      box-shadow: 0 0 8px var(--phosphor);
+      margin-right: 8px;
+      animation: blink 2.4s infinite;
+    }
+    @keyframes blink {
+      0%, 60%, 100% { opacity: 1; }
+      70%           { opacity: 0.2; }
+    }
+
+    /* -------- CRT screen -------- */
+    #screen {
+      grid-area: screen;
+      position: relative;
+      background: radial-gradient(ellipse at 50% 50%, #050d07 0%, #01050a 65%, #000 100%);
+      border: 3px solid #1a251c;
+      border-radius: 32px;
+      box-shadow:
+        inset 0 0 60px rgba(0, 0, 0, 0.9),
+        inset 0 0 30px rgba(94, 255, 138, 0.06),
+        0 0 40px rgba(94, 255, 138, 0.08),
+        0 20px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+    #screen::before {
+      /* subtle barrel curvature illusion — a radial darkening at corners */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%,
+        transparent 55%,
+        rgba(0, 0, 0, 0.55) 100%);
+      pointer-events: none;
+      z-index: 3;
+      border-radius: inherit;
+    }
+    #screen::after {
+      /* scanlines */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0)     0px,
+        rgba(0, 0, 0, 0)     2px,
+        rgba(0, 0, 0, 0.25)  3px,
+        rgba(0, 0, 0, 0.25)  4px
+      );
+      pointer-events: none;
+      z-index: 4;
+      mix-blend-mode: multiply;
+    }
+    #radar {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      filter: drop-shadow(0 0 3px rgba(94, 255, 138, 0.3));
+    }
+
+    /* -------- Dynamic cheat panel (per-plane hints) -------- */
+    #cheat-live-panel {
+      position: absolute;
+      top: 40px;
+      right: 22px;
+      z-index: 6;
+      width: 290px;
+      max-height: calc(100% - 80px);
+      background: rgba(4, 10, 6, 0.92);
+      border: 1px solid var(--amber);
+      border-radius: 6px;
+      box-shadow: 0 0 25px rgba(255, 177, 79, 0.18);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    #cheat-live-panel.shown {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #cheat-live-panel header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, #2a1e0e 0%, #14100a 100%);
+      border-bottom: 1px solid var(--console-border);
+    }
+    #cheat-live-panel .cheat-title {
+      color: var(--amber);
+      letter-spacing: 0.15em;
+      font-size: 11px;
+      text-transform: uppercase;
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.4);
+    }
+    #cheat-live-close {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 2px 8px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    #cheat-live-close:hover { color: var(--amber); border-color: var(--amber); }
+    .cheat-live-body {
+      padding: 8px 10px 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .cheat-live-body::-webkit-scrollbar { width: 6px; }
+    .cheat-live-body::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
+    .cheat-live-empty {
+      color: var(--text-dim);
+      font-style: italic;
+      text-align: center;
+      padding: 16px 0;
+    }
+    .hint-row {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px;
+      margin-bottom: 5px;
+      border-radius: 3px;
+      background: #050d08;
+      border-left: 3px solid var(--phosphor-dim);
+    }
+    .hint-row.priority-urgent {
+      border-left-color: var(--red);
+      background: #180404;
+      animation: hint-pulse 1.6s ease-in-out infinite;
+    }
+    .hint-row.priority-normal {
+      border-left-color: var(--phosphor);
+    }
+    .hint-row.priority-ok {
+      border-left-color: var(--phosphor-dim);
+      opacity: 0.55;
+    }
+    @keyframes hint-pulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0.0); }
+      50%      { box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
+    }
+    .hint-row .letter {
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--phosphor-bright);
+      text-align: center;
+      text-shadow: 0 0 4px var(--phosphor);
+      line-height: 1;
+    }
+    .hint-row.priority-urgent .letter { color: var(--red); text-shadow: 0 0 6px var(--red); }
+    .hint-body { min-width: 0; }
+    .hint-cs {
+      color: var(--text-dim);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+    }
+    .hint-cmd {
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      color: var(--phosphor-bright);
+      background: rgba(94, 255, 138, 0.08);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 2px;
+      padding: 1px 8px;
+      display: inline-block;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 4px var(--phosphor);
+    }
+    .hint-row.priority-urgent .hint-cmd {
+      color: #ffdcdc;
+      background: rgba(239, 68, 68, 0.14);
+      border-color: var(--red);
+      text-shadow: 0 0 4px var(--red);
+    }
+    .hint-done {
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      color: var(--phosphor);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 3px rgba(94, 255, 138, 0.4);
+    }
+    .hint-explain {
+      color: var(--text);
+      font-size: 11px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .hint-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: rgba(94, 255, 138, 0.15);
+      color: var(--phosphor);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .hint-row.priority-urgent .hint-tag {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--red);
+    }
+    .hint-row.priority-ok .hint-tag {
+      background: rgba(60, 100, 70, 0.15);
+      color: var(--phosphor-dim);
+    }
+
+    /* -------- Command reference (static help) panel -------- */
+    #help-panel {
+      position: absolute;
+      top: 40px;
+      left: 22px;
+      z-index: 6;
+      width: 285px;
+      max-height: calc(100% - 80px);
+      background: rgba(4, 10, 6, 0.9);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 6px;
+      box-shadow: 0 0 25px rgba(94, 255, 138, 0.15);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    #help-panel.shown {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #help-panel header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, #14201a 0%, #0a1210 100%);
+      border-bottom: 1px solid var(--console-border);
+    }
+    #help-panel .cheat-title {
+      color: var(--amber);
+      letter-spacing: 0.15em;
+      font-size: 11px;
+      text-transform: uppercase;
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.4);
+    }
+    #cheat-close {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 2px 8px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    #cheat-close:hover { color: var(--phosphor); border-color: var(--phosphor); }
+    #help-panel .cheat-body {
+      padding: 10px 12px 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    #help-panel .cheat-body::-webkit-scrollbar { width: 6px; }
+    #help-panel .cheat-body::-webkit-scrollbar-track { background: transparent; }
+    #help-panel .cheat-body::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
+    #help-panel .cheat-section { margin-bottom: 10px; }
+    #help-panel .cheat-section:last-child { margin-bottom: 0; }
+    #help-panel .cheat-h {
+      color: var(--phosphor);
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      padding-bottom: 3px;
+      border-bottom: 1px dashed var(--console-border);
+      text-shadow: 0 0 3px rgba(94, 255, 138, 0.35);
+    }
+    #help-panel .cheat-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 3px 0;
+    }
+    #help-panel .cheat-row span {
+      color: var(--text-dim);
+      font-size: 11px;
+      flex: 1;
+    }
+    #help-panel code {
+      display: inline-block;
+      font-family: 'VT323', monospace;
+      background: #050d08;
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 2px;
+      padding: 1px 5px;
+      font-size: 14px;
+      min-width: 42px;
+      text-align: center;
+      text-shadow: 0 0 3px rgba(94, 255, 138, 0.5);
+    }
+    #help-panel kbd {
+      display: inline-block;
+      font-family: 'VT323', monospace;
+      background: #050d08;
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor-dim);
+      border-bottom-width: 2px;
+      border-radius: 2px;
+      padding: 1px 6px;
+      font-size: 13px;
+      text-align: center;
+    }
+    #help-panel .cheat-compass {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      margin: 3px 0 6px;
+    }
+    #help-panel .cheat-compass > div {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-dim);
+      padding: 2px;
+      justify-content: center;
+    }
+    #help-panel .cheat-compass code {
+      min-width: 32px;
+      font-size: 12px;
+      padding: 0 3px;
+    }
+    #help-panel .cheat-compass .c-c {
+      color: var(--phosphor-dim);
+      font-size: 14px;
+    }
+    #help-panel .win-hint {
+      color: var(--phosphor-bright);
+      font-family: 'VT323', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      min-width: 82px;
+    }
+
+    /* Subtitle band inside the CRT */
+    #subtitle-bar {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 40px;
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+      padding: 10px 20px;
+      border-radius: 4px;
+      color: var(--phosphor-bright);
+      text-align: center;
+      font-family: 'VT323', 'Share Tech Mono', monospace;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      text-shadow: 0 0 6px rgba(94, 255, 138, 0.55);
+      min-height: 44px;
+      flex-wrap: wrap;
+    }
+    #subtitle-bar.shown { opacity: 1; }
+    #subtitle-bar.hidden-mode { display: none !important; }
+    #subtitle-speaker {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      font-weight: 700;
+      background: rgba(94, 255, 138, 0.2);
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor-dim);
+      text-transform: uppercase;
+      align-self: center;
+      text-shadow: none;
+    }
+    #subtitle-speaker.pilot {
+      background: rgba(255, 177, 79, 0.18);
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+    #subtitle-speaker.you {
+      background: rgba(94, 255, 138, 0.22);
+      color: var(--phosphor-bright);
+      border-color: var(--phosphor);
+    }
+
+    .bezel-controls { display: flex; gap: 6px; }
+    .bezel-controls button {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+    .bezel-controls button:hover {
+      color: var(--phosphor);
+      border-color: var(--phosphor);
+    }
+    .bezel-controls button.active {
+      color: var(--phosphor-bright);
+      border-color: var(--phosphor);
+      background: rgba(94, 255, 138, 0.12);
+    }
+
+    /* Corner labels inside the CRT */
+    .crt-corner {
+      position: absolute;
+      color: var(--phosphor-dim);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      z-index: 5;
+      pointer-events: none;
+      text-shadow: 0 0 4px currentColor;
+    }
+    .corner-tl { top: 14px; left: 22px; }
+    .corner-tr { top: 14px; right: 22px; }
+    .corner-bl { bottom: 14px; left: 22px; }
+    .corner-br { bottom: 14px; right: 22px; }
+
+    /* -------- Info strip -------- */
+    #info {
+      grid-area: info;
+      background: linear-gradient(180deg, #0f180f 0%, #0a120a 100%);
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      padding: 10px 18px;
+      color: var(--phosphor);
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 4px rgba(94, 255, 138, 0.4);
+    }
+
+    /* -------- Command line -------- */
+    #cmd-panel {
+      grid-area: cmd;
+      background: #04060a;
+      border: 1px solid var(--console-border);
+      border-radius: 4px 4px 8px 8px;
+      padding: 14px 18px 16px;
+    }
+    #hint {
+      color: var(--text-dim);
+      font-size: 12px;
+      margin-bottom: 8px;
+      min-height: 14px;
+      letter-spacing: 0.05em;
+    }
+    #cmdline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'VT323', monospace;
+      font-size: 26px;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 6px rgba(94, 255, 138, 0.7);
+    }
+    #cmdline .prompt {
+      color: var(--phosphor);
+      user-select: none;
+    }
+    #cmd-input {
+      display: inline-block;
+      min-width: 1ch;
+      letter-spacing: 0.08em;
+    }
+    #cmd-input::after {
+      content: '_';
+      animation: cursor-blink 1s steps(2) infinite;
+      color: var(--phosphor);
+    }
+    @keyframes cursor-blink {
+      50% { opacity: 0; }
+    }
+
+    /* -------- Sidebar -------- */
+    #sidebar {
+      grid-area: sidebar;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto auto;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .card {
+      background: linear-gradient(180deg, #131a13 0%, #0a120a 100%);
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      overflow: hidden;
+    }
+    .card h3 {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.4);
+    }
+    #playfield-picker {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pf-btn {
+      flex: 1;
+      min-width: 60px;
+      background: #0a120a;
+      color: var(--text);
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pf-btn:hover { background: #1a2a1a; color: var(--phosphor); }
+    .pf-btn.active {
+      background: var(--phosphor-dim);
+      color: var(--phosphor-bright);
+      border-color: var(--phosphor);
+    }
+    #shift-status {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--amber);
+      letter-spacing: 0.1em;
+    }
+    #shift-status span { text-shadow: 0 0 3px rgba(255, 177, 79, 0.4); }
+    #planes {
+      overflow-y: auto;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
+    }
+    .plane-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 6px 8px;
+      background: #050c05;
+      border-left: 3px solid var(--phosphor);
+      border-radius: 2px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .plane-row.status-marked { border-color: var(--phosphor-bright); }
+    .plane-row.status-unmarked { border-color: var(--phosphor-dim); opacity: 0.75; }
+    .plane-row.status-ignored { border-color: #444; opacity: 0.5; }
+    .plane-letter {
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 4px var(--phosphor);
+      min-width: 22px;
+      text-align: center;
+    }
+    .plane-detail { flex: 1; }
+    .plane-detail b {
+      color: var(--phosphor-bright);
+      font-family: 'VT323', monospace;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+    }
+    .plane-detail .callsign-name {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 11px;
+    }
+    .fuel-warn { color: var(--amber); }
+    .fuel-critical { color: var(--red); font-weight: bold; }
+    .empty {
+      color: var(--text-dim);
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
+    #events {
+      overflow-y: auto;
+      max-height: 200px;
+      font-size: 11px;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .event {
+      padding: 2px 6px;
+      border-left: 2px solid transparent;
+      color: var(--text-dim);
+    }
+    .event.spawn { color: var(--phosphor); border-color: var(--phosphor); }
+    .event.ok { color: var(--phosphor-bright); border-color: var(--phosphor-bright); }
+    .event.err { color: var(--red); border-color: var(--red); }
+    .event.cmd { color: var(--amber); border-color: var(--amber); }
+    .event.meta { color: var(--text-dim); }
+
+    /* audio toggle styles moved to .bezel-controls */
+
+    /* -------- Title screen -------- */
+    #title-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: radial-gradient(ellipse at 50% 30%, #0a1a10 0%, #030805 55%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+    #title-screen.hiding { opacity: 0; pointer-events: none; }
+    #title-inner {
+      position: relative;
+      width: min(700px, 92vw);
+      max-height: 92vh;
+      border: 2px solid var(--phosphor-dim);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(4, 12, 8, 0.92) 0%, rgba(2, 6, 4, 0.98) 100%);
+      box-shadow:
+        inset 0 0 60px rgba(94, 255, 138, 0.06),
+        0 0 60px rgba(94, 255, 138, 0.18),
+        0 30px 60px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+    #title-inner::after {
+      /* scanlines over the title panel too — same visual language */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(180deg,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 2px,
+        rgba(0,0,0,0.18) 3px,
+        rgba(0,0,0,0.18) 4px);
+      pointer-events: none;
+      z-index: 5;
+      mix-blend-mode: multiply;
+    }
+    #title-radar-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0.32;
+      pointer-events: none;
+    }
+    #title-content {
+      position: relative;
+      z-index: 3;
+      padding: 44px 40px 32px;
+      text-align: center;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    #title-mark {
+      color: var(--amber);
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      letter-spacing: 0.4em;
+      text-shadow: 0 0 4px rgba(255, 177, 79, 0.5);
+      opacity: 0.75;
+      margin-bottom: -6px;
+    }
+    #title-name {
+      font-family: 'VT323', monospace;
+      font-size: clamp(88px, 18vw, 148px);
+      color: var(--phosphor-bright);
+      letter-spacing: 0.28em;
+      line-height: 1;
+      margin-left: 0.28em;   /* offset for letter-spacing symmetry */
+      text-shadow:
+        0 0 8px var(--phosphor),
+        0 0 24px rgba(94, 255, 138, 0.55),
+        0 0 40px rgba(94, 255, 138, 0.3);
+      animation: title-pulse 3.4s ease-in-out infinite;
+    }
+    @keyframes title-pulse {
+      0%, 100% { text-shadow: 0 0 8px var(--phosphor), 0 0 24px rgba(94, 255, 138, 0.55), 0 0 40px rgba(94, 255, 138, 0.3); }
+      50%      { text-shadow: 0 0 12px var(--phosphor), 0 0 32px rgba(94, 255, 138, 0.75), 0 0 60px rgba(94, 255, 138, 0.5); }
+    }
+    #title-subtitle {
+      font-family: 'VT323', monospace;
+      font-size: 28px;
+      color: var(--phosphor);
+      letter-spacing: 0.3em;
+      text-shadow: 0 0 6px rgba(94, 255, 138, 0.4);
+      margin-top: -4px;
+    }
+    #title-tagline {
+      color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      line-height: 1.6;
+      margin-top: 6px;
+    }
+    #title-tagline code {
+      color: var(--amber);
+      background: transparent;
+    }
+    .title-block {
+      margin-top: 16px;
+      width: 100%;
+    }
+    .title-label {
+      color: var(--amber);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.4);
+    }
+    #title-sectors {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .title-sector-btn {
+      background: rgba(4, 10, 6, 0.6);
+      color: var(--text);
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      padding: 12px 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+    .title-sector-btn:hover {
+      background: rgba(94, 255, 138, 0.08);
+      color: var(--phosphor);
+      border-color: var(--phosphor-dim);
+    }
+    .title-sector-btn.active {
+      background: rgba(94, 255, 138, 0.14);
+      color: var(--phosphor-bright);
+      border-color: var(--phosphor);
+      box-shadow: 0 0 12px rgba(94, 255, 138, 0.3);
+    }
+    .title-sector-btn small {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      font-style: italic;
+    }
+    .title-sector-btn.active small { color: var(--phosphor); }
+    #title-begin {
+      margin-top: 22px;
+      background: linear-gradient(180deg, rgba(94, 255, 138, 0.15) 0%, rgba(60, 180, 100, 0.1) 100%);
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor);
+      border-radius: 5px;
+      padding: 14px 40px;
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      letter-spacing: 0.3em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-shadow: 0 0 6px rgba(94, 255, 138, 0.6);
+      box-shadow: 0 0 15px rgba(94, 255, 138, 0.25);
+      animation: begin-pulse 2s ease-in-out infinite;
+    }
+    #title-begin:hover {
+      background: linear-gradient(180deg, rgba(94, 255, 138, 0.3) 0%, rgba(60, 180, 100, 0.2) 100%);
+      box-shadow: 0 0 25px rgba(94, 255, 138, 0.5);
+    }
+    @keyframes begin-pulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(94, 255, 138, 0.25); }
+      50%      { box-shadow: 0 0 25px rgba(94, 255, 138, 0.5); }
+    }
+    #title-help {
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      margin-top: 18px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #title-help kbd {
+      display: inline-block;
+      font-family: 'VT323', monospace;
+      background: #050d08;
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor-dim);
+      border-bottom-width: 2px;
+      border-radius: 2px;
+      padding: 1px 6px;
+      font-size: 13px;
+      min-width: 16px;
+      text-align: center;
+    }
+    #title-help .dot { color: var(--phosphor-dim); }
+    #title-attribution {
+      color: var(--text-dim);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    /* -------- Help / how-to-play modal -------- */
+    #help-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    #help-overlay.shown { display: flex; }
+    #help-inner {
+      max-width: 820px;
+      width: 100%;
+      max-height: 90vh;
+      background: radial-gradient(ellipse at top, #0d1a10 0%, #030805 100%);
+      border: 2px solid var(--phosphor-dim);
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(94, 255, 138, 0.25);
+      padding: 32px 40px;
+      overflow-y: auto;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      line-height: 1.6;
+      position: relative;
+    }
+    #help-inner::-webkit-scrollbar { width: 10px; }
+    #help-inner::-webkit-scrollbar-track { background: #05100a; }
+    #help-inner::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 5px; }
+
+    #help-close {
+      position: sticky;
+      float: right;
+      top: 0;
+      background: transparent;
+      color: var(--phosphor);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 4px 12px;
+      cursor: pointer;
+      z-index: 2;
+    }
+    #help-close:hover { background: var(--phosphor-dim); color: var(--phosphor-bright); }
+
+    #help-inner h1 {
+      font-family: 'VT323', monospace;
+      font-size: 34px;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 8px var(--phosphor);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    #help-inner .subtitle {
+      color: var(--amber);
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    #help-inner h2 {
+      color: var(--amber);
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--console-border);
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.35);
+    }
+    #help-inner p { margin-bottom: 10px; }
+    #help-inner code, #help-inner kbd {
+      display: inline-block;
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      background: #04080a;
+      color: var(--phosphor-bright);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 2px;
+      padding: 1px 6px;
+      margin: 0 2px;
+    }
+    #help-inner .glyph-list {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 8px 14px;
+      align-items: center;
+      margin: 12px 0;
+    }
+    #help-inner .glyph {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #04080a;
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 3px;
+      padding: 8px;
+      font-family: 'VT323', monospace;
+      color: var(--phosphor);
+      text-shadow: 0 0 4px var(--phosphor);
+      min-height: 48px;
+      font-size: 22px;
+    }
+    #help-inner .glyph.beacon { color: var(--phosphor); }
+    #help-inner .glyph.airport { color: var(--phosphor); font-size: 26px; }
+    #help-inner .glyph.exit { color: var(--phosphor-dim); }
+    #help-inner .glyph.plane {
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 6px var(--phosphor);
+      font-weight: 700;
+      font-size: 26px;
+    }
+    #help-inner .glyph small {
+      display: block;
+      font-size: 12px;
+      color: var(--phosphor-dim);
+      text-shadow: none;
+    }
+    #help-inner .cmd-table {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 6px 14px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    #help-inner .cmd-table .cmd {
+      font-family: 'VT323', monospace;
+      color: var(--phosphor-bright);
+      background: #04080a;
+      border-left: 3px solid var(--phosphor);
+      padding: 4px 10px;
+      font-size: 16px;
+    }
+    #help-inner .cmd-table .desc { padding: 4px 0; }
+    #help-inner .lose-list {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+    }
+    #help-inner .lose-list li {
+      padding: 6px 12px;
+      margin-bottom: 4px;
+      border-left: 3px solid var(--red);
+      background: #100404;
+      color: var(--text);
+      font-size: 13px;
+    }
+    #help-inner .win-list li {
+      border-left-color: var(--phosphor);
+      background: #04100a;
+    }
+    #help-inner .compass {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 4px;
+      margin: 8px auto 14px;
+      width: max-content;
+    }
+    #help-inner .compass .key {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #04080a;
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 3px;
+      color: var(--phosphor);
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      flex-direction: column;
+    }
+    #help-inner .compass .key small {
+      font-size: 10px;
+      color: var(--phosphor-dim);
+      text-shadow: none;
+    }
+    #help-inner .compass .center {
+      background: transparent;
+      border: none;
+      color: var(--phosphor-dim);
+    }
+    #help-inner .footer-hint {
+      margin-top: 30px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      padding-top: 20px;
+      border-top: 1px solid var(--console-border);
+    }
+    #help-inner .footer-hint kbd { font-size: 14px; }
+    #help-inner .example-flow {
+      background: #04080a;
+      border-left: 3px solid var(--amber);
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-size: 13px;
+      color: var(--text);
+    }
+    #help-inner .example-flow .step {
+      display: flex;
+      gap: 10px;
+      margin: 4px 0;
+    }
+    #help-inner .example-flow .step .num {
+      color: var(--amber);
+      font-weight: bold;
+      min-width: 24px;
+    }
+
+    #help-btn {
+      background: transparent;
+      color: var(--phosphor);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 3px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      margin-right: 8px;
+    }
+    #help-btn:hover { background: var(--phosphor-dim); color: var(--phosphor-bright); }
+
+    /* -------- Game over overlay -------- */
+    #game-over {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 40px;
+    }
+    #game-over.shown { display: flex; }
+    #game-over-inner {
+      max-width: 500px;
+      text-align: center;
+      padding: 40px;
+      border: 2px solid var(--red);
+      border-radius: 8px;
+      background: radial-gradient(circle at center, #1a0808 0%, #050202 100%);
+      box-shadow: 0 0 60px rgba(255, 82, 82, 0.4);
+    }
+    #game-over h1 {
+      font-family: 'VT323', monospace;
+      font-size: 48px;
+      color: var(--red);
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 15px var(--red);
+      margin-bottom: 16px;
+    }
+    #game-over-text {
+      color: var(--phosphor-bright);
+      font-size: 20px;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    #game-over-stats {
+      color: var(--text);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+    #game-over-hint {
+      color: var(--text-dim);
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      animation: cursor-blink 1.4s infinite;
+    }
+
+    /* Small screens */
+    @media (max-width: 900px) {
+      #app {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "bezel"
+          "screen"
+          "info"
+          "cmd"
+          "sidebar";
+      }
+      #sidebar { max-height: 40vh; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="bezel-top">
+      <span class="bezel-info">
+        <span class="indicator"></span>
+        <span id="bezel-sector">SECTOR — INIT</span>
+        <span class="bezel-sep">·</span>
+        <span id="bezel-metar">— METAR —</span>
+        <span class="bezel-sep">·</span>
+        <span id="bezel-atis">ATIS INFO A</span>
+      </span>
+      <span class="bezel-controls">
+        <button id="help-panel-btn" title="Toggle help / command reference (\ key)">≡ help</button>
+        <button id="cheat-btn" title="Toggle dynamic cheat (per-plane suggestions)">▶ cheat</button>
+        <button id="sub-toggle" title="Toggle subtitles">✎ subs on</button>
+        <button id="voice-toggle" title="Toggle voice">◉ voice off</button>
+        <button id="audio-toggle" title="Toggle sound (ambient + SFX)">♪ sound on</button>
+      </span>
+    </div>
+
+    <div id="screen">
+      <canvas id="radar"></canvas>
+      <div class="crt-corner corner-tl">RADAR ACTIVE</div>
+      <div class="crt-corner corner-tr">CH 121.9</div>
+      <div class="crt-corner corner-bl">JETS ↑ · PROPS ↓</div>
+      <div class="crt-corner corner-br">v1986.10</div>
+      <div id="subtitle-bar" aria-hidden="true">
+        <span id="subtitle-speaker"></span>
+        <span id="subtitle-text"></span>
+      </div>
+
+      <aside id="cheat-live-panel">
+        <header>
+          <span class="cheat-title">▶ CHEAT · WHAT TO TYPE</span>
+          <button id="cheat-live-close" title="Hide">✕</button>
+        </header>
+        <div class="cheat-live-body">
+          <div id="cheat-live-empty" class="cheat-live-empty">— no traffic —</div>
+          <div id="cheat-live-list"></div>
+        </div>
+      </aside>
+
+      <aside id="help-panel">
+        <header>
+          <span class="cheat-title">≡ HELP</span>
+          <button id="help-panel-close" title="Hide (\ key)">✕</button>
+        </header>
+        <div class="cheat-body">
+          <div class="cheat-section">
+            <div class="cheat-h">PLANE LETTER</div>
+            <div class="cheat-row"><code>A</code>–<code>Z</code> <span>letter shown on the radar (jets = uppercase, props = lowercase)</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">ALTITUDE</div>
+            <div class="cheat-row"><code>Aa5</code> <span>set to 5000 ft</span></div>
+            <div class="cheat-row"><code>Aa+3</code> <span>climb 3000 ft</span></div>
+            <div class="cheat-row"><code>Aa-2</code> <span>descend 2000 ft</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">TURN (compass)</div>
+            <div class="cheat-compass">
+              <div><code>Atq</code> NW</div><div><code>Atw</code> N</div><div><code>Ate</code> NE</div>
+              <div><code>Ata</code> W</div><div class="c-c">·</div><div><code>Atd</code> E</div>
+              <div><code>Atz</code> SW</div><div><code>Atx</code> S</div><div><code>Atc</code> SE</div>
+            </div>
+            <div class="cheat-row"><code>AtL</code> <span>hard left 90°</span></div>
+            <div class="cheat-row"><code>AtR</code> <span>hard right 90°</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">TURN TOWARDS</div>
+            <div class="cheat-row"><code>Attb0</code> <span>beacon 0 (see <code>*0</code>)</span></div>
+            <div class="cheat-row"><code>Atta1</code> <span>airport 1 (see <code>A1</code>)</span></div>
+            <div class="cheat-row"><code>Atte2</code> <span>exit 2 (see <code>2</code> on border)</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">HOLD / STATUS</div>
+            <div class="cheat-row"><code>Ac</code> <span>circle in place (right turn)</span></div>
+            <div class="cheat-row"><code>Am</code> / <code>Ai</code> / <code>Au</code> <span>mark / ignore / unmark</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">SPECIAL KEYS</div>
+            <div class="cheat-row"><kbd>Enter</kbd> (empty) <span>force a tick now</span></div>
+            <div class="cheat-row"><kbd>Enter</kbd> (typed) <span>execute command</span></div>
+            <div class="cheat-row"><kbd>Backspace</kbd> <span>delete last char</span></div>
+            <div class="cheat-row"><kbd>Esc</kbd> <span>clear command buffer</span></div>
+            <div class="cheat-row"><kbd>?</kbd> <span>full how-to-play (pauses)</span></div>
+            <div class="cheat-row"><kbd>\</kbd> <span>toggle this cheat sheet</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">GOAL PER PLANE</div>
+            <div class="cheat-row"><span class="win-hint">✓ EXIT</span> <span>reach destination exit at <b>alt 9</b></span></div>
+            <div class="cheat-row"><span class="win-hint">✓ AIRPORT</span> <span>reach it at <b>alt 0</b> flying its arrow direction</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="info">— init —</div>
+
+    <div id="cmd-panel">
+      <div id="hint">Type plane letter (A-Z), then action.  Empty Enter = force tick.</div>
+      <div id="cmdline">
+        <span class="prompt">&gt;</span>
+        <span id="cmd-input"></span>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div class="card">
+        <h3>Sector Selection</h3>
+        <div id="playfield-picker"></div>
+      </div>
+
+      <div class="card">
+        <h3>Shift Status</h3>
+        <div id="shift-status">
+          <span id="shift-timer">SHIFT --:--</span>
+          <span id="next-tick">NEXT TICK --s</span>
+        </div>
+      </div>
+
+      <div class="card" style="min-height: 200px;">
+        <h3>Active Traffic</h3>
+        <div id="planes"><div class="empty">— no traffic —</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Events</h3>
+        <div id="events"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-over">
+    <div id="game-over-inner">
+      <h1>LOST</h1>
+      <div id="game-over-text"></div>
+      <div id="game-over-stats"></div>
+      <div id="game-over-hint">▸ ENTER / SPACE / CLICK · NEW SHIFT ◂</div>
+    </div>
+  </div>
+
+  <div id="title-screen">
+    <div id="title-inner">
+      <canvas id="title-radar-canvas"></canvas>
+      <div id="title-content">
+        <div id="title-mark">CTL</div>
+        <h1 id="title-name">ATC</h1>
+        <div id="title-subtitle">Control Room · 1986</div>
+        <div id="title-tagline">
+          A spiritual successor to BSD <code>atc(6)</code><br>
+          Ed James, University of California · 1986
+        </div>
+
+        <div class="title-block">
+          <div class="title-label">SELECT SECTOR</div>
+          <div id="title-sectors"></div>
+        </div>
+
+        <button id="title-begin">▶  BEGIN SHIFT  ◀</button>
+
+        <div id="title-help">
+          <span>type commands</span>
+          <span class="dot">·</span>
+          <span><kbd>?</kbd> tutorial</span>
+          <span class="dot">·</span>
+          <span><kbd>\</kbd> reference</span>
+          <span class="dot">·</span>
+          <span><kbd>▶</kbd> live cheat</span>
+        </div>
+        <div id="title-attribution">
+          Port by Agun Wijaya · Claude Opus · MIT license
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="help-overlay">
+    <div id="help-inner">
+      <button id="help-close">✕ close</button>
+      <h1>ATC — How to Play</h1>
+      <div class="subtitle">Control Room 1986 · BSD atc(6) spiritual successor</div>
+
+      <h2>The Job</h2>
+      <p>
+        You are an <b>air traffic controller</b>. Airplanes appear at exits
+        or airports on your radar screen. Each plane has a destination
+        (another exit, or an airport). Your job: route each plane to its
+        destination — alive — by typing commands that adjust its altitude
+        and heading. There is no win condition. You survive as long as
+        you can, and your score is the number of planes you safely deliver.
+      </p>
+
+      <h2>The Radar Screen (Center)</h2>
+      <p>The green radar shows a rectangular sector. Here's what each glyph means:</p>
+      <div class="glyph-list">
+        <div class="glyph plane">A<small>5</small></div>
+        <div>
+          <b>An airplane in flight.</b>
+          <b>Uppercase</b> letter = <b>jet</b> (fast, ticks every update).
+          <b>Lowercase</b> letter = <b>prop</b> (slow, ticks every other
+          update). The small digit below (<code>5</code>) is the plane's
+          <b>altitude in thousands of feet</b> (0–9 → 0–9000 ft).
+          The arrow points in its current heading. Brightness = status:
+          bright = MARKED (paying attention), dim = UNMARKED, faded = IGNORED.
+        </div>
+
+        <div class="glyph beacon">*0</div>
+        <div>
+          <b>Beacon.</b> A waypoint inside the arena. Useful as a routing
+          landmark: you can command <code>Attb0</code> to point a plane
+          toward beacon 0. Beacons themselves do nothing to planes — they're
+          navigation aids.
+        </div>
+
+        <div class="glyph airport">→<small>A0</small></div>
+        <div>
+          <b>Airport.</b> Where planes take off from and land at. The arrow
+          shows the airport's <b>runway direction</b> — a plane landing here
+          must be flying in exactly that direction, at altitude 0.
+        </div>
+
+        <div class="glyph exit">◦ 3</div>
+        <div>
+          <b>Exit.</b> A numbered gate on the border of the arena. Planes
+          departing here spawn at altitude 7000 ft. Planes exiting here
+          must be at altitude 9000 ft, otherwise you lose.
+        </div>
+      </div>
+      <p>
+        Faint <b>dashed lines</b> are <b>airways</b> — visual guides connecting
+        features. They have no gameplay effect, just help you plan routes.
+        The <b>dot grid</b> shows every cell you can occupy.
+      </p>
+
+      <h2>The Command Line (Bottom)</h2>
+      <p>
+        Type commands <b>character by character</b>. The hint above the
+        command line shows valid next tokens after every keystroke — you
+        never have to memorise the grammar.
+      </p>
+      <p><b>Every command starts with a plane letter</b> (A–Z), then an action:</p>
+      <div class="cmd-table">
+        <div class="cmd">Aa5</div>       <div class="desc">Plane <code>A</code>, set altitude to <b>5000 ft</b>.</div>
+        <div class="cmd">Aa+3</div>      <div class="desc">Plane <code>A</code>, <b>climb 3000 ft</b> from current altitude.</div>
+        <div class="cmd">Aa-2</div>      <div class="desc">Plane <code>A</code>, <b>descend 2000 ft</b>.</div>
+        <div class="cmd">Atw</div>       <div class="desc">Plane <code>A</code>, <b>turn to North</b> (see compass below).</div>
+        <div class="cmd">AtL</div>       <div class="desc">Plane <code>A</code>, <b>hard left 90°</b>.</div>
+        <div class="cmd">AtR</div>       <div class="desc">Plane <code>A</code>, <b>hard right 90°</b>.</div>
+        <div class="cmd">Attb0</div>     <div class="desc">Plane <code>A</code>, <b>turn toward beacon 0</b>.</div>
+        <div class="cmd">Atta1</div>     <div class="desc">Plane <code>A</code>, <b>turn toward airport 1</b>.</div>
+        <div class="cmd">Atte2</div>     <div class="desc">Plane <code>A</code>, <b>turn toward exit 2</b>.</div>
+        <div class="cmd">Ac</div>        <div class="desc">Plane <code>A</code>, <b>circle</b> in place until you say otherwise.</div>
+        <div class="cmd">Am / Ai / Au</div><div class="desc">Plane <code>A</code>, mark / ignore / unmark (brightness cues).</div>
+      </div>
+      <p><b>Compass keys</b> (8 directions, laid out like a numpad):</p>
+      <div class="compass">
+        <div class="key">q<small>NW</small></div>
+        <div class="key">w<small>N</small></div>
+        <div class="key">e<small>NE</small></div>
+        <div class="key">a<small>W</small></div>
+        <div class="key center">·</div>
+        <div class="key">d<small>E</small></div>
+        <div class="key">z<small>SW</small></div>
+        <div class="key">x<small>S</small></div>
+        <div class="key">c<small>SE</small></div>
+      </div>
+      <p>Special keys:</p>
+      <div class="cmd-table">
+        <div class="cmd"><kbd>Enter</kbd> (empty)</div>  <div class="desc"><b>Force an immediate tick</b>. Skips waiting; time advances now.</div>
+        <div class="cmd"><kbd>Enter</kbd> (typed)</div>  <div class="desc">Execute the current command.</div>
+        <div class="cmd"><kbd>Backspace</kbd></div>      <div class="desc">Delete the last character.</div>
+        <div class="cmd"><kbd>Esc</kbd></div>            <div class="desc">Clear the whole command buffer.</div>
+        <div class="cmd"><kbd>?</kbd></div>              <div class="desc">Toggle this help screen.</div>
+      </div>
+
+      <h2>The Sidebar (Right)</h2>
+      <p>Four cards, top to bottom:</p>
+      <p>
+        <b>1. Sector Selection.</b> Buttons to switch between sectors.
+        <b>Easy</b> is the training sector (slow, one airport, four exits).
+        <b>Default</b> is Ed James's reference difficulty. <b>Killer</b> is
+        the fast, punishing sector — do not start here.
+      </p>
+      <p>
+        <b>2. Shift Status.</b> <code>SHIFT MM:SS</code> counts down from 15 minutes
+        (compressed 8-hour shift). <code>NEXT TICK Ns</code> shows how long until
+        the game advances one tick — press Enter with an empty buffer to
+        force it now.
+      </p>
+      <p>
+        <b>3. Active Traffic.</b> Every plane currently on your radar,
+        with: origin → destination, altitude, heading, fuel. <b>Fuel goes yellow at 12,
+        red at 5</b> — those planes are urgent. This panel is your ground truth;
+        don't rely on the radar alone.
+      </p>
+      <p>
+        <b>4. Events.</b> Rolling log of the last ~12 events (spawns,
+        landings, exits, losses, commands you issued). Colour-coded.
+      </p>
+
+      <h2>How Time Works</h2>
+      <p>
+        Time advances in discrete <b>ticks</b> (every <b>5 seconds</b> on Default,
+        <b>6</b> on Easy, <b>3</b> on Killer). Between ticks the state is
+        frozen — you have time to type commands. When a tick fires:
+      </p>
+      <ul style="margin-left: 20px;">
+        <li>Every jet moves one cell in its heading direction.</li>
+        <li>Every prop moves one cell — <b>but only on every other tick</b>.</li>
+        <li>Altitude changes by <b>±1</b> toward the value you commanded.</li>
+        <li>Heading changes by <b>up to ±2</b> (45°) toward the direction you commanded.</li>
+        <li>Fuel decreases by 1 for every plane that moved.</li>
+      </ul>
+      <p>You cannot force a plane to change altitude by more than 1 per tick, or heading by more than 2 (90°). Plan ahead.</p>
+
+      <h2>Winning a Plane</h2>
+      <ul class="lose-list win-list">
+        <li>✓ <b>Airport landing:</b> plane reaches an airport at altitude 0, flying in the airport's arrow direction.</li>
+        <li>✓ <b>Exit departure:</b> plane reaches its destination exit at altitude 9 (9000 ft).</li>
+      </ul>
+
+      <h2>Losing the Shift</h2>
+      <p>Any of these ends the game immediately:</p>
+      <ul class="lose-list">
+        <li>✗ Two planes within 1 cell of each other and within 1000 ft of altitude (<b>collision</b>).</li>
+        <li>✗ Any plane runs <b>out of fuel</b> (fuel < 0).</li>
+        <li>✗ Plane reaches its <b>destination exit at wrong altitude</b> (not 9).</li>
+        <li>✗ Plane <b>lands at wrong airport</b>, or from wrong direction.</li>
+        <li>✗ Plane leaves the arena through a border cell that isn't its destination exit.</li>
+        <li>✗ Plane climbs above altitude 9 or descends to 0 outside an airport.</li>
+      </ul>
+
+      <h2>Walk-through: Your First Plane</h2>
+      <div class="example-flow">
+        <div class="step"><span class="num">1.</span> A jet spawns: <code>A</code> at exit 2, altitude 7, heading West. Its destination is airport 0 (bottom of screen). Traffic panel confirms.</div>
+        <div class="step"><span class="num">2.</span> You need it to descend and turn south. Type <code>A</code> — hint shows valid actions.</div>
+        <div class="step"><span class="num">3.</span> Type <code>a</code> — hint asks for a digit. Type <code>0</code> — command is <code>Aa0</code>. Press <kbd>Enter</kbd>. Plane will now descend 1 per tick.</div>
+        <div class="step"><span class="num">4.</span> Type <code>Atx</code> — plane will turn toward South (x). Press <kbd>Enter</kbd>.</div>
+        <div class="step"><span class="num">5.</span> Wait for ticks. Plane moves south, descending. Right before it reaches airport 0, type <code>Atta0</code> to align with the airport's runway direction, then <kbd>Enter</kbd>.</div>
+        <div class="step"><span class="num">6.</span> Plane arrives at altitude 0, matching runway direction → <b>landed. +1 to score.</b></div>
+      </div>
+
+      <h2>Tips for Beginners</h2>
+      <ul style="margin-left: 20px;">
+        <li>Start on <b>Easy</b>. Do not touch Killer until you can land 10 planes on Easy.</li>
+        <li><b>Circle</b> (<code>Ac</code>) is your friend. When a plane is early or you're overloaded, park it in a circle at high altitude.</li>
+        <li>The <b>traffic panel</b> is faster to read than the radar for altitude and fuel. Use it.</li>
+        <li>An empty <kbd>Enter</kbd> forces a tick. Use this to <b>skip idle time</b> when nothing is happening.</li>
+        <li>Fuel = arena width + arena height at spawn. On Easy this is 35 — you have time. On Killer, plan tighter routes.</li>
+      </ul>
+
+      <div class="footer-hint">
+        Press <kbd>?</kbd> or click <kbd>? help</kbd> anytime to see this again.
+      </div>
+    </div>
+  </div>
+
+  <!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+  <script src="../../bridge/bridge.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

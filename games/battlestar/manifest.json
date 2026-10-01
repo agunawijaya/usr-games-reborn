@@ -1,0 +1,122 @@
+{
+  "id": "battlestar",
+  "title": "Pajamas to Paradise",
+  "tagline": "Wake up aboard a dying starship and find your way to paradise.",
+  "teaser": "The 1979 Berkeley text adventure with its own words intact and every room drawn in 3D: escape a dying starship in your pajamas, fly the last fighter through a dogfight, and explore a tropical island of charms, caves and old riddles.",
+  "category": "stories",
+  "directory": "/usr/games/stories",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [20, 60],
+  "status": "shipped",
+  "accent": "#c77dff",
+  "emblem": "M24 5c7 6 9 17 6 29H18C15 22 17 11 24 5zM18 34l-6 7h8M30 34l6 7h-8M24 16a3 3 0 1 0 0 6a3 3 0 1 0 0-6",
+  "inspiredBy": {
+    "program": "battlestar",
+    "originalTitle": "battlestar",
+    "uiTitle": "battlestar",
+    "year": 1979
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/battlestar/app",
+    "output": "play/battlestar/"
+  },
+  "manPage": {
+    "synopsis": "battlestar — type what you want to do: explore, take, use, escape.",
+    "description": "David Riggle wrote the original in 1979 to try out the C language, with help from Chris Guthrie, Peter Da Silva, Kevin Brown and Edward Wang.",
+    "seeAlso": ["adventure", "hack", "phantasia"]
+  },
+  "howToPlay": [
+    "Type short commands: look, take, wear, ahead, left, up.",
+    "Escape the ship, land on the island and explore it.",
+    "The hint panel (`) suggests what to try next."
+  ],
+  "cronGoals": [
+    {
+      "id": "places-explored",
+      "stat": "placesExplored",
+      "label": "Explore {n} places",
+      "min": 30,
+      "max": 100
+    }
+  ],
+  "packages": [
+    {
+      "id": "out-of-pajamas",
+      "title": "Out of pajamas",
+      "description": "Escape the dying ship in its last fighter.",
+      "tier": "core"
+    },
+    {
+      "id": "touchdown",
+      "title": "Touchdown",
+      "description": "Bring your fighter down safely on the island.",
+      "tier": "core"
+    },
+    {
+      "id": "amulet-hop",
+      "title": "Amulet hop",
+      "description": "Let the amulet carry you away.",
+      "tier": "core"
+    },
+    {
+      "id": "napkin-map",
+      "title": "Napkin map",
+      "description": "Trade coins for an old-timer’s map.",
+      "tier": "core"
+    },
+    {
+      "id": "outwitted",
+      "title": "Outwitted",
+      "description": "Trick the dark lord into fleeing.",
+      "tier": "core"
+    },
+    {
+      "id": "prince-liverwort",
+      "title": "Prince Liverwort",
+      "description": "Return all three charms to the throne.",
+      "tier": "core"
+    },
+    {
+      "id": "clean-shot",
+      "title": "Clean shot",
+      "description": "Win a dogfight in deep space.",
+      "tier": "extra"
+    },
+    {
+      "id": "low-tide",
+      "title": "Low tide",
+      "description": "Open the way to the sea cave.",
+      "tier": "extra"
+    },
+    {
+      "id": "three-charms",
+      "title": "Three charms",
+      "description": "Hold all three charms at once.",
+      "tier": "extra"
+    },
+    {
+      "id": "island-night",
+      "title": "Island night",
+      "description": "See your first dusk fall on the island.",
+      "tier": "extra"
+    },
+    {
+      "id": "surveyor",
+      "title": "Island surveyor",
+      "description": "Explore 150 places in one game.",
+      "tier": "rare"
+    },
+    {
+      "id": "generous-heart",
+      "title": "Generous heart",
+      "description": "Reach an ego of 20 through gifts and kindness.",
+      "tier": "rare"
+    }
+  ]
+}

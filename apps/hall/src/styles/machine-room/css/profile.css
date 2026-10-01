@@ -1,0 +1,431 @@
+/* The home directory: banner, file tree, process table, calendar and cosmetics. */
+
+[data-style='machine-room'] .homedir {
+  display: grid;
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+
+[data-style='machine-room'] .homedir__banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 56px);
+  align-items: end;
+  overflow: hidden;
+  padding: clamp(22px, 2.4vw, 44px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+}
+
+/* Tractor-feed paper stripes, unlocked at rank user. */
+[data-style='machine-room'] .banner--stripes::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ug-accent) 7%, transparent) 0 28px,
+    transparent 28px 56px
+  );
+}
+
+[data-style='machine-room'] .homedir__banner > * {
+  position: relative;
+}
+
+[data-style='machine-room'] .homedir__who {
+  display: grid;
+  gap: 6px;
+}
+
+[data-style='machine-room'] .homedir__path {
+  font-family: var(--ug-font-mono);
+  font-size: 1.1rem;
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .homedir__rank {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  font-size: calc(clamp(3rem, calc(4vw + 0.5rem), 6rem) * var(--title-scale));
+  line-height: 0.95;
+  color: var(--ug-accent);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .homedir__flavour {
+  max-width: 44ch;
+  font-size: 1.12rem;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .homedir__id {
+  margin-top: 8px;
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+  overflow-wrap: anywhere;
+}
+
+[data-style='machine-room'] .homedir__xp {
+  display: grid;
+  gap: 10px;
+}
+
+[data-style='machine-room'] .xp-numbers {
+  font-family: var(--ug-font-mono);
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .xp-numbers__value {
+  font-size: clamp(2rem, calc(2vw + 0.8rem), 3.2rem);
+  font-weight: 600;
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'] .xp-numbers__unit {
+  font-size: 1.2rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .bar--xp {
+  height: 14px;
+}
+
+[data-style='machine-room'] .xp-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .xp-caption__to {
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .rank-ladder {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+[data-style='machine-room'] .rank-ladder__step {
+  padding: 6px 0;
+  border: 1px solid var(--ug-line);
+  border-radius: 999px;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  text-align: center;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .rank-ladder__step.is-reached {
+  border-color: var(--ug-line-strong);
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .rank-ladder__step.is-current {
+  background: var(--ug-accent);
+  border-color: var(--ug-accent);
+  color: var(--ug-accent-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .homedir__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr) minmax(0, 0.9fr);
+  grid-template-areas:
+    'files stats cal'
+    'files cosmetics cal';
+  gap: var(--gap);
+  align-items: start;
+}
+
+[data-style='machine-room'] .homedir__files {
+  grid-area: files;
+}
+
+[data-style='machine-room'] .homedir__stats {
+  grid-area: stats;
+}
+
+[data-style='machine-room'] .homedir__cal {
+  grid-area: cal;
+}
+
+[data-style='machine-room'] .homedir__cosmetics {
+  grid-area: cosmetics;
+}
+
+/* The package tree, drawn with the same connectors as `tree`. */
+[data-style='machine-room'] .tree__root {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .tree,
+[data-style='machine-room'] .tree__files {
+  display: grid;
+}
+
+[data-style='machine-room'] .tree {
+  margin-top: 6px;
+}
+
+[data-style='machine-room'] .tree__folder,
+[data-style='machine-room'] .tree__file {
+  position: relative;
+  padding-left: 26px;
+}
+
+[data-style='machine-room'] .tree__folder::before,
+[data-style='machine-room'] .tree__file::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--ug-line-strong);
+}
+
+[data-style='machine-room'] .tree__folder.is-last::before,
+[data-style='machine-room'] .tree__file.is-last::before {
+  bottom: auto;
+  height: 1.25em;
+}
+
+[data-style='machine-room'] .tree__folder::after,
+[data-style='machine-room'] .tree__file::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 1.25em;
+  width: 12px;
+  border-top: 1px solid var(--ug-line-strong);
+}
+
+[data-style='machine-room'] .tree__summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  font-family: var(--ug-font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+[data-style='machine-room'] .tree__summary::-webkit-details-marker {
+  display: none;
+}
+
+[data-style='machine-room'] .tree__summary .tree__icon {
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .tree__count {
+  margin-left: auto;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ug-accent-2) 16%, transparent);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'] .tree__file {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'icon name date' 'icon title date';
+  column-gap: 8px;
+  padding-top: 4px;
+  padding-bottom: 6px;
+}
+
+[data-style='machine-room'] .tree__file .tree__icon {
+  grid-area: icon;
+  margin-top: 3px;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .tree__file .tree__name {
+  grid-area: name;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-accent);
+}
+
+[data-style='machine-room'] .tree__title {
+  grid-area: title;
+  font-size: 0.98rem;
+}
+
+[data-style='machine-room'] .tree__date {
+  grid-area: date;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .ps-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+}
+
+[data-style='machine-room'] .ps-table th,
+[data-style='machine-room'] .ps-table td {
+  padding: 8px 6px;
+  text-align: right;
+  border-bottom: 1px solid color-mix(in srgb, var(--ug-line) 80%, transparent);
+  white-space: nowrap;
+}
+
+[data-style='machine-room'] .ps-table thead th {
+  color: var(--ug-ink-2);
+  font-weight: 500;
+}
+
+[data-style='machine-room'] .ps-table th[scope='row'],
+[data-style='machine-room'] .ps-table thead th:first-child {
+  text-align: left;
+}
+
+[data-style='machine-room'] .ps-table th[scope='row'] a {
+  font-family: var(--ug-font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+[data-style='machine-room'] .ps-table th[scope='row'] a:hover {
+  text-decoration: underline;
+}
+
+[data-style='machine-room'] .cal,
+[data-style='machine-room'] .cal__head {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  font-family: var(--ug-font-mono);
+}
+
+[data-style='machine-room'] .cal__dow {
+  padding-bottom: 4px;
+  font-size: var(--fs-meta);
+  text-align: center;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cal__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  font-size: var(--fs-meta);
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cal__day--played {
+  background: color-mix(in srgb, var(--ug-accent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ug-accent) 60%, transparent);
+  color: var(--ug-ink);
+  font-weight: 600;
+}
+
+[data-style='machine-room'] .cal__day--frozen {
+  border: 1px dashed var(--ug-accent-2);
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .cal__day--future {
+  opacity: 0.55;
+}
+
+[data-style='machine-room'] .cal__day.is-today {
+  outline: 2px solid var(--ug-accent-2);
+  outline-offset: 1px;
+}
+
+[data-style='machine-room'] .cal__snow {
+  width: 16px;
+  height: 16px;
+}
+
+[data-style='machine-room'] .uptime--wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+[data-style='machine-room'] .cosmetics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+[data-style='machine-room'] .cosmetic {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--ug-line);
+  border-radius: calc(var(--ug-radius) - 2px);
+  background: color-mix(in srgb, var(--ug-surface-2) 60%, transparent);
+}
+
+[data-style='machine-room'] .cosmetic__kind {
+  font-family: var(--ug-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cosmetic__name {
+  font-weight: 700;
+}
+
+[data-style='machine-room'] .cosmetic__source {
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'] .cosmetics__next {
+  margin-top: 14px;
+  font-size: 0.98rem;
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'] .cosmetics__next-label {
+  font-family: var(--ug-font-mono);
+  color: var(--ug-ink);
+}
+
+@media (max-width: 1280px) {
+  [data-style='machine-room'] .homedir__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    grid-template-areas:
+      'files stats'
+      'files cal'
+      'cosmetics cosmetics';
+  }
+}
+
+@media (max-width: 800px) {
+  [data-style='machine-room'] .homedir__banner,
+  [data-style='machine-room'] .homedir__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'files' 'stats' 'cal' 'cosmetics';
+  }
+}

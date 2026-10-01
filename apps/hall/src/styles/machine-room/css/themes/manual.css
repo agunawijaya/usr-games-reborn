@@ -1,0 +1,233 @@
+/*
+ * Manual Page. The room is a printed manual: serif headings, section marks in red ink,
+ * games filed as index cards with a coloured tab, figures drawn in ink inside hatched plates.
+ * By day it is warm paper on a desk; by night the same pages under a lamp.
+ */
+
+[data-style='machine-room'][data-theme='manual'] {
+  --prompt-font: var(--ug-font-mono);
+  --prompt-scale: 0.94;
+  --title-font: var(--ug-font-display);
+  --title-weight: 700;
+  --title-scale: 1;
+  --mark: '§';
+  --emblem-stroke: var(--ug-ink);
+  --led-on: var(--ug-good);
+  --led-arriving: var(--ug-warn);
+  --panel-radius: 3px;
+}
+
+[data-style='machine-room'][data-theme='manual'][data-appearance='light'] {
+  --panel-bg: var(--ug-surface);
+  --panel-border: color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+  --panel-shadow: 0 1px 0 rgba(90, 74, 48, 0.1), 0 22px 36px -28px rgba(90, 74, 48, 0.55);
+  --tile-bg: var(--ug-surface);
+  --screen-bg:
+    repeating-linear-gradient(135deg, transparent 0 7px, rgba(26, 22, 17, 0.06) 7px 8px),
+    var(--ug-surface-2);
+  --screen-border: var(--ug-line-strong);
+  --screen-shadow: inset 0 0 0 3px var(--ug-surface-2), inset 0 0 0 4px var(--ug-line);
+  --button-shadow: 0 2px 0 rgba(90, 20, 14, 0.35);
+}
+
+[data-style='machine-room'][data-theme='manual'][data-appearance='dark'] {
+  --panel-bg: color-mix(in srgb, var(--ug-surface) 90%, transparent);
+  --panel-border: color-mix(in srgb, var(--ug-line-strong) 45%, transparent);
+  --panel-shadow: 0 0 0 1px rgba(255, 207, 122, 0.04), 0 26px 44px -30px rgba(0, 0, 0, 0.9);
+  --tile-bg: color-mix(in srgb, var(--ug-surface) 88%, transparent);
+  --screen-bg:
+    repeating-linear-gradient(135deg, transparent 0 7px, rgba(242, 231, 208, 0.06) 7px 8px),
+    var(--ug-bg);
+  --screen-border: color-mix(in srgb, var(--ug-line-strong) 80%, transparent);
+  --screen-shadow: inset 0 0 0 3px var(--ug-bg), inset 0 0 0 4px var(--ug-line);
+  --text-glow: 0 0 18px rgba(255, 207, 122, 0.12);
+}
+
+[data-style='machine-room'][data-theme='manual'] .prompt__user {
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'] .prompt__cwd {
+  color: var(--ug-accent-2);
+}
+
+[data-style='machine-room'][data-theme='manual'] .cursor {
+  width: 0.5em;
+  height: 0.12em;
+  vertical-align: -0.1em;
+  background: var(--ug-ink);
+  box-shadow: none;
+}
+
+[data-style='machine-room'][data-theme='manual'] .brand__reborn {
+  font-style: italic;
+  font-weight: 700;
+  color: var(--ug-mark);
+  font-size: 1.15rem;
+}
+
+[data-style='machine-room'][data-theme='manual'] .brand__mark {
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'][data-theme='manual'] .panel__label {
+  border-bottom-style: solid;
+  font-family: var(--ug-font-display);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+[data-style='machine-room'][data-theme='manual'] .panel__label > :first-child::before {
+  content: '§ ';
+  font-style: normal;
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'] .panel__label > :first-child {
+  font-style: normal;
+  font-family: var(--ug-font-mono);
+  font-size: var(--fs-meta);
+}
+
+/* Index cards with a coloured tab down the left edge. */
+[data-style='machine-room'][data-theme='manual'] .proc {
+  border-left: 6px solid var(--game-accent);
+  border-radius: 2px;
+}
+
+[data-style='machine-room'][data-theme='manual'] .proc--sleeping {
+  border-left-color: var(--ug-line-strong);
+  border-left-style: dashed;
+}
+
+[data-style='machine-room'][data-theme='manual'] .led {
+  border-radius: 1px;
+  width: 8px;
+  height: 8px;
+}
+
+[data-style='machine-room'][data-theme='manual'] .proc:hover,
+[data-style='machine-room'][data-theme='manual'] .proc:focus-visible {
+  transform: translateY(-3px) rotate(-0.25deg);
+}
+
+[data-style='machine-room'][data-theme='manual'] .shelf__path {
+  font-family: var(--ug-font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+[data-style='machine-room'][data-theme='manual'] .shelf__label::after {
+  height: 0;
+  border-top: 3px double var(--ug-line-strong);
+}
+
+[data-style='machine-room'][data-theme='manual'] .today__title,
+[data-style='machine-room'][data-theme='manual'] .man-name__title,
+[data-style='machine-room'][data-theme='manual'] .homedir__rank {
+  letter-spacing: -0.01em;
+}
+
+[data-style='machine-room'][data-theme='manual'] .fortune {
+  font-style: italic;
+  font-size: 1.32rem;
+}
+
+[data-style='machine-room'][data-theme='manual'] .dirs__link.is-current {
+  background: transparent;
+  color: var(--ug-mark);
+  border-color: var(--ug-mark);
+  border-radius: 2px;
+}
+
+[data-style='machine-room'][data-theme='manual'] .button--primary {
+  border-radius: 3px;
+  letter-spacing: 0.01em;
+}
+
+/* The man page as a real printed page: serif body, caps headings in the margin. */
+[data-style='machine-room'][data-theme='manual'] .manpage {
+  border-radius: 2px;
+}
+
+[data-style='machine-room'][data-theme='manual'] .man-section__heading {
+  font-family: var(--ug-font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+}
+
+[data-style='machine-room'][data-theme='manual'] .man-section__body {
+  font-family: var(--ug-font-display);
+  font-size: 1.1rem;
+  line-height: 1.62;
+}
+
+[data-style='machine-room'][data-theme='manual'] .man-section__body code,
+[data-style='machine-room'][data-theme='manual'] .man-xrefs {
+  font-family: var(--ug-font-mono);
+  font-size: 0.92em;
+}
+
+[data-style='machine-room'][data-theme='manual'] .manpage__header,
+[data-style='machine-room'][data-theme='manual'] .manpage__footer {
+  font-family: var(--ug-font-display);
+  letter-spacing: 0.04em;
+}
+
+[data-style='machine-room'][data-theme='manual'] .homedir__rank {
+  font-style: italic;
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'] .rank-chip__rank {
+  color: var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'] .bar__fill,
+[data-style='machine-room'][data-theme='manual'] .meter__cell--on {
+  background: var(--ug-mark);
+  border-color: var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'] .cal__day--played {
+  background: transparent;
+  border: 1.5px solid var(--ug-mark);
+  border-radius: 50%;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'][data-theme='manual'] .week__mark {
+  border-radius: 2px;
+}
+
+[data-style='machine-room'][data-theme='manual'] .week__day--played .week__mark {
+  background: transparent;
+  border: 1.5px solid var(--ug-mark);
+  box-shadow:
+    inset 0 0 0 3px var(--panel-bg),
+    inset 0 0 0 20px var(--ug-mark);
+}
+
+[data-style='machine-room'][data-theme='manual'][data-appearance='light'] {
+  --room-light: radial-gradient(
+    ellipse 60vw 55vh at 92vw -8vh,
+    rgba(255, 253, 244, 0.55),
+    transparent 72%
+  );
+  --room-light-blend: soft-light;
+}
+
+/* The desk lamp's warm pool falls across the pages themselves, not just the desk. */
+[data-style='machine-room'][data-theme='manual'][data-appearance='dark'] {
+  --room-light: radial-gradient(
+    ellipse 80vw 95vh at 10vw -14vh,
+    rgba(255, 196, 110, 0.26),
+    rgba(255, 196, 110, 0.09) 48%,
+    transparent 80%
+  );
+  --room-light-blend: screen;
+}
+
+[data-style='machine-room'][data-theme='manual'] .manpage {
+  --man-indent: clamp(180px, 12vw, 240px);
+}

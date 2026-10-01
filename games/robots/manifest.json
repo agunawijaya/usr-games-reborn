@@ -1,0 +1,129 @@
+{
+  "id": "robots",
+  "title": "Robots",
+  "tagline": "Lure the robots into each other. Stay out of reach.",
+  "teaser": "Robots step toward you every turn. Dodge, teleport and trick them into crashing into each other until the arena is clear, while a floodlit stadium floating among the stars cheers every pile-up.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 10],
+  "status": "shipped",
+  "accent": "#ffb020",
+  "emblem": "M13 15h22v19H13zM24 15V9M20 8h8M19 22h.01M29 22h.01M19 29h10M9 21v7M39 21v7M17 34v6M31 34v6",
+  "inspiredBy": {
+    "program": "robots",
+    "originalTitle": "robots",
+    "uiTitle": "robots",
+    "year": 1991
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-vite",
+    "source": "games/robots/app",
+    "output": "play/robots/"
+  },
+  "manPage": {
+    "synopsis": "robots — move one step at a time and make the robots collide.",
+    "description": "Ken Arnold’s turn-based chase, where your only tool is making the pursuers crash. Christos Zoulas later added an automatic mode.",
+    "seeAlso": ["snake", "hunt", "worm"]
+  },
+  "howToPlay": [
+    "Move one step at a time; every robot steps toward you.",
+    "Trick robots into crashing into each other and into wrecks.",
+    "Teleport when cornered, and clear the board to win the wave."
+  ],
+  "cronGoals": [
+    {
+      "id": "waves",
+      "stat": "wavesCleared",
+      "label": "Clear {n} robot waves",
+      "min": 3,
+      "max": 8
+    },
+    {
+      "id": "crashes",
+      "stat": "robotsCrashed",
+      "label": "Crash {n} robots into each other",
+      "min": 50,
+      "max": 150
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-wave",
+      "title": "Clean sweep",
+      "description": "Clear your first wave of robots.",
+      "tier": "core"
+    },
+    {
+      "id": "pile-up",
+      "title": "Pile-up",
+      "description": "Crash three robots in a single chain.",
+      "tier": "core"
+    },
+    {
+      "id": "close-call",
+      "title": "Close call",
+      "description": "Teleport away when a robot is one step from you.",
+      "tier": "core"
+    },
+    {
+      "id": "third-wave",
+      "title": "Third wave",
+      "description": "Reach the third wave in one run.",
+      "tier": "core"
+    },
+    {
+      "id": "feet-on-the-ground",
+      "title": "Feet on the ground",
+      "description": "Clear a wave without teleporting once.",
+      "tier": "core"
+    },
+    {
+      "id": "scrap-dealer",
+      "title": "Scrap dealer",
+      "description": "Score 500 points in one run.",
+      "tier": "core"
+    },
+    {
+      "id": "chain-reaction",
+      "title": "Chain reaction",
+      "description": "Crash five robots in a single chain.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-house",
+      "title": "Full house",
+      "description": "Clear a wave of forty robots.",
+      "tier": "extra"
+    },
+    {
+      "id": "sixth-wave",
+      "title": "Sixth wave",
+      "description": "Reach the sixth wave in one run.",
+      "tier": "extra"
+    },
+    {
+      "id": "scrapyard",
+      "title": "Scrapyard",
+      "description": "Score 1,500 points in one run.",
+      "tier": "extra"
+    },
+    {
+      "id": "meltdown",
+      "title": "Meltdown",
+      "description": "Crash eight robots in a single chain.",
+      "tier": "rare"
+    },
+    {
+      "id": "ten-waves",
+      "title": "Ten waves deep",
+      "description": "Clear ten waves in one run.",
+      "tier": "rare"
+    }
+  ]
+}

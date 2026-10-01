@@ -1,0 +1,37 @@
+{
+  "id": "pig",
+  "title": "Dice push-your-luck",
+  "tagline": "Roll again or bank it? One unlucky roll ends the turn.",
+  "teaser": "Roll the die to build a turn total, then bank it before a one takes it away. First to the target wins.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 5],
+  "status": "coming-soon",
+  "accent": "#f48fb1",
+  "emblem": "M7 17h17v17H7zM24 12h17v17H24zM12 22h.01M19 29h.01M29 17h.01M36 24h.01M32.5 20.5h.01",
+  "inspiredBy": {
+    "program": "pig",
+    "originalTitle": "pig",
+    "uiTitle": "pig",
+    "year": 1992
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "pig — roll to build points, hold to keep them, avoid the one.",
+    "description": "The BSD pig program translated text into Pig Latin. We borrow its name for the family dice game called Pig.",
+    "seeAlso": ["backgammon", "arithmetic"]
+  },
+  "howToPlay": [
+    "Roll the die to build your turn total.",
+    "Stop whenever you like to bank it.",
+    "Roll a one and you lose that turn’s points."
+  ]
+}

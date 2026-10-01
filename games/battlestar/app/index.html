@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battlestar — Pajamas to Paradise</title>
+<meta name="description" content="A zero-raster fancy-web port of David Riggle's 1979 BSD adventure battlestar(6): a faithful engine, procedural 3D rooms, a cockpit dogfight. Every pixel and every sound is made by code.">
+<meta name="color-scheme" content="dark">
+<!-- Fonts are served from the game's own folder; until they arrive the page uses the system fallbacks. -->
+<link rel="stylesheet" href="src/ui/fonts/fonts.css">
+<link rel="stylesheet" href="src/ui/styles.css">
+<script type="importmap">
+{ "imports": { "three": "./src/vendor/three.module.js" } }
+</script>
+</head>
+<body class="biome-ship">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-hint" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-override" viewBox="0 0 24 24"><path d="M12 2l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 7.3l5-.7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z M8 3v6h8V3 M8 21v-7h8v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-load" viewBox="0 0 24 24"><path d="M4 7h6l2 2h8v10H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 11v6m-3-3l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-new" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-sound-off" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 9l5 6M22 9l-5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-sound-on" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.7-.8 1.2V14M12 17.2v.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-main">BATTLESTAR</span>
+      <span class="brand-sub">Pajamas to Paradise</span>
+    </div>
+    <div id="where" aria-live="polite"><span id="where-room">—</span><span id="where-time"></span></div>
+    <div id="badges"><span id="badge-override" hidden>OVERRIDE ACTIVE</span><span id="badge-wizard" hidden>WIZARD</span></div>
+    <nav id="tools" aria-label="Game menu">
+      <button id="btn-hints" title="Hints (`)" aria-keyshortcuts="`"><svg><use href="#i-hint"/></svg><span>Hints</span></button>
+      <button id="btn-override" title="Override panel (Shift+`)" aria-keyshortcuts="Shift+`"><svg><use href="#i-override"/></svg><span>Override</span></button>
+      <button id="btn-map" title="World map (Ctrl+M)"><svg><use href="#i-map"/></svg><span>Map</span></button>
+      <button id="btn-save" title="Save"><svg><use href="#i-save"/></svg><span>Save</span></button>
+      <button id="btn-load" title="Load"><svg><use href="#i-load"/></svg><span>Load</span></button>
+      <button id="btn-new" title="New game"><svg><use href="#i-new"/></svg><span>New</span></button>
+      <button id="btn-settings" title="Settings"><svg><use href="#i-settings"/></svg><span>Settings</span></button>
+      <button id="btn-sound" title="Sound is off — click to unmute" aria-pressed="false"><svg><use href="#i-sound-off"/></svg><span>Sound off</span></button>
+      <button id="btn-help" title="How to play (F1)"><svg><use href="#i-help"/></svg><span>Help</span></button>
+    </nav>
+  </header>
+
+  <main id="stage-col">
+    <section id="scene-wrap" aria-label="Scene">
+      <canvas id="scene" aria-hidden="true"></canvas>
+      <div id="scene-fallback" hidden></div>
+      <div id="scene-title" aria-hidden="true"><div class="t-room"></div><div class="t-sub"></div></div>
+      <div id="exits" aria-label="Exits"></div>
+      <div id="flash" aria-hidden="true"></div>
+      <div id="flight-hud" hidden aria-live="polite">
+        <div class="fh-top">DOGFIGHT · <span id="fh-msg">Raider inbound</span></div>
+        <div class="fh-help">
+          <b>←→↑↓</b> or <b>h l j k</b> / <b>r l u d</b> steer (Shift ×5) · <b>F</b>/<b>Space</b> fire · <b>+</b> reticle · <b>Q</b> break off
+          <span id="fh-mode"></span>
+        </div>
+      </div>
+      <div id="hint-panel" class="floating" hidden role="dialog" aria-label="Hints">
+        <header><b>Hint</b><span class="kbd">`</span><button class="x" data-close="hint-panel" aria-label="Close">×</button></header>
+        <div class="hint-goal"></div>
+        <div class="hint-why"></div>
+        <div class="hint-cmd"><code></code></div>
+        <div class="row"><button id="hint-do">Do it</button><button id="hint-auto" aria-pressed="false">Autoplay</button></div>
+        <p class="fine">Hints only suggest original commands; they do not mark your score.</p>
+      </div>
+    </section>
+
+    <section id="console" aria-label="Game text">
+      <div id="log" role="log" aria-live="polite" tabindex="0"></div>
+      <form id="cmdline" autocomplete="off">
+        <label id="prompt" for="cmd">&gt;-:</label>
+        <input id="cmd" name="cmd" spellcheck="false" autocapitalize="off" aria-label="Command">
+        <div id="suggest" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <aside id="side" aria-label="Status">
+    <section class="card" id="card-status">
+      <h2>Status</h2>
+      <div class="kv"><span>Turn</span><b id="st-turn">0</b></div>
+      <div class="kv"><span>Sky</span><b id="st-sky">—</b></div>
+      <div class="scores">
+        <div><span>PLEASURE</span><b id="st-pleasure">0</b></div>
+        <div><span>POWER</span><b id="st-power">0</b></div>
+        <div><span>EGO</span><b id="st-ego">0</b></div>
+      </div>
+      <div class="kv"><span>Rating</span><b id="st-rating">novice</b></div>
+    </section>
+    <section class="card" id="card-body">
+      <h2>Body</h2>
+      <div class="meter"><span>Stamina</span><i><em id="m-stamina"></em></i><b id="t-stamina"></b></div>
+      <div class="meter"><span>Hunger</span><i><em id="m-hunger"></em></i><b id="t-hunger"></b></div>
+      <div class="meter"><span>Load</span><i><em id="m-load"></em></i><b id="t-load"></b></div>
+      <div class="meter"><span>Arms</span><i><em id="m-bulk"></em></i><b id="t-bulk"></b></div>
+      <ul id="injuries" class="tags"></ul>
+    </section>
+    <section class="card" id="card-nav">
+      <h2>Bearings <small id="nav-mode"></small></h2>
+      <div class="nav-row">
+        <canvas id="compass" width="120" height="120" aria-label="Compass"></canvas>
+        <canvas id="minimap" width="220" height="160" aria-label="Map of visited rooms"></canvas>
+      </div>
+    </section>
+    <section class="card" id="card-inv">
+      <h2>Holding <small id="inv-weight"></small></h2>
+      <ul id="inv-held" class="items"></ul>
+      <h2>Wearing</h2>
+      <ul id="inv-worn" class="items"></ul>
+    </section>
+  </aside>
+</div>
+
+<dialog id="dlg-title" class="dlg">
+  <form method="dialog">
+    <h1><span>BATTLESTAR</span><small>Pajamas to Paradise</small></h1>
+    <p class="lede">Riggle's stellar-tropical adventure (Berkeley, 1979–84), rebuilt from its original source.
+      You wake in silk pajamas aboard a dying battlestar. Everything you see and hear is generated by code.</p>
+    <div class="grid2">
+      <label>Wizard name <input id="f-user" placeholder="(optional)" spellcheck="false" autocapitalize="off"></label>
+      <label>Seed <input id="f-seed" inputmode="numeric" spellcheck="false"></label>
+    </div>
+    <p class="fine">The original checked your Unix login against Berkeley's hereditary wizards. Type one of their
+      names here to begin as a wizard, or leave it empty.</p>
+    <menu>
+      <button id="b-continue" value="continue" hidden>Continue</button>
+      <button id="b-start" value="new" class="primary">New game</button>
+    </menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-saves" class="dlg">
+  <form method="dialog">
+    <h1>Saved games</h1>
+    <ul id="save-list" class="save-list"></ul>
+    <p class="fine">Type <code>save</code> in the game (as in 1984) to make a named save.
+      Loading one replays the start of a turn, exactly like <code>battlestar -r</code>.</p>
+    <menu><button value="close">Close</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-settings" class="dlg">
+  <form method="dialog">
+    <h1>Settings</h1>
+    <fieldset>
+      <legend>Graphics</legend>
+      <label><input type="radio" name="quality" value="high"> High</label>
+      <label><input type="radio" name="quality" value="low"> Low</label>
+      <label><input type="radio" name="quality" value="text"> Text only</label>
+    </fieldset>
+    <label class="chk"><input type="checkbox" id="s-contrast"> High contrast</label>
+    <label class="chk"><input type="checkbox" id="s-motion"> Reduce motion</label>
+    <label class="chk"><input type="checkbox" id="s-turnbased"> Turn-based dogfights</label>
+    <label class="chk"><input type="checkbox" id="s-strict"> Strict parser (no typo help)</label>
+    <p class="fine" id="s-gpu"></p>
+    <menu><button value="close" class="primary">Done</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-help" class="dlg wide">
+  <form method="dialog">
+    <h1>How to play</h1>
+    <div class="help-cols">
+      <div>
+        <h3>Moving</h3>
+        <p>You only ever move <b>relative to where you face</b>: <code>ahead</code> <code>back</code>
+          <code>left</code> <code>right</code> <code>up</code> <code>down</code> (or <code>a b l r u d</code>).
+          There is no north or south — a compass, if you find one, tells you where north is. Click the arrows on
+          the scene to move too.</p>
+        <h3>Doing</h3>
+        <p><code>take</code>/<code>get</code>, <code>drop</code>, <code>wear</code>, <code>take off</code>,
+          <code>draw</code>, <code>put on</code>, <code>i</code> (inventory), <code>look</code>, <code>eat</code>,
+          <code>drink</code>, <code>light</code>, <code>use</code>, <code>give … to …</code>, <code>kiss</code>,
+          <code>kill</code>, <code>shoot</code>, <code>throw</code>, <code>open</code>, <code>dig</code>,
+          <code>bury</code>, <code>ride</code>, <code>drive</code>, <code>jump</code>, <code>follow</code>,
+          <code>sleep</code>, <code>launch</code>, <code>land</code>, <code>time</code>, <code>score</code>,
+          <code>save</code>, <code>verbose</code>/<code>brief</code>, <code>quit</code>. Chain with commas or
+          <code>and</code>: <code>take knife, laser</code>.</p>
+      </div>
+      <div>
+        <h3>Keys</h3>
+        <p><kbd>Tab</kbd> completes a word · <kbd>↑</kbd>/<kbd>↓</kbd> history · <kbd>`</kbd> hints ·
+          <kbd>Shift</kbd>+<kbd>`</kbd> Override · <kbd>Ctrl</kbd>+<kbd>M</kbd> world map · <kbd>F1</kbd> help ·
+          <kbd>Esc</kbd> closes panels.</p>
+        <h3>Dogfights</h3>
+        <p>Your keys don't move a cursor: they set how the raider <em>drifts</em> across your sights (you are
+          turning the ship). Arrows or <code>h l j k</code> (<code>r l u d</code> in the original), Shift for a
+          hard turn. <kbd>F</kbd>/<kbd>Space</kbd> fires two torpedoes; they hit only when the raider sits on the
+          centre line. All dogfights share one 120-second clock.</p>
+        <h3>Scoring</h3>
+        <p>Three axes — PLEASURE, POWER, EGO — and a title from the strongest (Don Juan, Darth Vader,
+          Mr. Roarke…). Winning is its own story.</p>
+      </div>
+    </div>
+    <menu><button value="close" class="primary">Back to the game</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-override" class="dlg wide">
+  <form method="dialog">
+    <h1>Override <small>marks the score as cheated</small></h1>
+    <div class="ovr-cols">
+      <div class="ovr-flags">
+        <label class="chk"><input type="checkbox" data-flag="infiniteFuel"> Infinite fuel</label>
+        <label class="chk"><input type="checkbox" data-flag="infiniteTorps"> Infinite torpedoes</label>
+        <label class="chk"><input type="checkbox" data-flag="noHunger"> No hunger</label>
+        <label class="chk"><input type="checkbox" data-flag="noFatigue"> No fatigue</label>
+        <label class="chk"><input type="checkbox" data-flag="invulnerable"> Invulnerable</label>
+        <label class="chk"><input type="checkbox" id="ovr-reveal"> Reveal the whole map</label>
+        <button type="button" id="ovr-daynight">Toggle day / night</button>
+        <p class="fine">Click a room on the map to teleport there (only between commands).</p>
+      </div>
+      <canvas id="worldmap" width="760" height="520" aria-label="World map: click a room to teleport"></canvas>
+    </div>
+    <menu><button value="close" class="primary">Close</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-end" class="dlg">
+  <form method="dialog">
+    <h1 id="end-title"></h1>
+    <pre id="end-text"></pre>
+    <menu><button value="scores">Hall of fame</button><button value="new" class="primary">Play again</button></menu>
+  </form>
+</dialog>
+
+<!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="src/ui/app.js"></script>
+</body>
+</html>

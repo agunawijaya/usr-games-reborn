@@ -1,0 +1,539 @@
+/*
+ * The card: a link that keeps its slot, a tilt layer that leans toward the pointer, a frame in
+ * the set's colours, an art window with foil and a highlight, and a solid face for the words.
+ * The five variables --hc-px, --hc-py (pointer, 0–100), --hc-rx, --hc-ry (lean) and --hc-active
+ * are written by tilt.ts on one card at a time.
+ */
+
+[data-style='holo'] .hc-card {
+  --hc-lift: 0;
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 7;
+  perspective: 620px;
+  color: var(--ug-ink);
+  text-decoration: none;
+  border-radius: 20px;
+}
+
+[data-style='holo'] .hc-card:focus-visible {
+  outline: none;
+}
+
+[data-style='holo'] .hc-card.is-lifted {
+  --hc-lift: 12;
+  z-index: 2;
+}
+
+[data-style='holo'] .hc-card__tilt {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 20px;
+  transform: translateY(calc(var(--hc-lift) * -1px)) rotateX(var(--hc-rx, 0deg))
+    rotateY(var(--hc-ry, 0deg));
+  transition:
+    transform 0.45s var(--hc-ease),
+    box-shadow 0.35s var(--hc-ease);
+  box-shadow: var(--hc-shadow-card);
+}
+
+[data-style='holo'] .hc-card.is-tracking .hc-card__tilt {
+  transition-duration: 0.09s, 0.35s;
+}
+
+[data-style='holo'] .hc-card.is-lifted .hc-card__tilt {
+  will-change: transform;
+  box-shadow:
+    0 34px 60px -22px color-mix(in srgb, var(--hc-frame-from, var(--ug-accent)) 70%, transparent),
+    0 14px 24px -12px color-mix(in srgb, var(--ug-shadow) 55%, transparent);
+}
+
+[data-style='holo'] .hc-card:focus-visible .hc-card__tilt {
+  outline: 3px solid var(--ug-focus);
+  outline-offset: 5px;
+}
+
+[data-style='holo'] .hc-card__frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 6px;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      115deg,
+      transparent calc((var(--hc-px, 20) - 32) * 1%),
+      rgba(255, 255, 255, 0.6) calc((var(--hc-px, 20) - 8) * 1%),
+      transparent calc((var(--hc-px, 20) + 18) * 1%)
+    ),
+    linear-gradient(145deg, var(--hc-frame-from, #c7b8e6), var(--hc-frame-to, #e7dff4));
+}
+
+[data-style='holo'] .hc-card__face {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--ug-surface);
+}
+
+[data-style='holo'] .hc-card__art {
+  position: relative;
+  display: block;
+  flex: none;
+  aspect-ratio: 4 / 3;
+  margin: 7px 7px 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #1a1030;
+  isolation: isolate;
+}
+
+[data-style='holo'] .hc-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+[data-style='holo'] .hc-card__set {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(20, 12, 40, 0.74);
+  color: #fff;
+  font: 600 13px var(--ug-font-display);
+  letter-spacing: 0.03em;
+}
+
+[data-style='holo'] .hc-card__name {
+  display: block;
+  margin: 10px 14px 0;
+  font: 600 21px/1.15 var(--ug-font-display);
+  color: var(--ug-ink);
+}
+
+[data-style='holo'] .hc-card__tagline {
+  display: -webkit-box;
+  margin: 5px 14px 0;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.32;
+  color: var(--ug-ink-2);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+[data-style='holo'] .hc-card__stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: auto 12px 0;
+  padding: 9px 2px 11px;
+  border-top: 1.5px dashed var(--ug-line);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-card__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+[data-style='holo'] .hc-card__stat .hc-icon {
+  color: #d99a0b;
+  fill: color-mix(in srgb, #ffc93c 60%, transparent);
+}
+
+[data-style='holo'] .hc-card__stat--count {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--ug-surface-2);
+  color: var(--ug-ink);
+}
+
+[data-style='holo'] .hc-card__sticker {
+  position: absolute;
+  top: -14px;
+  right: -16px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--hc-sticker);
+  color: #1d1530;
+  font: 700 17px/1 var(--ug-font-display);
+  text-align: center;
+  transform: rotate(10deg);
+  box-shadow:
+    0 0 0 4px var(--ug-surface),
+    0 12px 22px -10px color-mix(in srgb, var(--ug-shadow) 70%, transparent);
+}
+
+/* Foil and highlight live only in the art window, so they never sit over words. */
+
+[data-style='holo'] .hc-foil,
+[data-style='holo'] .hc-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.35s var(--hc-ease);
+}
+
+[data-style='holo'] .hc-foil {
+  opacity: calc(0.2 + var(--hc-active, 0) * 0.5);
+  mix-blend-mode: color-dodge;
+  background-size: 220% 220%;
+  background-position: calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%);
+}
+
+[data-style='holo'] .hc-foil--rainbow {
+  background-image: repeating-linear-gradient(
+    115deg,
+    #ff6fb1 0%,
+    #ffcf5c 7%,
+    #7af0c4 14%,
+    #6fb8ff 21%,
+    #b98cff 28%,
+    #ff6fb1 35%
+  );
+}
+
+[data-style='holo'] .hc-foil--etched {
+  mix-blend-mode: overlay;
+  opacity: calc(0.35 + var(--hc-active, 0) * 0.55);
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0) 0 5px,
+      rgba(255, 255, 255, 0.75) 5px 6px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(170, 225, 255, 0) 0 9px,
+      rgba(170, 225, 255, 0.55) 9px 10px
+    );
+  background-size: auto;
+  background-position: 0 0;
+  mask-image: radial-gradient(
+    circle at calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%),
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    transparent 75%
+  );
+}
+
+[data-style='holo'] .hc-foil--sparkle {
+  mix-blend-mode: screen;
+  opacity: calc(0.45 + var(--hc-active, 0) * 0.5);
+  background-image:
+    radial-gradient(circle, #fff 0 1px, transparent 1.7px),
+    radial-gradient(circle, #fff6c4 0 1.4px, transparent 2.2px),
+    radial-gradient(circle, #e3c8ff 0 1px, transparent 1.7px),
+    linear-gradient(
+      115deg,
+      rgba(255, 111, 177, 0.22),
+      rgba(122, 240, 196, 0.22),
+      rgba(111, 184, 255, 0.22)
+    );
+  background-size:
+    17px 19px,
+    29px 31px,
+    41px 37px,
+    220% 220%;
+  background-position:
+    calc(var(--hc-px, 30) * 0.3px) calc(var(--hc-py, 30) * 0.2px),
+    calc(var(--hc-px, 30) * -0.2px) calc(var(--hc-py, 30) * 0.35px),
+    calc(var(--hc-px, 30) * 0.45px) calc(var(--hc-py, 30) * -0.25px),
+    calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%);
+}
+
+[data-style='holo'] .hc-foil--lattice {
+  mix-blend-mode: overlay;
+  opacity: calc(0.4 + var(--hc-active, 0) * 0.5);
+  background-image:
+    repeating-conic-gradient(
+      from 45deg,
+      rgba(255, 255, 255, 0.45) 0 25%,
+      rgba(255, 255, 255, 0) 0 50%
+    ),
+    repeating-linear-gradient(115deg, #ff6fb1 0%, #ffcf5c 8%, #7af0c4 16%, #6fb8ff 24%, #ff6fb1 32%);
+  background-size:
+    14px 14px,
+    220% 220%;
+  background-position:
+    0 0,
+    calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%);
+}
+
+[data-style='holo'] .hc-foil--gold {
+  mix-blend-mode: overlay;
+  opacity: calc(0.55 + var(--hc-active, 0) * 0.45);
+  background-image:
+    radial-gradient(circle, #fffbe2 0 1.2px, transparent 2px),
+    repeating-linear-gradient(
+      115deg,
+      #fff6c9 0%,
+      #f5c84b 9%,
+      #b8861f 18%,
+      #fff1b0 27%,
+      #d9a632 36%,
+      #fff6c9 45%
+    );
+  background-size:
+    21px 23px,
+    240% 240%;
+  background-position:
+    calc(var(--hc-px, 30) * 0.3px) calc(var(--hc-py, 30) * 0.3px),
+    calc(var(--hc-px, 30) * 1%) calc(var(--hc-py, 30) * 1%);
+}
+
+[data-style='holo'] .hc-glare {
+  z-index: 2;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--hc-active, 0) * 0.95);
+  background: radial-gradient(
+    farthest-corner circle at calc(var(--hc-px, 50) * 1%) calc(var(--hc-py, 50) * 1%),
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.35) 20%,
+    rgba(255, 255, 255, 0) 48%,
+    rgba(40, 20, 80, 0.25) 100%
+  );
+}
+
+/* Mastered: every achievement earned, so the whole card turns to gold. */
+
+[data-style='holo'] .hc-card--mastered .hc-card__frame {
+  background:
+    linear-gradient(
+      115deg,
+      transparent calc((var(--hc-px, 20) - 32) * 1%),
+      rgba(255, 255, 240, 0.85) calc((var(--hc-px, 20) - 8) * 1%),
+      transparent calc((var(--hc-px, 20) + 18) * 1%)
+    ),
+    linear-gradient(145deg, #fff1b0, #e2ae3a 35%, #b8861f 60%, #ffe28a);
+}
+
+/* Asleep: collectible, but not playable yet. */
+
+[data-style='holo'] .hc-card--asleep .hc-card__frame {
+  background: linear-gradient(145deg, #d9cfe9, #efe9f7);
+}
+
+[data-style='holo'][data-appearance='dark'] .hc-card--asleep .hc-card__frame {
+  background: linear-gradient(145deg, #3e2c62, #56447e);
+}
+
+[data-style='holo'] .hc-card--asleep .hc-poster {
+  filter: saturate(0.3) brightness(0.92);
+}
+
+[data-style='holo'] .hc-card--asleep .hc-foil {
+  opacity: calc(var(--hc-active, 0) * 0.3);
+}
+
+[data-style='holo'] .hc-card__ribbon {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  z-index: 3;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(247, 241, 255, 0.92);
+  color: #1d1530;
+  font: 600 14px var(--ug-font-display);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* Achievement cards: rarity frames, earned in foil, locked as soft silhouettes. */
+
+[data-style='holo'] .hc-tier--core {
+  --hc-frame-from: #b8c6e6;
+  --hc-frame-to: #e8eef9;
+}
+
+[data-style='holo'] .hc-tier--extra {
+  --hc-frame-from: #a476ff;
+  --hc-frame-to: #ff8fd0;
+}
+
+[data-style='holo'] .hc-tier--rare {
+  --hc-frame-from: #f7d774;
+  --hc-frame-to: #c9912f;
+}
+
+[data-style='holo'][data-appearance='dark'] .hc-tier--core {
+  --hc-frame-from: #6f7fa8;
+  --hc-frame-to: #a9b6d6;
+}
+
+[data-style='holo'] .hc-card--achievement .hc-card__art {
+  aspect-ratio: 2 / 1;
+}
+
+[data-style='holo'] .hc-card__art--hall {
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.65), transparent 42%),
+    radial-gradient(
+      circle at 80% 90%,
+      hsl(calc(var(--hc-hue, 280) + 60) 90% 80% / 0.9),
+      transparent 55%
+    ),
+    linear-gradient(
+      145deg,
+      hsl(var(--hc-hue, 280) 85% 84%),
+      hsl(calc(var(--hc-hue, 280) + 30) 80% 72%)
+    );
+}
+
+[data-style='holo'] .hc-hall-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 44%;
+  height: auto;
+  color: #1d1530;
+  stroke-width: 1.6;
+  transform: translate(-50%, -50%);
+}
+
+[data-style='holo'] .hc-card__tier {
+  display: block;
+  margin: 7px 12px 0;
+  font: 700 12px var(--ug-font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ug-ink-2);
+}
+
+[data-style='holo'] .hc-card--achievement .hc-card__name {
+  margin: 2px 12px 0;
+  font-size: 18px;
+}
+
+[data-style='holo'] .hc-card--achievement .hc-card__tagline {
+  margin: 4px 12px 0;
+  font-size: 14px;
+}
+
+[data-style='holo'] .hc-card--achievement .hc-card__stats {
+  margin-inline: 10px;
+  padding: 7px 2px 9px;
+  font-size: 13px;
+}
+
+[data-style='holo'] .hc-card--locked .hc-card__frame {
+  background: color-mix(in srgb, var(--ug-line) 70%, transparent);
+}
+
+[data-style='holo'] .hc-card--locked .hc-card__face {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 9px,
+      color-mix(in srgb, var(--ug-line) 45%, transparent) 9px 10px
+    ),
+    var(--ug-surface);
+}
+
+[data-style='holo'] .hc-card--locked .hc-card__art {
+  background: color-mix(in srgb, var(--ug-line) 60%, var(--ug-surface));
+}
+
+[data-style='holo'] .hc-card--locked .hc-poster,
+[data-style='holo'] .hc-card--locked .hc-hall-mark {
+  opacity: 0.18;
+  filter: grayscale(1) blur(1.5px);
+}
+
+[data-style='holo'] .hc-card--locked .hc-card__art--hall {
+  background: color-mix(in srgb, var(--ug-line) 60%, var(--ug-surface));
+}
+
+[data-style='holo'] .hc-card__lock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ug-surface);
+  color: var(--ug-ink-2);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 6px 14px -8px var(--ug-shadow);
+}
+
+[data-style='holo'] .hc-card--locked .hc-card__stats {
+  border-top-style: dotted;
+}
+
+/* Foil finishes, unlocked by rank, change the sheen only. */
+
+[data-style='holo'] .hc-finish-prism .hc-foil--rainbow,
+[data-style='holo'] .hc-finish-prism .hc-foil--lattice {
+  filter: saturate(1.6) contrast(1.15);
+}
+
+[data-style='holo'] .hc-finish-galaxy .hc-card__art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: calc(0.3 + var(--hc-active, 0) * 0.5);
+  background:
+    radial-gradient(circle, #fff 0 0.8px, transparent 1.4px) 0 0 / 11px 13px,
+    radial-gradient(circle, #cfe3ff 0 1px, transparent 1.6px) 5px 7px / 23px 19px;
+}
+
+[data-style='holo'] .hc-finish-gold .hc-foil {
+  filter: sepia(0.8) saturate(1.8) hue-rotate(-12deg);
+}
+
+[data-style='holo'] .hc-finish-chrome .hc-foil {
+  filter: grayscale(1) contrast(1.6) brightness(1.15);
+}
+
+/* Reduced motion: no lean and no drifting foil; a still sheen and a clear focus ring. */
+
+[data-style='holo'][data-motion='reduce'] .hc-card__tilt {
+  transform: none !important;
+}
+
+[data-style='holo'][data-motion='reduce'] .hc-card.is-lifted .hc-glare {
+  opacity: 0.35;
+}
+
+/*
+ * By day the art is bright, so the foil tints it (overlay) instead of burning it to white
+ * (color-dodge), and the highlight is a softer pool of light.
+ */
+[data-style='holo'][data-appearance='light'] .hc-foil--rainbow,
+[data-style='holo'][data-appearance='light'] .hc-foil--sparkle {
+  mix-blend-mode: hard-light;
+  opacity: calc(0.16 + var(--hc-active, 0) * 0.62);
+}
+
+[data-style='holo'][data-appearance='light'] .hc-glare {
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--hc-active, 0) * 0.9);
+}

@@ -1,0 +1,53 @@
+{
+  "name": "usr-games-reborn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Thirty classics from the Unix games directory, reborn for today.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @usr-games/hall dev",
+    "build": "tsx scripts/build-all.ts",
+    "preview": "pnpm --filter @usr-games/hall preview",
+    "test": "vitest run && tsx scripts/test-hosted.ts",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsx scripts/typecheck.ts",
+    "e2e": "pnpm --filter @usr-games/hall e2e",
+    "shots": "pnpm --filter @usr-games/hall shots",
+    "shots:all": "pnpm --filter @usr-games/hall shots:all",
+    "docs": "tsx scripts/docs.ts",
+    "sim": "tsx packages/kit/src/progression/sim/report.ts",
+    "check": "tsx scripts/check.ts",
+    "check:catalog": "tsx scripts/check-catalog.ts",
+    "check:raster": "tsx scripts/check-raster.ts",
+    "check:network": "tsx scripts/check-network.ts",
+    "check:words": "tsx scripts/check-words.ts",
+    "check:mermaid": "tsx scripts/check-mermaid.ts",
+    "check:provenance": "tsx scripts/check-provenance.ts",
+    "test:hosted": "tsx scripts/test-hosted.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.20.4",
+    "eslint": "10.11.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "^17.12.0",
+    "jsdom": "30.1.1",
+    "mermaid": "12.0.0",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.1",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  }
+}

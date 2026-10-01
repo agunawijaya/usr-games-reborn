@@ -1,0 +1,37 @@
+{
+  "id": "letters",
+  "title": "Letter grid",
+  "tagline": "Find words in a grid of letters before time runs out.",
+  "teaser": "A grid of letter cubes, three minutes and as many words as you can trace through neighbouring letters.",
+  "category": "words",
+  "directory": "/usr/games/words",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 6],
+  "status": "coming-soon",
+  "accent": "#ffc93c",
+  "emblem": "M8 8h33v33H8zM8 19h33M8 30h33M19 8v33M30 8v33",
+  "inspiredBy": {
+    "program": "boggle",
+    "originalTitle": "Boggle",
+    "uiTitle": "the BSD letter-grid program",
+    "year": 1993
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "letters — trace words through touching letters before the time is up.",
+    "description": "Barry Brachman of the University of British Columbia wrote the original word-search game for BSD.",
+    "seeAlso": ["hangman", "quiz"]
+  },
+  "howToPlay": [
+    "Find words by tracing through touching letters.",
+    "Each letter can be used once per word.",
+    "Find as many as you can before time runs out."
+  ]
+}

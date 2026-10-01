@@ -1,0 +1,16 @@
+# makemaze() + makeboots() for a handful of seeds (driver.c init order)
+seed 1
+init
+full
+seed 42
+init
+full
+seed 1234567
+init
+full
+seed -99
+init
+full
+seed 2026
+init
+full

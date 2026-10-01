@@ -1,0 +1,15 @@
+{
+  "name": "@usr-games/game-zoomies",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zoomies: a cat, a house full of robot vacuums, and the art of making them bonk. Inspired by robots (BSD games, 1980).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5290 --strictPort",
+    "rooms": "tsx scripts/search-rooms.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

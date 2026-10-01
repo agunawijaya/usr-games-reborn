@@ -1,0 +1,221 @@
+/*
+ * Phosphor. The whole room is terminal glass: pixel-font headlines, a monochrome green world
+ * with amber highlights, games recognised by the shape of their emblem glowing on dark tubes.
+ * Night is a CRT with bloom and scanlines; day is the same glass in a sunlit lab.
+ */
+
+[data-style='machine-room'][data-theme='phosphor'] {
+  --prompt-font: var(--ug-font-display);
+  --prompt-scale: 1.42;
+  --title-font: var(--ug-font-display);
+  --title-weight: 400;
+  --title-scale: 1.32;
+  --mark: '#';
+  --led-on: var(--ug-accent);
+  --led-arriving: var(--ug-accent-2);
+  --scanline: rgba(0, 0, 0, 0.16);
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='dark'] {
+  --panel-bg: color-mix(in srgb, var(--ug-surface) 82%, transparent);
+  --panel-border: color-mix(in srgb, var(--ug-line-strong) 60%, transparent);
+  --panel-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ug-glow) 5%, transparent),
+    0 0 30px -8px color-mix(in srgb, var(--ug-glow) 22%, transparent);
+  --tile-bg: color-mix(in srgb, var(--ug-surface) 76%, transparent);
+  --text-glow: 0 0 10px color-mix(in srgb, var(--ug-glow) 55%, transparent);
+  --screen-bg: radial-gradient(ellipse at 50% 42%, #0a2a15 0%, #03100a 58%, #010604 100%);
+  --screen-border: color-mix(in srgb, var(--ug-line-strong) 75%, transparent);
+  --screen-shadow:
+    inset 0 0 26px rgba(0, 0, 0, 0.85),
+    inset 0 0 2px color-mix(in srgb, var(--ug-glow) 50%, transparent);
+  --emblem-stroke: var(--ug-accent);
+  --emblem-filter: drop-shadow(0 0 5px rgba(61, 255, 136, 0.75));
+  --button-shadow: 0 0 24px -4px color-mix(in srgb, var(--ug-glow) 65%, transparent);
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='light'] {
+  --scanline: rgba(16, 70, 40, 0.035);
+  --panel-bg: color-mix(in srgb, var(--ug-surface) 80%, transparent);
+  --panel-border: color-mix(in srgb, var(--ug-line-strong) 42%, transparent);
+  --panel-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 14px 34px -22px color-mix(in srgb, var(--ug-shadow) 60%, transparent);
+  --tile-bg: color-mix(in srgb, var(--ug-surface) 72%, transparent);
+  --screen-bg: radial-gradient(ellipse at 50% 38%, #123a24 0%, #07180e 75%);
+  --screen-border: color-mix(in srgb, var(--ug-shadow) 70%, transparent);
+  --screen-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.8);
+  /* The tubes stay dark in daylight, so their emblems keep the night-time glow. */
+  --emblem-stroke: #72f5a4;
+  --emblem-filter: drop-shadow(0 0 4px rgba(93, 255, 154, 0.55));
+}
+
+/* Scanlines across the whole glass, faint enough never to cost legibility. */
+[data-style='machine-room'][data-theme='phosphor'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, var(--scanline) 0 1px, transparent 1px 3px);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .brand__mark {
+  color: var(--ug-accent);
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='light'] .brand__mark {
+  filter: none;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .brand__reborn {
+  font-size: 1.45rem;
+  line-height: 0.9;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .fortune {
+  font-size: 1.62rem;
+  line-height: 1.15;
+  color: var(--ug-ink);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .fortune p::before,
+[data-style='machine-room'][data-theme='phosphor'] .fortune p::after {
+  content: '';
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .fortune p::before {
+  content: '> ';
+  color: var(--ug-accent);
+}
+
+/* Title bars on the process windows, like a windowed terminal. */
+[data-style='machine-room'][data-theme='phosphor'] .proc__head {
+  margin: -12px -12px 0;
+  padding: 7px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ug-line-strong) 45%, transparent);
+  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+  background: color-mix(in srgb, var(--ug-accent) 7%, transparent);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .proc--sleeping .proc__head {
+  background: transparent;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .proc:hover,
+[data-style='machine-room'][data-theme='phosphor'] .proc:focus-visible {
+  box-shadow:
+    var(--panel-shadow),
+    0 0 0 1px color-mix(in srgb, var(--ug-accent) 50%, transparent),
+    0 0 34px -10px color-mix(in srgb, var(--ug-glow) 60%, transparent);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .shelf__path {
+  font-family: var(--ug-font-display);
+  font-size: 1.7rem;
+  font-weight: 400;
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .man-section__heading {
+  font-family: var(--ug-font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--ug-accent);
+  text-shadow: var(--text-glow);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .man-section__heading::before {
+  content: '';
+  margin: 0;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .manpage__header,
+[data-style='machine-room'][data-theme='phosphor'] .manpage__footer {
+  font-family: var(--ug-font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .manpage__book {
+  font-style: normal;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .rank-chip__rank,
+[data-style='machine-room'][data-theme='phosphor'] .homedir__rank {
+  font-family: var(--ug-font-display);
+  font-weight: 400;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .rank-chip__rank {
+  font-size: 1.55rem;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .homedir__rank {
+  letter-spacing: 0.02em;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .button--primary {
+  font-family: var(--ug-font-mono);
+  letter-spacing: 0.02em;
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='dark'] .cal__day--played {
+  box-shadow: 0 0 12px -2px color-mix(in srgb, var(--ug-glow) 55%, transparent);
+}
+
+/* VT323 draws the tilde as a raised mark; the home directory reads better in Plex. */
+[data-style='machine-room'][data-theme='phosphor'] .prompt__tilde {
+  font-family: var(--ug-font-mono);
+  font-size: 0.72em;
+  vertical-align: 0.08em;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .today__man {
+  color: var(--ug-ink-2);
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='dark'] {
+  --room-light: radial-gradient(
+    ellipse 80vw 70vh at 50vw 28vh,
+    rgba(61, 255, 136, 0.05),
+    transparent 70%
+  );
+  --room-light-blend: screen;
+}
+
+[data-style='machine-room'][data-theme='phosphor'][data-appearance='light'] {
+  --room-light:
+    linear-gradient(112deg, transparent 14%, rgba(255, 255, 255, 0.34) 23%, transparent 33%),
+    linear-gradient(112deg, transparent 52%, rgba(255, 255, 255, 0.2) 57%, transparent 62%);
+  --room-light-blend: soft-light;
+}
+
+/* Each shelf is a rack: two rails with mounting holes, the processes bolted in between. */
+[data-style='machine-room'][data-theme='phosphor'] .shelf__tiles {
+  position: relative;
+  padding: 10px 22px;
+  border-block: 1px solid color-mix(in srgb, var(--ug-line-strong) 35%, transparent);
+  background: color-mix(in srgb, var(--ug-bg) 55%, transparent);
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .shelf__tiles::before,
+[data-style='machine-room'][data-theme='phosphor'] .shelf__tiles::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background:
+    radial-gradient(circle at 6px 8px, var(--ug-bg) 2px, transparent 2.6px) 0 0 / 12px 16px repeat-y,
+    color-mix(in srgb, var(--ug-line-strong) 55%, var(--ug-surface));
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .shelf__tiles::before {
+  left: 0;
+}
+
+[data-style='machine-room'][data-theme='phosphor'] .shelf__tiles::after {
+  right: 0;
+}

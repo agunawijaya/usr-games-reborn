@@ -1,0 +1,37 @@
+{
+  "id": "gomoku",
+  "title": "Five in a row",
+  "tagline": "Five stones in a line. Simple to learn, deep to master.",
+  "teaser": "Take turns placing stones on a wide grid. Line up five before the computer does, and watch for its traps.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "coming-soon",
+  "accent": "#ef5350",
+  "emblem": "M10 34.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7M17 27.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7M24 20.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7M31 13.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7M38 6.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7M6 24h9M33 24h9",
+  "inspiredBy": {
+    "program": "gomoku",
+    "originalTitle": "gomoku",
+    "uiTitle": "gomoku",
+    "year": 1994
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "gomoku — place stones; get five in a row first.",
+    "description": "Ralph Campbell’s gomoku, whose board display was based on Peter Langston’s goref program.",
+    "seeAlso": ["dab", "backgammon"]
+  },
+  "howToPlay": [
+    "Take turns placing a stone on the grid.",
+    "Get five of yours in a row: across, down or diagonal.",
+    "Block the computer before it lines up five."
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@usr-games/bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free postMessage bridge between the Hall and hosted games.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "./fixture/*.js"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./host": "./src/host.ts",
+    "./protocol": "./src/protocol.ts",
+    "./build": "./build.ts",
+    "./testing": "./testing/hall.ts"
+  },
+  "scripts": {
+    "build": "vite build"
+  }
+}

@@ -1,0 +1,216 @@
+Version 4.2, fall 1984.
+First Adventure game written by His Lordship, the honorable
+Admiral D.W. Riggle
+
+
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: Please type in something.
+>-: Please type in something.
+>-: xyzzy: How's that?
+>-: 
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: 
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: 
+	This is a luxurious stateroom.
+The floor is carpeted with a soft animal fur and the great wooden furniture
+is inlaid with strips of platinum and gold.  Electronic equipment built
+into the walls and ceiling is flashing wildly.  The floor shudders and
+the sounds of dull explosions rumble though the room.  From a window in
+the wall ahead comes a view of darkest space.  There is a small adjoining
+room behind you, and a doorway right.
+
+>-: You've got to be kidding.
+>-: knife:
+I don't see any knife around here.
+>-: You've got to be kidding.
+>-: knife:
+I don't see any knife around here.
+>-: You aren't carrying anything.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: You aren't carrying anything.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: abcdefghijklmn: How's that?
+>-: 
+	These are the executive suites of the battlestar.
+Luxurious staterooms carpeted with crushed velvet and adorned with beaten
+gold open onto this parlor. A wide staircase with ivory banisters leads
+up or down. This parlor leads into a hallway behind you. The bridal suite is
+ahead. Other rooms lie left and right.
+
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar behind you. The hallway
+goes ahead.
+
+There is a laser pistol here.
+>-: pajamas:
+Taken.
+pajamas:
+Dropped.
+>-: You aren't carrying anything.
+
+You are stark naked.
+
+You are in perfect health.
+>-: You aren't holding the pajamas.
+>-: pajamas:
+Taken.
+>-: pajamas:
+You're already holding pajamas.
+You are now wearing the pajamas.
+>-: You aren't carrying anything.
+
+You are wearing:
+
+	pajamas
+
+You are in perfect health.
+>-: pajamas:
+You aren't holding the pajamas.
+>-: Do what?
+>-: I don't understand what you want to put.
+>-: pajamas:
+You aren't holding the pajamas.
+>-: Nothing to drop!
+>-: laser:
+Taken.
+>-: You are now wearing a laser.
+>-: pajamas:
+Taken.
+pajamas:
+Dropped.
+laser:
+Taken.
+laser:
+Dropped.
+>-: You aren't carrying anything.
+
+You are stark naked.
+
+You are in perfect health.
+>-: I'd prefer not to.
+>-: It doesn't seem to work.
+>-: I'm not thirsty.
+>-: You can't eat that!
+>-: You can't eat a knife!
+>-: You can't eat pajamas!
+>-: >-: Surf's up!
+>-: Nothing happens.
+>-: You don't have a shovel.
+>-: You aren't holding a shovel.
+>-: The door is already ajar.
+>-: The door is already ajar.
+>-: There is no horse here.
+>-: There is nothing to drive here.
+>-: You're out of matches.
+>-: There is no one to follow.
+>-: There is no apparent use.
+>-: You aren't holding the compass.
+>-: You aren't holding the amulet.
+>-: You aren't holding a blaster.
+>-: You don't have suitable weapons to kill.
+>-: How's that?
+>-: How's that?
+>-: You aren't a wizard.
+>-: I can't tell the time in here.
+>-: 	PLEASURE	POWER		EGO
+	  0		  0		  0
+
+This gives you the rating of novice in 14 turns.
+You have visited 3 out of 275 rooms this run (1%).
+>-: 	PLEASURE	POWER		EGO
+	  0		  0		  0
+
+This gives you the rating of novice in 14 turns.
+You have visited 3 out of 275 rooms this run (1%).
+>-: [Maximum verbosity]
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar behind you. The hallway
+goes ahead.
+
+There is a pair of pajamas here.
+There is a laser pistol here.
+>-: [Standard verbosity]
+>-: 
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar behind you. The hallway
+goes ahead.
+
+There is a pair of pajamas here.
+There is a laser pistol here.
+>-: Can't launch.
+>-: You can't land here.
+>-: I don't think that is possible.
+>-: I don't think that is possible.
+>-: pajamas:
+You aren't holding the pajamas.
+Kicked instead.
+>-: pajamas:
+Kicked.
+>-: You hurt your foot.
+>-: There is no way up.
+>-: Where's your lover?
+>-: There is no way up.
+>-: You can't go this way.
+>-: You can't go this way.
+>-: You can't go this way.
+>-: ,: How's that?
+>-: and: How's that?
+>-: knife:
+I don't see any knife around here.
+It doesn't seem to work.
+>-: You've got to be kidding.
+You don't have suitable weapons to kill.
+>-: You aren't holding the pajamas.
+
+	The hallway ends here at the presidential suite.
+The door to this suite is made from solid magnesium, and the entryway is
+inlaid with diamonds and fire opals. The door is ajar left. The hallway
+goes right.
+
+There is a pair of pajamas here.
+There is a laser pistol here.
+>-: pajamas:
+Taken.
+pajamas:
+You're already holding pajamas.
+>-: I see nothing like that here.
+>-: the: How's that?
+>-: bye.
+Your rating was novice.

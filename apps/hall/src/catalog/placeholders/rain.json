@@ -1,0 +1,39 @@
+{
+  "id": "rain",
+  "title": "Rain screensaver",
+  "tagline": "Raindrops ripple across a quiet window.",
+  "teaser": "Drops land and spread outward in rings, one after another. Put it on and breathe out.",
+  "category": "toys",
+  "directory": "/usr/games/toys",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [1, 10],
+  "status": "adopting",
+  "accent": "#6fa8ff",
+  "emblem": "M13 6l-3 8M25 6l-3 8M37 6l-3 8M8 34c0-3 7-5 16-5s16 2 16 5-7 5-16 5-16-2-16-5M17 34c0-1.5 3-2.5 7-2.5s7 1 7 2.5-3 2.5-7 2.5-7-1-7-2.5",
+  "inspiredBy": {
+    "program": "rain",
+    "originalTitle": "rain",
+    "uiTitle": "rain",
+    "year": 1989
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/rain/app",
+    "output": "play/rain/"
+  },
+  "manPage": {
+    "synopsis": "rain — watch raindrops ripple; nothing else required.",
+    "description": "Eric P. Scott’s rain drew expanding rings of characters to look like drops on a pond; its notes said it looked best at 9600 baud. This one needs no modem.",
+    "seeAlso": ["worms", "pom"]
+  },
+  "howToPlay": [
+    "Start the rain and watch the drops land.",
+    "Each drop spreads into rings on the water.",
+    "Leave it on as a calm window in the corner."
+  ]
+}

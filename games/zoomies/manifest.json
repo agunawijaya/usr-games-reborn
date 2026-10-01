@@ -1,0 +1,199 @@
+{
+  "id": "zoomies",
+  "title": "Zoomies",
+  "tagline": "Every robot vacuum in the house wants your fur. Make them bonk.",
+  "teaser": "You are the hairiest thing in the house, and every robot vacuum is coming for you, one square a turn. You cannot fight them, only move: stand where two arrive together and they bonk. Twelve rooms, a daily mess, the 1980 original and the cats next door, who play every room too.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 12],
+  "status": "shipped",
+  "accent": "#ef8a3c",
+  "emblem": "M10 22A14 13 0 1 0 38 22A14 13 0 1 0 10 22ZM12 14L13 6L20 11M36 14L35 6L28 11M19 22h.01M29 22h.01M21 28Q24 31 27 28M4 26h7M37 26h7",
+  "inspiredBy": {
+    "program": "robots",
+    "originalTitle": "robots",
+    "uiTitle": "robots",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "zoomies — step, loaf or zoom, and make the robot vacuums bump into each other.",
+    "description": "A reborn robots, the turn-based chase Ken Arnold wrote for BSD Unix. Every vacuum rolls straight at the cat after each move; two on one square tangle for good. The rival cats play strategies found in the original's source: two hidden experiments and the automatic player added in 1999.",
+    "seeAlso": ["robots", "hunt", "snake"]
+  },
+  "howToPlay": [
+    "Step one square at a time; after every step each vacuum rolls one square toward you.",
+    "Stand where two vacuums arrive together and they bonk into a tangle that traps the rest.",
+    "Loaf to let them come to you, zoom when you are cornered, and tidy every room."
+  ],
+  "controls": [
+    {
+      "action": "up-left",
+      "label": "Step up and left",
+      "keys": ["KeyQ", "Numpad7"]
+    },
+    {
+      "action": "up",
+      "label": "Step up",
+      "keys": ["KeyW", "ArrowUp", "Numpad8"]
+    },
+    {
+      "action": "up-right",
+      "label": "Step up and right",
+      "keys": ["KeyE", "Numpad9"]
+    },
+    {
+      "action": "left",
+      "label": "Step left",
+      "keys": ["KeyA", "ArrowLeft", "Numpad4"]
+    },
+    {
+      "action": "stay",
+      "label": "Stay put for a turn",
+      "keys": ["KeyS", "Numpad5", "Period", "Space"]
+    },
+    {
+      "action": "right",
+      "label": "Step right",
+      "keys": ["KeyD", "ArrowRight", "Numpad6"]
+    },
+    {
+      "action": "down-left",
+      "label": "Step down and left",
+      "keys": ["KeyZ", "Numpad1"]
+    },
+    {
+      "action": "down",
+      "label": "Step down",
+      "keys": ["KeyX", "ArrowDown", "Numpad2"]
+    },
+    {
+      "action": "down-right",
+      "label": "Step down and right",
+      "keys": ["KeyC", "Numpad3"]
+    },
+    {
+      "action": "loaf",
+      "label": "Loaf (wait while it is safe)",
+      "keys": ["KeyL"]
+    },
+    {
+      "action": "zoom",
+      "label": "Zoom (dash to a random square)",
+      "keys": ["KeyT"]
+    },
+    {
+      "action": "undo",
+      "label": "Undo a turn",
+      "keys": ["KeyU", "Backspace"]
+    },
+    {
+      "action": "nap",
+      "label": "Nap until the wave is over (Long Night)",
+      "keys": ["KeyN"]
+    },
+    {
+      "action": "whiskers",
+      "label": "Whiskers (danger hints) on or off",
+      "keys": ["KeyV"]
+    }
+  ],
+  "cronGoals": [
+    {
+      "id": "tangles",
+      "stat": "vacuumsTangled",
+      "label": "Tangle {n} robot vacuums",
+      "min": 40,
+      "max": 150
+    },
+    {
+      "id": "rooms",
+      "stat": "roomsTidied",
+      "label": "Tidy {n} rooms in Zoomies",
+      "min": 3,
+      "max": 8
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-bonk",
+      "title": "First bonk",
+      "description": "Make two vacuums bump into each other.",
+      "tier": "core"
+    },
+    {
+      "id": "hallway-tidy",
+      "title": "Hallway tidy",
+      "description": "Clear the first room of the house.",
+      "tier": "core"
+    },
+    {
+      "id": "earned-loaf",
+      "title": "Earned loaf",
+      "description": "Earn a safe zoom by loafing while a vacuum tangles.",
+      "tier": "core"
+    },
+    {
+      "id": "sock-trap",
+      "title": "Sock trap",
+      "description": "Watch a vacuum choke on a sock.",
+      "tier": "core"
+    },
+    {
+      "id": "morning-tidy",
+      "title": "Morning tidy",
+      "description": "Clear a Today’s Mess room.",
+      "tier": "core"
+    },
+    {
+      "id": "night-shift",
+      "title": "Night shift",
+      "description": "Clear a wave of the Long Night.",
+      "tier": "core"
+    },
+    {
+      "id": "right-on-par",
+      "title": "Right on par",
+      "description": "Clear a room in par turns or fewer.",
+      "tier": "extra"
+    },
+    {
+      "id": "top-of-the-class",
+      "title": "Top of the class",
+      "description": "Clear a room in fewer turns than the Professor.",
+      "tier": "extra"
+    },
+    {
+      "id": "jammed-dock",
+      "title": "Jammed dock",
+      "description": "Get a tangle onto a charging dock.",
+      "tier": "extra"
+    },
+    {
+      "id": "domino-day",
+      "title": "Domino day",
+      "description": "Tangle four vacuums in a single turn.",
+      "tier": "extra"
+    },
+    {
+      "id": "spotless",
+      "title": "Spotless",
+      "description": "Earn all thirty-six stars of the house.",
+      "tier": "rare"
+    },
+    {
+      "id": "pattern-prodigy",
+      "title": "Pattern prodigy",
+      "description": "Write a pattern in the Pattern Lab that scores more than twice Pip’s.",
+      "tier": "rare"
+    }
+  ]
+}

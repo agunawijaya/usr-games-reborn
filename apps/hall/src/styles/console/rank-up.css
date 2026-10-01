@@ -1,0 +1,435 @@
+/*
+ * The rank-up moment: the room dims, a big ring fills in the chrome colour, pulses, and throws
+ * sparks; the new level pops in its centre. Screenshot scenes (which pause every animation in
+ * the Hall) get the peak drawn as still styles instead.
+ */
+
+@keyframes ch-rankup-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ch-rankup-ring-in {
+  from {
+    transform: scale(0.82);
+  }
+}
+
+@keyframes ch-rankup-fill {
+  from {
+    stroke-dasharray: 0 100;
+  }
+  to {
+    stroke-dasharray: 100 100;
+  }
+}
+
+@keyframes ch-rankup-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes ch-rankup-wave {
+  from {
+    opacity: 0.8;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes ch-rankup-spark {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--ch-spark-angle)) translateX(40cqi) scaleX(0.3);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--ch-spark-angle)) translateX(calc(74cqi * var(--ch-spark-reach)))
+      scaleX(1);
+  }
+}
+
+@keyframes ch-rankup-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes ch-rankup-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+[data-style='console'] .ch-rankup {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  animation: ch-rankup-in 0.26s var(--ch-ease) both;
+  transition: opacity 0.26s var(--ch-ease);
+  cursor: pointer;
+}
+
+[data-style='console'] .ch-rankup.is-leaving {
+  opacity: 0;
+}
+
+[data-style='console'] .ch-rankup__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      closest-side at 50% 44%,
+      color-mix(in srgb, var(--ch-chrome) 34%, transparent),
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--ug-bg) 90%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  backdrop-filter: blur(16px) saturate(1.1);
+}
+
+[data-style='console'] .ch-rankup__centre {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+/* The ring is a size container so the sparks fly in proportion to it at every window size. */
+[data-style='console'] .ch-rankup__ring {
+  position: relative;
+  container-type: inline-size;
+  width: clamp(200px, min(17vw, 30vh), 320px);
+  aspect-ratio: 1;
+  margin-bottom: 40px;
+  animation:
+    ch-rankup-ring-in 0.5s var(--ch-ease) both,
+    ch-rankup-pulse 0.5s var(--ch-ease) both;
+  animation-delay: 0s, 0.8s;
+}
+
+[data-style='console'] .ch-ring--rankup {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+[data-style='console'] .ch-ring--rankup .ch-ring__track,
+[data-style='console'] .ch-ring--rankup .ch-ring__arc {
+  stroke-width: 5.5;
+}
+
+[data-style='console'] .ch-ring--rankup .ch-ring__arc {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--ch-chrome) 80%, transparent));
+  animation: ch-rankup-fill 0.72s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: 0.1s;
+}
+
+[data-style='console'] .ch-rankup__wave {
+  position: absolute;
+  inset: 4%;
+  border: 3px solid var(--ch-chrome);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ch-rankup-wave 0.7s ease-out both;
+  animation-delay: 0.8s;
+}
+
+[data-style='console'] .ch-rankup__sparks {
+  position: absolute;
+  inset: 0;
+}
+
+[data-style='console'] .ch-rankup__spark {
+  position: absolute;
+  top: calc(50% - 3px);
+  left: 50%;
+  width: 26px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ch-chrome);
+  opacity: 0;
+  transform-origin: 0 50%;
+  animation: ch-rankup-spark 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: 0.8s;
+}
+
+[data-style='console'] .ch-rankup__spark:nth-child(3n + 1) {
+  background: var(--ug-accent-2);
+}
+
+[data-style='console'] .ch-rankup__spark:nth-child(3n + 2) {
+  width: 14px;
+  height: 14px;
+  top: calc(50% - 7px);
+  background: #ffd24a;
+  animation-delay: 0.86s;
+}
+
+[data-style='console'] .ch-rankup__number {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  line-height: 1;
+  animation: ch-rankup-pop 0.36s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  animation-delay: 0.72s;
+}
+
+[data-style='console'] .ch-rankup__number span {
+  color: var(--ug-ink-2);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-style='console'] .ch-rankup__number b {
+  font-family: var(--ug-font-display);
+  font-size: clamp(5rem, 6.4vw, 7.6rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+[data-style='console'] .ch-rankup__eyebrow,
+[data-style='console'] .ch-rankup__title,
+[data-style='console'] .ch-rankup__unlock {
+  position: relative;
+  z-index: 3;
+  animation: ch-rankup-rise 0.34s var(--ch-ease) both;
+}
+
+[data-style='console'] .ch-rankup__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+  font-weight: 800;
+  animation-delay: 0.66s;
+}
+
+[data-style='console'] .ch-rankup__eyebrow .ch-icon {
+  width: 18px;
+  height: 18px;
+}
+
+[data-style='console'] .ch-rankup__title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--ug-font-display);
+  font-size: clamp(2.4rem, 3vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  animation-delay: 0.74s;
+}
+
+[data-style='console'] .ch-rankup__rank {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--ug-ink);
+  color: var(--ug-bg);
+  font-family: var(--ug-font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+[data-style='console'] .ch-rankup__unlock {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px 8px 8px;
+  border: 1px solid var(--ch-glass-line);
+  border-radius: 999px;
+  background: var(--ch-glass);
+  font-size: 1.1rem;
+  font-weight: 700;
+  animation-delay: 0.82s;
+}
+
+[data-style='console'] .ch-swatch--small {
+  gap: 6px;
+  width: 92px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 999px;
+}
+
+[data-style='console'] .ch-swatch--small .ch-swatch__ring {
+  width: 24px;
+  height: 24px;
+}
+
+[data-style='console'] .ch-swatch--small .ch-swatch__pill {
+  height: 16px;
+}
+
+[data-style='console'] .ch-rankup__more {
+  color: var(--ug-ink-2);
+  font-weight: 600;
+}
+
+[data-style='console'] .ch-rankup__skip {
+  position: absolute;
+  bottom: clamp(24px, 5vh, 56px);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 12px 0 20px;
+  border: 1px solid var(--ch-glass-line);
+  border-radius: 999px;
+  background: var(--ch-glass);
+  color: var(--ug-ink);
+  font: inherit;
+  font-weight: 700;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+[data-style='console'] .ch-rankup__skip kbd {
+  padding: 2px 8px;
+  border: 1px solid var(--ug-line-strong);
+  border-radius: 8px;
+  font-family: var(--ug-font-mono);
+  font-size: 0.85rem;
+}
+
+/* A screenshot holds the moment at its peak: ring full, the wave spreading, sparks mid-flight. */
+[data-style='console'] .ch-rankup.is-frozen,
+[data-style='console'] .ch-rankup.is-frozen * {
+  animation: none !important;
+}
+
+[data-style='console'] .ch-rankup.is-frozen .ch-rankup__wave {
+  opacity: 0.4;
+  transform: scale(1.3);
+}
+
+[data-style='console'] .ch-rankup.is-frozen .ch-rankup__spark {
+  opacity: 0.95;
+  transform: rotate(var(--ch-spark-angle)) translateX(calc(60cqi * var(--ch-spark-reach)))
+    scaleX(0.75);
+}
+
+[data-style='console'] .ch-rankup.is-frozen .ch-rankup__ring {
+  transform: scale(1.04);
+}
+
+/* Reduced motion: no pop, no sparks, no pulse; the moment simply fades in and out. */
+[data-style='console'] .ch-rankup.is-still *,
+[data-style='console'] .ch-rankup.is-still {
+  animation: none !important;
+}
+
+[data-style='console'] .ch-rankup.is-still {
+  animation: ch-rankup-in 0.2s linear both !important;
+}
+
+[data-style='console'] .ch-rankup.is-still .ch-rankup__sparks,
+[data-style='console'] .ch-rankup.is-still .ch-rankup__wave {
+  display: none;
+}
+
+/* ---------- The keepsake card ---------- */
+
+[data-style='console'] .ch-keepsake {
+  position: absolute;
+  right: clamp(16px, 2vw, 32px);
+  bottom: clamp(16px, 3vh, 32px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--ug-line);
+  border-radius: 24px;
+  background: var(--ug-surface);
+  box-shadow: 0 30px 60px -24px color-mix(in srgb, var(--ug-shadow) 60%, transparent);
+  pointer-events: auto;
+  animation: ch-rankup-rise 0.3s var(--ch-ease) both;
+}
+
+[data-style='console'] .ch-keepsake__badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+  font-family: var(--ug-font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+[data-style='console'] .ch-keepsake__text {
+  display: grid;
+  min-width: 0;
+}
+
+[data-style='console'] .ch-keepsake__text span {
+  color: var(--ug-ink-2);
+}
+
+[data-style='console'] .ch-keepsake__try {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ch-chrome-fill);
+  color: var(--ch-chrome-ink);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-style='console'] .ch-keepsake__close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ug-ink-2);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-style='console'] .ch-keepsake {
+    animation: none;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "quiz",
+  "title": "Trivia",
+  "tagline": "Quick questions, fair answers, something new each day.",
+  "teaser": "Pick a subject and answer as many questions as you can. Every question is written fresh for this collection.",
+  "category": "words",
+  "directory": "/usr/games/words",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 8],
+  "status": "coming-soon",
+  "accent": "#2aa4f4",
+  "emblem": "M8 9h32v22H22l-8 8v-8H8zM20 16a4 4 0 1 1 5.5 3.7c-1 .5-1.5 1.3-1.5 2.3v1M24 27h.01",
+  "inspiredBy": {
+    "program": "quiz",
+    "originalTitle": "quiz",
+    "uiTitle": "quiz",
+    "year": 1991
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "quiz — choose a topic, answer questions and see how far you get.",
+    "description": "Jim R. Oldroyd’s quiz asked questions from data files; we write our own questions from scratch.",
+    "seeAlso": ["letters", "hangman", "arithmetic"]
+  },
+  "howToPlay": [
+    "Pick a subject.",
+    "Answer the questions one by one.",
+    "See how far you get and try to beat it next time."
+  ]
+}

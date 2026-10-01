@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Abyssal Worms · BSD worms(6)</title>
+<meta name="description" content="BSD worms(6) as a bioluminescent deep-sea screensaver, rendered entirely from code. The engine reproduces the original cell for cell.">
+<meta name="theme-color" content="#02070a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2302070a'/%3E%3Cpath d='M12 44c8-14 14 6 22-8s14-8 18-2' fill='none' stroke='%2334f0d2' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='52' cy='34' r='4' fill='%23d9fff7'/%3E%3C/svg%3E">
+<!-- Fonts are served from the game's own folder; until they arrive the page
+     shows the system fallbacks. -->
+<link rel="stylesheet" href="./src/ui/fonts/fonts.css">
+<link rel="stylesheet" href="./src/ui/styles.css">
+</head>
+<body>
+<canvas id="abyss" aria-hidden="true"></canvas>
+<canvas id="classic" aria-hidden="true"></canvas>
+<div id="divider" role="separator" aria-orientation="vertical" aria-label="Drag to compare classic and modern" tabindex="0" hidden>
+  <span class="grip" aria-hidden="true"></span>
+  <span class="tag tag-l">classic · worms(6)</span>
+  <span class="tag tag-r">abyssal</span>
+</div>
+<div id="veil" aria-hidden="true"><span id="veil-text">Descending…</span></div>
+
+<div class="ui" id="ui">
+  <header class="brand">
+    <h1>Abyssal Worms</h1>
+    <p>after BSD <code>worms(6)</code> · Eric P. Scott, Caltech, 1980</p>
+  </header>
+
+  <nav class="bar" aria-label="View">
+    <div class="seg" role="radiogroup" aria-label="View mode">
+      <button type="button" role="radio" data-view="classic" aria-checked="false" title="Classic terminal (C)">Classic</button>
+      <button type="button" role="radio" data-view="split" aria-checked="false" title="Split: classic | modern (V)">Split</button>
+      <button type="button" role="radio" data-view="modern" aria-checked="true" title="Modern (C)">Abyssal</button>
+    </div>
+    <button type="button" class="ico" id="btn-sound" aria-pressed="false" title="Sound (M)" aria-label="Sound off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="on" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10"/><path class="off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    </button>
+    <button type="button" class="ico" id="btn-settings" aria-pressed="false" aria-controls="panel" title="Settings (S)" aria-label="Settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+    </button>
+    <button type="button" class="ico" id="btn-full" title="Fullscreen (F)" aria-label="Fullscreen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+  </nav>
+
+  <output class="cmd" id="cmd" aria-live="polite"><span class="prompt">$</span> <span id="cmd-text">worms</span></output>
+  <p class="notice" id="notice" hidden></p>
+
+  <aside class="panel" id="panel" aria-label="Settings" hidden>
+    <h2>The original flags</h2>
+    <label class="row">
+      <span class="lbl"><code>-n</code> worms</span>
+      <input type="range" id="in-n" min="1" max="64" step="1">
+      <input type="number" id="num-n" min="1" max="256" class="num">
+    </label>
+    <label class="row">
+      <span class="lbl"><code>-l</code> length</span>
+      <input type="range" id="in-l" min="2" max="256" step="1">
+      <input type="number" id="num-l" min="2" max="1024" class="num">
+    </label>
+    <label class="row">
+      <span class="lbl"><code>-d</code> delay</span>
+      <input type="range" id="in-d" min="0" max="1000" step="5">
+      <span class="val" id="val-d">terminal</span>
+    </label>
+    <div class="row toggles">
+      <label class="chk"><input type="checkbox" id="in-f"> <span><code>-f</code> field of “WORM”</span></label>
+      <label class="chk"><input type="checkbox" id="in-t"> <span><code>-t</code> leave a trail</span></label>
+    </div>
+    <form class="row argline" id="argform" autocomplete="off">
+      <span class="prompt" aria-hidden="true">$ worms</span>
+      <input type="text" id="in-args" spellcheck="false" aria-label="Command-line arguments" placeholder="[-ft] [-d delay] [-l length] [-n number]">
+    </form>
+    <p class="err" id="arg-err" role="alert" hidden></p>
+
+    <h2>The abyss</h2>
+    <label class="row">
+      <span class="lbl">Cell size</span>
+      <input type="range" id="in-cell" min="8" max="36" step="1">
+      <span class="val" id="val-cell">14 px</span>
+    </label>
+    <div class="row">
+      <span class="lbl">Quality</span>
+      <div class="seg small" role="radiogroup" aria-label="Quality">
+        <button type="button" role="radio" data-q="low" aria-checked="false">Low</button>
+        <button type="button" role="radio" data-q="high" aria-checked="true">High</button>
+      </div>
+    </div>
+    <div class="row buttons">
+      <button type="button" class="btn" id="btn-restart" title="Restart (R)">Restart</button>
+      <button type="button" class="btn" id="btn-seed" title="New random seed">New seed</button>
+      <span class="val" id="val-seed">seed 1</span>
+    </div>
+    <p class="fine">Seed 1 is glibc’s default. With it, the worms move exactly as the original program did on a terminal of this size.</p>
+    <p class="fine" id="render-info"></p>
+  </aside>
+</div>
+
+<!-- /usr/games Reborn: the bridge to the Hall (a harmless no-op when opened on its own). -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

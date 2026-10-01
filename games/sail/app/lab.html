@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Broadside — Visual Bench</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b1016; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #info { position: fixed; left: 8px; bottom: 8px; color: #ccd; font: 12px/1.3 monospace; background: #0008; padding: 4px 6px; }
+</style>
+<script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="info"></div>
+<!-- Visual test bench: isolated scenes for art review and screenshots.
+     ?scene=sea&wind=3&mood=golden&cam=low   (see src/lab.js) -->
+<script type="module" src="./src/lab.js"></script>
+</body>
+</html>

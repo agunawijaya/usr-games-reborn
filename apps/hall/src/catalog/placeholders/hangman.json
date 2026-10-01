@@ -1,0 +1,37 @@
+{
+  "id": "hangman",
+  "title": "Word guess",
+  "tagline": "Guess the word, one letter at a time.",
+  "teaser": "A hidden word and a handful of wrong guesses to spare. Pick your letters well and reveal it before you run out.",
+  "category": "words",
+  "directory": "/usr/games/words",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 5],
+  "status": "coming-soon",
+  "accent": "#6574d6",
+  "emblem": "M6 38h9M19 38h9M32 38h9M6.5 30l4-14 4 14M8 25h5M37 16v1M37 21v9",
+  "inspiredBy": {
+    "program": "hangman",
+    "originalTitle": "hangman",
+    "uiTitle": "hangman",
+    "year": 1983
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "hangman — guess letters; reveal the word before your misses run out.",
+    "description": "Ken Arnold’s word-guessing game. Our version keeps the puzzle and leaves the gallows behind.",
+    "seeAlso": ["letters", "quiz"]
+  },
+  "howToPlay": [
+    "A word is hidden behind blank spaces.",
+    "Guess one letter at a time to reveal it.",
+    "Find the word before your wrong guesses run out."
+  ]
+}

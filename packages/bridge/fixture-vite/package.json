@@ -1,0 +1,14 @@
+{
+  "name": "@usr-games/fixture-vite",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A tiny hosted game built by its own Vite step, used to test the hosted-vite build path.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@usr-games/bridge": "workspace:*"
+  }
+}

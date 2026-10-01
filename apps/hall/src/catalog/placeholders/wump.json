@@ -1,0 +1,37 @@
+{
+  "id": "wump",
+  "title": "Cave hunt",
+  "tagline": "Track the creature in the caves by the clues it leaves.",
+  "teaser": "Wander a network of caves, read the drafts and the smells, and find the creature before it finds you.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 8],
+  "status": "coming-soon",
+  "accent": "#8bc34a",
+  "emblem": "M5 41c3-16 10-27 19-27s16 11 19 27M17 41c1-6 4-10 7-10s6 4 7 10M24 4v7M21 8l3 3 3-3",
+  "inspiredBy": {
+    "program": "wump",
+    "originalTitle": "Hunt the Wumpus",
+    "uiTitle": "wump",
+    "year": 1989
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "wump — move between caves, read the clues, aim with care.",
+    "description": "Dave Taylor’s version of the classic cave-hunting puzzle: work out where the creature hides from what you sense nearby.",
+    "seeAlso": ["adventure", "gomoku"]
+  },
+  "howToPlay": [
+    "Move from cave to cave through the tunnels.",
+    "Drafts, smells and noises hint at what is nearby.",
+    "Work out where the creature hides and aim carefully."
+  ]
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>trek procedural — visual lab</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; color: #9cc; font: 12px monospace; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #info { position: fixed; left: 8px; top: 6px; pointer-events: none; text-shadow: 0 0 3px #000; }
+  </style>
+  <script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
+</head>
+<body>
+  <!-- Art-direction bench: lab.html?view=nebula&qx=2&qy=5 · view=ships · view=fx -->
+  <canvas id="gl"></canvas>
+  <div id="info"></div>
+  <script type="module" src="./src/lab.js"></script>
+</body>
+</html>
