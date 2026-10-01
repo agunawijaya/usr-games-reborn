@@ -2,7 +2,7 @@
   "id": "robots",
   "title": "Robots",
   "tagline": "Lure the robots into each other. Stay out of reach.",
-  "teaser": "Robots step toward you every turn. Dodge, teleport and trick them into crashing into each other until the arena is clear, while a floodlit stadium floating among the stars cheers every pile-up.",
+  "teaser": "Robots step toward you every turn: trick them into crashing into each other while a floodlit stadium among the stars roars louder with every pile-up. Play the original wave after wave, tour twelve matches up to fifty robots, race the clock in Blitz, or meet the same waves as everyone in the Daily Showdown.",
   "category": "arcade",
   "directory": "/usr/games/arcade",
   "players": {
@@ -19,7 +19,7 @@
     "uiTitle": "robots",
     "year": 1991
   },
-  "daily": false,
+  "daily": true,
   "kind": "hosted",
   "build": {
     "kind": "hosted-vite",
@@ -33,8 +33,8 @@
   },
   "howToPlay": [
     "Move one step at a time; every robot steps toward you.",
-    "Trick robots into crashing into each other and into wrecks.",
-    "Teleport when cornered, and clear the board to win the wave."
+    "Trick robots into crashing into each other and into the scrap: the louder the crowd, the more each crash is worth.",
+    "Teleport when cornered, meet the jumbotron's calls, and clear the board to win the wave."
   ],
   "cronGoals": [
     {
@@ -50,6 +50,13 @@
       "label": "Crash {n} robots into each other",
       "min": 50,
       "max": 150
+    },
+    {
+      "id": "calls",
+      "stat": "callsMet",
+      "label": "Meet {n} jumbotron calls",
+      "min": 3,
+      "max": 8
     }
   ],
   "packages": [
@@ -74,7 +81,7 @@
     {
       "id": "third-wave",
       "title": "Third wave",
-      "description": "Reach the third wave in one run.",
+      "description": "Reach the third wave of a run.",
       "tier": "core"
     },
     {
@@ -84,9 +91,9 @@
       "tier": "core"
     },
     {
-      "id": "scrap-dealer",
-      "title": "Scrap dealer",
-      "description": "Score 500 points in one run.",
+      "id": "showtime",
+      "title": "Showtime",
+      "description": "Get the crowd all the way to Showtime.",
       "tier": "core"
     },
     {
@@ -102,15 +109,15 @@
       "tier": "extra"
     },
     {
-      "id": "sixth-wave",
-      "title": "Sixth wave",
-      "description": "Reach the sixth wave in one run.",
+      "id": "daily-showdown",
+      "title": "Showdown",
+      "description": "Play a Daily Showdown to the end.",
       "tier": "extra"
     },
     {
-      "id": "scrapyard",
-      "title": "Scrapyard",
-      "description": "Score 1,500 points in one run.",
+      "id": "blitz-wave",
+      "title": "Keeping time",
+      "description": "Clear a wave while the robots move on their own.",
       "tier": "extra"
     },
     {
@@ -120,9 +127,9 @@
       "tier": "rare"
     },
     {
-      "id": "ten-waves",
-      "title": "Ten waves deep",
-      "description": "Clear ten waves in one run.",
+      "id": "grand-final",
+      "title": "Grand Final",
+      "description": "Win the last match of the Grand Tour.",
       "tier": "rare"
     }
   ]

@@ -14,10 +14,7 @@ export type FxEvent =
   | { type: 'spawn'; at: Position; delay: number }
   | { type: 'shake'; amount: number }
   // the stadium
-  | { type: 'firework'; phase: 'launch' | 'burst'; size: number; distance: number }
-  | { type: 'trash'; kind: TrashKind; speed: number };
-
-export type TrashKind = 'can' | 'cup' | 'bottle' | 'paper';
+  | { type: 'firework'; phase: 'launch' | 'burst'; size: number; distance: number };
 
 type Listener = (e: FxEvent) => void;
 const listeners = new Set<Listener>();

@@ -1,8 +1,20 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties, useEffect } from 'react';
 
 type Props = Readonly<{ onClose: () => void }>;
 
 export function HelpPanel({ onClose }: Props) {
+  // Escape closes the help first; prevented, it never reaches the menu's or the Hall's own Escape.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      onClose();
+    };
+    window.addEventListener('keydown', onKey, { capture: true });
+    return () => window.removeEventListener('keydown', onKey, { capture: true });
+  }, [onClose]);
+
   return (
     <div style={backdropStyle} onClick={onClose}>
       <div style={panelStyle} onClick={(e) => e.stopPropagation()}>
@@ -15,10 +27,38 @@ export function HelpPanel({ onClose }: Props) {
         <section style={sectionStyle}>
           <h3 style={h3Style}>Goal</h3>
           <p style={pStyle}>
-            You cannot win. Survive as long as possible; every cleared level
-            adds more robots (up to 40). Robots move one cell toward you every
-            turn — outmaneuver them.
+            Robots move one cell toward you every turn. Lure them into each
+            other and onto the scrap, and stay out of reach. Clear every robot
+            to clear the wave; the next wave brings more.
           </p>
+        </section>
+
+        <section style={sectionStyle}>
+          <h3 style={h3Style}>Modes</h3>
+          <ul style={ulStyle}>
+            <li>
+              <b>Exhibition</b>: the original, wave after wave, ten more robots
+              each wave up to forty. Play until you are caught.
+            </li>
+            <li>
+              <b>Grand Tour</b>: twelve matches with set waves, from ten robots
+              to fifty. Win a match to open the next; earn a star for the win,
+              one for the score target and one for the match's challenge.
+            </li>
+            <li>
+              <b>Daily Showdown</b>: the same waves for everyone today, with one
+              rule bent for the day of the week. Your first finished run is the
+              one that counts.
+            </li>
+            <li>
+              <b>Blitz</b>: the robots move every 3, 2 or 1.5 seconds whether
+              you do or not. The original program had this switch, hidden.
+            </li>
+            <li>
+              <b>Custom match</b>: choose the start wave, teleports, tempo and
+              waiting. Practice only: no records.
+            </li>
+          </ul>
         </section>
 
         <section style={sectionStyle}>
@@ -138,7 +178,7 @@ export function HelpPanel({ onClose }: Props) {
                   <kbd style={kbdStyle}>Enter</kbd>
                 </td>
                 <td>
-                  after a level is cleared: go on to the next level (or
+                  after a wave is cleared: go on to the next wave (or
                   stay and watch the fireworks as long as you like)
                 </td>
               </tr>
@@ -148,26 +188,43 @@ export function HelpPanel({ onClose }: Props) {
                 </td>
                 <td>toggle this help</td>
               </tr>
+              <tr>
+                <td style={keyCellStyle}>
+                  <kbd style={kbdStyle}>Esc</kbd>
+                </td>
+                <td>on the menu's screens, back to the game menu; on the game menu, back to the Hall</td>
+              </tr>
             </tbody>
           </table>
         </section>
 
         <section style={sectionStyle}>
-          <h3 style={h3Style}>Scoring</h3>
+          <h3 style={h3Style}>Points and the crowd</h3>
           <ul style={ulStyle}>
             <li>
               <b style={{ color: '#4cc9f0' }}>+10</b> every time a robot is
-              destroyed.
+              destroyed, times the crowd's multiplier.
             </li>
             <li>
-              <b style={{ color: '#ffbe0b' }}>+1 extra</b> per robot killed
+              <b>The crowd</b> gets louder with every crash, more so along a
+              chain (crashes on turn after turn), while you wait, and when a
+              robot ends a turn right beside you. Teleporting and quiet turns
+              calm it. Warm ×1, Loud ×2, Roaring ×3, Showtime ×4.
+            </li>
+            <li>
+              <b>Jumbotron calls</b>: most waves the big screen calls for
+              something extra (a chain, no teleports, a quick clear…). Meet it
+              for bonus points and a stamp on your trophy wall.
+            </li>
+            <li>
+              <b style={{ color: '#ffbe0b' }}>+1 extra</b> per robot destroyed
               while <kbd style={kbdStyle}>w</kbd>-waiting. This "wait bonus"
-              accumulates during a level and is added to your score when the
-              level clears.
+              accumulates during a wave and is added when the wave clears.
             </li>
             <li>
-              There is no win condition — the score at time of death is your
-              result.
+              Starting past wave 1 pays the original's bonus of 600 when you
+              clear that first wave. The match report also shows the
+              original's own score, without the crowd.
             </li>
           </ul>
         </section>
@@ -190,12 +247,10 @@ export function HelpPanel({ onClose }: Props) {
         </section>
 
         <section style={sectionStyle}>
-          <h3 style={h3Style}>How you die</h3>
+          <h3 style={h3Style}>How you get caught</h3>
           <ul style={ulStyle}>
-            <li>Stepping onto a robot or a scrap pile — instant death.</li>
-            <li>
-              A robot moving onto your cell during its turn — instant death.
-            </li>
+            <li>Stepping onto a robot or a scrap pile ends the run.</li>
+            <li>So does a robot moving onto your cell during its turn.</li>
           </ul>
         </section>
 
@@ -212,7 +267,7 @@ export function HelpPanel({ onClose }: Props) {
             </li>
             <li>
               Teleport is a last resort — the destination is uniformly random
-              among empty cells.
+              among empty cells, and the crowd goes quiet.
             </li>
           </ul>
         </section>

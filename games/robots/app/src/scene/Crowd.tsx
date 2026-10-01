@@ -6,8 +6,7 @@
 //               reacts is their own
 //   wave      — a Mexican wave running round the stands
 //   celebrate — everyone up, arms up, bouncing
-//   boo       — fists shaking; the throwers (the same rule as Trash.tsx)
-//               wind up and hurl at their own moment
+//   ovation   — on their feet, hands up and clapping, when you are caught
 // Faces and hair are coloured per person in the fragment shader; shirts
 // are the instance colour. Phone flashes pop now and then, more when
 // celebrating.
@@ -22,7 +21,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { vclock } from '../fx/clock';
 import { crowd } from '../fx/crowd';
 import { quality } from '../fx/store';
-import { seats, THROW_SHARE, THROW_SPAN, type Seat } from './stadiumLayout';
+import { seats, type Seat } from './stadiumLayout';
 
 // Shirt colours: the home end in cyan, the far end in magenta, a sprinkle
 // of robot-yellow (they came for the robots), and everyday colours.
@@ -47,7 +46,7 @@ function personGeometry(detail: number): BufferGeometry {
 
 const VERT_COMMON = /* glsl */ `
 attribute float part; attribute float aSeed; attribute float aAround;
-uniform float uTime, uExcite, uCelebrate, uBoo, uWavePos, uWaveOn, uThrowT, uThrowShare, uThrowSpan;
+uniform float uTime, uExcite, uCelebrate, uOvation, uWavePos, uWaveOn;
 varying float vPart; varying float vSeed; varying float vLocalY;
 `;
 const VERT_BEGIN = /* glsl */ `
@@ -60,16 +59,13 @@ float wave = uWaveOn * exp(-dw * dw / 0.0012);
 float cel = uCelebrate * (0.75 + 0.25 * r2);
 float up = max(max(ex, wave), cel);
 float bounce = max(0.0, sin(uTime * (6.5 + r2 * 3.0) + aSeed * 40.0));
-float lift = smoothstep(0.05, 0.5, max(up, uBoo * 0.8)) * 0.16 + bounce * 0.13 * max(ex, cel) + wave * 0.12;
+float lift = smoothstep(0.05, 0.5, max(up, uOvation * 0.8)) * 0.16 + bounce * 0.13 * max(ex, cel) + wave * 0.12;
 float arm = mix(0.12, 2.75, up) + sin(uTime * (8.0 + r3 * 4.0) + aSeed * 30.0) * 0.35 * up;
-// booing: on their feet, fists pumping up and forward
-arm = mix(arm, 2.2 + 0.55 * sin(uTime * (7.0 + r3 * 3.0) + aSeed * 20.0), uBoo * (1.0 - up));
-float tt = uThrowT - fract(aSeed * 3.71) * uThrowSpan;
-bool throwing = fract(aSeed * 7.13) < uThrowShare && tt > -0.35 && tt < 0.45;
+// the ovation: on their feet, hands up in front, clapping quickly
+arm = mix(arm, 2.0 + 0.25 * abs(sin(uTime * (11.0 + r3 * 4.0) + aSeed * 20.0)), uOvation * (1.0 - up));
 if (part > 1.5 && part < 3.5) {
   float side = part < 2.5 ? -1.0 : 1.0;
   float a = arm * (side < 0.0 ? 1.0 : 0.93 + 0.07 * r1);
-  if (throwing && side > 0.0) a = tt < 0.0 ? mix(1.4, 3.6, (tt + 0.35) / 0.35) : mix(3.6, 0.9, clamp(tt / 0.15, 0.0, 1.0));
   vec3 p = transformed - vec3(side * 0.215, 0.64, 0.0);
   float c = cos(a), s = sin(a);
   p = vec3(p.x, p.y * c + p.z * s, -p.y * s + p.z * c);
@@ -99,8 +95,8 @@ totalEmissiveRadiance += vec3(3.0) * fl * step(vPart, 0.5);
 export function Crowd() {
   const list = useMemo<Seat[]>(() => seats(quality.low ? 0.3 : 1), []);
   const uniforms = useMemo(() => ({
-    uTime: { value: 0 }, uExcite: { value: 0 }, uCelebrate: { value: 0 }, uBoo: { value: 0 }, uWavePos: { value: 0 },
-    uWaveOn: { value: 0 }, uThrowT: { value: -1e9 }, uThrowShare: { value: THROW_SHARE }, uThrowSpan: { value: THROW_SPAN },
+    uTime: { value: 0 }, uExcite: { value: 0 }, uCelebrate: { value: 0 }, uOvation: { value: 0 }, uWavePos: { value: 0 },
+    uWaveOn: { value: 0 },
     uFlash: { value: 0.3 },
   }), []);
   const mesh = useMemo(() => {
@@ -149,11 +145,10 @@ export function Crowd() {
     const ease = (cur: number, to: number, k: number) => cur + (to - cur) * Math.min(1, dt * k);
     u.uExcite.value = ease(u.uExcite.value, crowd.excite, 10);
     u.uCelebrate.value = ease(u.uCelebrate.value, crowd.celebrate, 4);
-    u.uBoo.value = ease(u.uBoo.value, crowd.boo, 3);
+    u.uOvation.value = ease(u.uOvation.value, crowd.ovation, 3);
     const waving = t < crowd.waveUntil;
     u.uWaveOn.value = ease(u.uWaveOn.value, waving ? 1 : 0, 3);
     u.uWavePos.value = ((t - crowd.waveT0) * 0.22) % 1;
-    u.uThrowT.value = t - crowd.throwT0;
     u.uFlash.value = 0.25 + crowd.excite * 1.2 + crowd.celebrate * 2.5;
   });
 

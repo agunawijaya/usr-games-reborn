@@ -1,7 +1,6 @@
 // The stadium round the arena, as numbers (no Three.js): the ring the
 // stands follow, the rows, and every seat. Stadium.tsx builds the meshes
-// from this; Crowd.tsx seats the crowd; Trash.tsx knows where the throwers
-// sit. Kept pure so it can be tested.
+// from this and Crowd.tsx seats the crowd. Kept pure so it can be tested.
 //
 // The ring is a rounded rectangle just outside the arena's lip and a moat.
 // Rows step up and out from it. The camera looks from the +x/+z corner, so
@@ -127,11 +126,3 @@ export function seats(density = 1): Seat[] {
   for (let r = FRONT_ROWS; r < BACK_ROWS; r++) place(back, r);
   return out;
 }
-
-/** Throwers when you lose: a small share of the crowd, each at its own
- *  moment within THROW_SPAN seconds. The crowd shader uses the same rule
- *  to swing their arms (keep the constants in step). */
-export const THROW_SHARE = 0.09;
-export const THROW_SPAN = 6;
-export const isThrower = (seed: number): boolean => ((seed * 7.13) % 1) < THROW_SHARE;
-export const throwDelay = (seed: number): number => ((seed * 3.71) % 1) * THROW_SPAN;

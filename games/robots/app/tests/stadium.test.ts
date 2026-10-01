@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  AX, AZ, BACK_ROWS, FRONT_ROWS, isThrower, ringStations, rowTop, seats, THROW_SHARE, THROW_SPAN, throwDelay,
+  AX, AZ, BACK_ROWS, FRONT_ROWS, ringStations, rowTop, seats,
 } from '../src/scene/stadiumLayout';
 import { crowd, crowdEvent, resetCrowd } from '../src/fx/crowd';
 
@@ -35,18 +35,7 @@ describe('stadium layout', () => {
     expect(Math.max(...front.map((s) => s.y))).toBeCloseTo(rowTop(FRONT_ROWS - 1));
   });
 
-  it('about THROW_SHARE of the crowd throws, each within THROW_SPAN seconds', () => {
-    const throwers = all.filter((s) => isThrower(s.seed));
-    const share = throwers.length / all.length;
-    expect(share).toBeGreaterThan(THROW_SHARE * 0.6);
-    expect(share).toBeLessThan(THROW_SHARE * 1.4);
-    for (const s of throwers) {
-      expect(throwDelay(s.seed)).toBeGreaterThanOrEqual(0);
-      expect(throwDelay(s.seed)).toBeLessThan(THROW_SPAN);
-    }
-  });
-
-  it('is the same every time (the crowd shader and the rubbish agree on who throws)', () => {
+  it('is the same every time', () => {
     expect(seats().map((s) => s.seed)).toEqual(all.map((s) => s.seed));
   });
 });
@@ -74,12 +63,13 @@ describe('crowd mood', () => {
     expect(crowd.fireworks).toBe(false);
   });
 
-  it('boos and starts throwing when you lose, and stops celebrating', () => {
+  it('rises to applaud the run when you are caught, and stops the fireworks', () => {
     resetCrowd();
     crowdEvent({ type: 'levelClear', level: 1 });
     crowdEvent({ type: 'death', at });
-    expect(crowd.boo).toBe(1);
+    expect(crowd.ovation).toBe(1);
     expect(crowd.celebrate).toBe(0);
-    expect(crowd.throwT0).toBeGreaterThan(-1e8);
+    expect(crowd.fireworks).toBe(false);
+    expect(crowd.waveUntil).toBeGreaterThan(0);
   });
 });

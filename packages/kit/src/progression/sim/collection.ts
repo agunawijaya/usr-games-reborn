@@ -16,7 +16,7 @@ const ROWS: Row[] = [
   ['sail', 'strategy', 15, 40, false],
   ['trek', 'strategy', 15, 40, false],
   ['hunt', 'arcade', 5, 15, false],
-  ['robots', 'arcade', 3, 10, false],
+  ['robots', 'arcade', 3, 10, true],
   // A second interpretation of robots: a native reborn with rooms, rivals and a daily mess.
   ['zoomies', 'arcade', 3, 12, true],
   ['battlestar', 'stories', 20, 60, false],

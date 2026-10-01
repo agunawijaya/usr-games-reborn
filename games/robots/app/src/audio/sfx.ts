@@ -11,11 +11,10 @@
 // The stadium:
 //   crowd     — a bed of murmur that swells with the game; a cheer (a
 //               roar, claps, whistles) on every crash, bigger along a chain;
-//               an "ooh" when a robot gets next to you or you teleport; a
-//               long "boo" when you lose; applause through a celebration
-//               (voices are detuned sawtooths through vowel formants)
+//               an "ooh" when a robot gets next to you or you teleport, and
+//               when you are caught, before the applause; applause through a
+//               celebration (voices are detuned sawtooths through vowel formants)
 //   fireworks — a whistle up, a boom and a crackle, later when further away
-//   rubbish   — cans clink, bottles knock, cups and paper tap as they land
 import { fxBus, type FxEvent } from '../fx/bus';
 
 const PENTA = [0, 3, 5, 7, 10];
@@ -31,7 +30,6 @@ class Sfx {
   bedFilter!: BiquadFilterNode;
   on = false;
   private lastOoh = -10;
-  private lastTrash = -10;
 
   private ensure() {
     if (this.ctx) return;
@@ -100,23 +98,23 @@ class Sfx {
     }
   }
 
-  /** Many voices on one vowel: "ooh" (rising, then falling) or "boo". */
-  private voices(t: number, boo: boolean, dur: number, gain: number) {
+  /** Many voices on one vowel: an "ooh", rising, then falling. */
+  private voices(t: number, dur: number, gain: number) {
     const ctx = this.ctx!;
     const out = ctx.createGain();
     const f1 = ctx.createBiquadFilter(), f2 = ctx.createBiquadFilter();
     f1.type = 'bandpass'; f2.type = 'bandpass';
-    f1.frequency.value = boo ? 320 : 360; f1.Q.value = 5;
-    f2.frequency.value = boo ? 700 : 880; f2.Q.value = 7;
+    f1.frequency.value = 360; f1.Q.value = 5;
+    f2.frequency.value = 880; f2.Q.value = 7;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1400;
     out.connect(f1).connect(lp); out.connect(f2).connect(lp); lp.connect(this.master);
     for (let i = 0; i < 10; i++) {
       const o = ctx.createOscillator(); o.type = 'sawtooth';
-      const f0 = boo ? 105 + Math.random() * 70 : 170 + Math.random() * 120;
+      const f0 = 170 + Math.random() * 120;
       const st = t + Math.random() * 0.15;
       o.frequency.setValueAtTime(f0, st);
-      if (boo) o.frequency.linearRampToValueAtTime(f0 * 0.9, st + dur);
-      else { o.frequency.linearRampToValueAtTime(f0 * 1.18, st + dur * 0.4); o.frequency.linearRampToValueAtTime(f0 * 0.92, st + dur); }
+      o.frequency.linearRampToValueAtTime(f0 * 1.18, st + dur * 0.4);
+      o.frequency.linearRampToValueAtTime(f0 * 0.92, st + dur);
       const g = ctx.createGain();
       g.gain.setValueAtTime(0.0001, st);
       g.gain.exponentialRampToValueAtTime(gain, st + 0.18);
@@ -179,7 +177,7 @@ class Sfx {
         break;
       case 'robotSteps': {
         const near = e.nearest <= 1 ? 1 : e.nearest <= 3 ? 0.6 : e.nearest <= 6 ? 0.3 : 0.1;
-        if (e.nearest <= 1 && t - this.lastOoh > 2) { this.lastOoh = t; this.voices(t + 0.05, false, 1.1, 0.02); }
+        if (e.nearest <= 1 && t - this.lastOoh > 2) { this.lastOoh = t; this.voices(t + 0.05, 1.1, 0.02); }
         this.hiss(t + 0.02, 0.16, 0.03 + near * 0.06, 900 + near * 1400, 2400 + near * 2000, 4);
         this.tone(t + 0.02, 140 + near * 90, 0.14, 0.02 + near * 0.03, 'square', 1.25);
         this.humFilter.frequency.setTargetAtTime(220 + near * 700, t, 0.3);
@@ -202,7 +200,7 @@ class Sfx {
         break;
       }
       case 'teleport':
-        if (t - this.lastOoh > 1) { this.lastOoh = t; this.voices(t + 0.1, false, 1.2, 0.022); }
+        if (t - this.lastOoh > 1) { this.lastOoh = t; this.voices(t + 0.1, 1.2, 0.022); }
         this.tone(t, 300, 0.5, 0.12, 'sawtooth', 5);
         this.hiss(t, 0.5, 0.12, 1200, 7000, 2);
         this.tone(t + 0.45, 1400, 0.4, 0.05, 'sine', 1.5);
@@ -220,9 +218,10 @@ class Sfx {
         this.tone(t, 55, 1.4, 0.4, 'sine', 0.5);
         this.hiss(t + 0.05, 1.6, 0.2, 6000, 600, 0.5);
         this.hum.gain.setTargetAtTime(0.0, t + 0.5, 0.5);
-        this.voices(t + 0.7, true, 2.6, 0.024);
-        this.voices(t + 2.9, true, 2.2, 0.018);
-        this.swell(t + 0.7, 0.2, 4, 420);
+        // A gasp from the stands, then applause for the run.
+        this.voices(t + 0.5, 1.4, 0.024);
+        this.cheer(t + 1.8, 0.9);
+        this.cheer(t + 3.0, 0.7);
         break;
       case 'firework':
         if (e.phase === 'launch') {
@@ -235,13 +234,6 @@ class Sfx {
           for (let i = 0; i < 24; i++) this.hiss(t + d + 0.35 + Math.random() * 1.1, 0.02, 0.02 + Math.random() * 0.03, 5000, 3000, 2);
           if (Math.random() < 0.4) this.cheer(t + d + 0.2, 0.35);
         }
-        break;
-      case 'trash':
-        if (t - this.lastTrash < 0.035) break;
-        this.lastTrash = t;
-        if (e.kind === 'can') this.tone(t, 2600 + Math.random() * 1500, 0.12, 0.02 + Math.min(0.03, e.speed * 0.002), 'triangle', 0.9);
-        else if (e.kind === 'bottle') this.tone(t, 900 + Math.random() * 400, 0.1, 0.03, 'sine', 0.8);
-        else this.hiss(t, 0.04, 0.03, 2500, 1500, 1.5);
         break;
       case 'levelStart':
         this.cheer(t + 0.3, 0.4);

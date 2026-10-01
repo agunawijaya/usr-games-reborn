@@ -59,10 +59,12 @@ function pickEmpty(occupied: Set<string>, rng: RNG): Position {
 // -----------------------------------------------------------------------------
 // Public API
 
-export function initGame(level: number, rng: RNG): GameState {
+// `robotCount` overrides the spec's count for the gamified modes (src/modes/),
+// which plan their own waves; left out, the level brings min(level * 10, 40).
+export function initGame(level: number, rng: RNG, robotCount?: number): GameState {
   if (level < 1) throw new RangeError(`Level must be >= 1, got ${level}`);
 
-  const numRobots = Math.min(level * ROBOTS_PER_LEVEL, MAX_ROBOTS);
+  const numRobots = robotCount ?? Math.min(level * ROBOTS_PER_LEVEL, MAX_ROBOTS);
   const occupied = new Set<string>();
   const robots: Robot[] = [];
 
@@ -85,8 +87,8 @@ export function initGame(level: number, rng: RNG): GameState {
   };
 }
 
-export function nextLevel(state: GameState, rng: RNG): GameState {
-  const fresh = initGame(state.level + 1, rng);
+export function nextLevel(state: GameState, rng: RNG, robotCount?: number): GameState {
+  const fresh = initGame(state.level + 1, rng, robotCount);
   return {
     ...fresh,
     score: state.score, // carry cumulative score forward

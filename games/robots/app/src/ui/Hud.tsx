@@ -1,22 +1,28 @@
-// HUD, remastered: glass panels, counters that roll, a chain counter, a
-// glitching epitaph when you die, and cards that feel like moments.
+// HUD, remastered: glass panels, counters that roll, a chain counter, and the
+// broadcast layer on top (the crowd's hype, the jumbotron's call, the
+// play-by-play). The cards between waves and at the end live in MatchCards.tsx.
 
 import { useEffect, useRef, useState } from 'react';
+import type { Call } from '../modes/calls';
+import type { MatchPlan } from '../modes/plans';
 import type { GameState } from '../game/state';
-import type { HighScoreEntry } from '../game/highScores';
+import { CallCard, type CallState, HypeMeter, TempoRing, Ticker } from './Broadcast';
 
 type Props = Readonly<{
   state: GameState;
+  plan: MatchPlan;
+  points: number;
+  hype: number;
+  call: Call | null;
+  callState: CallState;
+  ticker: readonly { text: string; key: number }[];
+  teleportsLeft: number | null;
+  tempoSince: number;
+  paused: boolean;
   waiting: boolean;
-  highScores: readonly HighScoreEntry[];
-  isNewBest: boolean;
-  deathCard: boolean;
   combo: { n: number; key: number } | null;
   sound: boolean;
   preview: boolean;
-  warping: boolean;
-  onRestart: () => void;
-  onAdvance: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onHelp: () => void;
@@ -61,20 +67,29 @@ export function Hud(p: Props) {
     <>
       <div className="rr-title">
         <div className="rr-logo">ROBOTS</div>
+        <div className="rr-mode-line">{p.plan.title}</div>
         <div className="rr-sub">hjkl · yubn · arrows move &nbsp;·&nbsp; t teleport &nbsp;·&nbsp; w wait &nbsp;·&nbsp; p preview &nbsp;·&nbsp; m sound &nbsp;·&nbsp;
           <button className="rr-link" onClick={p.onHelp}>? help</button>
         </div>
       </div>
 
-      <div className="rr-panel rr-stats">
-        <div className="rr-stat"><span>LEVEL</span><Roll value={state.level} /></div>
-        <div className="rr-stat"><span>SCORE</span><Roll value={state.score} /></div>
-        <div className="rr-stat rr-robots">
-          <span>ROBOTS</span><Roll value={robots} />
-          <div className="rr-bar"><i style={{ width: `${threat * 100}%` }} /></div>
+      <div className="rr-hudright">
+        <div className="rr-panel rr-stats">
+          <div className="rr-stat"><span>WAVE</span><Roll value={state.level} /></div>
+          <div className="rr-stat rr-points"><span>POINTS</span><Roll value={p.points} /></div>
+          <div className="rr-stat rr-robots">
+            <span>ROBOTS</span><Roll value={robots} />
+            <div className="rr-bar"><i style={{ width: `${threat * 100}%` }} /></div>
+          </div>
+          {p.teleportsLeft !== null && <div className="rr-stat"><span>TELEPORTS</span><b>{p.teleportsLeft}</b></div>}
+          {state.waitBonus > 0 && <div className="rr-stat rr-bonus"><span>WAIT BONUS</span><b>+{state.waitBonus}</b></div>}
         </div>
-        {state.waitBonus > 0 && <div className="rr-stat rr-bonus"><span>WAIT BONUS</span><b>+{state.waitBonus}</b></div>}
+        <HypeMeter hype={p.hype} />
+        {p.plan.tempo !== null && state.status === 'playing' && <TempoRing tempo={p.plan.tempo} since={p.tempoSince} paused={p.paused || p.waiting} />}
       </div>
+
+      <CallCard call={p.call} state={p.callState} />
+      <Ticker lines={p.ticker} />
 
       <div className="rr-controls">
         <button className={`rr-btn ${p.sound ? 'on' : ''}`} onClick={p.onSound} title="Sound (m)">{p.sound ? '♪ on' : '♪ off'}</button>
@@ -89,41 +104,6 @@ export function Hud(p: Props) {
         <div key={p.combo.key} className="rr-combo">
           <span className="rr-combo-n">×{p.combo.n}</span>
           <span className="rr-combo-l">{p.combo.n >= 8 ? 'MELTDOWN' : p.combo.n >= 5 ? 'CHAIN REACTION' : 'CHAIN'}</span>
-        </div>
-      )}
-
-      {state.status === 'dead' && (
-        <div className="rr-death">
-          <div className="rr-glitch" data-text="AARRrrgghhhh...">AARRrrgghhhh...</div>
-          {p.deathCard && (
-            <div className="rr-card">
-              <div className="rr-card-sub">caught on level {state.level}</div>
-              <div className="rr-card-score">{state.score}</div>
-              {p.isNewBest && <div className="rr-best">★ new high score</div>}
-              {p.highScores.length > 0 && (
-                <div className="rr-scores">
-                  {p.highScores.slice(0, 5).map((e, i) => {
-                    const cur = e.score === state.score && e.level === state.level;
-                    return (
-                      <div key={`${e.date}-${i}`} className={cur ? 'cur' : ''}>
-                        <span>#{i + 1}</span><span>{e.score}</span><span>Lv {e.level}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              <button className="rr-primary" onClick={p.onRestart} autoFocus>Play again</button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {state.status === 'level-clear' && !p.warping && (
-        <div className="rr-clear">
-          <div className="rr-clear-title">LEVEL {state.level} CLEAR!</div>
-          <div className="rr-card-sub">score {state.score} · the crowd goes wild</div>
-          <button className="rr-primary" onClick={p.onAdvance} autoFocus>Next level →</button>
-          <div className="rr-hint">Enter to go on · or stay for the fireworks</div>
         </div>
       )}
     </>
