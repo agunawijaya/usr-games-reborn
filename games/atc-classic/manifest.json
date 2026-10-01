@@ -2,7 +2,7 @@
   "id": "atc-classic",
   "title": "Control Room 1986",
   "tagline": "Type the orders that bring every flight home.",
-  "teaser": "Clock in at a green phosphor radar and talk planes through your sector one typed order at a time: climb, turn, circle, land. Jets and props arrive from the edges and the airports, the radio reads back every call, and the shift runs until a plane is lost. How many can you bring home?",
+  "teaser": "Clock in at a green phosphor radar and talk planes home one typed order at a time. Rise from Trainee to Chief of the Room through twelve assignments, earn commendation stamps on every briefing, fly the same Daily Traffic as everyone, and keep each printed shift report in your logbook.",
   "category": "arcade",
   "directory": "/usr/games/arcade",
   "players": {
@@ -19,7 +19,7 @@
     "uiTitle": "atc",
     "year": 1986
   },
-  "daily": false,
+  "daily": true,
   "kind": "hosted",
   "build": {
     "kind": "hosted-static",
@@ -28,13 +28,13 @@
   },
   "manPage": {
     "synopsis": "atc — type a plane’s letter and an order; land it or send it out, and keep every pair apart.",
-    "description": "The owner’s earlier typed-radar port of Ed James’s atc, kept as it was built: a phosphor console, the original’s command letters and a radio that reads back every order. A second interpretation beside the collection’s own atc.",
+    "description": "The owner’s earlier typed-radar port of Ed James’s atc: a phosphor console, the original’s command letters and a radio that reads back every order. Around the 1986 shift it adds a controller’s career of twelve assignments, a briefing of tasks before every shift, a printed report after it, a logbook and a Daily Traffic. A second interpretation beside the collection’s own atc.",
     "seeAlso": ["atc", "robots"]
   },
   "howToPlay": [
     "Type a plane’s letter, then an order: Aa9 climbs plane A to 9,000 feet, Atd turns it east.",
     "Land at altitude 0 along the runway arrow; leave by the right exit at 9,000 feet.",
-    "Keep planes apart and fuelled: the shift ends when one is lost."
+    "Keep planes apart and fuelled: a career assignment ends when its target is home, any shift when a plane is lost."
   ],
   "cronGoals": [
     {
@@ -43,6 +43,13 @@
       "label": "Guide {n} planes home",
       "min": 10,
       "max": 30
+    },
+    {
+      "id": "stamps",
+      "stat": "stamps",
+      "label": "Earn {n} commendation stamps",
+      "min": 4,
+      "max": 12
     }
   ],
   "packages": [

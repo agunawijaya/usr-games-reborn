@@ -2,7 +2,7 @@
 
 > Type the orders that bring every flight home.
 
-![A plane leaves through its exit at 9,000 feet: the radio reads back the handoff under the green radar, the cheat panel shows the other two flights on course, and the Hall announces a new package](media/signature-1280.webp)
+![A plane leaves through its exit at 9,000 feet: the radio reads back the handoff under the green radar, and the briefing card in the sidebar ticks off the task](media/signature-1280.webp)
 
 ## The hook
 
@@ -12,8 +12,13 @@ where it must touch down at zero feet flying along the runway arrow, or an exit,
 leave at exactly 9,000 feet. You talk to them one typed line at a time. `Aa9` climbs plane A,
 `Atd` turns it east, `Ac` parks it in a circle while you think. Every few seconds the radar ticks
 and everything moves at once: altitudes change by a thousand feet, headings by up to ninety
-degrees, fuel drops. The shift runs until the first plane is lost, and the only score that matters
-is how many you brought home.
+degrees, fuel drops. The shift runs until the first plane is lost.
+
+Around that 1986 shift sits a controller's career. Twelve assignments ask for a number of planes
+home before your relief takes over, and passing them takes you from Trainee to Chief of the Room.
+Every shift opens with a clipboard of tasks that earn commendation stamps, and ends with the room's
+printer typing your shift report into a logbook. Once a day, Daily Traffic gives every controller
+the same planes.
 
 ## Where it comes from
 
@@ -38,10 +43,15 @@ two sit side by side.
   or describes the finished order.
 - A radio: pilots call in, ask for priority when fuel runs short and read back your orders, as
   subtitles and, if you turn it on, a spoken voice that runs on your own device.
-- A cheat panel that suggests the next line to type for every plane, and a reference card of every
-  order. You still type each line yourself.
-- Three sectors chosen on the title screen, a fifteen-minute shift clock, an event log and a quiet
-  console hum, all drawn and synthesised in code.
+- A career of twelve assignments over the three sectors, with ranks, sector endorsements and a
+  controller licence that keeps your service record.
+- A briefing of tasks before every shift, followed live in the sidebar, one commendation stamp
+  each.
+- A shift report printed line by line on green-bar paper, kept in a logbook of your last twenty
+  shifts.
+- Daily Traffic: the same planes and tasks for every controller each day, with a share line.
+- A reference card of every order, a fifteen-minute shift clock, an event log and a quiet console
+  hum, all drawn and synthesised in code.
 
 ## At a glance
 
@@ -50,7 +60,7 @@ two sit side by side.
 | Directory       | `/usr/games/arcade` |
 | Players         | 1                   |
 | Session         | 5–15 minutes        |
-| Daily challenge | no                  |
+| Daily challenge | yes, Daily Traffic  |
 | Inspired by     | `atc` (1986)        |
 
 ## More

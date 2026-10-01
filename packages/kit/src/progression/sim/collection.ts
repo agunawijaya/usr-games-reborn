@@ -21,8 +21,8 @@ const ROWS: Row[] = [
   ['zoomies', 'arcade', 3, 12, true],
   ['battlestar', 'stories', 20, 60, false],
   ['atc', 'arcade', 5, 15, true],
-  // A second interpretation of atc: the earlier typed-radar port, adopted as it was built.
-  ['atc-classic', 'arcade', 5, 15, false],
+  // A second interpretation of atc: the earlier typed-radar port, with a career and Daily Traffic.
+  ['atc-classic', 'arcade', 5, 15, true],
   ['wump', 'strategy', 3, 8, true],
   ['worm', 'arcade', 2, 6, false],
   ['snake', 'arcade', 2, 6, false],

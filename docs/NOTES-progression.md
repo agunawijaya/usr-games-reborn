@@ -7,6 +7,11 @@ themselves are recorded in [ADR 0005](adr/0005-progression-rules.md); the code i
 Recorded 2026-09-28 from `pnpm sim 60` (60 seeded runs per bot, 140 simulated days); re-run on
 2026-10-01 after prompt 01 corrected the model: `robots` has no daily challenge, so its catalog
 entry and the simulated collection now say `daily: false`. Every target below is still met.
+Re-run on 2026-10-02 with 32 entries, after Zoomies joined and Control Room 1986 gained Daily
+Traffic (`daily: true`): casual reaches `staff` on day 15 (p10 11, p90 20), regular reaches
+`wheel` on day 34 (29–40), enthusiast reaches `root` on day 54 (52–57, fastest 50) and the
+marathon bot on day 29 (28–30). Every target is still met; the tables below are the 2026-09-28
+run.
 
 ## Rules as simulated
 

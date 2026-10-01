@@ -617,7 +617,8 @@
     #sidebar {
       grid-area: sidebar;
       display: grid;
-      grid-template-rows: auto auto 1fr auto auto;
+      /* Sector, shift status, briefing, the traffic list (which takes the room), events. */
+      grid-template-rows: auto auto auto 1fr auto;
       gap: 10px;
       overflow: hidden;
     }
@@ -760,8 +761,8 @@
     #title-screen.hiding { opacity: 0; pointer-events: none; }
     #title-inner {
       position: relative;
-      width: min(700px, 92vw);
-      max-height: 92vh;
+      width: min(1020px, 94vw);
+      max-height: 94vh;
       border: 2px solid var(--phosphor-dim);
       border-radius: 12px;
       background: linear-gradient(180deg, rgba(4, 12, 8, 0.92) 0%, rgba(2, 6, 4, 0.98) 100%);
@@ -795,14 +796,14 @@
     #title-content {
       position: relative;
       z-index: 3;
-      padding: 44px 40px 32px;
+      padding: 28px 32px 22px;
       text-align: center;
       color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      max-height: 92vh;
+      gap: 8px;
+      max-height: 94vh;
       overflow-y: auto;
     }
     #title-mark {
@@ -816,7 +817,7 @@
     }
     #title-name {
       font-family: 'VT323', monospace;
-      font-size: clamp(88px, 18vw, 148px);
+      font-size: clamp(52px, 9vh, 104px);
       color: var(--phosphor-bright);
       letter-spacing: 0.28em;
       line-height: 1;
@@ -833,7 +834,7 @@
     }
     #title-subtitle {
       font-family: 'VT323', monospace;
-      font-size: 28px;
+      font-size: clamp(20px, 3.4vh, 28px);
       color: var(--phosphor);
       letter-spacing: 0.3em;
       text-shadow: 0 0 6px rgba(94, 255, 138, 0.4);
@@ -903,7 +904,7 @@
     }
     .title-sector-btn.active small { color: var(--phosphor); }
     #title-begin {
-      margin-top: 22px;
+      margin-top: 14px;
       background: linear-gradient(180deg, rgba(94, 255, 138, 0.15) 0%, rgba(60, 180, 100, 0.1) 100%);
       color: var(--phosphor-bright);
       border: 1px solid var(--phosphor);
@@ -1190,52 +1191,385 @@
     #help-btn:hover { background: var(--phosphor-dim); color: var(--phosphor-bright); }
 
     /* -------- Game over overlay -------- */
-    #game-over {
+    /* -------- Overlays: briefing, printed report, logbook -------- */
+    .overlay, #game-over {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
       z-index: 100;
       display: none;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      padding: 40px;
+      padding: 28px;
+      background: rgba(0, 0, 0, 0.78);
     }
-    #game-over.shown { display: flex; }
-    #game-over-inner {
-      max-width: 500px;
-      text-align: center;
-      padding: 40px;
-      border: 2px solid var(--red);
-      border-radius: 8px;
-      background: radial-gradient(circle at center, #1a0808 0%, #050202 100%);
-      box-shadow: 0 0 60px rgba(255, 82, 82, 0.4);
-    }
-    #game-over h1 {
+    .overlay.shown, #game-over.shown { display: flex; }
+    /* The briefing and the logbook open over the game menu, which sits above the console. */
+    .overlay { z-index: 400; }
+    #logbook-overlay { background: rgba(2, 6, 4, 0.94); }
+    body.in-hall .overlay, body.in-hall #game-over { padding-top: 66px; }
+    kbd {
+      display: inline-block;
       font-family: 'VT323', monospace;
-      font-size: 48px;
-      color: var(--red);
-      letter-spacing: 0.15em;
-      text-shadow: 0 0 15px var(--red);
-      margin-bottom: 16px;
-    }
-    #game-over-text {
+      background: #050d08;
       color: var(--phosphor-bright);
-      font-size: 20px;
-      margin-bottom: 20px;
-      letter-spacing: 0.05em;
+      border: 1px solid var(--phosphor-dim);
+      border-bottom-width: 2px;
+      border-radius: 2px;
+      padding: 0 5px;
+      font-size: 13px;
+      line-height: 1.3;
     }
-    #game-over-stats {
-      color: var(--text);
+
+    /* The briefing clipboard: a sheet of pale paper under a steel clip. */
+    .clipboard {
+      position: relative;
+      width: min(560px, 94vw);
+      padding: 46px 34px 26px;
+      border-radius: 10px;
+      background: #3a2c1c;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 210, 150, 0.12);
+      color: #20251f;
+    }
+    .clipboard::before {
+      content: '';
+      position: absolute;
+      inset: 30px 16px 16px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #ece6d2 0%, #e2dcc6 100%);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .clipboard > * { position: relative; }
+    .clipboard .clip {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 150px;
+      height: 34px;
+      transform: translateX(-50%);
+      border-radius: 6px 6px 3px 3px;
+      background: linear-gradient(180deg, #c9ccc6 0%, #8c908a 100%);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.45);
+    }
+    .brief-kicker {
+      margin-top: 8px;
+      color: #7a4a10;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+    }
+    .clipboard h2 {
+      margin: 4px 0 2px;
+      font-family: 'VT323', monospace;
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: #14301c;
+    }
+    .brief-sector { color: #4f5a50; font-size: 12px; letter-spacing: 0.12em; }
+    .brief-note { margin: 12px 0; color: #2d342d; font-size: 14px; line-height: 1.5; font-style: italic; }
+    .brief-tasks { margin: 0 0 18px 1.4em; color: #1d241e; font-size: 15px; line-height: 1.7; }
+    .brief-tasks .target { font-weight: 700; }
+    .brief-keys {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #4f5a50;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+    .brief-keys kbd { background: #1d2a20; }
+
+    /* The printed report: green-bar listing paper with tractor holes, as from a 1986 printer. */
+    .printout, .logbook {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      max-height: 94vh;
+    }
+    .paper {
+      position: relative;
+      padding: 16px 44px;
+      overflow: auto;
+      background:
+        radial-gradient(circle at 18px 50%, #0b0f0b 5px, transparent 6px) 0 0 / 100% 24px repeat-y,
+        radial-gradient(circle at calc(100% - 18px) 50%, #0b0f0b 5px, transparent 6px) 0 0 / 100% 24px repeat-y,
+        repeating-linear-gradient(180deg, #e9f2e3 0, #e9f2e3 48px, #d3e8cd 48px, #d3e8cd 96px);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.6);
+      color: #1e2a20;
+    }
+    .report-text {
+      margin: 0;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      line-height: 24px;
+      white-space: pre;
+    }
+    .rl.title { font-weight: 700; letter-spacing: 0.08em; }
+    .rl.rule { color: #6b7d6a; }
+    .rl.result { font-weight: 700; color: #102414; }
+    .share-line {
+      max-width: 92vw;
+      padding: 8px 14px;
+      border: 1px dashed var(--phosphor-dim);
+      color: var(--phosphor-bright);
       font-size: 14px;
-      letter-spacing: 0.08em;
-      margin-bottom: 24px;
+      user-select: text;
     }
-    #game-over-hint {
+    .report-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .report-actions[hidden] { display: none; }
+    .report-btn {
+      padding: 9px 16px;
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      background: rgba(4, 10, 6, 0.85);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+    }
+    .report-btn.primary { border-color: var(--phosphor); color: var(--phosphor-bright); box-shadow: 0 0 14px rgba(94, 255, 138, 0.25); }
+    .report-btn:hover { border-color: var(--phosphor); }
+
+    .logbook { width: min(1080px, 96vw); }
+    .logbook-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      width: 100%;
       color: var(--text-dim);
       font-size: 12px;
       letter-spacing: 0.15em;
-      animation: cursor-blink 1.4s infinite;
+    }
+    .logbook-head h2 {
+      font-family: 'VT323', monospace;
+      font-size: 30px;
+      font-weight: 400;
+      color: var(--phosphor-bright);
+      letter-spacing: 0.25em;
+    }
+    .logbook-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      width: 100%;
+      max-height: 80vh;
+    }
+    .log-list { display: grid; align-content: start; gap: 4px; overflow: auto; }
+    .log-row {
+      display: grid;
+      grid-template-columns: 7.5em minmax(0, 1fr) 4.5em 5.5em 4em;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      background: rgba(4, 10, 6, 0.8);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .log-row.selected, .log-row:hover { border-color: var(--phosphor); color: var(--phosphor-bright); }
+    .logbook .paper { max-height: 80vh; }
+
+    /* Commendation stamps: filled rounds earned, empty rounds still to earn. */
+    .stamps { display: inline-flex; gap: 3px; }
+    .stamps i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1px solid var(--amber);
+    }
+    .stamps i.on { background: var(--amber); box-shadow: 0 0 6px rgba(255, 177, 79, 0.6); }
+
+    /* -------- The desk on the game menu -------- */
+    .desk-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .desk-tab {
+      padding: 8px 14px;
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      background: rgba(4, 10, 6, 0.6);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+    }
+    .desk-tab.active {
+      border-color: var(--phosphor);
+      color: var(--phosphor-bright);
+      background: rgba(94, 255, 138, 0.12);
+      box-shadow: 0 0 12px rgba(94, 255, 138, 0.25);
+    }
+    .desk-tab.logbook-btn { margin-left: auto; }
+    .desk-tab kbd { margin-right: 4px; font-size: 11px; }
+    .desk {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 14px;
+      width: 100%;
+      margin-top: 12px;
+      text-align: left;
+    }
+    .licence {
+      padding: 14px 16px;
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 8px;
+      background: linear-gradient(160deg, rgba(20, 40, 26, 0.95) 0%, rgba(6, 14, 9, 0.95) 100%);
+      box-shadow: inset 0 0 30px rgba(94, 255, 138, 0.06);
+      font-size: 12px;
+    }
+    .licence-head {
+      display: flex;
+      justify-content: space-between;
+      color: var(--amber);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+    }
+    .licence-rank {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 6px;
+      color: var(--phosphor-bright);
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 6px rgba(94, 255, 138, 0.5);
+    }
+    .rank-mark { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; width: 26px; }
+    .rank-mark i { width: 24px; height: 4px; background: var(--amber); box-shadow: 0 0 4px rgba(255, 177, 79, 0.6); }
+    .rank-mark b { color: var(--amber); font-size: 16px; line-height: 1; }
+    .rank-mark em { color: var(--text-dim); font-style: normal; }
+    .licence-next small { color: var(--text-dim); letter-spacing: 0.05em; }
+    .licence-next .bar { height: 6px; margin-bottom: 4px; border: 1px solid var(--phosphor-dim); border-radius: 3px; }
+    .licence-next .bar i { display: block; height: 100%; background: var(--phosphor); }
+    .licence-label { margin: 12px 0 6px; color: var(--amber); font-size: 10px; letter-spacing: 0.2em; }
+    .endorsements { display: flex; gap: 6px; }
+    .endorse {
+      padding: 3px 7px;
+      border: 1px dashed var(--console-border);
+      border-radius: 3px;
+      color: var(--text-dim);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+    }
+    .endorse.on {
+      border: 2px solid var(--amber);
+      color: var(--amber);
+      transform: rotate(-4deg);
+      text-shadow: 0 0 4px rgba(255, 177, 79, 0.5);
+    }
+    .svc-row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; color: var(--text-dim); }
+    .svc-row b { color: var(--phosphor-bright); font-weight: 400; }
+    .desk-panel {
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid var(--console-border);
+      border-radius: 8px;
+      background: rgba(4, 10, 6, 0.7);
+    }
+    .panel-note { margin-top: 10px; color: var(--text-dim); font-size: 12px; line-height: 1.6; }
+    .panel-note b { color: var(--phosphor-bright); font-weight: 400; }
+    .assignments { display: grid; gap: 3px; }
+    .assignment {
+      display: grid;
+      grid-template-columns: 2.2em minmax(0, 1fr) 5.4em 5.6em 3.6em;
+      gap: 8px;
+      align-items: center;
+      padding: 5px 8px;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .assignment:hover:not(:disabled) { border-color: var(--console-border); }
+    .assignment.selected { border-color: var(--phosphor); background: rgba(94, 255, 138, 0.1); color: var(--phosphor-bright); }
+    .assignment.passed .a-title { color: var(--phosphor); }
+    .assignment.locked { color: #3b4a40; cursor: default; }
+    .assignment .a-no { color: var(--amber); }
+    .assignment.locked .a-no { color: inherit; }
+    .assignment .a-sector, .assignment .a-target { color: var(--text-dim); font-size: 11px; letter-spacing: 0.08em; }
+    .assignment.locked .stamps { color: #3b4a40; font-size: 10px; letter-spacing: 0.1em; }
+    .panel-open #title-sectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .title-sector-btn .best { color: var(--amber); font-style: normal; }
+    .daily-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--amber); letter-spacing: 0.2em; font-size: 12px; }
+    .daily-head b { color: var(--phosphor-bright); font-family: 'VT323', monospace; font-size: 40px; font-weight: 400; text-shadow: 0 0 8px rgba(94, 255, 138, 0.5); }
+    .daily-sector { color: var(--phosphor); letter-spacing: 0.15em; font-size: 13px; }
+    .recent { margin-top: 10px; border-top: 1px solid var(--console-border); padding-top: 6px; font-size: 12px; }
+    .daily-tasks { margin: 0 0 0 1.5em; color: var(--phosphor-bright); font-size: 13px; line-height: 1.8; }
+    .best-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .best-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px;
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+    }
+    .best-cell b {
+      color: var(--phosphor-bright);
+      font-family: 'VT323', monospace;
+      font-size: 34px;
+      font-weight: 400;
+      text-shadow: 0 0 8px rgba(94, 255, 138, 0.4);
+    }
+
+    /* The briefing card in the sidebar during a shift. */
+    #briefing-card { font-size: 12px; line-height: 1.5; }
+    .bc-heading { color: var(--phosphor); letter-spacing: 0.08em; margin-bottom: 4px; }
+    .bc-row { display: grid; grid-template-columns: 2.4em minmax(0, 1fr) auto; gap: 6px; color: var(--text); }
+    .bc-row b { color: var(--text-dim); font-weight: 400; }
+    .bc-row.done { color: var(--phosphor-bright); }
+    .bc-row.done .bc-mark { color: var(--amber); }
+    .bc-row.broken { color: var(--text-dim); text-decoration: line-through; }
+    .bc-row.holding .bc-mark { color: var(--phosphor); }
+
+    #title-desk { width: 100%; }
+
+    /* Inside the Hall its strip lies over the top of the game menu. */
+    body.in-hall #title-screen { padding-top: 58px; }
+    body.in-hall #title-inner, body.in-hall #title-content { max-height: calc(100vh - 70px); }
+
+    /* A window about 720 pixels high: the desk keeps its place, the decoration steps back. */
+    @media (max-height: 800px) {
+      #title-mark, #title-tagline { display: none; }
+      #title-name { font-size: clamp(44px, 8vh, 64px); }
+      #title-subtitle { font-size: 18px; margin-top: -2px; }
+      #title-content { padding: 18px 28px 14px; gap: 6px; }
+      .desk-tabs { margin-top: 4px; }
+      .desk { margin-top: 6px; }
+      .assignment { padding: 3px 8px; }
+      .licence { padding: 10px 14px; }
+      .licence-label { margin: 8px 0 4px; }
+      .svc-row { padding: 1px 0; }
+      #title-begin { margin-top: 8px; padding: 9px 30px; font-size: 20px; }
+      #title-help { margin-top: 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #title-name, #title-begin { animation: none; }
+    }
+
+    @media (max-width: 760px) {
+      .desk { grid-template-columns: 1fr; }
+      .logbook-body { grid-template-columns: 1fr; }
     }
 
     /* Small screens */
@@ -1266,7 +1600,7 @@
       </span>
       <span class="bezel-controls">
         <button id="help-panel-btn" title="Toggle help / command reference (\ key)">≡ help</button>
-        <button id="cheat-btn" title="Toggle dynamic cheat (per-plane suggestions)">▶ cheat</button>
+        <button id="cheat-btn" hidden title="Toggle dynamic cheat (per-plane suggestions)">▶ cheat</button>
         <button id="sub-toggle" title="Toggle subtitles">✎ subs on</button>
         <button id="voice-toggle" title="Toggle voice">◉ voice off</button>
         <button id="audio-toggle" title="Toggle sound (ambient + SFX)">♪ sound on</button>
@@ -1380,6 +1714,11 @@
         </div>
       </div>
 
+      <div class="card">
+        <h3>Briefing</h3>
+        <div id="briefing-card"></div>
+      </div>
+
       <div class="card" style="min-height: 200px;">
         <h3>Active Traffic</h3>
         <div id="planes"><div class="empty">— no traffic —</div></div>
@@ -1392,14 +1731,9 @@
     </div>
   </div>
 
-  <div id="game-over">
-    <div id="game-over-inner">
-      <h1>LOST</h1>
-      <div id="game-over-text"></div>
-      <div id="game-over-stats"></div>
-      <div id="game-over-hint">▸ ENTER / SPACE / CLICK · NEW SHIFT ◂</div>
-    </div>
-  </div>
+  <div id="game-over"></div>
+  <div id="briefing-overlay" class="overlay"></div>
+  <div id="logbook-overlay" class="overlay"></div>
 
   <div id="title-screen">
     <div id="title-inner">
@@ -1413,10 +1747,7 @@
           Ed James, University of California · 1986
         </div>
 
-        <div class="title-block">
-          <div class="title-label">SELECT SECTOR</div>
-          <div id="title-sectors"></div>
-        </div>
+        <div id="title-desk"></div>
 
         <button id="title-begin">▶  BEGIN SHIFT  ◀</button>
 
@@ -1427,7 +1758,7 @@
           <span class="dot">·</span>
           <span><kbd>\</kbd> reference</span>
           <span class="dot">·</span>
-          <span><kbd>▶</kbd> live cheat</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> choose</span>
         </div>
         <div id="title-attribution">
           Port by Agun Wijaya · Claude Opus · MIT license

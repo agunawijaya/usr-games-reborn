@@ -2,10 +2,24 @@
 
 ## Goal
 
-Bring as many planes home as you can before one is lost. Each plane has one destination: an
-airport, where it must arrive at altitude 0 flying in the direction of the runway arrow, or an exit
-on the edge of the radar, where it must arrive at altitude 9 (9,000 feet). A shift has no winning
-state; it ends the moment any plane is lost, and your score is the number of planes brought home.
+Bring planes home without losing one. Each plane has one destination: an airport, where it must
+arrive at altitude 0 flying in the direction of the runway arrow, or an exit on the edge of the
+radar, where it must arrive at altitude 9 (9,000 feet). Any shift ends the moment a plane is lost.
+
+There are three ways to work a shift, chosen on the game menu:
+
+- **Career:** twelve assignments, each asking for a number of planes home; when you reach it, your
+  relief controller takes over and the assignment is passed. Passing assignments raises your rank,
+  from Trainee to Chief of the Room.
+- **Open shift:** the 1986 way, new traffic until a plane is lost, on the sector of your choice.
+- **Daily Traffic:** one shift a day with the same traffic and the same briefing for every
+  controller.
+
+Every shift opens with a **briefing** of tasks on a clipboard; each one done earns a commendation
+stamp. When it ends, the room's printer types a **shift report**, and it goes into your
+**logbook**.
+
+![The game menu: the controller licence with rank, endorsements and service record, beside the twelve assignments of the career](media/title-1280.webp)
 
 ## Controls
 
@@ -15,8 +29,14 @@ Keys are the game’s own and cannot be remapped from the Hall.
 
 | Action                                   | Keyboard                          | Mouse                                        |
 | ---------------------------------------- | --------------------------------- | -------------------------------------------- |
-| Choose a sector (title screen)           | — (see the tips)                  | Easy, Default or Killer                      |
-| Begin the shift (title screen)           | Enter or Space                    | ▶ BEGIN SHIFT ◀                              |
+| Career, Open shift, Daily Traffic        | 1, 2, 3 (or ← →)                  | The tabs on the game menu                    |
+| Choose an assignment or a sector         | ↑ ↓                               | Click it                                     |
+| Open the logbook (game menu)             | L                                 | LOGBOOK                                      |
+| Read another page of the logbook         | ↑ ↓                               | Click a row                                  |
+| Close the logbook                        | Esc or L                          | Outside the pages                            |
+| Begin the shift (game menu)              | Enter or Space                    | ▶ BEGIN SHIFT ◀                              |
+| Take the position (briefing)             | Enter or Space                    | Outside the clipboard                        |
+| Back to the game menu (briefing)         | Esc                               | —                                            |
 | Type an order                            | Letters, digits, `+`, `-` and `@` | —                                            |
 | Give the order                           | Enter                             | —                                            |
 | Force the next tick now                  | Enter on an empty line            | —                                            |
@@ -25,10 +45,14 @@ Keys are the game’s own and cannot be remapped from the Hall.
 | Tutorial (pauses the shift)              | ? (during a shift)                | —                                            |
 | Close the tutorial                       | ? or Esc                          | ✕ close, or outside its panel                |
 | Reference card of every order            | `\`                               | ≡ help, ✕ on the card                        |
-| Cheat panel (what to type next)          | —                                 | ▶ cheat, ✕ on the panel                      |
 | Subtitles, voice, sound                  | —                                 | ✎ subs, ◉ voice, ♪ sound                     |
-| Start a new shift on another sector      | —                                 | Easy, Default or Killer in the sidebar       |
-| New shift after a loss                   | Enter or Space                    | Click anywhere                               |
+| Start an open shift on another sector    | —                                 | Easy, Default or Killer in the sidebar       |
+| Finish printing the report               | Any key                           | Click the paper                              |
+| Next assignment (report)                 | Enter                             | NEXT ASSIGNMENT                              |
+| Try again or a new shift (report)        | R                                 | AGAIN, TRY AGAIN or NEW SHIFT                |
+| Copy the Daily's share line (report)     | S                                 | COPY SHARE LINE                              |
+| Game menu (report)                       | M                                 | GAME MENU                                    |
+| Back to the Hall (report)                | H                                 | ← BACK TO THE HALL                           |
 | Leave for the Hall from the title screen | Esc                               | Move to the top edge; ← Back to the Hall     |
 | Leave for the Hall during a shift        | Tab to the Hall’s strip           | Move to the top edge; ← Back to the Hall     |
 | Back to the title screen                 | Tab to the Hall’s strip           | Move to the top edge; Game menu (then Leave) |
@@ -105,8 +129,11 @@ exits. Only its own exit at 9,000 feet takes it home, and only leaving the grid 
 
 ## Modes
 
-Three sectors, chosen on the title screen and remembered on this device. Each shift draws its
-traffic at random.
+### Sectors
+
+Three sectors. An assignment says which it uses; an open shift is on the sector you choose; the
+Daily's sector is set by the day of the week (Easy on Mondays and Thursdays, Killer on Sundays,
+Default the other days).
 
 | Sector  | Size  | Tick | A new plane about every | Exits | Airports | Beacons | Fuel at start |
 | ------- | ----- | ---- | ----------------------- | ----- | -------- | ------- | ------------- |
@@ -114,25 +141,101 @@ traffic at random.
 | Default | 30×21 | 5 s  | 5 ticks                 | 7     | 2        | 2       | 51            |
 | Killer  | 30×21 | 3 s  | 3 ticks                 | 7     | 3        | 3       | 51            |
 
-The sector buttons in the sidebar start a new shift on that sector at once, without asking. The
-`SHIFT` clock counts down fifteen minutes, but only for show: nothing happens when it reaches zero.
-Control Room 1986 has no daily challenge.
+The sector buttons in the sidebar start a new open shift on that sector at once, without asking.
+The `SHIFT` clock counts down fifteen minutes; reaching zero with the shift still running completes
+the briefing task "Stay on position for the full 15 minutes", and the shift carries on.
+
+### Career
+
+Twelve assignments, open one after another. Each has a target of planes home and two tasks; reach
+the target and your relief takes over, which passes the assignment. A plane lost first ends it, and
+you can try again at once.
+
+| #   | Assignment           | Sector  | Target |
+| --- | -------------------- | ------- | ------ |
+| 1   | First watch          | Easy    | 2      |
+| 2   | Wheels down          | Easy    | 3      |
+| 3   | Morning push         | Easy    | 5      |
+| 4   | The reference sector | Default | 3      |
+| 5   | Two fields           | Default | 5      |
+| 6   | Long afternoon       | Easy    | 8      |
+| 7   | Handoffs             | Default | 7      |
+| 8   | Fast lane            | Killer  | 2      |
+| 9   | Evening rush         | Default | 9      |
+| 10  | Short fuse           | Killer  | 4      |
+| 11  | Double watch         | Default | 12     |
+| 12  | Midnight in the room | Killer  | 7      |
+
+Each assignment earns up to three stamps: its target and its two tasks. A stamp counts only on a
+pass, and replaying keeps your best.
+
+| Rank                 | Asks for                         |
+| -------------------- | -------------------------------- |
+| Trainee              | —                                |
+| Assistant Controller | 3 assignments passed             |
+| Controller           | 6                                |
+| Senior Controller    | 9                                |
+| Watch Supervisor     | all 12                           |
+| Chief of the Room    | all 12, with 30 of the 36 stamps |
+
+Passing every assignment of a sector stamps its **endorsement** on your licence.
+
+### Open shift
+
+New traffic until a plane is lost, as in 1986, with three tasks drawn for the sector. The licence
+keeps your best open shift on each sector.
+
+### Daily Traffic
+
+One shift a day, numbered like every daily challenge in the Hall (#1 was 1 September 2026). The
+planes, the moments they appear and the three tasks are the same for every controller that day.
+The first flight of the day is the one on record; you can fly it again for practice. The report
+offers a share line without a link:
+
+```text
+Control Room 1986 #32 · Default · 7 home · 🟩🟩⬜
+```
+
+One square per briefing task: green when done.
+
+### The briefing
+
+| Task                                                 | Done when                                                       |
+| ---------------------------------------------------- | --------------------------------------------------------------- |
+| Land _n_ planes (at airport _a_)                     | that many land (at that airport)                                |
+| Hand off _n_ planes through the exits (exit _e_)     | that many leave by their exits (one by that exit)               |
+| Clear _n_ departures off the ground                  | that many take off                                              |
+| Turn a plane toward a beacon, then bring it home     | a plane given `ttb` comes home                                  |
+| Park a plane in a holding circle, then bring it home | a plane given `c` comes home                                    |
+| Give every order right the first time                | at the end, if no order was refused by the parser or the engine |
+| Keep every pilot off minimum fuel                    | at the end, if no plane in the air fell to fuel 6               |
+| Stay on position for the full 15 minutes             | the shift clock reaches zero with the shift still running       |
+
+The briefing card in the sidebar follows each task as you work: `[✓]` done, `[·]` holding,
+`[✗]` broken. Nothing counts from the tick that loses a plane.
+
+![The briefing clipboard of the first assignment](media/briefing-1280.webp)
 
 ## Settings
 
 All of them live in the bar along the top of the console and are remembered on this device.
 
-| Setting        | Options                                                  | Default |
-| -------------- | -------------------------------------------------------- | ------- |
-| Sound          | The console hum and the beeps, on or off                 | On      |
-| Voice          | Pilots and you speak the radio lines aloud, or not       | Off     |
-| Subtitles      | The radio lines written under the radar, or not          | On      |
-| Reference card | Every order on one card beside the radar                 | Shown   |
-| Cheat panel    | The next line to type for every plane, most urgent first | Shown   |
+| Setting        | Options                                            | Default |
+| -------------- | -------------------------------------------------- | ------- |
+| Sound          | The console hum and the beeps, on or off           | On      |
+| Voice          | Pilots and you speak the radio lines aloud, or not | Off     |
+| Subtitles      | The radio lines written under the radar, or not    | On      |
+| Reference card | Every order on one card beside the radar           | Shown   |
 
 The voice uses only a speech voice that runs on your own device; where the browser offers none,
-the radio stays silent and the subtitles carry on. The tutorial opens by itself at the start of
-your first shift and pauses the shift while it is open; nothing else pauses it.
+the radio stays silent and the subtitles carry on. The tutorial opens by itself when you take the
+position for the first time.
+
+The shift clock stops while the briefing is open, while the tutorial is open, while the Hall's
+pause menu is up and while the page is hidden; the room goes quiet in the last two.
+
+Your career, service record and logbook are kept in this browser with the rest of the collection,
+and the Hall's "Forget everything" clears them too.
 
 Control Room 1986 has a single dark look; the Hall’s strip follows the Hall’s light or dark
 appearance.
@@ -140,8 +243,12 @@ appearance.
 ## Scoring
 
 The score is the number of planes brought home in the shift, shown under the radar as
-`PLANES n SAFE … SCORE n`. The loss screen names the plane that was lost and why, with the planes
-safe and the length of the shift. The Hall keeps your best score.
+`PLANES n SAFE … SCORE n`. The shift report adds landings, handoffs, departures cleared, orders
+given and refused, orders a minute, time on position (pauses left out), the briefing with its
+stamps, how the shift ended, and your rank. The Hall keeps your best score; the licence keeps your
+shifts worked, planes home, hours on duty and stamps.
+
+![A shift report printed after the first assignment](media/report-1280.webp)
 
 ## Achievements (packages)
 
@@ -165,15 +272,14 @@ because the game stops before it adds that tick’s arrivals.
 
 ## XP
 
-Each shift reports to the Hall when a plane is lost. A shift that brought at least one plane home
-counts as a win, since the game has no winning state; a shift with none home counts as a loss. On
-top of the session’s XP, a shift earns 3 XP for every plane brought home (up to 25); the Hall caps
-a session’s extras at 30. A shift you leave by pressing a sector button in the sidebar, after at
-least one tick, counts as quit and earns no XP, though its planes still count toward the weekly
-goal. Weekly goals can ask you to guide a number of planes home (10–30).
-
-The cheat panel only suggests lines; you still type each one, so shifts played with it count like
-any other.
+Each shift reports to the Hall when it ends. A career assignment is a win when the relief arrives
+and a loss when a plane is lost first; an open shift or the Daily is a win when at least one plane
+came home. Daily Traffic counts as the Hall's daily challenge. On top of the session's XP, a shift
+earns 3 XP for every plane home (up to 18), 3 for every commendation stamp and 6 for a promotion;
+the Hall caps a session's extras at 30. A shift you leave by pressing a sector button in the
+sidebar, after at least one tick, counts as quit and earns no XP, though its planes still count
+toward the weekly goal. Weekly goals can ask you to guide 10–30 planes home or to earn 4–12
+commendation stamps.
 
 ## Tips
 
@@ -187,5 +293,7 @@ any other.
 - When you are busy or a plane is early, park it with `c` at a safe altitude and come back to it.
 - Keep crossing planes at least 2,000 feet apart: altitude is the quickest way to separate them.
 - An empty Enter skips the wait when nothing needs an order.
-- To pick a sector with the keyboard, the buttons do not help yet: Enter on a focused sector
-  button begins the shift before the choice applies. Click the sector instead.
+- On the game menu, 1, 2 and 3 pick the way to work and ↑ ↓ the assignment or sector; Enter
+  begins.
+- Read the briefing before you take the position: a task like "Land a plane at airport 1" decides
+  which plane to serve first.

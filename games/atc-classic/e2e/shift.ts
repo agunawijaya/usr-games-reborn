@@ -7,8 +7,12 @@ import { gameFrame, inGame } from '../../../packages/bridge/testing/hall';
  * player would press, and the state is read back from the page.
  */
 
-/** Truthy inside the game's page once the title screen has its sector buttons. */
-export const READY = "document.querySelectorAll('#title-sectors .title-sector-btn').length === 3";
+/** Truthy inside the game's page once the game menu's desk has its tabs and the logbook. */
+export const READY = "document.querySelectorAll('#title-desk .desk-tab').length === 4";
+
+/** The desk's tabs by their number keys. */
+const MODE_KEYS = { career: '1', open: '2', daily: '3' } as const;
+export type ShiftMode = keyof typeof MODE_KEYS;
 
 /**
  * Seeds `Math.random` inside the game's frame (never the Hall's). The engine takes its seed from
@@ -28,13 +32,36 @@ export async function seedTheShift(page: Page, seed: number) {
   }, seed);
 }
 
-/** Begins a shift from the title screen and closes the tutorial the first shift opens. */
-export async function beginShift(page: Page) {
+/**
+ * Begins a shift from the game menu: picks the tab, reads the briefing (Enter takes the
+ * position) and closes the tutorial the first shift of a visit opens.
+ */
+export async function beginShift(page: Page, mode: ShiftMode = 'open') {
+  const briefing = gameFrame(page).locator('#briefing-overlay');
   const help = gameFrame(page).locator('#help-overlay');
+  await page.keyboard.press(MODE_KEYS[mode]);
   await page.keyboard.press('Enter');
+  await expect(briefing).toHaveClass(/shown/);
+  await takePosition(page);
   await expect(help).toHaveClass(/shown/);
   await page.keyboard.press('Escape');
   await expect(help).not.toHaveClass(/shown/);
+}
+
+/** Enter on the briefing clipboard starts the clock. */
+export async function takePosition(page: Page) {
+  const briefing = gameFrame(page).locator('#briefing-overlay');
+  await page.keyboard.press('Enter');
+  await expect(briefing).not.toHaveClass(/shown/);
+}
+
+/** The cheat panel is kept out of sight; its hidden key brings it up for the suites. */
+export async function showCheat(page: Page) {
+  const panel = gameFrame(page).locator('#cheat-live-panel');
+  if (!(await panel.evaluate((el) => el.classList.contains('shown')))) {
+    await page.keyboard.press('Control+Alt+KeyC');
+  }
+  await expect(panel).toHaveClass(/shown/);
 }
 
 export function shiftIsOver(page: Page): Promise<boolean> {
@@ -57,6 +84,7 @@ export async function forceTick(page: Page) {
  * home or the shift is over. Returns the planes safe.
  */
 export async function followTheHints(page: Page, target: number, maxTicks = 200): Promise<number> {
+  await showCheat(page);
   for (let tick = 0; tick < maxTicks; tick++) {
     if ((await planesSafe(page)) >= target || (await shiftIsOver(page))) break;
     const commands = await inGame<string[]>(

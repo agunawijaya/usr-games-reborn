@@ -5,6 +5,10 @@ earlier typed-radar port of `atc` joins the Hall as a second interpretation of t
 collection’s native `atc`, which another session builds in parallel. The two share nothing: no code,
 no files, no progress.
 
+On 2026-10-02 the owner asked for gamification around the adopted game: a career, briefings with
+stamps, printed reports with a logbook and Daily Traffic, together with the Hall's pause reaching
+the game and the cheat panel kept out of sight. That work is recorded in "Gamification" below.
+
 ## Sources studied
 
 | Source                                                                  | What we took or learned                                                                                      |
@@ -204,6 +208,67 @@ ships `index.html` (54 KB, all CSS inline), 113 KB of its own JavaScript and 31 
 | 2026-10-01 | Airline names, call signs and the airport code kept in `app/` for now                   | Copy is not edited on adoption; listed in `docs/KNOWN-ISSUES.md`                                                                               |
 | 2026-10-01 | Test script `node --test "tests/*.test.js"` instead of `tests/`                         | Node 22 reads `tests/` as a pattern and finds no files                                                                                         |
 
+## Gamification (2026-10-02)
+
+The 1986 shift is untouched: the engine, the parser, the radio, the hints and the playfields did
+not change. Around it:
+
+| Piece            | Where                           | What it does                                                                                                                 |
+| ---------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Career           | `app/src/career.js`             | Twelve assignments over the three sectors, a target each; ranks from Trainee to Chief of the Room; endorsements per sector   |
+| Briefing         | `app/src/briefing.js`           | Two tasks per assignment, three drawn per open shift or Daily; a tracker fed by the engine's events and the orders typed     |
+| Daily Traffic    | `app/src/daily.js`              | The kit's epoch (#1 on 2026-09-01), a sector by weekday, an FNV-1a seed of the date, a one-line share without a link         |
+| Shift report     | `app/src/report.js`, `desk.js`  | 44-column lines printed on green-bar paper; the first key finishes the printing                                              |
+| Service, logbook | `app/src/service.js`            | Shifts, planes home, hours on duty, stamps, best open shift per sector, the first Daily of each day; the last twenty reports |
+| Saving           | `app/src/store.js`              | `usr-games:atc-classic:` keys with a version, so the Hall's "Forget everything" clears them                                  |
+| The desk         | `app/src/desk.js`, `index.html` | The game menu's tabs (1 2 3), the licence card, the panels, the briefing clipboard and sidebar card, the report, the logbook |
+
+### Targets
+
+Measured with the cheat panel's autoplayer (every suggestion for every plane, no judgment), over
+400 seeds per assignment, how often it reaches the target before a plane is lost. A player who
+chooses which plane to serve first does better; the numbers are a floor, and the unit tests only
+require each target to be reached on some seed.
+
+| #   | Assignment           | Sector  | Target | Autoplayer reaches |
+| --- | -------------------- | ------- | ------ | ------------------ |
+| 1   | First watch          | Easy    | 2      | 66.0 %             |
+| 2   | Wheels down          | Easy    | 3      | 48.3 %             |
+| 3   | Morning push         | Easy    | 5      | 27.3 %             |
+| 4   | The reference sector | Default | 3      | 36.3 %             |
+| 5   | Two fields           | Default | 5      | 16.0 %             |
+| 6   | Long afternoon       | Easy    | 8      | 8.3 %              |
+| 7   | Handoffs             | Default | 7      | 5.8 %              |
+| 8   | Fast lane            | Killer  | 2      | 41.3 %             |
+| 9   | Evening rush         | Default | 9      | 2.8 %              |
+| 10  | Short fuse           | Killer  | 4      | 15.3 %             |
+| 11  | Double watch         | Default | 12     | 0.5 %              |
+| 12  | Midnight in the room | Killer  | 7      | 2.3 %              |
+
+Evening rush was first set at 10 (1.5 %) and Double watch at 14 (0.3 %); both were eased. The
+autoplayer's whole shifts, for reference (300 seeds a sector, until a plane is lost): median 2
+planes home on Easy and Default and 1 on Killer, best 14, 19 and 10.
+
+### XP
+
+`planes-safe` is now capped at 18 (3 a plane), leaving room under the Hall's cap of 30 for
+`stamps` (3 a stamp) and `promotion` (6). Daily Traffic sends `daily: true`, so the manifest says
+`daily: true` and the kit's collection model was changed to match; the progression simulation was
+re-run and every target still holds (`docs/NOTES-progression.md`). A second weekly goal counts
+`stamps` (4–12).
+
+### Decisions
+
+| Date       | Decision                                                                                                        | Why                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 2026-10-02 | The cheat panel stays in the page but hidden: no button, off by default, `?cheat=1` or Ctrl+Alt+C for one visit | The owner's testing aid for checking a shift can be won by hand; players never see it |
+| 2026-10-02 | An assignment ends when its target is home ("your relief takes over"), as a win                                 | Gives the endless shift a finish line without changing the rules                      |
+| 2026-10-02 | Stamps count only on a pass, and a replay keeps the best                                                        | Progress never goes backwards; a failed shift costs nothing                           |
+| 2026-10-02 | Keeping tasks (no refused order, no minimum fuel) count only at the end, if unbroken                            | They are about the whole shift                                                        |
+| 2026-10-02 | The Daily's first flight of the day is the one on record; later flights are practice                            | A fair, shared result                                                                 |
+| 2026-10-02 | The clock stops for the briefing, the tutorial, the Hall's pause and a hidden page                              | With rewards at stake, nobody should lose a plane while away                          |
+| 2026-10-02 | The licence number comes from the clock, not `Math.random`                                                      | The in-Hall suites seed `Math.random` so the engine's traffic repeats                 |
+
 ## Open questions
 
 Listed in `docs/KNOWN-ISSUES.md` for the owner or a modification prompt:
@@ -212,19 +277,17 @@ Listed in `docs/KNOWN-ISSUES.md` for the owner or a modification prompt:
   panel and the event log, and a real airport’s code in the Default sector’s name.
 - Upstream wording: the loss reasons repeat the original’s messages almost word for word.
 - One dark look only; no light appearance.
-- The Hall’s pause does not reach the game: in a hidden tab the shift keeps ticking, and a plane
-  can be lost while the player is away. Sound is on by default and keeps playing while the tab is
-  hidden.
+- Fixed 2026-10-02: the Hall's pause and a hidden page now stop the clock and quiet the room.
 - No `:focus-visible` styles, no ARIA beyond a hidden subtitle bar, and no reduced-motion handling
   (the sweep and the title’s fade always run).
-- Enter on a Tab-focused sector button begins the shift before the choice applies, so a keyboard
-  player cannot pick a sector.
+- Fixed 2026-10-02: the game menu has keys for everything (1 2 3, ↑ ↓, L, Enter); Enter on a
+  Tab-focused button still begins the shift with the choice the desk shows.
 - The sidebar’s sector buttons abandon a running shift without asking.
-- `?` does nothing on the title, though the title offers it; the sidebar highlight lags the
-  title’s sector choice.
+- `?` does nothing on the game menu, though the menu mentions it (the tutorial opens during a
+  shift).
 - The delay suffix is accepted and silently ignored.
-- The loss screen offers only a new shift; the results order of the navigation standard (Play
-  again, Game menu, Back to the Hall) is left to the Hall’s strip.
+- Fixed 2026-10-02: the shift report offers the way on, then Again (R), Game menu (M) and Back to
+  the Hall (H).
 - The Hall’s volume and mute settings do not reach the game, which has its own switches.
 - This session’s screenshots and in-Hall runs used a Hall that Playwright started on port 5209:
   the Hall already running on 5174 had read the games’ manifests before this one existed, and its

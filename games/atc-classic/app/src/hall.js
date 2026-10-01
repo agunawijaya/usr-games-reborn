@@ -3,19 +3,45 @@
 // script is missing or reports `hosted: false`, and every call below does nothing.
 //
 // What the Hall hears comes from the engine's own tick events and from the commands the player
-// types, both passed on by main.js. A shift has no winning state: it runs until a plane is lost,
-// so a shift that brought at least one plane home counts as a win (ADR 0011). The cheat panel only
-// suggests what to type; the player still types every command, so it does not change what a
-// shift earns.
+// types, both passed on by main.js. A career assignment is won when its relief arrives, that is
+// when its target of planes is home; an open shift or the Daily runs until a plane is lost and
+// counts as a win when at least one plane came home (ADR 0011). The cheat panel is a testing aid
+// kept out of sight; it only suggests what to type, so it does not change what a shift earns.
 
-const hall = globalThis.UsrGamesBridge?.connectToHall({ id: 'atc-classic' }) ?? null;
+// The Hall pauses the game behind its pause menu and while its tab is hidden; main.js decides
+// what pausing means, through onHallPause.
+const pauseHandlers = { pause: () => {}, resume: () => {} };
+const hall =
+  globalThis.UsrGamesBridge?.connectToHall({
+    id: 'atc-classic',
+    onPause: () => pauseHandlers.pause(),
+    onResume: () => pauseHandlers.resume(),
+  }) ?? null;
 const installed = new Set();
 const XP_PER_PLANE = 3;
+const PLANES_XP_MAX = 18;
+const XP_PER_STAMP = 3;
+const PROMOTION_XP = 6;
 /** main.js has a pilot call "minimum fuel" once a plane in the air is down to this much fuel. */
 const MINIMUM_FUEL = 6;
 const STEADY_SHIFT = 5;
 const FULL_BOARD = 10;
 const DOUBLE_SHIFT = 25;
+
+/** True inside the Hall's frame; on its own the game has no Hall to go back to. */
+export const hostedInHall = Boolean(hall?.hosted);
+if (hostedInHall) document.body.classList.add('in-hall');
+
+/** @param {() => void} pause @param {() => void} resume */
+export function onHallPause(pause, resume) {
+  pauseHandlers.pause = pause;
+  pauseHandlers.resume = resume;
+}
+
+/** The report's "Back to the Hall". */
+export function leaveForHall() {
+  hall?.navigate('hall');
+}
 
 function install(id) {
   if (!hall || installed.has(id)) return;
@@ -113,25 +139,40 @@ export function noteTick(game, events) {
   noteSafePlanes(game.safePlanes);
 }
 
-function reportShift(record, outcome) {
+/**
+ * @param {object} record
+ * @param {'win' | 'loss' | 'quit'} outcome
+ * @param {{ mode?: string, stamps?: number, promoted?: boolean }} details
+ */
+function reportShift(record, outcome, details = {}) {
   if (!hall) return;
   const planesSafe = record.game.safePlanes;
-  const earnsXp = outcome !== 'quit' && planesSafe > 0;
+  const stamps = details.stamps ?? 0;
+  const xpEvents = [];
+  if (outcome !== 'quit') {
+    if (planesSafe > 0) xpEvents.push({ id: 'planes-safe', xp: Math.min(PLANES_XP_MAX, planesSafe * XP_PER_PLANE) });
+    if (stamps > 0) xpEvents.push({ id: 'stamps', xp: stamps * XP_PER_STAMP });
+    if (details.promoted) xpEvents.push({ id: 'promotion', xp: PROMOTION_XP });
+  }
   hall.result({
     outcome,
     score: planesSafe,
-    stats: { planesSafe, landings: record.landings, exits: record.exits },
-    xpEvents: earnsXp
-      ? [{ id: 'planes-safe', xp: Math.min(25, planesSafe * XP_PER_PLANE) }]
-      : [],
+    stats: { planesSafe, landings: record.landings, exits: record.exits, stamps },
+    xpEvents,
+    daily: details.mode === 'daily',
     durationSeconds: Math.round((performance.now() - record.startedAt) / 1000),
   });
 }
 
-/** Called by endGame: a plane was lost, which is the only way a shift ends on its own. */
-export function noteShiftEnded(game) {
+/**
+ * Called when a shift is over: a plane was lost, or on an assignment the relief arrived.
+ * @param {object} game
+ * @param {{ mode: 'career' | 'open' | 'daily', passed: boolean, stamps: number, promoted: boolean }} details
+ */
+export function noteShiftEnded(game, details) {
   if (!shift || shift.game !== game) return;
-  reportShift(shift, game.safePlanes > 0 ? 'win' : 'loss');
+  const won = details.mode === 'career' ? details.passed : game.safePlanes > 0;
+  reportShift(shift, won ? 'win' : 'loss', details);
   shift = null;
 }
 

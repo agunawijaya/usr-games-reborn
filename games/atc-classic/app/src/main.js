@@ -9,7 +9,24 @@ import { PLAYFIELDS } from './playfields.js';
 import { parseCommand, describeCommand, PARSE } from './parser.js';
 import * as chatter from './chatter.js';
 import { hintForPlane, sortHintsByPriority } from './hints.js';
-import { noteCommand, noteShiftEnded, noteShiftStarted, noteTick, offerPoster, posterWanted } from './hall.js';
+import {
+  hostedInHall, leaveForHall, noteCommand, noteShiftEnded, noteShiftStarted, noteTick, offerPoster,
+  onHallPause, posterWanted,
+} from './hall.js';
+import {
+  ASSIGNMENTS, isUnlocked, newCareer, nextAssignmentIndex, nextRankNeed, RANKS, rankIndex,
+  withShift as withCareerShift,
+} from './career.js';
+import {
+  createTracker, describeTask, FULL_SHIFT_MINUTES, generateTasks, taskProgress, taskState, tasksDone,
+  trackCommand, trackFullShift, trackRefusal, trackTick,
+} from './briefing.js';
+import { dailyNumber, dailySector, dailySeed, dailyShareLine, localDateKey, seededRandom } from './daily.js';
+import { licenceNumber, newService, withPage, withShift as withServiceShift } from './service.js';
+import { loadSaved, save } from './store.js';
+import {
+  hideOverlay, printReport, renderBriefingCard, renderDesk, showBriefing, showLogbook, TABS,
+} from './desk.js';
 
 // ---------------------------------------------------------------------------
 // DOM refs
@@ -25,8 +42,10 @@ const hint = $('hint');
 const planesPanel = $('planes');
 const eventsLog = $('events');
 const gameOverEl = $('game-over');
-const gameOverText = $('game-over-text');
-const gameOverStats = $('game-over-stats');
+const briefingOverlay = $('briefing-overlay');
+const logbookOverlay = $('logbook-overlay');
+const briefingCardEl = $('briefing-card');
+const titleDesk = $('title-desk');
 const playfieldPicker = $('playfield-picker');
 const shiftTimerEl = $('shift-timer');
 const nextTickEl = $('next-tick');
@@ -52,7 +71,6 @@ const cheatBtn = $('cheat-btn');
 const cheatLiveClose = $('cheat-live-close');
 
 const titleScreen = $('title-screen');
-const titleSectorsHost = $('title-sectors');
 const titleBeginBtn = $('title-begin');
 const titleRadarCanvas = $('title-radar-canvas');
 
@@ -61,7 +79,6 @@ const SOUND_ON_KEY = 'atc-fancyweb-sound';
 const VOICE_ON_KEY = 'atc-fancyweb-voice';
 const SUBS_ON_KEY = 'atc-fancyweb-subs';
 const HELP_PANEL_KEY = 'atc-fancyweb-help-panel';
-const CHEAT_LIVE_KEY = 'atc-fancyweb-cheat-live';
 const LAST_SECTOR_KEY = 'atc-fancyweb-sector';
 
 // ---------------------------------------------------------------------------
@@ -84,7 +101,9 @@ let audioEnabled = loadBool(SOUND_ON_KEY, true);
 let voiceEnabled = loadBool(VOICE_ON_KEY, false); // default off — TTS can be startling
 let subsEnabled = loadBool(SUBS_ON_KEY, true);
 let helpPanelVisible = loadBool(HELP_PANEL_KEY, true);   // static reference — user requested default on
-let cheatLiveVisible = loadBool(CHEAT_LIVE_KEY, true);   // dynamic cheat — user requested default on
+// The cheat panel is the owner's testing aid for checking that a shift can be won by hand: it is
+// kept out of sight, and opens with ?cheat=1 in the address or Ctrl+Alt+C, for this visit only.
+let cheatLiveVisible = new URLSearchParams(location.search).has('cheat');
 let audioCtx = null;
 let ambientBed = null;
 let ttsVoice = null;
@@ -92,9 +111,33 @@ let subtitleHideTimer = null;
 let subtitleSeq = 0;    // increments per subtitle so stale timers can no-op
 let shiftStart = Date.now();
 let paused = false;
+// The clock stops while any of these holds: the tutorial is open, the briefing is being read, the
+// Hall's pause menu is up, the page is hidden.
+const pauseReasons = new Set();
 let pausedAt = 0;        // timestamp when pause began
 let pausedRemainingMs = 0; // ms remaining on the tick when paused
-const SHIFT_LENGTH_MS = 15 * 60 * 1000; // 15 min compressed shift
+const SHIFT_LENGTH_MS = FULL_SHIFT_MINUTES * 60 * 1000; // 15 min compressed shift
+
+// The career, the service record and the logbook live in the browser (store.js).
+let career = loadSaved('career', newCareer);
+let service = loadSaved('service', newService);
+let logbook = loadSaved('logbook', () => []);
+// From the clock rather than Math.random, which the tests seed for the engine's traffic.
+const licence = loadSaved('licence', () => licenceNumber(Date.now() % 9000));
+save('licence', licence);
+/** What the game menu's desk shows: the tab, the assignment and the open-shift sector chosen. */
+let desk = { tab: 'career', assignment: nextAssignmentIndex(career), ...loadSaved('desk', () => ({})) };
+if (!isUnlocked(career, desk.assignment)) desk.assignment = nextAssignmentIndex(career);
+let logbookPage = 0;
+/**
+ * The shift being worked: how it was chosen, its briefing and what the report will need.
+ * @type {null | { mode: 'career' | 'open' | 'daily', sectorKey: string, assignmentIndex: number,
+ *   dateKey: string, tracker: ReturnType<typeof createTracker>, orders: number, refused: number,
+ *   over: boolean, briefing: boolean, rankBefore: number, fullShift: boolean }}
+ */
+let current = null;
+let stopPrinting = null;
+let reportButtons = [];
 
 // ---------------------------------------------------------------------------
 // Canvas sizing
@@ -743,8 +786,10 @@ function renderBezel() {
   document.getElementById('bezel-atis').textContent = `ATIS INFO ${atis}`;
 }
 
+let shiftEndedAt = 0;
+
 function renderShiftTimer() {
-  const nowRef = paused ? pausedAt : Date.now();
+  const nowRef = current?.over && shiftEndedAt ? shiftEndedAt : paused ? pausedAt : Date.now();
   const elapsed = nowRef - shiftStart;
   const remaining = Math.max(0, SHIFT_LENGTH_MS - elapsed);
   const m = Math.floor(remaining / 60000);
@@ -805,15 +850,21 @@ function submitCommand() {
   if (parsed.status !== PARSE.OK) {
     pushEvent('✗ ' + (parsed.error || 'incomplete'), 'err');
     playBeep(180, 0.15, 'sawtooth', 0.12);
+    noteRefusal();
     return;
   }
   const res = executeCommand(game, parsed.cmd);
   if (!res.ok) {
     pushEvent('✗ ' + res.error, 'err');
     playBeep(180, 0.15, 'sawtooth', 0.12);
+    noteRefusal();
     return;
   }
   noteCommand(parsed.cmd, res.plane);
+  if (current) {
+    current.orders += 1;
+    trackCommand(current.tracker, parsed.cmd, res.plane);
+  }
   // Controller radio call
   const cs = callsigns.get(res.plane.letter);
   emitChatter(chatter.chatterOnCommand(cs, parsed.cmd, res.plane));
@@ -825,6 +876,13 @@ function submitCommand() {
   renderHint();
   renderPlanesPanel();
   renderCheatLive();
+}
+
+function noteRefusal() {
+  if (!current) return;
+  current.refused += 1;
+  trackRefusal(current.tracker);
+  renderBriefingSidebar();
 }
 
 // ---------------------------------------------------------------------------
@@ -839,10 +897,12 @@ function scheduleNextTick() {
 }
 
 function doTick(forced) {
-  if (!game || game.lost) return;
+  if (!game || game.lost || current?.over) return;
   const pf = game.playfield;
   const res = tick(game);
   noteTick(game, res.events);
+  // A tick that loses a plane counts nothing, as the engine leaves its arrivals out of the score.
+  if (current && !game.lost) trackTick(current.tracker, res.events, game.air);
   if (forced) playTick();
   for (const ev of res.events) {
     if (ev.type === 'spawn') {
@@ -912,9 +972,16 @@ function doTick(forced) {
   renderBezel();
   renderPlanesPanel();
   renderCheatLive();
+  renderBriefingSidebar();
 
   if (game.lost) {
-    endGame();
+    endShift('lost');
+    return;
+  }
+  const assignment = current?.mode === 'career' ? ASSIGNMENTS[current.assignmentIndex] : null;
+  if (assignment && game.safePlanes >= assignment.target) {
+    pushEvent('◇ relief controller on position', 'meta');
+    endShift('relieved');
     return;
   }
   scheduleNextTick();
@@ -946,13 +1013,150 @@ function labelWithCallsign(letter) {
   return cs ? `${letter} ${cs}` : letter;
 }
 
-function endGame() {
-  noteShiftEnded(game);
+/** Seconds on position in this shift, pauses left out. */
+function secondsOnPosition() {
+  return Math.max(0, Math.floor(((paused ? pausedAt : Date.now()) - shiftStart) / 1000));
+}
+
+function assignmentOf(shift) {
+  return shift.mode === 'career' ? ASSIGNMENTS[shift.assignmentIndex] : null;
+}
+
+/** The briefing as the report and the logbook list it: the target first on an assignment. */
+function briefingResults(shift, passed) {
+  const assignment = assignmentOf(shift);
+  const done = tasksDone(shift.tracker);
+  return [
+    ...(assignment ? [{ text: `Bring ${assignment.target} planes home`, done: passed }] : []),
+    ...shift.tracker.tasks.map((task, i) => ({ text: describeTask(task, game.playfield), done: done[i] })),
+  ];
+}
+
+/**
+ * A plane was lost, or on an assignment the relief arrived: save the career, the service record
+ * and the logbook, tell the Hall, and print the report.
+ * @param {'lost' | 'relieved'} ended
+ */
+function endShift(ended) {
+  if (!current || current.over) return;
+  const shift = current;
+  const seconds = secondsOnPosition();
+  shift.over = true;
+  shiftEndedAt = Date.now();
   clearTimeout(tickTimer);
-  const runtime = Math.floor((Date.now() - shiftStart) / 1000);
-  gameOverText.textContent = `${game.lostPlane} — ${game.lostReason}`;
-  gameOverStats.textContent = `${game.safePlanes} planes safely delivered · shift ran ${runtime}s · sector ${game.playfield.name}`;
-  gameOverEl.classList.add('shown');
+  const passed = ended === 'relieved';
+  const assignment = assignmentOf(shift);
+  const tasks = briefingResults(shift, passed);
+  const stamps = tasks.filter((task) => task.done).length;
+  if (assignment) {
+    career = withCareerShift(career, assignment.id, passed, stamps);
+    save('career', career);
+  }
+  const rank = rankIndex(career);
+  const promoted = rank > shift.rankBefore;
+  const need = nextRankNeed(career);
+  const summary = {
+    mode: shift.mode,
+    dateKey: shift.dateKey,
+    sectorName: game.playfield.name,
+    assignment: assignment
+      ? { number: shift.assignmentIndex + 1, total: ASSIGNMENTS.length, title: assignment.title, target: assignment.target }
+      : null,
+    daily: shift.mode === 'daily' ? { number: dailyNumber(shift.dateKey) } : null,
+    safe: game.safePlanes,
+    landings: shift.tracker.landings,
+    exits: shift.tracker.exits,
+    takeoffs: shift.tracker.takeoffs,
+    orders: shift.orders,
+    refused: shift.refused,
+    seconds,
+    ended,
+    lostPlane: game.lostPlane ?? null,
+    lostReason: game.lostReason ?? null,
+    tasks,
+    rank: { title: RANKS[rank].title, promoted, next: need ? `${need.rank}, ${need.text}` : null },
+  };
+  service = withServiceShift(service, summary, shift.sectorKey);
+  save('service', service);
+  logbook = withPage(logbook, summary);
+  save('logbook', logbook);
+  noteShiftEnded(game, { mode: shift.mode, passed, stamps, promoted });
+  if (passed) {
+    playSuccess();
+    if (assignment && shift.assignmentIndex + 1 < ASSIGNMENTS.length) desk.assignment = shift.assignmentIndex + 1;
+    saveDesk();
+  }
+  printShiftReport(summary, shift);
+}
+
+/** The ways on from a report, in the order of the collection's results: the way on first. */
+function reportButtonsFor(summary, shift) {
+  const buttons = [];
+  if (shift.mode === 'daily') {
+    buttons.push({ key: 'S', label: 'COPY SHARE LINE', action: 'share', primary: true });
+    buttons.push({ key: 'R', label: 'FLY IT AGAIN', action: 'again' });
+  } else if (shift.mode === 'career' && summary.ended === 'relieved' && shift.assignmentIndex + 1 < ASSIGNMENTS.length) {
+    buttons.push({ key: 'ENTER', label: 'NEXT ASSIGNMENT', action: 'next', primary: true });
+    buttons.push({ key: 'R', label: 'AGAIN', action: 'again' });
+  } else {
+    buttons.push({ key: 'R', label: shift.mode === 'career' ? 'TRY AGAIN' : 'NEW SHIFT', action: 'again', primary: true });
+  }
+  buttons.push({ key: 'M', label: 'GAME MENU', action: 'menu' });
+  if (hostedInHall) buttons.push({ key: 'H', label: '← BACK TO THE HALL', action: 'hall' });
+  return buttons;
+}
+
+function printShiftReport(summary, shift) {
+  reportButtons = reportButtonsFor(summary, shift);
+  const share =
+    shift.mode === 'daily'
+      ? dailyShareLine({
+          number: dailyNumber(shift.dateKey),
+          sectorName: summary.sectorName,
+          safe: summary.safe,
+          tasksDone: summary.tasks.map((task) => task.done),
+        })
+      : null;
+  stopPrinting = printReport(gameOverEl, summary, reportButtons, { reducedMotion: prefersReducedMotion(), share });
+  gameOverEl.dataset.share = share ?? '';
+}
+
+function prefersReducedMotion() {
+  return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+}
+
+/** What a report button does; the keys in onKeyDown lead here too. */
+function reportAction(action) {
+  const shift = current;
+  if (!shift) return;
+  switch (action) {
+    case 'next':
+      startNewGame(planForAssignment(shift.assignmentIndex + 1));
+      break;
+    case 'again':
+      startNewGame({ ...shift, assignmentIndex: shift.assignmentIndex });
+      break;
+    case 'menu':
+      showTitle();
+      break;
+    case 'hall':
+      leaveForHall();
+      break;
+    case 'share': {
+      const line = gameOverEl.dataset.share;
+      const shown = gameOverEl.querySelector('.share-line span');
+      navigator.clipboard?.writeText(line).then(
+        () => { if (shown) shown.textContent = `${line}  · copied`; },
+        () => { if (shown) shown.textContent = line; },
+      );
+      break;
+    }
+  }
+}
+
+function planForAssignment(index) {
+  const assignment = ASSIGNMENTS[index];
+  return { mode: 'career', sectorKey: assignment.sector, assignmentIndex: index };
 }
 
 // ---------------------------------------------------------------------------
@@ -962,10 +1166,30 @@ function endGame() {
 function onKeyDown(e) {
   if (e.repeat) return;
 
-  // Title screen active — Enter/Space starts the shift; other keys ignored.
+  // The testing aid's hidden switch (see cheatLiveVisible).
+  if (e.ctrlKey && e.altKey && e.code === 'KeyC') {
+    setCheatLiveVisible(!cheatLiveVisible);
+    e.preventDefault();
+    return;
+  }
+
+  if (logbookOverlay.classList.contains('shown')) {
+    logbookKey(e);
+    return;
+  }
+
+  // The game menu: the desk's keys, Enter or Space begins the chosen shift.
   if (!gameStarted) {
+    deskKey(e);
+    return;
+  }
+
+  if (briefingOverlay.classList.contains('shown')) {
     if (e.key === 'Enter' || e.key === ' ') {
-      hideTitleAndBegin();
+      takePosition();
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      showTitle();
       e.preventDefault();
     }
     return;
@@ -993,7 +1217,7 @@ function onKeyDown(e) {
   }
 
   if (gameOverEl.classList.contains('shown')) {
-    if (e.key === 'Enter' || e.key === ' ') startNewGame();
+    reportKey(e);
     return;
   }
 
@@ -1027,15 +1251,62 @@ function onKeyDown(e) {
   }
 }
 
+/** On the report: the first key finishes the printing; then each key is a button. */
+function reportKey(e) {
+  const actions = gameOverEl.querySelector('.report-actions');
+  if (actions?.hidden) {
+    stopPrinting?.();
+    e.preventDefault();
+    return;
+  }
+  const key = e.key === ' ' || e.key === 'Enter' ? 'ENTER' : e.key.toUpperCase();
+  const primary = reportButtons.find((b) => b.primary);
+  const button = reportButtons.find((b) => b.key === key) ?? (key === 'ENTER' ? primary : null);
+  if (!button) return;
+  e.preventDefault();
+  reportAction(button.action);
+}
+
+function deskKey(e) {
+  const key = e.key;
+  if (key === 'Enter' || key === ' ') {
+    hideTitleAndBegin();
+    e.preventDefault();
+  } else if (/^[1-3]$/.test(key)) {
+    setDeskTab(TABS[Number(key) - 1]);
+  } else if (key === 'ArrowLeft' || key === 'ArrowRight') {
+    const at = TABS.indexOf(desk.tab);
+    setDeskTab(TABS[(at + (key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length]);
+    e.preventDefault();
+  } else if (key === 'ArrowUp' || key === 'ArrowDown') {
+    moveDeskSelection(key === 'ArrowDown' ? 1 : -1);
+    e.preventDefault();
+  } else if (key === 'l' || key === 'L') {
+    openLogbook();
+  }
+}
+
+function logbookKey(e) {
+  if (e.key === 'Escape' || e.key === 'l' || e.key === 'L') {
+    hideOverlay(logbookOverlay);
+    e.preventDefault();
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    const last = Math.max(0, logbook.length - 1);
+    logbookPage = Math.min(last, Math.max(0, logbookPage + (e.key === 'ArrowDown' ? 1 : -1)));
+    showLogbook(logbookOverlay, logbook, logbookPage);
+    e.preventDefault();
+  }
+}
+
 function showHelp() {
   helpOverlay.classList.add('shown');
-  pauseGame();
+  pauseGame('help');
 }
 
 function hideHelp() {
   helpOverlay.classList.remove('shown');
   try { localStorage.setItem(HELP_SEEN_KEY, '1'); } catch (_) {}
-  resumeGame();
+  resumeGame('help');
 }
 
 function setHelpPanelVisible(v) {
@@ -1047,7 +1318,6 @@ function setHelpPanelVisible(v) {
 
 function setCheatLiveVisible(v) {
   cheatLiveVisible = v;
-  saveBool(CHEAT_LIVE_KEY, v);
   cheatLivePanel.classList.toggle('shown', v);
   cheatBtn.classList.toggle('active', v);
   if (v) renderCheatLive();
@@ -1097,16 +1367,20 @@ function renderCheatLive() {
   }).join('');
 }
 
-function pauseGame() {
-  if (paused || !game || game.lost) return;
+function pauseGame(reason) {
+  pauseReasons.add(reason);
+  if (reason === 'hall' || reason === 'hidden') quietRoom(true);
+  if (paused || !game || game.lost || current?.over) return;
   paused = true;
   pausedAt = Date.now();
   pausedRemainingMs = Math.max(0, nextTickAt - pausedAt);
   if (tickTimer) { clearTimeout(tickTimer); tickTimer = null; }
 }
 
-function resumeGame() {
-  if (!paused) return;
+function resumeGame(reason) {
+  pauseReasons.delete(reason);
+  if (!pauseReasons.has('hall') && !pauseReasons.has('hidden')) quietRoom(false);
+  if (!paused || pauseReasons.size > 0) return;
   paused = false;
   // shift the wall-clock deadlines forward by the pause duration
   const pauseDuration = Date.now() - pausedAt;
@@ -1115,17 +1389,50 @@ function resumeGame() {
   tickTimer = setTimeout(() => doTick(false), pausedRemainingMs);
 }
 
+/** While the Hall's pause menu is up or the page is hidden, the room hum and the radio go quiet. */
+function quietRoom(quiet) {
+  if (ambientBed) ambientBed.master.gain.value = quiet || !audioEnabled ? 0 : 0.10;
+  if (quiet && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
 // ---------------------------------------------------------------------------
 // Game lifecycle
 // ---------------------------------------------------------------------------
 
-function startNewGame() {
+/**
+ * Sets up a shift and opens its briefing; the clock waits until the controller takes the position.
+ * @param {{ mode: 'career' | 'open' | 'daily', sectorKey: string, assignmentIndex?: number }} plan
+ */
+function startNewGame(plan = { mode: 'open', sectorKey: currentPlayfieldKey }) {
+  currentPlayfieldKey = plan.sectorKey;
   const pf = PLAYFIELDS[currentPlayfieldKey];
-  game = createGame(pf, { seed: Math.floor(Math.random() * 1e9) });
+  const dateKey = localDateKey();
+  // The Daily's traffic and briefing come from the date, the same for every controller.
+  const seed = plan.mode === 'daily' ? dailySeed(dateKey) : Math.floor(Math.random() * 1e9);
+  game = createGame(pf, { seed });
+  const assignment = plan.mode === 'career' ? ASSIGNMENTS[plan.assignmentIndex ?? 0] : null;
+  const tasks = assignment ? assignment.tasks : plan.mode === 'daily' ? dailyTasks(dateKey) : generateTasks(pf, Math.random);
+  current = {
+    mode: plan.mode,
+    sectorKey: plan.sectorKey,
+    assignmentIndex: plan.assignmentIndex ?? 0,
+    dateKey,
+    tracker: createTracker(tasks),
+    orders: 0,
+    refused: 0,
+    over: false,
+    briefing: true,
+    rankBefore: rankIndex(career),
+    fullShift: false,
+  };
+  hideOverlay(gameOverEl);
+  stopPrinting = null;
   planeTrails.clear();
   callsigns.clear();
   fuelWarned.clear();
   paused = false;
+  pauseReasons.delete('help');
+  pauseReasons.delete('briefing');
   hideSubtitle();
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   // seed initial plane so screen isn't empty
@@ -1142,7 +1449,7 @@ function startNewGame() {
   shiftStart = Date.now();
   cmdBuffer = '';
   eventsLog.innerHTML = '';
-  gameOverEl.classList.remove('shown');
+  document.querySelectorAll('.pf-btn').forEach((b) => b.classList.toggle('active', b.dataset.pf === currentPlayfieldKey));
   fitCanvas();
   renderBezel();
   renderInfoStrip();
@@ -1153,41 +1460,200 @@ function startNewGame() {
   pushEvent(`◇ shift start · sector ${pf.name}`, 'meta');
   renderCheatLive();
   noteShiftStarted(game);
+  renderBriefingSidebar();
+  openBriefing();
 }
 
+/** The clipboard before the shift: the clock waits behind it. */
+function openBriefing() {
+  const shift = current;
+  const pf = game.playfield;
+  const assignment = assignmentOf(shift);
+  const tasks = shift.tracker.tasks.map((task) => describeTask(task, pf));
+  if (assignment) {
+    showBriefing(briefingOverlay, {
+      kicker: `ASSIGNMENT ${shift.assignmentIndex + 1} OF ${ASSIGNMENTS.length}`,
+      title: assignment.title,
+      sector: `SECTOR ${pf.name.toUpperCase()} · A TICK EVERY ${pf.updateSecs} SECONDS`,
+      note: assignment.note,
+      target: assignment.target,
+      tasks,
+    });
+  } else if (shift.mode === 'daily') {
+    showBriefing(briefingOverlay, {
+      kicker: `DAILY TRAFFIC #${dailyNumber(shift.dateKey)} · ${shift.dateKey}`,
+      title: 'Today’s traffic',
+      sector: `SECTOR ${pf.name.toUpperCase()} · A TICK EVERY ${pf.updateSecs} SECONDS`,
+      note: 'The same planes and the same three tasks for every controller today. Keep the room going as long as you can.',
+      target: null,
+      tasks,
+    });
+  } else {
+    showBriefing(briefingOverlay, {
+      kicker: 'OPEN SHIFT',
+      title: `The ${pf.name} sector`,
+      sector: `A TICK EVERY ${pf.updateSecs} SECONDS · NEW TRAFFIC UNTIL A PLANE IS LOST`,
+      note: 'Three tasks for this shift. Each one done earns a commendation stamp.',
+      target: null,
+      tasks,
+    });
+  }
+  pauseGame('briefing');
+}
+
+/** Enter on the briefing: the clock starts, and a first visit opens the tutorial. */
+function takePosition() {
+  if (!current) return;
+  current.briefing = false;
+  hideOverlay(briefingOverlay);
+  resumeGame('briefing');
+  try {
+    if (!localStorage.getItem(HELP_SEEN_KEY)) setTimeout(() => showHelp(), 300);
+  } catch (_) {}
+}
+
+function renderBriefingSidebar() {
+  if (!current || !game) {
+    briefingCardEl.innerHTML = '<div class="empty">— no briefing —</div>';
+    return;
+  }
+  const assignment = assignmentOf(current);
+  const heading = assignment
+    ? `${String(current.assignmentIndex + 1).padStart(2, '0')} · ${assignment.title.toUpperCase()}`
+    : current.mode === 'daily'
+      ? `DAILY TRAFFIC #${dailyNumber(current.dateKey)}`
+      : 'OPEN SHIFT';
+  renderBriefingCard(briefingCardEl, {
+    heading,
+    target: assignment ? { have: game.safePlanes, need: assignment.target } : null,
+    tasks: current.tracker.tasks.map((task) => ({
+      text: describeTask(task, game.playfield),
+      state: taskState(current.tracker, task),
+      progress: taskProgress(current.tracker, task),
+    })),
+  });
+}
+
+/** Fifteen minutes on position completes the briefing's full-shift task. */
+function checkFullShift() {
+  if (!current || current.over || current.fullShift || paused) return;
+  if (Date.now() - shiftStart < SHIFT_LENGTH_MS) return;
+  current.fullShift = true;
+  trackFullShift(current.tracker);
+  pushEvent('◇ full shift worked', 'meta');
+  renderBriefingSidebar();
+}
+
+/** A sector button in the sidebar starts an open shift there, leaving the current one. */
 function selectPlayfield(key) {
   currentPlayfieldKey = key;
   try { localStorage.setItem(LAST_SECTOR_KEY, key); } catch (_) {}
-  document.querySelectorAll('.pf-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.pf === key));
-  if (gameStarted) startNewGame();
+  desk.sectorKey = key;
+  saveDesk();
+  if (gameStarted) startNewGame({ mode: 'open', sectorKey: key });
 }
 
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
 
-function buildTitleSectorButtons() {
-  const descriptions = {
-    easy:    'training · slow · 1 airport',
-    default: 'reference · Ed James map',
-    killer:  'fast · punishing · 3 airports',
-  };
-  titleSectorsHost.innerHTML = '';
-  for (const key of Object.keys(PLAYFIELDS)) {
-    const b = document.createElement('button');
-    b.className = 'title-sector-btn';
-    b.dataset.pf = key;
-    if (key === currentPlayfieldKey) b.classList.add('active');
-    b.innerHTML = `${PLAYFIELDS[key].name.toUpperCase()}<small>${descriptions[key] || ''}</small>`;
-    b.addEventListener('click', () => {
-      currentPlayfieldKey = key;
-      try { localStorage.setItem(LAST_SECTOR_KEY, key); } catch (_) {}
-      titleSectorsHost.querySelectorAll('.title-sector-btn').forEach(x =>
-        x.classList.toggle('active', x.dataset.pf === key));
-    });
-    titleSectorsHost.appendChild(b);
+function saveDesk() {
+  save('desk', { tab: desk.tab, assignment: desk.assignment, sectorKey: desk.sectorKey });
+}
+
+function renderTitleDesk() {
+  const dateKey = localDateKey();
+  const recent = Object.entries(service.dailies)
+    .filter(([key]) => key !== dateKey)
+    .sort(([a], [b]) => b.localeCompare(a))
+    .slice(0, 4)
+    .map(([, record]) => record);
+  renderDesk(titleDesk, {
+    tab: desk.tab,
+    career,
+    service,
+    licence,
+    assignment: desk.assignment,
+    sectorKey: desk.sectorKey ?? currentPlayfieldKey,
+    daily: {
+      number: dailyNumber(dateKey),
+      dateKey,
+      sectorKey: dailySector(dateKey),
+      flown: service.dailies[dateKey] ?? null,
+      recent,
+      tasks: dailyTasks(dateKey).map((task) => describeTask(task, PLAYFIELDS[dailySector(dateKey)])),
+    },
+  });
+}
+
+/** The Daily's briefing, drawn from the day's seed so every controller gets the same three. */
+function dailyTasks(dateKey) {
+  return generateTasks(PLAYFIELDS[dailySector(dateKey)], seededRandom(dailySeed(dateKey) ^ 0x9e3779b9));
+}
+
+function setDeskTab(tab) {
+  desk.tab = tab;
+  saveDesk();
+  renderTitleDesk();
+}
+
+function moveDeskSelection(step) {
+  if (desk.tab === 'career') {
+    let next = desk.assignment + step;
+    while (next >= 0 && next < ASSIGNMENTS.length && !isUnlocked(career, next)) next += step;
+    if (next >= 0 && next < ASSIGNMENTS.length) desk.assignment = next;
+  } else if (desk.tab === 'open') {
+    const keys = Object.keys(PLAYFIELDS);
+    const at = keys.indexOf(desk.sectorKey ?? currentPlayfieldKey);
+    desk.sectorKey = keys[(at + step + keys.length) % keys.length];
   }
+  saveDesk();
+  renderTitleDesk();
+}
+
+/** The shift the desk is set to. */
+function planFromDesk() {
+  if (desk.tab === 'career') return planForAssignment(desk.assignment);
+  if (desk.tab === 'daily') return { mode: 'daily', sectorKey: dailySector(localDateKey()) };
+  return { mode: 'open', sectorKey: desk.sectorKey ?? currentPlayfieldKey };
+}
+
+function openLogbook() {
+  logbookPage = 0;
+  showLogbook(logbookOverlay, logbook, logbookPage);
+}
+
+/** Clicks on the desk: tabs, assignments, sectors and the logbook. */
+function onDeskClick(e) {
+  const target = e.target.closest('button');
+  if (!target) return;
+  if (target.dataset.tab) setDeskTab(target.dataset.tab);
+  else if (target.dataset.assignment !== undefined) {
+    desk.assignment = Number(target.dataset.assignment);
+    saveDesk();
+    renderTitleDesk();
+  } else if (target.dataset.pf) {
+    desk.sectorKey = target.dataset.pf;
+    saveDesk();
+    renderTitleDesk();
+  } else if (target.dataset.logbook !== undefined) openLogbook();
+}
+
+/** Back to the game menu from a shift: the shift is left as it is and nothing more counts. */
+function showTitle() {
+  clearTimeout(tickTimer);
+  tickTimer = null;
+  if (current) current.over = true;
+  hideOverlay(gameOverEl);
+  hideOverlay(briefingOverlay);
+  helpOverlay.classList.remove('shown');
+  pauseReasons.clear();
+  paused = false;
+  gameStarted = false;
+  renderTitleDesk();
+  titleScreen.style.display = '';
+  // A frame later, so the fade back in runs.
+  requestAnimationFrame(() => titleScreen.classList.remove('hiding'));
 }
 
 // Small looping radar sweep drawn behind the title text. Uses the same
@@ -1278,23 +1744,39 @@ function hideTitleAndBegin() {
   if (gameStarted) return;
   gameStarted = true;
   // Init audio here — this is inside a user gesture, so browsers allow it.
-  initAudio();
+  if (!audioCtx) initAudio();
   titleScreen.classList.add('hiding');
-  setTimeout(() => { titleScreen.style.display = 'none'; }, 700);
-  startNewGame();
-  // Show first-time help modal *after* the shift starts, so beginners
-  // read it with the actual game visible behind them.
-  try {
-    if (!localStorage.getItem(HELP_SEEN_KEY)) {
-      setTimeout(() => showHelp(), 400);
-    }
-  } catch (_) {}
+  setTimeout(() => { if (gameStarted) titleScreen.style.display = 'none'; }, 700);
+  // The briefing opens first; the first-time tutorial follows when the position is taken.
+  startNewGame(planFromDesk());
 }
 
 function boot() {
-  buildTitleSectorButtons();
+  desk.sectorKey ??= currentPlayfieldKey;
+  renderTitleDesk();
+  titleDesk.addEventListener('click', onDeskClick);
   startTitleRadarLoop();
   titleBeginBtn.addEventListener('click', hideTitleAndBegin);
+  briefingOverlay.addEventListener('click', (e) => {
+    if (e.target === briefingOverlay) takePosition();
+  });
+  gameOverEl.addEventListener('click', (e) => {
+    const button = e.target.closest('[data-action]');
+    if (button) reportAction(button.dataset.action);
+  });
+  logbookOverlay.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-page]');
+    if (row) {
+      logbookPage = Number(row.dataset.page);
+      showLogbook(logbookOverlay, logbook, logbookPage);
+    } else if (e.target === logbookOverlay) hideOverlay(logbookOverlay);
+  });
+  // The Hall's pause, and a hidden page on its own, stop the clock.
+  onHallPause(() => pauseGame('hall'), () => resumeGame('hall'));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseGame('hidden');
+    else resumeGame('hidden');
+  });
 
   // playfield picker buttons in the sidebar (post-title)
   for (const key of Object.keys(PLAYFIELDS)) {
@@ -1363,7 +1845,6 @@ function boot() {
 
   document.addEventListener('keydown', onKeyDown);
   window.addEventListener('resize', () => { fitCanvas(); render(); });
-  gameOverEl.addEventListener('click', () => startNewGame());
 
   // Do NOT auto-start the game. Wait for BEGIN SHIFT on the title screen.
   // Ambient audio requires a user gesture anyway; deferring both to the
@@ -1382,6 +1863,7 @@ function boot() {
 
     render();
     if (posterWanted(game)) offerPoster(radar);
+    checkFullShift();
     renderShiftTimer();
     renderNextTick();
     requestAnimationFrame(frame);
