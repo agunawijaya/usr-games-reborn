@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Rune Gates</title>
+  <link rel="stylesheet" href="src/fonts/fonts.css">
+  <link rel="stylesheet" href="src/desk.css">
+  <style>
+    :root {
+      --bg-dark: #04060a;
+      --gate-gold: #d4af37;
+      --gate-gold-glow: rgba(212, 175, 55, 0.4);
+      --rune-cyan: #a5f3fc;
+      --rune-glow: rgba(165, 243, 252, 0.5);
+      --danger-red: #ef4444;
+      --wumpus-green: #22c55e;
+      --pit-purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #e2e8f0;
+      font-family: 'Cinzel', serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 50%, #080d14 0%, #030508 100%);
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #bg-canvas { z-index: 1; }
+    #chamber-canvas { z-index: 2; }
+    #floor-canvas { z-index: 3; }
+    #fx-canvas { z-index: 4; pointer-events: none; }
+    #overlay-canvas { z-index: 5; pointer-events: none; }
+
+    /* Vignette & Sensory Screen Overlays */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.95), inset 0 0 70px rgba(0, 0, 0, 0.98);
+      transition: all 0.6s ease;
+    }
+    .vignette.stench {
+      box-shadow: inset 0 0 160px rgba(16, 185, 129, 0.45), inset 0 0 60px rgba(5, 150, 105, 0.6);
+    }
+    .vignette.draft {
+      box-shadow: inset 0 0 160px rgba(147, 197, 253, 0.45), inset 0 0 70px rgba(255, 255, 255, 0.25);
+    }
+    .vignette.danger {
+      box-shadow: inset 0 0 180px rgba(239, 68, 68, 0.6), inset 0 0 80px rgba(185, 28, 28, 0.8);
+    }
+
+    /* Top HUD Bar */
+    #top-hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: linear-gradient(180deg, rgba(4, 7, 12, 0.95) 0%, rgba(4, 7, 12, 0.7) 70%, transparent 100%);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .hud-title {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.35rem;
+      color: var(--gate-gold);
+      text-shadow: 0 0 12px var(--gate-gold-glow);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud-badge {
+      font-size: 0.75rem;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #fef08a;
+      letter-spacing: 1px;
+    }
+
+    .hud-center {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    .status-pill.active-draft {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #bae6fd;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+    .status-pill.active-stench {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22c55e;
+      color: #bbf7d0;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
+    .status-pill.active-bats {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: #a855f7;
+      color: #e9d5ff;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+    }
+
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-btn {
+      background: rgba(20, 28, 42, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #e2e8f0;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .hud-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gate-gold);
+      color: #fff;
+      box-shadow: 0 0 10px var(--gate-gold-glow);
+    }
+    .hud-btn.primary {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(180, 83, 9, 0.4) 100%);
+      border-color: var(--gate-gold);
+      font-weight: 700;
+      color: #fef08a;
+    }
+
+    /* Bottom Control Bar */
+    #bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: linear-gradient(0deg, rgba(3, 5, 8, 0.98) 0%, rgba(3, 5, 8, 0.8) 75%, transparent 100%);
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .quiver-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .arrow-icon {
+      font-size: 1.4rem;
+      color: var(--gate-gold);
+      text-shadow: 0 0 8px var(--gate-gold-glow);
+    }
+    .quiver-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .quiver-count {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fef08a;
+      letter-spacing: 0.5px;
+    }
+    .quiver-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      letter-spacing: 1px;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .action-btn {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #f1f5f9;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+    .action-btn:hover {
+      background: rgba(212, 175, 55, 0.25);
+      border-color: var(--gate-gold);
+      box-shadow: 0 0 14px var(--gate-gold-glow);
+      transform: translateY(-1px);
+    }
+    .action-btn.shoot {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.3) 0%, rgba(185, 28, 28, 0.5) 100%);
+      border-color: #ef4444;
+      color: #fecaca;
+    }
+    .action-btn.shoot:hover {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.45) 0%, rgba(185, 28, 28, 0.7) 100%);
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Tunnel Door Target Hotspots */
+    .door-hotspot {
+      position: absolute;
+      z-index: 8;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      border-radius: 50% 50% 0 0;
+      transition: all 0.3s ease;
+    }
+    .door-hotspot:hover .door-nameplate {
+      border-color: var(--rune-cyan);
+      box-shadow: 0 0 16px var(--rune-glow);
+      color: #fff;
+      transform: translateY(-3px) scale(1.05);
+    }
+    .door-hotspot:hover .door-prompt {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .door-nameplate {
+      position: absolute;
+      top: -36px;
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid rgba(165, 243, 252, 0.4);
+      color: var(--rune-cyan);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 8px var(--rune-glow);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .door-prompt {
+      position: absolute;
+      top: -16px;
+      font-size: 0.7rem;
+      color: #cbd5e1;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.2s ease;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
+
+    /* Banner Notifications */
+    #banner-notify {
+      position: absolute;
+      bottom: 95px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(4, 7, 14, 0.92);
+      border: 1px solid var(--gate-gold);
+      color: #fef08a;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 0.92rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 16px var(--gate-gold-glow);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      max-width: 80%;
+    }
+    #banner-notify.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 4, 8, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      background: linear-gradient(180deg, #090e17 0%, #04060a 100%);
+      border: 1px solid var(--gate-gold);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 32px var(--gate-gold-glow);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 620px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+    }
+    .modal-dialog h2 {
+      font-family: 'Cinzel Decorative', cursive;
+      color: var(--gate-gold);
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      text-align: center;
+      text-shadow: 0 0 12px var(--gate-gold-glow);
+    }
+    .modal-dialog p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+
+    /* Trajectory Planner Modal UI */
+    .trajectory-sequence {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+      min-height: 52px;
+    }
+    .traj-hop {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gate-gold);
+      color: #fef08a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .traj-arrow {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+    .tunnel-picker {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .tunnel-chip {
+      font: inherit;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(165, 243, 252, 0.35);
+      color: var(--rune-cyan);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .tunnel-chip:hover {
+      background: rgba(165, 243, 252, 0.2);
+      border-color: var(--rune-cyan);
+      box-shadow: 0 0 10px var(--rune-glow);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    /* Outcome Modals */
+    .outcome-modal {
+      text-align: center;
+    }
+    .outcome-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+    .outcome-victory h2 { color: #facc15; }
+    .outcome-defeat h2 { color: #f87171; }
+  </style>
+</head>
+<body data-desk="menu">
+  <div id="game-container">
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="chamber-canvas"></canvas>
+    <canvas id="floor-canvas"></canvas>
+    <canvas id="fx-canvas"></canvas>
+    <canvas id="overlay-canvas"></canvas>
+
+    <div class="vignette" id="vignette"></div>
+
+    <!-- Top HUD -->
+    <div id="top-hud">
+      <div class="hud-title">
+        <span>THE RUNE GATES</span>
+        <span class="hud-badge" id="hud-mode-badge">DODECAHEDRON</span>
+      </div>
+      <div class="hud-center">
+        <div class="status-pill" id="pill-room">
+          <span>🏛️</span>
+          <span id="label-room">CHAMBER 1</span>
+        </div>
+        <div class="status-pill" id="pill-draft">
+          <span>💨</span>
+          <span>COLD DRAFT</span>
+        </div>
+        <div class="status-pill" id="pill-stench">
+          <span>👃</span>
+          <span>WUMPUS STENCH</span>
+        </div>
+        <div class="status-pill" id="pill-bats">
+          <span>🦇</span>
+          <span>BAT FLUTTER</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button class="hud-btn" id="btn-desk-menu" title="Game menu">☰ Menu</button>
+        <button class="hud-btn" id="btn-minimap" title="Minimap (M)">🗺️ Map</button>
+        <button class="hud-btn" id="btn-lore" title="Lore & Rules (H)">📜 Lore</button>
+        <button class="hud-btn" id="btn-settings" title="Settings">⚙️ Setup</button>
+        <button class="hud-btn" id="btn-audio" title="Deep-hall drone">🔊 Drone</button>
+      </div>
+    </div>
+
+    <!-- Tunnel Gate Hotspots -->
+    <div class="door-hotspot" id="door-left">
+      <div class="door-nameplate" id="label-door-left">ROOM 2</div>
+      <div class="door-prompt">KEY [1]</div>
+    </div>
+    <div class="door-hotspot" id="door-center">
+      <div class="door-nameplate" id="label-door-center">ROOM 5</div>
+      <div class="door-prompt">KEY [2]</div>
+    </div>
+    <div class="door-hotspot" id="door-right">
+      <div class="door-nameplate" id="label-door-right">ROOM 8</div>
+      <div class="door-prompt">KEY [3]</div>
+    </div>
+
+    <!-- Banner Notifications -->
+    <div id="banner-notify">Welcome to the Rune Gates.</div>
+
+    <!-- Bottom Bar -->
+    <div id="bottom-bar">
+      <div class="quiver-box">
+        <div class="arrow-icon">🏹</div>
+        <div class="quiver-info">
+          <div class="quiver-count" id="quiver-count">5 MAGIC ARROWS</div>
+          <div class="quiver-label">CROOKED FLIGHT QUIVER</div>
+        </div>
+      </div>
+      <div class="action-group">
+        <button class="action-btn" id="btn-move-left">◀ Move [1]</button>
+        <button class="action-btn" id="btn-move-center">▲ Move [2]</button>
+        <button class="action-btn" id="btn-move-right">Move [3] ▶</button>
+        <button class="action-btn shoot" id="btn-shoot-modal">🏹 Shoot Arrow [S]</button>
+      </div>
+    </div>
+
+    <!-- Arrow Trajectory Modal -->
+    <div class="modal-backdrop" id="modal-shoot">
+      <div class="modal-dialog">
+        <button class="modal-close" id="btn-close-shoot">&times;</button>
+        <h2>LOOSE A CROOKED ARROW</h2>
+        <p>Crooked arrows can bend around corners through connected tunnels. Choose a sequence of up to 5 chambers. An arrow that cannot find a tunnel will deflect wildly!</p>
+        
+        <div class="trajectory-sequence" id="trajectory-display">
+          <div class="traj-hop" id="traj-cur-room">1</div>
+        </div>
+
+        <div style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-bottom: 8px;">CLICK TUNNEL TO EXTEND FLIGHT:</div>
+        <div class="tunnel-picker" id="tunnel-chips-container"></div>
+
+        <div class="modal-actions">
+          <button class="hud-btn" id="btn-traj-clear">Clear Path</button>
+          <button class="action-btn shoot" id="btn-traj-fire">⚡ Release Arrow!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outcome Modal (Victory / Defeat) -->
+    <div class="modal-backdrop" id="modal-outcome">
+      <div class="modal-dialog outcome-modal" id="outcome-container">
+        <div class="outcome-icon" id="outcome-icon">🏆</div>
+        <h2 id="outcome-title">WUMPUS SLAIN!</h2>
+        <p id="outcome-message">Your crooked arrow pierced the beast through the heart!</p>
+        <div class="modal-actions">
+          <button class="action-btn" id="btn-rematch-same">Rematch (Same Cave)</button>
+          <button class="action-btn primary" id="btn-rematch-new">Explore New Cave</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimap Modal -->
+    <div class="modal-backdrop" id="modal-map">
+      <div class="modal-dialog" style="max-width: 680px; text-align: center;">
+        <button class="modal-close" id="btn-close-map">&times;</button>
+        <h2>TOPOLOGICAL CAVE CHART</h2>
+        <p>A schematic representation of explored chambers and connecting tunnels in this subterranean domain.</p>
+        <canvas id="minimap-chart" width="560" height="380" style="position: relative; margin: 0 auto; background: #03060a; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Lore & Guide Modal -->
+    <div class="modal-backdrop" id="modal-lore">
+      <div class="modal-dialog">
+        <button class="modal-close" id="btn-close-lore">&times;</button>
+        <h2>DELVERS' LORE & SURVIVAL GUIDE</h2>
+        <p><strong>The Objective:</strong> Deep within these Dwarven halls slumbers the dreaded Wumpus. Track its lair through sensory cues and loose a crooked arrow into its chamber before you stumble into its jaws or fall prey to the abyss.</p>
+        <p><strong>Sensory Cues:</strong></p>
+        <ul style="margin-left: 20px; line-height: 1.8; color: #cbd5e1; font-size: 0.9rem;">
+          <li><strong style="color: var(--rune-cyan);">Cold Draft (💨):</strong> A bottomless pit lies directly adjacent (1 hop). Stepping into a pit is fatal, though a skilled wanderer has a 2-in-12 chance of grabbing a rock outcrop.</li>
+          <li><strong style="color: var(--wumpus-green);">Stench (👃):</strong> The foul odor of the beast drifts across up to 2 chambers. Take heed when loosed arrows miss!</li>
+          <li><strong style="color: var(--pit-purple);">Bat Flutter (🦇):</strong> Super-bats roost in an adjacent room. They will seize you and deposit you in a random cave chamber!</li>
+        </ul>
+        <p style="margin-top: 16px;"><strong>Crooked Arrows:</strong> Your magic arrows can bend through up to 5 chambers. Be wary: ricochets that return to your room will strike you down!</p>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="modal-settings">
+      <div class="modal-dialog">
+        <button class="modal-close" id="btn-close-settings">&times;</button>
+        <h2>EXPEDITION SETUP</h2>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin: 20px 0;">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Difficulty Level:</span>
+            <select id="set-level" style="background: #0f172a; color: #e2e8f0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 4px; font-family: 'Cinzel';">
+              <option value="EASY">EASY (Standard Hazards)</option>
+              <option value="HARD">HARD (Escalated Bats/Pits & Aggressive Wumpus)</option>
+            </select>
+          </label>
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Cave Topology:</span>
+            <select id="set-mode" style="background: #0f172a; color: #e2e8f0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 4px; font-family: 'Cinzel';">
+              <option value="dodecahedron">Classical Dodecahedron (20 Chambers, 3 Tunnels)</option>
+              <option value="procedural">Dave Taylor GCD Procedural Cave (Custom Size)</option>
+            </select>
+          </label>
+          <label style="display: flex; justify-content: space-between; align-items: center;" id="row-room-num">
+            <span>Procedural Chambers:</span>
+            <input type="number" id="set-room-num" min="10" max="100" value="25" style="background: #0f172a; color: #e2e8f0; border: 1px solid #d4af37; padding: 4px 8px; border-radius: 4px; width: 80px; text-align: center;">
+          </label>
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Quiver Capacity:</span>
+            <input type="number" id="set-arrows" min="1" max="10" value="5" style="background: #0f172a; color: #e2e8f0; border: 1px solid #d4af37; padding: 4px 8px; border-radius: 4px; width: 80px; text-align: center;">
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn primary" id="btn-apply-settings">Restart Expedition</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Hall's bridge, the art drawn in code, then the core engine -->
+  <script src="../../bridge/bridge.js"></script>
+  <script src="src/art.js"></script>
+  <script src="src/engine.js"></script>
+
+  <script>
+    /* =========================================================================
+       WUMP FANCY-WEB CLIENT & VISUAL PIPELINE
+       ========================================================================= */
+
+    // Canvases
+    const bgCanvas = document.getElementById('bg-canvas');
+    const chamberCanvas = document.getElementById('chamber-canvas');
+    const floorCanvas = document.getElementById('floor-canvas');
+    const fxCanvas = document.getElementById('fx-canvas');
+    const overlayCanvas = document.getElementById('overlay-canvas');
+
+    const bgCtx = bgCanvas.getContext('2d');
+    const chamberCtx = chamberCanvas.getContext('2d');
+    const floorCtx = floorCanvas.getContext('2d');
+    const fxCtx = fxCanvas.getContext('2d');
+    const overlayCtx = overlayCanvas.getContext('2d');
+
+    let W = window.innerWidth;
+    let H = window.innerHeight;
+
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      [bgCanvas, chamberCanvas, floorCanvas, fxCanvas, overlayCanvas].forEach(c => {
+        c.width = W;
+        c.height = H;
+      });
+      positionDoorHotspots();
+      renderStaticLayers();
+    }
+    window.addEventListener('resize', resize);
+
+    // Assets
+    const assets = {
+      runeGate: null,
+      hangingPlant: null,
+      moss: [],
+      caveTextures: []
+    };
+
+    function loadAssets() {
+      // The gate and the vine are drawn in code (src/art.js) at the sizes of the images they replace.
+      assets.runeGate = RuneArt.gate();
+      assets.hangingPlant = RuneArt.vine();
+
+      ['moss_01.svg', 'moss_02.svg', 'moss_04.svg', 'moss_05.svg'].forEach(file => {
+        const m = new Image();
+        m.src = 'assets/' + file;
+        m.onload = () => { assets.moss.push(m); renderStaticLayers(); };
+      });
+
+      ['cave_texture_01.svg', 'cave_texture_02.svg', 'cave_texture_08.svg', 'cave_texture_10.svg'].forEach(file => {
+        const t = new Image();
+        t.src = 'assets/' + file;
+        t.onload = () => { assets.caveTextures.push(t); renderStaticLayers(); };
+      });
+    }
+
+    // --- Web Audio Synthesizer ---
+    let audioCtx = null;
+    let ambientGain = null;
+    let audioPlaying = false;
+
+    function initAudio() {
+      if (audioCtx) return;
+      try {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioClass();
+
+        // The deep-hall drone
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        ambientGain = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(43.65, audioCtx.currentTime); // F1 low
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2 fifth
+
+        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime);
+
+        osc1.connect(ambientGain);
+        osc2.connect(ambientGain);
+        ambientGain.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+      } catch (e) {
+        console.warn('Web Audio not available:', e);
+      }
+    }
+
+    function toggleDrone() {
+      initAudio();
+      if (!audioCtx) return;
+      audioPlaying = !audioPlaying;
+      if (audioPlaying) {
+        audioCtx.resume();
+        ambientGain.gain.setTargetAtTime(0.12, audioCtx.currentTime, 0.5);
+        document.getElementById('btn-audio').style.color = '#fef08a';
+        document.getElementById('btn-audio').style.borderColor = '#d4af37';
+        showBanner('🔊 The deep-hall drone hums through the stone.');
+      } else {
+        ambientGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+        document.getElementById('btn-audio').style.color = '';
+        document.getElementById('btn-audio').style.borderColor = '';
+        showBanner('🔇 Cavern drone silenced.');
+      }
+      window.RuneGatesDesk?.noteDrone(audioPlaying);
+    }
+
+    function playSoundEffect(type) {
+      if (!audioCtx) initAudio();
+      if (!audioCtx) return;
+      audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      if (type === 'bow') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(380, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.18);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'victory') {
+        [440, 554, 659, 880].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.8);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.12);
+          osc.stop(now + idx * 0.12 + 0.85);
+        });
+      } else if (type === 'wumpus') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(60, now);
+        osc.frequency.linearRampToValueAtTime(95, now + 0.4);
+        osc.frequency.linearRampToValueAtTime(45, now + 0.9);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 1.05);
+      }
+    }
+
+    // --- GAME ENGINE INSTANCE ---
+    let game = new WumpEngine.WumpGame();
+    window.game = game;
+    let currentTrajectory = [];
+
+    // --- Progressive Wind System State ---
+    let windBurstStartTime = 0;
+    let activeWindStrands = [];
+
+    function generateWindStrands(gateDir) {
+      const strands = [];
+
+      function createStrand(dir, normY, delayJitter) {
+        const absNorm = Math.abs(normY);
+        const sizeScale = 1.0 - absNorm * 0.35;
+        const w = (260 * sizeScale) + (Math.random() - 0.5) * 20;
+        const h = (170 * sizeScale) + (Math.random() - 0.5) * 15;
+        const yOffset = normY * 90 - 15 + (Math.random() - 0.5) * 16;
+        const pushForward = (1.0 - absNorm * 0.7) * 45 + (Math.random() - 0.5) * 25;
+        const xOffset = dir === 'left' ? -pushForward : pushForward;
+
+        return {
+          direction: dir,
+          yOffset: yOffset,
+          xOffset: xOffset,
+          w: w,
+          h: h,
+          delay: delayJitter,
+          drawDuration: 1050 + Math.random() * 200,
+          holdDuration: 1400 + Math.random() * 300,
+          fadeDuration: 800 + Math.random() * 200,
+          maxAlpha: 0.78 + Math.random() * 0.18
+        };
+      }
+
+      if (gateDir === 'left' || gateDir === 'right') {
+        const count = Math.floor(Math.random() * 3) + 3; // 3 to 5 strands
+        const dir = (gateDir === 'left') ? 'right' : 'left';
+        const normYs = count === 3 ? [-0.95, -0.05, 0.9] : (count === 4 ? [-0.98, -0.35, 0.25, 0.95] : [-1.0, -0.55, -0.05, 0.45, 0.95]);
+
+        const delays = [100 + Math.random() * 50];
+        for (let i = 1; i < count; i++) {
+          delays.push(delays[i - 1] + 750 + Math.random() * 250);
+        }
+        for (let i = delays.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [delays[i], delays[j]] = [delays[j], delays[i]];
+        }
+        for (let i = 0; i < count; i++) {
+          strands.push(createStrand(dir, normYs[i], delays[i]));
+        }
+      } else {
+        // Center Gate: 6 to 10 strands (asymmetric)
+        const totalCount = Math.floor(Math.random() * 5) + 6;
+        const minSide = 2;
+        let leftCount = Math.floor(Math.random() * (totalCount - 2 * minSide + 1)) + minSide;
+        let rightCount = totalCount - leftCount;
+        if (leftCount === rightCount && totalCount >= 7) { leftCount++; rightCount--; }
+
+        const allDelays = [100 + Math.random() * 50];
+        for (let i = 1; i < totalCount; i++) {
+          allDelays.push(allDelays[i - 1] + 450 + Math.random() * 200);
+        }
+        for (let i = allDelays.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [allDelays[i], allDelays[j]] = [allDelays[j], allDelays[i]];
+        }
+
+        let delayIdx = 0;
+        function makeSide(sideCount, dir) {
+          const step = 1.9 / Math.max(1, sideCount - 1);
+          for (let i = 0; i < sideCount; i++) {
+            const ny = -0.95 + i * step;
+            strands.push(createStrand(dir, ny, allDelays[delayIdx++]));
+          }
+        }
+        makeSide(leftCount, 'left');
+        makeSide(rightCount, 'right');
+      }
+
+      return strands;
+    }
+
+    // Each strand of wind draws itself stroke by stroke along its own curves (src/art.js).
+    function renderWindSwirl(originX, originY, w, h, direction, progress, curAlpha) {
+      RuneArt.drawWind(fxCtx, originX, originY, w, h, direction, progress, curAlpha);
+    }
+
+    // --- SEEDED RNG FOR CONSISTENT PROCEDURAL CAVERN PERSISTENCE ---
+    function makeSeededRng(seed) {
+      let s = (seed || 1) % 2147483647;
+      if (s <= 0) s += 2147483646;
+      return function() {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+      };
+    }
+
+    // --- MIST, SPORES, TORCH, MIASMA & BATS PARTICLE SYSTEMS ---
+    const groundMist = [];
+    for (let i = 0; i < 30; i++) {
+      groundMist.push({
+        x: Math.random() * window.innerWidth,
+        y: window.innerHeight - 80 - Math.random() * 80,
+        vx: 0.15 + Math.random() * 0.25,
+        radius: 70 + Math.random() * 120,
+        alpha: 0.12 + Math.random() * 0.18
+      });
+    }
+
+    const spores = [];
+    for (let i = 0; i < 45; i++) {
+      spores.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: -0.15 - Math.random() * 0.25,
+        size: Math.random() * 2.2 + 0.6,
+        alpha: Math.random() * 0.6 + 0.2,
+        hue: Math.random() > 0.6 ? 185 : 45
+      });
+    }
+
+    const toxicMiasma = [];
+    const bats = [];
+    let torchFlicker = 1.0;
+
+    // --- RENDER 1: WILD CRAGGY CAVERN BACKGROUND (FROM POC) ---
+    function renderWildCavernBackground(seed) {
+      bgCtx.clearRect(0, 0, W, H);
+      const rng = makeSeededRng(seed || game.playerLoc);
+
+      const grad = bgCtx.createRadialGradient(W / 2, H * 0.25, 30, W / 2, H * 0.45, W * 0.85);
+      grad.addColorStop(0, '#0a101b');
+      grad.addColorStop(0.4, '#05080e');
+      grad.addColorStop(0.8, '#020306');
+      grad.addColorStop(1, '#000102');
+      bgCtx.fillStyle = grad;
+      bgCtx.fillRect(0, 0, W, H);
+
+      // Cave texture SVGs
+      if (assets.caveTextures.length > 0) {
+        bgCtx.save();
+        bgCtx.globalAlpha = 0.22;
+        bgCtx.filter = 'brightness(0.35) saturate(0.4)';
+        const count = 3 + Math.floor(rng() * 3);
+        for (let i = 0; i < count; i++) {
+          const tex = assets.caveTextures[Math.floor(rng() * assets.caveTextures.length)];
+          const tx = rng() * (W - 200);
+          const ty = 40 + rng() * (H * 0.5);
+          const tw = 220 + rng() * 180;
+          const th = tw * 0.8;
+          bgCtx.drawImage(tex, tx, ty, tw, th);
+        }
+        bgCtx.restore();
+      }
+
+      // Jagged Boulders
+      const boulderLayers = [
+        { count: 6, baseY: H * 0.45, color: '#080c14', stroke: 'rgba(255,255,255,0.02)' },
+        { count: 8, baseY: H * 0.65, color: '#05080d', stroke: 'rgba(255,255,255,0.03)' }
+      ];
+
+      boulderLayers.forEach(layer => {
+        bgCtx.fillStyle = layer.color;
+        bgCtx.strokeStyle = layer.stroke;
+        bgCtx.lineWidth = 1.5;
+
+        for (let b = 0; b < layer.count; b++) {
+          const bx = (W / layer.count) * b + (rng() - 0.5) * 90;
+          const by = layer.baseY + (rng() - 0.5) * 70;
+          const bw = 150 + rng() * 110;
+          const bh = 110 + rng() * 80;
+
+          bgCtx.beginPath();
+          bgCtx.moveTo(bx, by);
+          bgCtx.lineTo(bx + bw * 0.3 + (rng() - 0.5) * 20, by - bh * 0.7);
+          bgCtx.lineTo(bx + bw * 0.7 + (rng() - 0.5) * 25, by - bh);
+          bgCtx.lineTo(bx + bw, by - bh * 0.4);
+          bgCtx.lineTo(bx + bw * 0.85, by + bh * 0.3);
+          bgCtx.lineTo(bx + bw * 0.2, by + bh * 0.4);
+          bgCtx.closePath();
+          bgCtx.fill();
+          bgCtx.stroke();
+        }
+      });
+
+      // Moss SVGs
+      if (assets.moss.length > 0) {
+        bgCtx.save();
+        bgCtx.globalAlpha = 0.5;
+        bgCtx.filter = 'brightness(0.65) hue-rotate(40deg)';
+        const mossCount = 4 + Math.floor(rng() * 4);
+        for (let m = 0; m < mossCount; m++) {
+          const moss = assets.moss[Math.floor(rng() * assets.moss.length)];
+          const mx = rng() * (W - 140);
+          const my = H * 0.3 + rng() * (H * 0.35);
+          const mw = 80 + rng() * 100;
+          const mh = mw * 0.7;
+          bgCtx.drawImage(moss, mx, my, mw, mh);
+        }
+        bgCtx.restore();
+      }
+
+      // The ceiling and its stalactites (src/art.js)
+      RuneArt.drawCeiling(bgCtx, W, rng);
+
+      // Hanging Plant
+      if (assets.hangingPlant) {
+        bgCtx.save();
+        bgCtx.globalAlpha = 0.8;
+        bgCtx.filter = 'brightness(0.55) saturate(0.65)';
+        const plantCount = 3 + Math.floor(rng() * 3);
+        for (let p = 0; p < plantCount; p++) {
+          const px = (W / (plantCount + 1)) * (p + 1) + (rng() - 0.5) * 120;
+          const pw = 160 + rng() * 110;
+          const ph = pw * 1.35;
+          bgCtx.drawImage(assets.hangingPlant, px - pw / 2, -10, pw, ph);
+        }
+        bgCtx.restore();
+      }
+    }
+
+    // --- RENDER 2: SOLID CARVED STONE FLOOR WITH MOSS & PLINTHS (FROM POC) ---
+    function renderSolidStoneFloor(seed) {
+      floorCtx.clearRect(0, 0, W, H);
+      const rng = makeSeededRng((seed || game.playerLoc) + 999);
+      const floorTopY = H - 85;
+
+      const floorGrad = floorCtx.createLinearGradient(0, floorTopY, 0, H);
+      floorGrad.addColorStop(0, '#0a0f18');
+      floorGrad.addColorStop(0.3, '#101624');
+      floorGrad.addColorStop(1, '#04060a');
+
+      floorCtx.fillStyle = floorGrad;
+      floorCtx.fillRect(0, floorTopY, W, H - floorTopY);
+
+      const perspectiveRows = [
+        { y: floorTopY, h: 16 },
+        { y: floorTopY + 16, h: 22 },
+        { y: floorTopY + 38, h: 26 },
+        { y: floorTopY + 64, h: 21 }
+      ];
+
+      perspectiveRows.forEach((row, rIdx) => {
+        floorCtx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+        floorCtx.lineWidth = 3;
+        floorCtx.beginPath();
+        floorCtx.moveTo(0, row.y + row.h);
+        floorCtx.lineTo(W, row.y + row.h);
+        floorCtx.stroke();
+
+        floorCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+        floorCtx.lineWidth = 1.2;
+        floorCtx.beginPath();
+        floorCtx.moveTo(0, row.y);
+        floorCtx.lineTo(W, row.y);
+        floorCtx.stroke();
+
+        const tileW = 95 + rIdx * 35;
+        const rowOffset = (rng() * tileW);
+        for (let x = -rowOffset; x < W + tileW; x += tileW) {
+          floorCtx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+          floorCtx.lineWidth = 2.5;
+          floorCtx.beginPath();
+          floorCtx.moveTo(x, row.y);
+          floorCtx.lineTo(x + (x - W / 2) * 0.1, row.y + row.h);
+          floorCtx.stroke();
+        }
+      });
+
+      // Scatter moss onto floor
+      if (assets.moss.length > 0) {
+        floorCtx.save();
+        floorCtx.globalAlpha = 0.45;
+        floorCtx.filter = 'brightness(0.65) hue-rotate(45deg)';
+        for (let m = 0; m < 4; m++) {
+          const moss = assets.moss[Math.floor(rng() * assets.moss.length)];
+          const mx = rng() * (W - 120);
+          const my = floorTopY + 10 + rng() * 60;
+          floorCtx.drawImage(moss, mx, my, 65, 40);
+        }
+        floorCtx.restore();
+      }
+
+      function drawPortalPlinth(cx, w) {
+        const plinthY = floorTopY - 8;
+        floorCtx.fillStyle = '#141c2c';
+        floorCtx.fillRect(cx - w / 2 - 16, plinthY, w + 32, 14);
+
+        floorCtx.strokeStyle = 'rgba(103, 232, 249, 0.35)';
+        floorCtx.lineWidth = 1.5;
+        floorCtx.strokeRect(cx - w / 2 - 16, plinthY, w + 32, 14);
+
+        floorCtx.fillStyle = 'rgba(0,0,0,0.75)';
+        floorCtx.fillRect(cx - w / 2 - 16, plinthY + 14, w + 32, 6);
+      }
+
+      // Plinth widths aligned with stretched pillar bases
+      drawPortalPlinth(W * 0.21, 270);
+      drawPortalPlinth(W * 0.5, 340);
+      drawPortalPlinth(W * 0.79, 270);
+    }
+
+    // --- RENDER 3: THE RUNE GATES WITH THEIR TUNNEL VOID (FROM POC) ---
+    function drawRuneGate(ctx, cx, groundY, caveWidth, height, tunnelNum, seed) {
+      ctx.save();
+
+      const destW = caveWidth;
+      const destH = height;
+      const destX = cx - destW / 2;
+      const destY = groundY - destH;
+
+      // 1. Dark Cavern Tunnel Void (Behind the Open Portal Archway)
+      const innerVoid = ctx.createRadialGradient(cx, groundY - height * 0.45, 10, cx, groundY - height * 0.45, destW * 0.45);
+      innerVoid.addColorStop(0, '#000102');
+      innerVoid.addColorStop(0.7, '#010204');
+      innerVoid.addColorStop(1, '#030508');
+
+      ctx.fillStyle = innerVoid;
+      ctx.beginPath();
+      ctx.moveTo(destX + destW * 0.16, groundY);
+      ctx.lineTo(destX + destW * 0.16, groundY - height * 0.65);
+      ctx.bezierCurveTo(
+        destX + destW * 0.16, groundY - height * 0.95,
+        destX + destW * 0.84, groundY - height * 0.95,
+        destX + destW * 0.84, groundY - height * 0.65
+      );
+      ctx.lineTo(destX + destW * 0.84, groundY);
+      ctx.closePath();
+      ctx.fill();
+
+      // 2. The rune gate, stretched to the cave opening
+      if (assets.runeGate) {
+        ctx.save();
+        const pulse = 0.82 + Math.sin(Date.now() * 0.003 + (tunnelNum || 0)) * 0.18;
+        ctx.globalAlpha = pulse;
+        ctx.shadowColor = '#67e8f9';
+        ctx.shadowBlur = 18;
+
+        ctx.drawImage(assets.runeGate, 0, 0, assets.runeGate.width, assets.runeGate.height, destX, destY, destW, destH);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function renderOrnateChamber() {
+      chamberCtx.clearRect(0, 0, W, H);
+      const groundY = H - 85;
+      const tunnels = game.cave[game.playerLoc] || [1, 2, 3];
+
+      // Left Portal (West Gate I) - 270px wide cave opening
+      drawRuneGate(chamberCtx, W * 0.21, groundY, 270, 420, tunnels[0] || 1, game.playerLoc);
+
+      // Center Portal (the great gate) - 340px wide cave opening
+      drawRuneGate(chamberCtx, W * 0.5, groundY, 340, 470, tunnels[1] || 2, game.playerLoc + 1);
+
+      // Right Portal (East Delving III) - 270px wide cave opening
+      drawRuneGate(chamberCtx, W * 0.79, groundY, 270, 420, tunnels[2] || 3, game.playerLoc + 2);
+    }
+
+    function renderStaticLayers() {
+      renderWildCavernBackground(game.playerLoc);
+      renderOrnateChamber();
+      renderSolidStoneFloor(game.playerLoc);
+    }
+
+    // --- Dynamic Door Hotspot Positioning ---
+    function positionDoorHotspots() {
+      const groundY = H - 85;
+      const dLeft = document.getElementById('door-left');
+      const dCenter = document.getElementById('door-center');
+      const dRight = document.getElementById('door-right');
+
+      dLeft.style.width = '270px';
+      dLeft.style.height = '420px';
+      dLeft.style.left = (W * 0.21 - 135) + 'px';
+      dLeft.style.top = (groundY - 420) + 'px';
+
+      dCenter.style.width = '340px';
+      dCenter.style.height = '470px';
+      dCenter.style.left = (W * 0.5 - 170) + 'px';
+      dCenter.style.top = (groundY - 470) + 'px';
+
+      dRight.style.width = '270px';
+      dRight.style.height = '420px';
+      dRight.style.left = (W * 0.79 - 135) + 'px';
+      dRight.style.top = (groundY - 420) + 'px';
+    }
+
+    // --- Arrow Particle System ---
+    let activeArrow = null;
+    let arrowParticles = [];
+
+    function triggerArrowAnimation(targetTunnelIndex, callback) {
+      playSoundEffect('bow');
+      const startX = W * 0.5;
+      const startY = H - 40;
+
+      let targetX = W * 0.5;
+      let targetY = H - 360;
+      if (targetTunnelIndex === 0) { targetX = W * 0.21; targetY = H - 320; }
+      else if (targetTunnelIndex === 2) { targetX = W * 0.79; targetY = H - 320; }
+
+      activeArrow = {
+        startX: startX,
+        startY: startY,
+        controlX: (startX + targetX) / 2 + (Math.random() - 0.5) * 140,
+        controlY: (startY + targetY) / 2 - 80,
+        targetX: targetX,
+        targetY: targetY,
+        progress: 0,
+        speed: 0.024,
+        trail: [],
+        onComplete: callback
+      };
+    }
+
+    // --- Game Loop Animation ---
+    function animate() {
+      fxCtx.clearRect(0, 0, W, H);
+      overlayCtx.clearRect(0, 0, W, H);
+
+      // Re-render chamber doors every frame for the pulsing luminous runes
+      renderOrnateChamber();
+
+      torchFlicker = 0.95 + Math.sin(Date.now() * 0.006) * 0.05 + (Math.random() - 0.5) * 0.025;
+
+      const lanternGrad = overlayCtx.createRadialGradient(
+        W * 0.5, H - 50, 10,
+        W * 0.5, H - 50, W * 0.65 * torchFlicker
+      );
+      lanternGrad.addColorStop(0, 'rgba(103, 232, 249, 0.06)');
+      lanternGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.02)');
+      lanternGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      overlayCtx.fillStyle = lanternGrad;
+      overlayCtx.fillRect(0, 0, W, H);
+
+      // 1. Ground Mist (drifting along cavern floor)
+      groundMist.forEach(m => {
+        m.x += m.vx;
+        if (m.x - m.radius > W) m.x = -m.radius;
+
+        const mGrad = fxCtx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius);
+        mGrad.addColorStop(0, `rgba(15, 23, 42, ${m.alpha})`);
+        mGrad.addColorStop(0.6, `rgba(8, 12, 20, ${m.alpha * 0.5})`);
+        mGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        fxCtx.fillStyle = mGrad;
+        fxCtx.beginPath();
+        fxCtx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+        fxCtx.fill();
+      });
+
+      // 2. Bioluminescent Spores (floating motes)
+      spores.forEach(s => {
+        s.x += s.vx;
+        s.y += s.vy;
+        if (s.y < 0) s.y = H;
+        if (s.x < 0) s.x = W;
+        if (s.x > W) s.x = 0;
+
+        fxCtx.fillStyle = s.hue === 185
+          ? `rgba(103, 232, 249, ${s.alpha * 0.6})`
+          : `rgba(212, 175, 55, ${s.alpha * 0.5})`;
+        fxCtx.beginPath();
+        fxCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        fxCtx.fill();
+      });
+
+      const now = performance.now();
+      const cues = game.getSensoryCues(game.playerLoc);
+
+      // 3. Toxic Miasma if Wumpus stench nearby
+      if (cues.stench && Math.random() < 0.45) {
+        toxicMiasma.push({
+          x: W * 0.5 + (Math.random() - 0.5) * 140,
+          y: H - 240,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: -0.8 - Math.random() * 0.9,
+          radius: 20 + Math.random() * 30,
+          alpha: 0.35 + Math.random() * 0.25,
+          maxRadius: 75 + Math.random() * 45
+        });
+      }
+
+      for (let i = toxicMiasma.length - 1; i >= 0; i--) {
+        const tm = toxicMiasma[i];
+        tm.x += tm.vx;
+        tm.y += tm.vy;
+        tm.radius += 0.45;
+        tm.alpha -= 0.005;
+
+        const tGrad = fxCtx.createRadialGradient(tm.x, tm.y, 0, tm.x, tm.y, tm.radius);
+        tGrad.addColorStop(0, `rgba(34, 197, 94, ${tm.alpha * 0.7})`);
+        tGrad.addColorStop(0.5, `rgba(16, 185, 129, ${tm.alpha * 0.35})`);
+        tGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        fxCtx.fillStyle = tGrad;
+        fxCtx.beginPath();
+        fxCtx.arc(tm.x, tm.y, tm.radius, 0, Math.PI * 2);
+        fxCtx.fill();
+
+        if (tm.alpha <= 0 || tm.radius > tm.maxRadius) {
+          toxicMiasma.splice(i, 1);
+        }
+      }
+
+      // 4. Fluttering Bats if bats nearby
+      if (cues.flutter && Math.random() < 0.04 && bats.length < 12) {
+        bats.push({
+          x: W * 0.21 + (Math.random() - 0.5) * 80,
+          y: H - 340,
+          vx: (Math.random() - 0.5) * 2.8 + (Math.random() > 0.5 ? 2 : -2),
+          vy: -1.2 - Math.random() * 1.8,
+          flapSpeed: 0.12 + Math.random() * 0.05,
+          flapAngle: Math.random() * Math.PI * 2,
+          scale: 1.1 + Math.random() * 0.7
+        });
+      }
+
+      for (let i = bats.length - 1; i >= 0; i--) {
+        const b = bats[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.flapAngle += b.flapSpeed;
+        const wingY = Math.sin(b.flapAngle) * 8 * b.scale;
+
+        fxCtx.save();
+        fxCtx.translate(b.x, b.y);
+        fxCtx.fillStyle = '#060911';
+        fxCtx.beginPath();
+        fxCtx.ellipse(0, 0, 4 * b.scale, 7 * b.scale, 0, 0, Math.PI * 2);
+        fxCtx.fill();
+
+        fxCtx.beginPath();
+        fxCtx.moveTo(0, -2);
+        fxCtx.quadraticCurveTo(-12 * b.scale, wingY - 14 * b.scale, -24 * b.scale, wingY);
+        fxCtx.quadraticCurveTo(-16 * b.scale, wingY + 7 * b.scale, -8 * b.scale, wingY + 3 * b.scale);
+        fxCtx.quadraticCurveTo(-4 * b.scale, wingY + 6 * b.scale, 0, 4);
+        fxCtx.fill();
+
+        fxCtx.beginPath();
+        fxCtx.moveTo(0, -2);
+        fxCtx.quadraticCurveTo(12 * b.scale, wingY - 14 * b.scale, 24 * b.scale, wingY);
+        fxCtx.quadraticCurveTo(16 * b.scale, wingY + 7 * b.scale, 8 * b.scale, wingY + 3 * b.scale);
+        fxCtx.quadraticCurveTo(4 * b.scale, wingY + 6 * b.scale, 0, 4);
+        fxCtx.fill();
+
+        fxCtx.fillStyle = '#ef4444';
+        fxCtx.fillRect(-2, -4, 1.5, 1.5);
+        fxCtx.fillRect(1, -4, 1.5, 1.5);
+        fxCtx.restore();
+
+        if (b.y < -80 || b.x < -100 || b.x > W + 100) {
+          bats.splice(i, 1);
+        }
+      }
+
+      // 5. Draw Staggered Wind Drafts from Pits
+      if (cues.draft) {
+        if (!windBurstStartTime) {
+          windBurstStartTime = now;
+          // Pick gate direction based on draft tunnel
+          const tunnels = game.cave[game.playerLoc] || [];
+          let dir = 'center';
+          if (cues.draftTunnels.includes(tunnels[0])) dir = 'left';
+          else if (cues.draftTunnels.includes(tunnels[2])) dir = 'right';
+          activeWindStrands = generateWindStrands(dir);
+        }
+
+        let elapsed = now - windBurstStartTime;
+        let maxEndTime = 0;
+        activeWindStrands.forEach(s => {
+          const end = s.delay + s.drawDuration + s.holdDuration + s.fadeDuration;
+          if (end > maxEndTime) maxEndTime = end;
+        });
+        const totalCycle = maxEndTime + 2000;
+
+        if (elapsed >= totalCycle) {
+          windBurstStartTime = now;
+          const tunnels = game.cave[game.playerLoc] || [];
+          let dir = 'center';
+          if (cues.draftTunnels.includes(tunnels[0])) dir = 'left';
+          else if (cues.draftTunnels.includes(tunnels[2])) dir = 'right';
+          activeWindStrands = generateWindStrands(dir);
+          elapsed = 0;
+        }
+
+        const groundY = H - 85;
+        let originX = W * 0.5;
+        let originY = groundY - 210;
+        const tunnels = game.cave[game.playerLoc] || [];
+        if (cues.draftTunnels.includes(tunnels[0])) { originX = W * 0.21 + 25; originY = groundY - 190; }
+        else if (cues.draftTunnels.includes(tunnels[2])) { originX = W * 0.79 - 25; originY = groundY - 190; }
+
+        fxCtx.save();
+        fxCtx.shadowColor = '#ffffff';
+        fxCtx.shadowBlur = 12;
+
+        activeWindStrands.forEach(s => {
+          if (elapsed < s.delay) return;
+          const strElapsed = elapsed - s.delay;
+          let prog = 0;
+          let alpha = 0;
+
+          if (strElapsed < s.drawDuration) {
+            prog = strElapsed / s.drawDuration;
+            alpha = Math.min(s.maxAlpha, prog * 1.5 * s.maxAlpha);
+          } else if (strElapsed < s.drawDuration + s.holdDuration) {
+            prog = 1.0;
+            const pulse = Math.sin((strElapsed - s.drawDuration) * 0.005) * 0.05;
+            alpha = Math.min(1.0, s.maxAlpha * (0.95 + pulse));
+          } else if (strElapsed < s.drawDuration + s.holdDuration + s.fadeDuration) {
+            prog = 1.0;
+            alpha = s.maxAlpha * (1.0 - (strElapsed - s.drawDuration - s.holdDuration) / s.fadeDuration);
+          } else {
+            return;
+          }
+
+          let sx = originX + s.xOffset;
+          if (originX === W * 0.5) sx += (s.direction === 'left' ? -15 : 15);
+          renderWindSwirl(sx, originY + s.yOffset, s.w, s.h, s.direction, prog, alpha);
+        });
+
+        fxCtx.restore();
+      } else {
+        windBurstStartTime = 0;
+        activeWindStrands = [];
+      }
+
+      // 2. Draw Arrow Projectile Flight
+      if (activeArrow) {
+        activeArrow.progress += activeArrow.speed;
+        const t = Math.min(1.0, activeArrow.progress);
+        const inv = 1.0 - t;
+
+        // Quadratic bezier position
+        const curX = inv * inv * activeArrow.startX + 2 * inv * t * activeArrow.controlX + t * t * activeArrow.targetX;
+        const curY = inv * inv * activeArrow.startY + 2 * inv * t * activeArrow.controlY + t * t * activeArrow.targetY;
+
+        activeArrow.trail.push({ x: curX, y: curY, alpha: 1.0 });
+
+        // Add spark particles
+        for (let i = 0; i < 3; i++) {
+          arrowParticles.push({
+            x: curX,
+            y: curY,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: (Math.random() - 0.5) * 2.5,
+            alpha: 1.0,
+            size: Math.random() * 2.5 + 1
+          });
+        }
+
+        // Render trail
+        overlayCtx.lineCap = 'round';
+        for (let i = 0; i < activeArrow.trail.length; i++) {
+          const pt = activeArrow.trail[i];
+          pt.alpha -= 0.024;
+          if (pt.alpha > 0) {
+            overlayCtx.strokeStyle = `rgba(254, 240, 138, ${pt.alpha})`;
+            overlayCtx.lineWidth = 4.5 * pt.alpha;
+            overlayCtx.beginPath();
+            overlayCtx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+            overlayCtx.stroke();
+          }
+        }
+
+        // Draw arrow head
+        overlayCtx.fillStyle = '#ffffff';
+        overlayCtx.shadowColor = '#d4af37';
+        overlayCtx.shadowBlur = 18;
+        overlayCtx.beginPath();
+        overlayCtx.arc(curX, curY, 4, 0, Math.PI * 2);
+        overlayCtx.fill();
+        overlayCtx.shadowBlur = 0;
+
+        if (activeArrow.progress >= 1.0) {
+          const cb = activeArrow.onComplete;
+          activeArrow = null;
+          if (cb) cb();
+        }
+      }
+
+      // Render sparks
+      for (let i = arrowParticles.length - 1; i >= 0; i--) {
+        const p = arrowParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.035;
+        overlayCtx.fillStyle = `rgba(212, 175, 55, ${p.alpha})`;
+        overlayCtx.beginPath();
+        overlayCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        overlayCtx.fill();
+        if (p.alpha <= 0) arrowParticles.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // --- UI Update Hooks ---
+    function updateHUD() {
+      const curRoom = game.playerLoc;
+      const tunnels = game.cave[curRoom] || [1, 2, 3];
+      const cues = game.getSensoryCues(curRoom);
+
+      // Labels
+      document.getElementById('label-room').textContent = `CHAMBER ${curRoom}`;
+      document.getElementById('quiver-count').textContent = `${game.arrowsLeft} MAGIC ARROWS`;
+      document.getElementById('hud-mode-badge').textContent = game.options.mode.toUpperCase();
+
+      // Doors
+      document.getElementById('label-door-left').textContent = `ROOM ${tunnels[0] || '-'}`;
+      document.getElementById('label-door-center').textContent = `ROOM ${tunnels[1] || '-'}`;
+      document.getElementById('label-door-right').textContent = `ROOM ${tunnels[2] || '-'}`;
+
+      // Sensory Pills
+      const pillDraft = document.getElementById('pill-draft');
+      const pillStench = document.getElementById('pill-stench');
+      const pillBats = document.getElementById('pill-bats');
+      const vig = document.getElementById('vignette');
+
+      pillDraft.className = cues.draft ? 'status-pill active-draft' : 'status-pill';
+      pillStench.className = cues.stench ? 'status-pill active-stench' : 'status-pill';
+      pillBats.className = cues.flutter ? 'status-pill active-bats' : 'status-pill';
+
+      vig.className = 'vignette' + (cues.stench ? ' stench' : (cues.draft ? ' draft' : ''));
+
+      // Render updated background scene
+      renderWildCavernBackground();
+    }
+
+    let bannerTimer = null;
+    function showBanner(text) {
+      const b = document.getElementById('banner-notify');
+      b.textContent = text;
+      b.classList.add('show');
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => { b.classList.remove('show'); }, 3800);
+    }
+
+    function handlePlayerMove(targetRoom) {
+      const res = game.moveTo(targetRoom);
+      window.RuneGatesDesk?.noteMove(targetRoom, res, game);
+      updateHUD();
+      showBanner(res.message);
+
+      if (game.status === 'VICTORY') {
+        showOutcomeModal(true, 'WUMPUS SLAIN!', res.message);
+      } else if (game.status.startsWith('DEFEAT')) {
+        showOutcomeModal(false, 'YOU HAVE PERISHED', res.message);
+      }
+    }
+    window.handlePlayerMove = handlePlayerMove;
+
+    function showOutcomeModal(isVictory, title, message) {
+      // In the Hall's version the desk writes the delve's chronicle instead of this dialog.
+      if (window.RuneGatesDesk?.finishRun(isVictory, title, message, game)) {
+        playSoundEffect(isVictory ? 'victory' : 'wumpus');
+        return;
+      }
+      const modal = document.getElementById('modal-outcome');
+      const icon = document.getElementById('outcome-icon');
+      const t = document.getElementById('outcome-title');
+      const msg = document.getElementById('outcome-message');
+      const cont = document.getElementById('outcome-container');
+
+      icon.textContent = isVictory ? '🏆' : '💀';
+      t.textContent = title;
+      msg.textContent = message;
+      cont.className = isVictory ? 'modal-dialog outcome-modal outcome-victory' : 'modal-dialog outcome-modal outcome-defeat';
+
+      if (isVictory) playSoundEffect('victory');
+      else playSoundEffect('wumpus');
+
+      modal.classList.add('open');
+    }
+
+    // --- Trajectory Planner Modal Logic ---
+    function openShootModal() {
+      if (game.status !== 'IN_PROGRESS') return;
+      currentTrajectory = [];
+      updateTrajectoryModal();
+      document.getElementById('modal-shoot').classList.add('open');
+      focusPlanner();
+    }
+
+    // Keyboard players land on the first chamber they can name, or on the release once five are named.
+    function focusPlanner() {
+      (document.querySelector('#tunnel-chips-container .tunnel-chip') || document.getElementById('btn-traj-fire')).focus();
+    }
+
+    function updateTrajectoryModal() {
+      const curRoom = game.playerLoc;
+      const display = document.getElementById('trajectory-display');
+      display.innerHTML = `<div class="traj-hop">${curRoom}</div>`;
+
+      currentTrajectory.forEach(r => {
+        display.innerHTML += `<div class="traj-arrow">➔</div><div class="traj-hop">${r}</div>`;
+      });
+
+      // Show adjacent tunnels of the last hop
+      const lastLoc = currentTrajectory.length > 0 ? currentTrajectory[currentTrajectory.length - 1] : curRoom;
+      const availableTunnels = game.cave[lastLoc] || [];
+      const chips = document.getElementById('tunnel-chips-container');
+      chips.innerHTML = '';
+
+      if (currentTrajectory.length < 5) {
+        availableTunnels.forEach(t => {
+          // A real button, so the planner works from the keyboard too (Tab, then Enter or Space).
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'tunnel-chip';
+          btn.textContent = `Chamber ${t}`;
+          btn.onclick = () => {
+            currentTrajectory.push(t);
+            updateTrajectoryModal();
+            focusPlanner();
+          };
+          chips.appendChild(btn);
+        });
+      } else {
+        chips.innerHTML = '<div style="color: #fef08a; font-size: 0.85rem;">Maximum 5 hops selected!</div>';
+      }
+    }
+
+    function firePlannedArrow() {
+      if (currentTrajectory.length === 0) {
+        showBanner('Select at least one chamber for your arrow path!');
+        return;
+      }
+      document.getElementById('modal-shoot').classList.remove('open');
+
+      // Determine visual target door
+      const tunnels = game.cave[game.playerLoc] || [];
+      let doorIdx = 1;
+      if (currentTrajectory[0] === tunnels[0]) doorIdx = 0;
+      else if (currentTrajectory[0] === tunnels[2]) doorIdx = 2;
+
+      triggerArrowAnimation(doorIdx, () => {
+        const res = game.shootArrow(currentTrajectory);
+        window.RuneGatesDesk?.noteShot(currentTrajectory.slice(), res, game);
+        updateHUD();
+        showBanner(res.message);
+
+        if (res.status === 'VICTORY') {
+          showOutcomeModal(true, 'WUMPUS SLAIN!', res.message);
+        } else if (res.status.startsWith('DEFEAT')) {
+          showOutcomeModal(false, 'EXPEDITION FAILED', res.message);
+        }
+      });
+    }
+
+    // --- Interactive Minimap Renderer ---
+    function renderMinimapModal() {
+      const mapCanvas = document.getElementById('minimap-chart');
+      const ctx = mapCanvas.getContext('2d');
+      const mw = mapCanvas.width;
+      const mh = mapCanvas.height;
+
+      ctx.clearRect(0, 0, mw, mh);
+      ctx.fillStyle = '#03060a';
+      ctx.fillRect(0, 0, mw, mh);
+
+      const total = game.roomNum;
+      const positions = {};
+
+      // Layout rooms in a circle or dodecahedral projection
+      for (let i = 1; i <= total; i++) {
+        const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+        const radius = Math.min(mw, mh) * 0.38;
+        positions[i] = {
+          x: mw / 2 + Math.cos(angle) * radius,
+          y: mh / 2 + Math.sin(angle) * radius
+        };
+      }
+
+      // Draw tunnels
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
+      ctx.lineWidth = 1.5;
+      for (let i = 1; i <= total; i++) {
+        const neighbors = game.cave[i] || [];
+        neighbors.forEach(n => {
+          if (positions[n]) {
+            ctx.beginPath();
+            ctx.moveTo(positions[i].x, positions[i].y);
+            ctx.lineTo(positions[n].x, positions[n].y);
+            ctx.stroke();
+          }
+        });
+      }
+
+      // Draw chambers
+      for (let i = 1; i <= total; i++) {
+        const p = positions[i];
+        const isVisited = game.visitedRooms.has(i);
+        const isCurrent = (i === game.playerLoc);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isCurrent ? 12 : 8, 0, Math.PI * 2);
+
+        if (isCurrent) {
+          ctx.fillStyle = '#38bdf8';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 12;
+        } else if (isVisited) {
+          ctx.fillStyle = '#d4af37';
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = '#1e293b';
+          ctx.shadowBlur = 0;
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = isCurrent ? '#ffffff' : (isVisited ? '#fef08a' : '#64748b');
+        ctx.font = '10px Cinzel';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(i, p.x, p.y);
+      }
+    }
+
+    // --- Event Listeners & Controls ---
+    function setupControls() {
+      // Door hotspots
+      document.getElementById('door-left').onclick = () => handlePlayerMove(game.cave[game.playerLoc][0]);
+      document.getElementById('door-center').onclick = () => handlePlayerMove(game.cave[game.playerLoc][1]);
+      document.getElementById('door-right').onclick = () => handlePlayerMove(game.cave[game.playerLoc][2]);
+
+      // Bottom bar buttons
+      document.getElementById('btn-move-left').onclick = () => handlePlayerMove(game.cave[game.playerLoc][0]);
+      document.getElementById('btn-move-center').onclick = () => handlePlayerMove(game.cave[game.playerLoc][1]);
+      document.getElementById('btn-move-right').onclick = () => handlePlayerMove(game.cave[game.playerLoc][2]);
+      document.getElementById('btn-shoot-modal').onclick = openShootModal;
+
+      // Shoot modal buttons
+      document.getElementById('btn-close-shoot').onclick = () => document.getElementById('modal-shoot').classList.remove('open');
+      document.getElementById('btn-traj-clear').onclick = () => { currentTrajectory = []; updateTrajectoryModal(); };
+      document.getElementById('btn-traj-fire').onclick = firePlannedArrow;
+
+      // Rematch buttons
+      document.getElementById('btn-rematch-same').onclick = () => {
+        document.getElementById('modal-outcome').classList.remove('open');
+        game.rematch(true);
+        updateHUD();
+        showBanner(`Rematch begins in same cave! You wake in Chamber ${game.playerLoc}.`);
+      };
+      document.getElementById('btn-rematch-new').onclick = () => {
+        document.getElementById('modal-outcome').classList.remove('open');
+        game.rematch(false);
+        updateHUD();
+        showBanner(`You enter a freshly forged cavern! Arrived in Chamber ${game.playerLoc}.`);
+      };
+
+      // Minimap
+      document.getElementById('btn-minimap').onclick = () => {
+        window.RuneGatesDesk?.noteMap();
+        renderMinimapModal();
+        document.getElementById('modal-map').classList.add('open');
+      };
+      document.getElementById('btn-close-map').onclick = () => document.getElementById('modal-map').classList.remove('open');
+
+      // Lore & Rules
+      document.getElementById('btn-lore').onclick = () => document.getElementById('modal-lore').classList.add('open');
+      document.getElementById('btn-close-lore').onclick = () => document.getElementById('modal-lore').classList.remove('open');
+
+      // Settings
+      document.getElementById('btn-settings').onclick = () => document.getElementById('modal-settings').classList.add('open');
+      document.getElementById('btn-close-settings').onclick = () => document.getElementById('modal-settings').classList.remove('open');
+
+      document.getElementById('set-mode').onchange = (e) => {
+        document.getElementById('row-room-num').style.display = e.target.value === 'procedural' ? 'flex' : 'none';
+      };
+
+      document.getElementById('btn-apply-settings').onclick = () => {
+        const lvl = document.getElementById('set-level').value;
+        const mode = document.getElementById('set-mode').value;
+        const rNum = parseInt(document.getElementById('set-room-num').value) || 25;
+        const arrows = parseInt(document.getElementById('set-arrows').value) || 5;
+
+        game = new WumpEngine.WumpGame({
+          level: lvl,
+          mode: mode,
+          roomNum: rNum,
+          arrowNum: arrows
+        });
+
+        window.game = game;
+        window.RuneGatesDesk?.noteNewGame(game);
+        document.getElementById('modal-settings').classList.remove('open');
+        updateHUD();
+        showBanner(`Expedition reconfigured: ${mode.toUpperCase()} on ${lvl} difficulty.`);
+      };
+
+      document.getElementById('btn-audio').onclick = toggleDrone;
+
+      // Keyboard Shortcuts
+      window.addEventListener('keydown', (e) => {
+        // While a page of the game menu is open, its keys are its own.
+        if (window.RuneGatesDesk?.ownsKeys()) return;
+        const activeModal = document.querySelector('.modal-backdrop.open');
+        if (e.key === 'Escape' && activeModal) {
+          // Handled here, so the Hall's bridge does not also take it as "back to the Hall".
+          e.preventDefault();
+          activeModal.classList.remove('open');
+          return;
+        }
+
+        if (activeModal) return; // Don't trigger movement if modal is open
+
+        const tunnels = game.cave[game.playerLoc] || [];
+        if (e.key === '1' || e.key === 'a' || e.key === 'A') {
+          handlePlayerMove(tunnels[0]);
+        } else if (e.key === '2' || e.key === 'w' || e.key === 'W') {
+          handlePlayerMove(tunnels[1]);
+        } else if (e.key === '3' || e.key === 'd' || e.key === 'D') {
+          handlePlayerMove(tunnels[2]);
+        } else if (e.key === 's' || e.key === 'S') {
+          openShootModal();
+        } else if (e.key === 'm' || e.key === 'M') {
+          window.RuneGatesDesk?.noteMap();
+          renderMinimapModal();
+          document.getElementById('modal-map').classList.add('open');
+        } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
+          document.getElementById('modal-lore').classList.add('open');
+        }
+      });
+    }
+
+    // --- The game menu's way in (src/desk.mjs) ---
+    window.RuneGatesPlay = {
+      /** Starts a delve with the engine's options; the cave behind the menu is replaced. */
+      begin(options, intro) {
+        game = new WumpEngine.WumpGame(options);
+        window.game = game;
+        currentTrajectory = [];
+        document.querySelectorAll('.modal-backdrop.open').forEach((m) => m.classList.remove('open'));
+        windBurstStartTime = 0;
+        updateHUD();
+        renderStaticLayers();
+        if (intro) showBanner(intro);
+        return game;
+      },
+      current: () => game,
+      /** The five layers of the scene, back to front, for the Hall's key art. */
+      layers: () => [bgCanvas, chamberCanvas, floorCanvas, fxCanvas, overlayCanvas],
+      openLore: () => document.getElementById('modal-lore').classList.add('open'),
+      /** The Hall's pause silences the drone; resuming brings it back if it was playing. */
+      pauseSound: () => audioCtx?.suspend(),
+      resumeSound: () => { if (audioPlaying) audioCtx?.resume(); },
+    };
+
+    // --- Bootstrap ---
+    loadAssets();
+    setupControls();
+    resize();
+    updateHUD();
+    animate();
+    if (document.body.dataset.desk !== 'menu') {
+      showBanner(`You step through the Rune Gates into Chamber ${game.playerLoc}. Listen closely to the cave...`);
+    }
+  </script>
+  <script type="module" src="src/desk.mjs"></script>
+</body>
+</html>

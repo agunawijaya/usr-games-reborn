@@ -320,6 +320,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/wump-classic/app: {}
+
   games/zoomies:
     dependencies:
       '@usr-games/kit':

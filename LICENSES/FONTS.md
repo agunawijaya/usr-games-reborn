@@ -31,6 +31,8 @@ their styles already use:
 | IBM Plex Mono                 | `@fontsource/ibm-plex-mono`               | Pajamas to Paradise                    | Copyright 2017 IBM Corp. All rights reserved.                                                                                 |
 | Share Tech Mono               | `@fontsource/share-tech-mono`             | Trek — Deep Space; Control Room 1986   | Copyright (c) 2012, Carrois Type Design, Ralph du Carrois (www.carrois.com post@carrois.com), with Reserved Font Name 'Share' |
 | VT323                         | `@fontsource/vt323`                       | Control Room 1986                      | Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)                                                              |
+| Cinzel                        | `@fontsource/cinzel`                      | The Rune Gates                         | Copyright 2020 The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel)                                               |
+| Cinzel Decorative             | `@fontsource/cinzel-decorative`           | The Rune Gates                         | Copyright 2012 Natanael Gama (info@ndiscovered.com), with Reserved Font Name 'Cinzel'                                         |
 
 Only the Latin subsets are imported. When a font is added or swapped, update this table,
 [`../CREDITS.md`](../CREDITS.md) and ADR [0008](../docs/adr/0008-fonts.md) in the same change.

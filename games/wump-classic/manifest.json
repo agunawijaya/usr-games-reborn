@@ -1,0 +1,129 @@
+{
+  "id": "wump-classic",
+  "title": "The Rune Gates",
+  "tagline": "Read the draft, the stench and the wings. Loose a crooked arrow.",
+  "teaser": "Step through glowing rune gates where a cold draft means a pit, a flutter means super-bats and a stench means the wumpus is near. Rise from Lamp-bearer to Master through twelve delves, earn a seal for every quest met, keep a ledger of every delve, fill the lore codex and take the Daily Delve.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 10],
+  "status": "shipped",
+  "accent": "#d4af37",
+  "emblem": "M10 42V22a14 14 0 0 1 28 0v20M15 42V23a9 9 0 0 1 18 0v19M6 42h36M24 3v3M16.5 5.5l1.5 2.5M31.5 5.5L30 8M12 31h3M33 31h3",
+  "inspiredBy": {
+    "program": "wump",
+    "originalTitle": "Hunt the Wumpus",
+    "uiTitle": "wump",
+    "year": 1989
+  },
+  "daily": true,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/wump-classic/app",
+    "output": "play/wump-classic/"
+  },
+  "manPage": {
+    "synopsis": "wump — walk the halls by draft, stench and wing beat; name up to five chambers and loose a crooked arrow into the wumpus's.",
+    "description": "The owner's earlier fancy-web port of wump: rune-lit gates, wind that curls out of the tunnel towards a pit, a drone in the stone, and the original's rules of the hunt. Around it, a delver's career of twelve delves with ranks, a briefing of three quests and a seal for each, a written chronicle of every delve kept in a ledger, a lore codex and a Daily Delve. A second interpretation beside the collection's own wump.",
+    "seeAlso": ["wump", "adventure"]
+  },
+  "howToPlay": [
+    "Each chamber has three rune gates; walk through one with 1, 2 or 3, or click it.",
+    "A cold draft means a pit next door, a flutter means super-bats, a stench means the wumpus is within two chambers.",
+    "Press S, name up to five chambers and loose a crooked arrow: only the chamber it ends in counts."
+  ],
+  "cronGoals": [
+    {
+      "id": "wumpuses-slain",
+      "stat": "wumpusesSlain",
+      "label": "Slay {n} wumpuses",
+      "min": 1,
+      "max": 4
+    },
+    {
+      "id": "seals",
+      "stat": "seals",
+      "label": "Earn {n} quest seals",
+      "min": 3,
+      "max": 9
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-slay",
+      "title": "The beast falls",
+      "description": "Slay your first wumpus.",
+      "tier": "core"
+    },
+    {
+      "id": "bat-rider",
+      "title": "Bat rider",
+      "description": "Let the super-bats carry you off, and live.",
+      "tier": "core"
+    },
+    {
+      "id": "outcrop",
+      "title": "Outcrop",
+      "description": "Cling to a rock outcrop over a bottomless pit.",
+      "tier": "core"
+    },
+    {
+      "id": "first-seal",
+      "title": "First seal",
+      "description": "Earn a quest seal on any delve.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-delver",
+      "title": "Daily delver",
+      "description": "Finish a Daily Delve.",
+      "tier": "core"
+    },
+    {
+      "id": "single-arrow",
+      "title": "Single arrow",
+      "description": "Slay a wumpus with your first arrow.",
+      "tier": "extra"
+    },
+    {
+      "id": "crooked-flight",
+      "title": "Crooked flight",
+      "description": "Slay a wumpus with an arrow named through three or more chambers.",
+      "tier": "extra"
+    },
+    {
+      "id": "hard-gate",
+      "title": "Through the hard gate",
+      "description": "Slay a wumpus on the hard level.",
+      "tier": "extra"
+    },
+    {
+      "id": "gate-warden",
+      "title": "Gate-warden",
+      "description": "Clear six delves of the career.",
+      "tier": "extra"
+    },
+    {
+      "id": "sealbearer",
+      "title": "Sealbearer",
+      "description": "Hold eighteen seals across the twelve delves.",
+      "tier": "rare"
+    },
+    {
+      "id": "loremaster",
+      "title": "Loremaster",
+      "description": "Find every page of the lore codex.",
+      "tier": "rare"
+    },
+    {
+      "id": "master-delver",
+      "title": "Master of the Rune Gates",
+      "description": "Clear all twelve delves.",
+      "tier": "rare"
+    }
+  ]
+}

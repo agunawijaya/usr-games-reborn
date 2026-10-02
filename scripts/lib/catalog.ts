@@ -23,6 +23,7 @@ export const PLANNED_IDS = [
   'atc',
   'atc-classic',
   'wump',
+  'wump-classic',
   'worm',
   'snake',
   'blocks',

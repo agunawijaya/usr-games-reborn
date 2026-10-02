@@ -26,6 +26,8 @@ const ROWS: Row[] = [
   // A second interpretation of atc: the earlier typed-radar port, with a career and Daily Traffic.
   ['atc-classic', 'arcade', 5, 15, true],
   ['wump', 'strategy', 3, 8, true],
+  // A second interpretation of wump: the earlier rune-gate port, with a career and a Daily Delve.
+  ['wump-classic', 'strategy', 3, 10, true],
   ['worm', 'arcade', 2, 6, false],
   ['snake', 'arcade', 2, 6, false],
   ['blocks', 'arcade', 3, 12, true],

@@ -100,6 +100,14 @@
         "path": "dist/play/hunt/src/engine/*.js",
         "match": "WebSocket",
         "reason": "The same comments in the built copy of hunt (ADR 0011)."
+      },
+      {
+        "path": "games/wump-classic/app/assets/*.svg",
+        "reason": "The Rune Gates' moss and rock textures are Openclipart's public-domain SVGs; their metadata names Inkscape, Sodipodi, Sozi, Dublin Core and Creative Commons by namespace and licence URI. Nothing is fetched (ADR 0011)."
+      },
+      {
+        "path": "dist/play/wump-classic/assets/*.svg",
+        "reason": "The same textures in the built copy (ADR 0011)."
       }
     ]
   },

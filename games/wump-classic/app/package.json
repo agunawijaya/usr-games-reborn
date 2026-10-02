@@ -1,0 +1,19 @@
+{
+  "name": "@usr-games/wump-classic-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The Rune Gates: the owner's earlier fancy-web port of wump, with rune gates, progressive wind drafts, a Web Audio drone, and a delver's career, quests, chronicles, a Daily Delve and a lore codex.",
+  "main": "src/engine.js",
+  "scripts": {
+    "test": "node --test tests/wump.test.js \"tests/*.test.mjs\""
+  },
+  "keywords": [
+    "bsdgames",
+    "wump",
+    "canvas",
+    "web-audio",
+    "procedural-generation"
+  ],
+  "author": "Agun Wijaya",
+  "license": "MIT"
+}

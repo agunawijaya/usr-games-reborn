@@ -1,0 +1,45 @@
+/* The two families this game used to fetch from a font CDN, served from the game's own folder so
+   it makes no network requests (/usr/games Reborn, hard rule 4). Latin subsets of the @fontsource
+   builds, both under the SIL Open Font License 1.1; see LICENSES/FONTS.md at the repository root.
+   Family names match the game's own styles, so nothing else changes. The game also asked the CDN
+   for MedievalSharp and Fira Code but never used them; they are not carried over. */
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./cinzel-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./cinzel-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./cinzel-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./cinzel-latin-900-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./cinzel-decorative-latin-700-normal.woff2') format('woff2');
+}

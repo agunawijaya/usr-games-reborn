@@ -1,0 +1,568 @@
+/* The Rune Gates — the desk: game menu, trail, briefing, chronicle, ledger and codex. Drawn in
+   the game's own manner: Cinzel, gold rules and rune-cyan glow over the dark of the halls. */
+
+:root {
+  --desk-gold: #d4af37;
+  --desk-gold-soft: rgba(212, 175, 55, 0.35);
+  --desk-rune: #a5f3fc;
+  --desk-ink: #e2e8f0;
+  --desk-ink-2: #a8b3c4;
+  --desk-panel: rgba(5, 8, 14, 0.92);
+}
+
+/* While the desk is open the play controls step aside; the cave stays in view behind it. */
+body:not([data-desk='play']) :is(#top-hud, #bottom-bar, .door-hotspot, #banner-notify) {
+  visibility: hidden;
+}
+
+/* The game's setup dialog belongs to free delves; career and daily delves have their own caves. */
+body:not(.free-delve) #btn-settings {
+  display: none;
+}
+
+button:focus-visible,
+summary:focus-visible,
+.door-hotspot:focus-visible {
+  outline: 3px solid var(--desk-rune);
+  outline-offset: 3px;
+}
+
+.desk {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  display: none;
+  padding: 24px;
+  overflow-y: auto;
+  color: var(--desk-ink);
+  font-family: 'Cinzel', serif;
+  background: radial-gradient(ellipse at 50% 40%, rgba(2, 4, 8, 0.55), rgba(2, 4, 8, 0.9));
+}
+
+/* Centred while it fits; a tall page scrolls from its top instead of overflowing both ways. */
+.desk.open {
+  display: grid;
+  place-items: safe center;
+}
+
+.desk--menu.open {
+  place-items: stretch start;
+  padding: 0;
+  background: linear-gradient(90deg, rgba(2, 4, 8, 0.96) 0%, rgba(2, 4, 8, 0.86) 34%, rgba(2, 4, 8, 0.25) 58%, transparent 75%);
+}
+
+.desk-panel {
+  width: min(760px, 100%);
+  padding: 24px 32px 26px;
+  border: 1px solid var(--desk-gold-soft);
+  border-radius: 14px;
+  background: var(--desk-panel);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.85), 0 0 28px rgba(212, 175, 55, 0.12);
+}
+
+.desk-wide {
+  width: min(1180px, 100%);
+}
+
+.desk-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: min(470px, 100%);
+  min-height: 100%;
+  padding: 24px 40px 18px 52px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* The page's own rule draws every canvas full-screen behind the play; these sit in the text. */
+.desk canvas.desk-inscription {
+  position: static;
+  display: block;
+  width: 380px;
+  max-width: 100%;
+  height: auto;
+  opacity: 0.85;
+}
+
+.desk-title {
+  margin: 0;
+  font: 700 clamp(2.2rem, 3.6vw, 3.2rem) / 1 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--desk-gold);
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+}
+
+.desk-lede {
+  margin: 0;
+  color: var(--desk-ink-2);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.desk-rank {
+  margin: 4px 0 6px;
+  color: var(--desk-ink-2);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+}
+
+.desk-rank strong {
+  color: var(--desk-rune);
+}
+
+.desk-menu-list {
+  display: grid;
+  gap: 5px;
+}
+
+.desk-menu-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid rgba(165, 243, 252, 0.14);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55);
+  color: var(--desk-ink);
+  font: 700 1.05rem/1.2 'Cinzel', serif;
+  letter-spacing: 0.03em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-menu-item:hover {
+  border-color: var(--desk-gold);
+  background: rgba(212, 175, 55, 0.14);
+}
+
+.desk-menu-item.is-primary {
+  border-color: var(--desk-gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.32), rgba(180, 83, 9, 0.38));
+  color: #fef08a;
+}
+
+.desk-menu-note {
+  color: var(--desk-ink-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.desk-menu-item.is-primary .desk-menu-note {
+  color: #fde68a;
+}
+
+.desk-credit {
+  margin: 10px 0 0;
+  color: #7c8798;
+  font-size: 0.74rem;
+}
+
+.desk-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.desk-page-title {
+  margin: 0 0 6px;
+  font: 700 1.7rem/1.1 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--desk-gold);
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.desk-subhead {
+  margin: 20px 0 8px;
+  font: 700 1rem/1.2 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  color: var(--desk-rune);
+  text-transform: uppercase;
+}
+
+.desk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 18px;
+  border: 1px solid var(--desk-gold-soft);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--desk-ink);
+  font: 600 0.92rem/1 'Cinzel', serif;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.desk-btn:hover {
+  border-color: var(--desk-gold);
+  background: rgba(212, 175, 55, 0.18);
+}
+
+.desk-btn.is-primary {
+  border-color: var(--desk-gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.32), rgba(180, 83, 9, 0.4));
+  color: #fef08a;
+}
+
+.desk-back {
+  flex: none;
+}
+
+.desk-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.5em;
+  padding: 0 0.35em;
+  border: 1px solid rgba(254, 240, 138, 0.45);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font: 700 0.72em/1 'Cinzel', serif;
+}
+
+.desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.desk-note {
+  margin: 10px 0 0;
+  color: var(--desk-ink-2);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.desk-found {
+  color: var(--desk-rune);
+}
+
+.desk-facts {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(165, 243, 252, 0.18);
+  border-radius: 8px;
+  color: var(--desk-rune);
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+}
+
+.desk-tasks {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.98rem;
+}
+
+.desk-tasks--done li {
+  color: var(--desk-ink-2);
+}
+
+.desk-tasks--done li.is-met {
+  color: var(--desk-ink);
+}
+
+.seal {
+  display: inline-block;
+  width: 1.1em;
+  color: #7c8798;
+  text-align: center;
+}
+
+.seal.is-earned {
+  color: var(--desk-gold);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+.desk-seals {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* —— the trail —— */
+
+.desk-trail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1000px) {
+  .desk-trail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.desk-hall-name {
+  margin: 0 0 8px;
+  font: 700 0.9rem/1.2 'Cinzel', serif;
+  color: var(--desk-rune);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.desk-delves {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desk-delve {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--desk-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-delve:hover:not(:disabled) {
+  border-color: var(--desk-gold);
+}
+
+.desk-delve-number {
+  display: grid;
+  place-items: center;
+  width: 2.2em;
+  height: 2.2em;
+  border: 1px solid var(--desk-gold-soft);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.desk-delve.is-cleared .desk-delve-number {
+  border-color: var(--desk-gold);
+  background: rgba(212, 175, 55, 0.25);
+  color: #fef08a;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.desk-delve-text {
+  display: grid;
+  gap: 3px;
+}
+
+.desk-delve-text strong {
+  font-size: 0.95rem;
+}
+
+.desk-delve .desk-seals {
+  grid-column: 2;
+}
+
+.desk-delve-text small {
+  color: var(--desk-ink-2);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.desk-delve.is-locked {
+  border-style: dashed;
+  background: transparent;
+  color: #7c8798;
+  cursor: not-allowed;
+}
+
+/* —— the report —— */
+
+.desk-report {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0 28px;
+  width: min(1120px, 100%);
+}
+
+.desk-report .desk-actions {
+  grid-column: 1 / -1;
+}
+
+.desk-report-side .desk-subhead {
+  margin-top: 4px;
+}
+
+.desk-report-side .desk-chronicle {
+  max-height: 380px;
+}
+
+.desk-kicker {
+  margin: 0 0 4px;
+  color: var(--desk-ink-2);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.desk-report-title {
+  margin: 0 0 8px;
+  font: 700 2rem/1.1 'Cinzel Decorative', 'Cinzel', serif;
+}
+
+.desk-report.is-victory .desk-report-title {
+  color: #facc15;
+  text-shadow: 0 0 14px rgba(250, 204, 21, 0.4);
+}
+
+.desk-report.is-defeat .desk-report-title {
+  color: #f87171;
+}
+
+.desk-report-message {
+  margin: 0 0 10px;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.desk-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+.desk-stat {
+  padding: 8px 10px;
+  border: 1px solid rgba(165, 243, 252, 0.16);
+  border-radius: 8px;
+}
+
+.desk-stat dt {
+  color: var(--desk-ink-2);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.desk-stat dd {
+  margin: 2px 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fef08a;
+}
+
+.desk-share {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px dashed var(--desk-gold-soft);
+  border-radius: 8px;
+  font-family: system-ui, sans-serif;
+  user-select: text;
+}
+
+.desk-chronicle {
+  display: grid;
+  gap: 5px;
+  max-height: 150px;
+  margin: 0;
+  padding: 0 0 0 1.4em;
+  overflow-y: auto;
+  color: #cbd5e1;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* —— ledger and codex —— */
+
+.desk-ledger {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desk-ledger summary {
+  padding: 10px 12px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.desk-ledger details[open] summary {
+  margin-bottom: 8px;
+}
+
+.desk-codex {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desk-page {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 70px;
+  padding: 12px 14px;
+  border: 1px solid rgba(165, 243, 252, 0.3);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--desk-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-page small {
+  color: var(--desk-rune);
+  font-size: 0.74rem;
+}
+
+.desk-page.is-hidden {
+  border-style: dashed;
+  background: transparent;
+  color: #7c8798;
+  cursor: default;
+}
+
+.desk-page.is-hidden small {
+  color: #7c8798;
+}
+
+.desk-lore p {
+  margin: 0 0 12px;
+  color: #cbd5e1;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.desk-lore canvas.desk-inscription {
+  width: 420px;
+  margin: 0 auto 4px;
+}
+
+.desk-confirm {
+  width: min(460px, 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk,
+  .desk * {
+    transition: none !important;
+  }
+}
