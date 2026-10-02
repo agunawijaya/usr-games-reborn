@@ -2,7 +2,7 @@
   "id": "sail",
   "title": "Broadside",
   "tagline": "Command a wooden warship in the age of sail.",
-  "teaser": "Choose one of history’s sea fights, take a ship and give your orders: trim the sails, load round or grape, and wait for the moment to rake. Every sea, sky, ship and flag is drawn by code, and the rules are the 1980 game’s own.",
+  "teaser": "Take a ship and give your orders: trim the sails, load round or grape, and wait for the moment to rake. Rise from midshipman to admiral in ten actions of the Sea Service, or fight the same Daily Engagement as everyone else. Every sea, sky and ship is drawn by code.",
   "category": "strategy",
   "directory": "/usr/games/strategy",
   "players": {
@@ -19,7 +19,7 @@
     "uiTitle": "sail",
     "year": 1980
   },
-  "daily": false,
+  "daily": true,
   "kind": "hosted",
   "build": {
     "kind": "hosted-static",
@@ -34,7 +34,7 @@
   "howToPlay": [
     "Choose a battle and a ship, then load your guns.",
     "Type or click your orders, then “Make it so” to play the turn.",
-    "Fire when you can rake; close in to board, or outsail them."
+    "Fire when you can rake; each action carries three commendations to earn."
   ],
   "cronGoals": [
     {
@@ -50,6 +50,13 @@
       "label": "Fire {n} broadsides",
       "min": 20,
       "max": 60
+    },
+    {
+      "id": "commendations",
+      "stat": "commendations",
+      "label": "Earn {n} commendations",
+      "min": 3,
+      "max": 9
     }
   ],
   "packages": [
@@ -111,6 +118,36 @@
       "id": "a-brace-of-prizes",
       "title": "A brace of prizes",
       "description": "Take two enemy ships in one battle.",
+      "tier": "rare"
+    },
+    {
+      "id": "first-action",
+      "title": "First command",
+      "description": "Win an action of the Sea Service.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-engagement",
+      "title": "Ship of the day",
+      "description": "Win a Daily Engagement.",
+      "tier": "core"
+    },
+    {
+      "id": "promoted",
+      "title": "Promoted",
+      "description": "Earn enough commendations to make lieutenant.",
+      "tier": "core"
+    },
+    {
+      "id": "full-marks",
+      "title": "Mentioned in dispatches",
+      "description": "Earn all three commendations in one battle.",
+      "tier": "extra"
+    },
+    {
+      "id": "sea-service",
+      "title": "Flag officer’s pennant",
+      "description": "Win all ten actions of the Sea Service.",
       "tier": "rare"
     }
   ]

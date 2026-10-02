@@ -305,13 +305,16 @@ diffuseColor.a = 1.0;
   for (int i = 0; i < ${MAX_HITS}; i++) {
     vec4 h = uHits[i];
     if (h.w <= 0.0) continue;
-    float d = distance(vLocal, h.xyz) / h.w + (n - 0.5) * 0.55;
-    float hole = 1.0 - smoothstep(0.28, 0.42, d);
-    float rim = smoothstep(0.3, 0.45, d) * (1.0 - smoothstep(0.5, 0.85, d));
-    float soot = 1.0 - smoothstep(0.5, 1.6, d);
-    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.48, 0.3), rim * 0.75);
+    float d = distance(vLocal, h.xyz) / h.w + (n - 0.5) * 0.6;
+    float hole = 1.0 - smoothstep(0.22, 0.27, d);
+    // raw oak splintered outward round the hole, in jagged tongues, so a hole reads on a black
+    // hull as well as on a pale band
+    float tongues = nn(vLocal * 7.0 + h.xyz);
+    float splinter = (1.0 - smoothstep(0.27, 0.33 + 0.25 * tongues, d)) * (1.0 - hole);
+    float soot = 1.0 - smoothstep(0.35, 1.4, d);
     diffuseColor.rgb *= 1.0 - soot * 0.55;
-    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.015, 0.01, 0.008), hole);
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.74, 0.58, 0.38), splinter * 0.85);
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.012, 0.008, 0.006), hole);
   }
   float s = smoothstep(0.55, 0.85, nn(vLocal * 0.35 + 3.0) * 0.7 + nn(vLocal * 1.7) * 0.3 + uSoot * 0.5 - 0.35);
   diffuseColor.rgb *= 1.0 - s * uSoot * 0.8;
@@ -527,8 +530,8 @@ export function buildHull(spec, nation) {
     for (let w = 0; w < nW; w++) {
       const x = lerp(-sternX * 0.8, sternX * 0.8, nW === 1 ? 0.5 : w / (nW - 1));
       const win = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.0), winMat);
+      // the stern faces +z (aft): the panes look outward, to be seen from astern
       win.position.set(x, y, tz + 0.52);
-      win.rotation.y = Math.PI;
       group.add(win);
     }
   }
@@ -554,7 +557,8 @@ export function buildHull(spec, nation) {
   const barrels = new THREE.InstancedMesh(barrelGeo, new THREE.MeshStandardMaterial({ color: '#191a1c', roughness: 0.55, metalness: 0.6 }), ports.length * 2);
   const lidGeo = new THREE.BoxGeometry(0.1, 0.85, 0.85);
   lidGeo.translate(0.05, 0.42, 0);
-  const lids = new THREE.InstancedMesh(lidGeo, new THREE.MeshStandardMaterial({ color: P.lid, roughness: 0.7 }), ports.length * 2);
+  // Lids take their colour per instance: the painted inner face shows when a lid is hauled up.
+  const lids = new THREE.InstancedMesh(lidGeo, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 }), ports.length * 2);
   barrels.castShadow = true;
   const muzzles = [];
   const m = new THREE.Matrix4();
@@ -568,7 +572,7 @@ export function buildHull(spec, nation) {
       const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), side > 0 ? 0 : Math.PI);
       m.compose(new THREE.Vector3(side * (s.x - 0.4), p.y, z), q, new THREE.Vector3(1, 1, 1));
       barrels.setMatrixAt(k, m);
-      muzzles.push({ side: side > 0 ? 'R' : 'L', deck: p.deck, u: p.u, pos: new THREE.Vector3(side * (s.x + 1.9), p.y, z), index: k });
+      muzzles.push({ side: side > 0 ? 'R' : 'L', deck: p.deck, u: p.u, pos: new THREE.Vector3(side * (s.x + 1.9), p.y, z), index: k, lost: false });
       k++;
     }
   }
@@ -583,16 +587,29 @@ export function buildHull(spec, nation) {
   };
 }
 
+// Which guns a battered broadside has lost: a fixed scatter per ship, so the same ports go
+// first every time and a gun once lost stays lost as the count falls.
+function gunSurvives(k, kept) {
+  const r = Math.abs(Math.sin(k * 12.9898 + 4.1414) * 43758.5453) % 1;
+  return r < kept;
+}
+
 // Place/rotate port lids: open (hinged up) or closed; hide barrels behind
-// closed lids. closedDecks: set of deck indices whose ports are shut.
-export function setPorts(h, closedDecks) {
+// closed lids. closedDecks: set of deck indices whose ports are shut. kept:
+// the fraction of each side's guns still in action ({ L, R }); a dismounted
+// gun leaves an empty port with its lid shot away.
+export function setPorts(h, closedDecks, kept = { L: 1, R: 1 }) {
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const e = new THREE.Euler();
+  const inner = new THREE.Color(h.paint.inner);
+  const outer = new THREE.Color(h.paint.lid);
   let k = 0;
   for (const side of [1, -1]) {
     for (const p of h.ports) {
-      const closed = closedDecks.has(p.deck);
+      const lost = !gunSurvives(k, kept[side > 0 ? 'R' : 'L']);
+      h.muzzles[k].lost = lost;
+      const closed = closedDecks.has(p.deck) && !lost;
       const b = h.form.bottom(p.u);
       const t = (p.y - b) / (h.form.top(p.u) - b);
       const s = h.form.section(p.u, t);
@@ -600,19 +617,21 @@ export function setPorts(h, closedDecks) {
       // lid hinge at the top edge of the port; open = swung up and out
       e.set(0, side > 0 ? 0 : Math.PI, closed ? 0 : -1.15);
       q.setFromEuler(e);
-      m.compose(new THREE.Vector3(side * (s.x + 0.02), p.y + (closed ? -0.42 : 0.42), z), q, new THREE.Vector3(1, 1, 1));
+      m.compose(new THREE.Vector3(side * (s.x + 0.02), p.y + (closed ? -0.42 : 0.42), z), q, lost ? new THREE.Vector3(0.001, 0.001, 0.001) : new THREE.Vector3(1, 1, 1));
       h.lids.setMatrixAt(k, m);
+      h.lids.setColorAt(k, closed ? outer : inner);
       // barrel: hidden (scaled to 0) when closed
       h.barrels.getMatrixAt(k, m);
       const pos = new THREE.Vector3();
       const qq = new THREE.Quaternion();
       const sc = new THREE.Vector3();
       m.decompose(pos, qq, sc);
-      m.compose(pos, qq, closed ? new THREE.Vector3(0.001, 0.001, 0.001) : new THREE.Vector3(1, 1, 1));
+      m.compose(pos, qq, closed || lost ? new THREE.Vector3(0.001, 0.001, 0.001) : new THREE.Vector3(1, 1, 1));
       h.barrels.setMatrixAt(k, m);
       k++;
     }
   }
   h.lids.instanceMatrix.needsUpdate = true;
+  if (h.lids.instanceColor) h.lids.instanceColor.needsUpdate = true;
   h.barrels.instanceMatrix.needsUpdate = true;
 }

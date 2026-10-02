@@ -61,14 +61,24 @@ uniform float uTear; uniform float uGlow; uniform float uSeed; uniform float uSo
 varying vec2 vSailUv;
 float sh1(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233)) + uSeed) * 43758.5453); }
 float sn(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(sh1(i), sh1(i + vec2(1, 0)), f.x), mix(sh1(i + vec2(0, 1)), sh1(i + vec2(1, 1)), f.x), f.y); }`)
+  return mix(mix(sh1(i), sh1(i + vec2(1, 0)), f.x), mix(sh1(i + vec2(0, 1)), sh1(i + vec2(1, 1)), f.x), f.y); }
+// Round shot punches clean holes: one cell in a coarse grid may hold a hole, more of them as the
+// rigging is shot away. Returns the distance past the hole's edge (< 0 inside the hole).
+float shotHole(vec2 uv) {
+  vec2 g = uv * vec2(9.0, 7.0);
+  vec2 cell = floor(g);
+  vec2 f = fract(g) - 0.5 - (vec2(sh1(cell + 3.1), sh1(cell + 5.7)) - 0.5) * 0.5;
+  float r = 0.1 + sh1(cell + 17.3) * 0.14;
+  float present = step(sh1(cell), uTear * 0.7);
+  return mix(1.0, length(f * vec2(1.0, 0.8)) - r, present);
+}`)
       .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
 {
   // shot holes and rents grow with rigging damage (chain shot shreds sails)
   float n = sn(vSailUv * vec2(7.0, 5.0)) * 0.6 + sn(vSailUv * vec2(19.0, 13.0)) * 0.4;
   float holes = step(n, uTear * 0.85 - 0.08);
   float rent = step(0.985 - uTear * 0.25, sn(vec2(vSailUv.x * 40.0, vSailUv.y * 2.0)));
-  if (uTear > 0.0 && (holes > 0.5 || rent * step(0.25, uTear) > 0.5)) discard;
+  if (uTear > 0.0 && (holes > 0.5 || rent * step(0.25, uTear) > 0.5 || shotHole(vSailUv) < 0.0)) discard;
 }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
 {
@@ -79,6 +89,15 @@ float sn(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 
   diffuseColor.rgb *= 1.0 - uSoot * 0.6 * smoothstep(0.3, 0.8, sn(vSailUv * 3.0 + 7.0));
   float edge = 1.0 - smoothstep(0.0, 0.03, min(min(vSailUv.x, 1.0 - vSailUv.x), min(vSailUv.y, 1.0 - vSailUv.y)));
   diffuseColor.rgb *= 1.0 - edge * 0.12;
+  // reef bands across the head of the sail, with their row of points
+  float reef = (1.0 - smoothstep(0.0, 0.006, abs(vSailUv.y - 0.86))) + (1.0 - smoothstep(0.0, 0.006, abs(vSailUv.y - 0.74)));
+  float points = step(0.82, fract(vSailUv.x * 22.0)) * ((1.0 - step(0.012, abs(vSailUv.y - 0.845))) + (1.0 - step(0.012, abs(vSailUv.y - 0.725))));
+  diffuseColor.rgb *= 1.0 - min(1.0, reef * 0.18 + points * 0.25);
+  // scorched, frayed edges round the shot holes
+  if (uTear > 0.0) {
+    float d = shotHole(vSailUv);
+    diffuseColor.rgb *= 1.0 - (1.0 - smoothstep(0.0, 0.06, d)) * 0.7;
+  }
 }`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
 totalEmissiveRadiance += diffuseColor.rgb * uGlow;`);
@@ -317,6 +336,8 @@ export function buildRig(h) {
 
     masts.push({
       index: i, u, H, Y, r0, pivot, body, yards, sails, mat, lines,
+      // what goes first when the rigging is cut up: the topgallant mast and its yard
+      topgallant: [tg, yards[2], xt, truck],
       fallen: false, fall: 0, fallDir: 1, stump: null, jury: false,
     });
   }

@@ -2,7 +2,12 @@
 //
 // Owns the engine state and this turn's orders; hands the engine's events
 // to the Fleet cinematic; drives the camera director, HUD, labels, input and
-// audio. The engine (src/engine) never sees any of this.
+// audio. The engine (src/engine) never sees any of this. For /usr/games
+// Reborn it also hosts the game menu (src/career/): the Sea Service, the
+// Daily Engagement, the historical actions and the service record, with a
+// battle report at the end. The first lieutenant's counsel, a full set of
+// orders for each turn, is a testing aid kept out of sight: Ctrl+Alt+C, or
+// ?counsel=1 in the address, shows it.
 
 import * as THREE from 'three';
 import * as E from './engine/index.js';
@@ -16,7 +21,17 @@ import { createRain } from './render/weather.js';
 import { createAudio } from './audio/audio.js';
 import * as HUD from './ui/hud.js';
 import * as Menu from './ui/menu.js';
-import { noteBattleStarted, noteTurn, offerPoster, posterWanted, reportBattle } from './hall.js';
+import {
+  hostedInHall, leaveForHall, noteBattleStarted, noteTurn, offerPoster, posterWanted, reportBattle,
+} from './hall.js';
+import { createDeck } from './career/deck.js';
+import { counsel } from './career/counsel.js';
+import { createLog, noteTurn as logTurn } from './career/logbook.js';
+import { settleBattle } from './career/progress.js';
+import { planAction, planDaily, planFree, actionOfPlan } from './career/plans.js';
+import { actionAfter, actionById } from './career/service.js';
+import { localDateKey } from './career/daily.js';
+import { counselHtml, reportButtons, reportHtml, reportShareLine, stripHtml } from './career/report.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -50,7 +65,9 @@ const rain = createRain(world.scene, { quality });
 audio.setCamera(director.persp);
 
 let st = null; // engine state (authoritative)
-let cfg = null; // { scenarioId, playerShip, captain, initialLoad, seed }
+let cfg = null; // { scenarioId, playerShip, captain, initialLoad, seed, plan }
+let log = null; // the player's logbook for this battle (career/logbook.js)
+let report = null; // { buttons, share, shownAt } while the battle report is up
 let orders = {};
 let me = -1;
 let hint = null;
@@ -100,13 +117,35 @@ function applyStage(s) {
   }
 }
 
-function startBattle(c, saved = null) {
+const dayParam = /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null;
+const today = () => dayParam ?? localDateKey();
+const storedCaptain = () => store.get('broadside.captain', 'Hornblower');
+
+/** Battles from the game menu: a plan fought with the stored captain's name and round shot. */
+function launch(plan, extra = {}) {
+  const c = {
+    scenarioId: plan.scenarioId,
+    playerShip: plan.ship,
+    captain: extra.captain ?? storedCaptain(),
+    initialLoad: extra.initialLoad ?? { L: 'round', R: 'round' },
+    plan,
+  };
+  if (plan.seed !== undefined) c.seed = plan.seed;
+  Menu.close('menu');
+  Menu.close('end');
+  startBattle(c);
+}
+
+function startBattle(c, saved = null, savedLog = null) {
   cfg = { seed: (Math.random() * 2 ** 31) >>> 0, ...c };
+  cfg.plan ??= planFree(cfg.scenarioId, cfg.playerShip ?? 0, cfg.seed);
   st = saved || E.createGame(cfg);
   if (!saved) applyStage(st);
   noteBattleStarted();
   document.body.classList.remove('nobattle');
   me = st.players[0] ?? -1;
+  log = savedLog ?? (me >= 0 ? createLog(st, me) : null);
+  report = null;
   orders = {};
   pendingEnd = false;
   fx.clear();
@@ -124,7 +163,7 @@ function startBattle(c, saved = null) {
   director.tactical.halfH = Math.max(260, fleet.extent().radius * 1.1);
   director.updateOrtho();
   $('log').innerHTML = '';
-  $('meta').textContent = `· ${st.name}`;
+  $('meta').textContent = `· ${cfg.plan.mode === 'free' ? st.name : cfg.plan.name}`;
   HUD.logLine(`${st.name} — scenario ${st.scenarioId}.`, 'turn');
   if (v) HUD.logLine(`Captain ${st.ships[me].captain} assuming command of the ${st.ships[me].name}.`, 'me');
   newTurn();
@@ -152,6 +191,8 @@ function newTurn() {
 function refreshHud() {
   if (!st) return;
   const ms = st.ships[me];
+  renderStrip();
+  renderCounsel();
   if (ms) {
     HUD.renderSlate(st, ms);
     const input = HUD.renderOrders(st, ms, orders, {
@@ -269,6 +310,7 @@ function commit() {
   turnEvents = res.events;
   st = res.state;
   noteTurn(res.events, me);
+  if (log) logTurn(log, res.events, st, me, orders);
   HUD.logLine(`— Turn ${st.turn} —`, 'turn');
   const skip = params.get('cine') === '0';
   document.body.classList.add('cinematic');
@@ -305,7 +347,9 @@ function endBattle() {
   if (pendingEnd) return;
   pendingEnd = true;
   autoTurns = 0;
-  reportBattle(st, me);
+  const plan = cfg.plan;
+  const summary = me >= 0 && log ? settleBattle(plan, st, me, log) : { earned: [], newlyEarned: [], rating: null, rankBefore: '', rankAfter: '' };
+  reportBattle(st, me, plan, summary);
   if (fleet.onBeatHook) fleet.onBeatHook('end');
   refreshHud();
   const r = st.result || {};
@@ -315,7 +359,127 @@ function endBattle() {
     fleet.visuals.forEach((v, i) => setTimeout(() => { v.startPlunge(); fx.founder(v.root.position); }, 600 + i * 500));
   }
   try { sessionStorage.removeItem('broadside.battle'); } catch { /* ignore */ }
-  setTimeout(() => Menu.showEnd(st, st.ships[me], () => Menu.showScenarios(startBattle), () => startBattle({ ...cfg })), r.reason === 'hurricane' ? 4200 : 1400);
+  setTimeout(() => showReport(plan, summary), r.reason === 'hurricane' ? 4200 : 1400);
+}
+
+// ---------------------------------------------------------------------------
+// Battle report, strip and counsel
+// ---------------------------------------------------------------------------
+/** After the report appears, keys wait this long, so the Enter that made the last turn so is not
+ *  also taken as a choice on the report. */
+const REPORT_SETTLE_MS = 700;
+
+function showReport(plan, summary) {
+  const ms = st.ships[me];
+  const { board, rank } = Menu.recordInTopTen(st, ms);
+  const buttons = reportButtons(plan, st, summary, hostedInHall);
+  report = { buttons, share: reportShareLine(plan, st, summary), shownAt: performance.now() };
+  const el = $('end');
+  el.innerHTML = reportHtml({ plan, st, me: ms, summary, rank, board, buttons });
+  el.onclick = (e) => {
+    const b = e.target.closest('[data-report]');
+    if (b) reportAction(b.dataset.report);
+  };
+  el.onkeydown = onReportKey;
+  Menu.open('end');
+  setTimeout(() => el.querySelector('.btn.primary')?.focus({ preventScroll: true }), 40);
+}
+
+function reportAction(action) {
+  const plan = cfg.plan;
+  switch (action) {
+    case 'next':
+      launch(planAction(actionAfter(actionOfPlan(plan))));
+      break;
+    case 'again':
+      if (plan.mode === 'free') {
+        Menu.close('end');
+        startBattle({ ...cfg });
+      } else launch(plan);
+      break;
+    case 'menu':
+      Menu.close('end');
+      showGameMenu();
+      break;
+    case 'hall':
+      leaveForHall();
+      break;
+    case 'look':
+      Menu.close('end');
+      break;
+    case 'share': {
+      const shown = $('end').querySelector('.share-line span');
+      navigator.clipboard?.writeText(report.share).then(
+        () => { if (shown) shown.textContent = `${report.share}  · copied`; },
+        () => { if (shown) shown.textContent = report.share; },
+      );
+      break;
+    }
+  }
+}
+
+function onReportKey(e) {
+  if (!report || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (performance.now() - report.shownAt < REPORT_SETTLE_MS) {
+    if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
+    return;
+  }
+  if (e.key === 'Escape') { e.preventDefault(); reportAction('menu'); return; }
+  const b = report.buttons.find((x) => x.key === e.key.toUpperCase());
+  if (b) { e.preventDefault(); reportAction(b.action); }
+}
+
+function renderStrip() {
+  const el = $('strip');
+  if (!el) return;
+  const plan = cfg?.plan;
+  const show = !!plan && !!log && plan.mode !== 'free';
+  el.hidden = !show;
+  if (show) el.innerHTML = stripHtml(plan, st, me, log);
+}
+
+let counselShown = params.get('counsel') === '1';
+function renderCounsel() {
+  const el = $('counsel');
+  el.hidden = !counselShown || !st || me < 0;
+  if (el.hidden) return;
+  const advice = counsel(st, me);
+  el.innerHTML = counselHtml(advice);
+  const apply = $('counselApply');
+  if (apply && advice) apply.onclick = () => { orders = { ...advice.orders }; refreshHud(); };
+}
+function toggleCounsel() {
+  counselShown = !counselShown;
+  renderCounsel();
+}
+// The testing aid: no button and no help line mention it. Caught before the command line, which
+// keeps every other key for itself.
+window.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.altKey && e.code === 'KeyC') {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleCounsel();
+  }
+}, { capture: true });
+
+// ---------------------------------------------------------------------------
+// The game menu
+// ---------------------------------------------------------------------------
+const deck = createDeck({
+  host: $('menu'),
+  hosted: hostedInHall,
+  dateKey: today,
+  open: () => { $('menu').onkeydown = null; Menu.open('menu'); },
+  onLaunch: (plan) => launch(plan),
+  onHistoric: () => Menu.showScenarios((c) => startBattle(c), () => deck.show('menu')),
+  onTopTen: () => Menu.showBoard(() => deck.show('menu')),
+  onHelp: () => Menu.showHelp(),
+  onLeave: leaveForHall,
+});
+
+function showGameMenu() {
+  if (st) document.body.classList.add('nobattle');
+  deck.show('menu');
 }
 
 // ---------------------------------------------------------------------------
@@ -550,7 +714,7 @@ function pick(e) {
 // ---------------------------------------------------------------------------
 function save() {
   if (!st || st.over) return;
-  try { sessionStorage.setItem('broadside.battle', JSON.stringify({ cfg, st })); } catch { /* ignore */ }
+  try { sessionStorage.setItem('broadside.battle', JSON.stringify({ cfg, st, log })); } catch { /* ignore */ }
 }
 function restore() {
   try {
@@ -562,14 +726,17 @@ function restore() {
 
 // ---------------------------------------------------------------------------
 // Auto-play (for demos, screenshots and smoke tests): ?auto=N plays N turns
-// with the sailing master's helm and both broadsides every turn.
+// with the sailing master's helm and both broadsides every turn, or with the
+// first lieutenant's counsel (&autoorders=counsel).
 // ---------------------------------------------------------------------------
 let autoTurns = +(params.get('auto') || 0);
 function autoStep() {
   if (!st || st.over || autoTurns <= 0) return;
   autoTurns--;
   const ms = st.ships[me];
-  if (ms && params.get('autoorders') !== 'none') {
+  if (ms && params.get('autoorders') === 'counsel') {
+    orders = { ...(counsel(st, me)?.orders ?? {}) };
+  } else if (ms && params.get('autoorders') !== 'none') {
     orders = { fire: { L: 'hull', R: 'hull' }, load: { L: 'round', R: 'round' }, move: hint || 'd' };
     if (params.get('autosails') === 'full') orders.sails = 'full';
   } else orders = {};
@@ -663,15 +830,27 @@ if (params.get('scenario')) {
   if (params.get('pitch')) director.orbit.pitch = THREE.MathUtils.degToRad(+params.get('pitch'));
   if (params.get('dist')) director.orbit.dist = +params.get('dist');
   if (autoTurns > 0) setTimeout(autoStep, 300);
+} else if (params.get('mission')) {
+  // captures and tests: ?mission=daily or ?mission=<action id> (with &day=YYYY-MM-DD)
+  const wanted = params.get('mission');
+  const action = actionById(wanted);
+  if (wanted === 'daily') launch(planDaily(today()));
+  else if (action) launch(planAction(action));
+  else showGameMenu();
+  if (autoTurns > 0) setTimeout(autoStep, 300);
 } else if (resumed) {
   Menu.close('menu');
-  startBattle(resumed.cfg, resumed.st);
+  startBattle(resumed.cfg, resumed.st, resumed.log ?? null);
 } else {
-  Menu.showScenarios((c) => startBattle(c));
+  showGameMenu();
 }
 window.addEventListener('pointerdown', () => audio.start(), { once: true });
 window.addEventListener('keydown', () => audio.start(), { once: true });
-window.__game = { get st() { return st; }, fleet, director, world, fx, commit, runCommand, setView };
+window.__game = {
+  get st() { return st; }, get plan() { return cfg?.plan ?? null; }, get log() { return log; },
+  get menuPage() { return deck.page; },
+  fleet, director, world, fx, commit, runCommand, setView,
+};
 // Screenshot hook: ?readyAt=fire|move|sink|explode|idle[&readyDelay=ms]
 // holds window.__ready until that beat of the last auto-played turn.
 window.__ready = !params.get('readyAt');

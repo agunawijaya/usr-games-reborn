@@ -4,7 +4,8 @@
 
 Win the action: every ship on the other side has struck her colours, been taken, sunk or blown up
 while yours is still fighting. Along the way you earn points for the ships you take, and the best
-captains go into the game’s top ten.
+captains go into the game’s top ten. Each action of the Sea Service and each day’s engagement also
+carries three commendations; they earn stars, and the stars earn rank.
 
 ## Controls
 
@@ -12,37 +13,41 @@ Broadside is played with the keyboard or the mouse; every order has both. You ca
 the command line at the bottom of the screen, exactly as captains did in 1980, or click the buttons
 above it: both edit the same orders. Keys are the game’s own and cannot be remapped from the Hall.
 
-| Action                                      | Keyboard (type on the command line unless noted)   | Mouse                                            |
-| ------------------------------------------- | -------------------------------------------------- | ------------------------------------------------ |
-| Go to the command line                      | `/` or `:`                                         | Click it                                         |
-| Helm order                                  | `3`, `l1r1r2`, `d` (see Sailing below)             | ↶ l, 1–7, r ↷, d and ⌫ in the Helm box           |
-| Take the sailing master’s suggestion        | —                                                  | Take it                                          |
-| Fire a broadside at the hull or the rigging | `f l h` (port, hull), `f r r` (starboard, rigging) | Hull or Rig under Port or Starboard              |
-| Fire both broadsides at the hull            | `f`                                                | Hull on both sides                               |
-| Load an empty broadside                     | `ld l d` (port, double), `ld b r` (both, round)    | R, D, C or G under that side                     |
-| Unload both broadsides                      | `L`                                                | L                                                |
-| Battle or full sails                        | `c` (switch), `c full`, `c battle`                 | Battle or Full                                   |
-| Repair hull, guns or rigging                | `rp h`, `rp g`, `rp r`                             | ⚒ H, ⚒ G or ⚒ R                                  |
-| Grapple or ungrapple a ship alongside       | `g b0`, `g b0 u`                                   | Grapple or Ungrapple under Close action          |
-| Try to cut free of a fouled ship            | `u b0`                                             | Unfoul                                           |
-| Send boarders (1 to 3 crew sections)        | `b b0 2`                                           | Board 1, 2 or 3                                  |
-| Keep sections back to repel boarders        | `b repel 1`                                        | Repel 1, 2 or 3                                  |
-| Recall all boarding parties                 | `B`                                                | Recall                                           |
-| Report on the nearest ship, or all ships    | `i` (or `i b0`), `I`; `F f?` finds a French ship   | Click a ship, its label or its line in The Fleet |
-| Earlier commands                            | ↑ / ↓ on the command line                          | —                                                |
-| Make it so (play the turn)                  | Enter on an empty command line, or `.`             | Make it so ⏎                                     |
-| Skip the turn’s playback                    | Space, Esc or Enter                                | —                                                |
-| Chart view on or off                        | T (anywhere but the command line)                  | Chart                                            |
-| Rendering quality, High or Low              | Q (anywhere but the command line)                  | High / Low                                       |
-| Sound on or off                             | M (anywhere but the command line)                  | Sound                                            |
-| Help                                        | ? (or `?` on the command line)                     | ? or How to command                              |
-| Turn the camera (pan on the chart)          | ← ↑ → ↓                                            | Drag                                             |
-| Zoom                                        | + / −                                              | The wheel                                        |
-| Look at another ship, or your own           | 1–9, 0                                             | Click the ship                                   |
-| Give up your command                        | Type `Q` or `quit` on the command line             | —                                                |
-| New battle, or fight this one again (end)   | —                                                  | New battle, Fight it again                       |
-| Leave for the Hall                          | Esc on the scenario list; Tab to the Hall’s strip  | Move to the top edge; ← Back to the Hall         |
-| Back to the scenario list                   | Tab to the Hall’s strip                            | Move to the top edge; Game menu, then Leave      |
+| Action                                      | Keyboard (type on the command line unless noted)                             | Mouse                                            |
+| ------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ |
+| Go to the command line                      | `/` or `:`                                                                   | Click it                                         |
+| Helm order                                  | `3`, `l1r1r2`, `d` (see Sailing below)                                       | ↶ l, 1–7, r ↷, d and ⌫ in the Helm box           |
+| Take the sailing master’s suggestion        | —                                                                            | Take it                                          |
+| Fire a broadside at the hull or the rigging | `f l h` (port, hull), `f r r` (starboard, rigging)                           | Hull or Rig under Port or Starboard              |
+| Fire both broadsides at the hull            | `f`                                                                          | Hull on both sides                               |
+| Load an empty broadside                     | `ld l d` (port, double), `ld b r` (both, round)                              | R, D, C or G under that side                     |
+| Unload both broadsides                      | `L`                                                                          | L                                                |
+| Battle or full sails                        | `c` (switch), `c full`, `c battle`                                           | Battle or Full                                   |
+| Repair hull, guns or rigging                | `rp h`, `rp g`, `rp r`                                                       | ⚒ H, ⚒ G or ⚒ R                                  |
+| Grapple or ungrapple a ship alongside       | `g b0`, `g b0 u`                                                             | Grapple or Ungrapple under Close action          |
+| Try to cut free of a fouled ship            | `u b0`                                                                       | Unfoul                                           |
+| Send boarders (1 to 3 crew sections)        | `b b0 2`                                                                     | Board 1, 2 or 3                                  |
+| Keep sections back to repel boarders        | `b repel 1`                                                                  | Repel 1, 2 or 3                                  |
+| Recall all boarding parties                 | `B`                                                                          | Recall                                           |
+| Report on the nearest ship, or all ships    | `i` (or `i b0`), `I`; `F f?` finds a French ship                             | Click a ship, its label or its line in The Fleet |
+| Earlier commands                            | ↑ / ↓ on the command line                                                    | —                                                |
+| Make it so (play the turn)                  | Enter on an empty command line, or `.`                                       | Make it so ⏎                                     |
+| Skip the turn’s playback                    | Space, Esc or Enter                                                          | —                                                |
+| Chart view on or off                        | T (anywhere but the command line)                                            | Chart                                            |
+| Rendering quality, High or Low              | Q (anywhere but the command line)                                            | High / Low                                       |
+| Sound on or off                             | M (anywhere but the command line)                                            | Sound                                            |
+| Help                                        | ? (or `?` on the command line)                                               | ? or How to command                              |
+| Turn the camera (pan on the chart)          | ← ↑ → ↓                                                                      | Drag                                             |
+| Zoom                                        | + / −                                                                        | The wheel                                        |
+| Look at another ship, or your own           | 1–9, 0                                                                       | Click the ship                                   |
+| Give up your command                        | Type `Q` or `quit` on the command line                                       | —                                                |
+| Open a page of the game menu                | S Sea Service, D Daily Engagement, H Historical Actions, R Service Record    | The four cards                                   |
+| Move between the menu’s buttons             | Arrow keys (Tab works too), then Enter                                       | —                                                |
+| Back to the game menu from one of its pages | Esc                                                                          | ← Game menu                                      |
+| On the battle report                        | N next action, R fight it again, M (or Esc) game menu, H Hall, L look around | The report’s buttons                             |
+| Copy a daily engagement’s share line        | S on its report                                                              | Copy share line                                  |
+| Leave for the Hall                          | Esc on the game menu; Tab to the Hall’s strip                                | ← Back to the Hall; or the top edge’s            |
+| Back to the game menu during a battle       | Tab to the Hall’s strip                                                      | Move to the top edge; Game menu, then Leave      |
 
 `b0`, `F1` and the like are a ship’s mark, shown on its label, in The Fleet and in the log: the
 first letter of its nation (a capital when it carries full sails) and a number. A `!`, `~` or `#` in
@@ -137,14 +142,80 @@ work bring back up to two points, and a lost mast can only be jury-rigged back t
 | Hurricane | The wind rises to a hurricane: the storm turn plays, then every ship goes down |
 | Given up  | You type `Q`: you hand over your command                                       |
 
-The end screen shows your points and the top ten, then offers New battle (the scenario list), Fight
-it again (the same scenario and ship, with the same random seed) and Look around, which closes the
+The battle report shows the result, your points, the battle’s commendations earned ★ or missed ☆
+(a “new” tag marks a star earned for the first time), what opened or changed in your career, and
+the top ten. It offers the way on first (the next action of the Sea Service, or the daily
+engagement’s share line), then Fight it again (the same plan: the same scenario, ship and seed),
+Game menu, Back to the Hall and Look around, which closes the
 screen so you can study the last scene. From there, the Hall’s Game menu brings back the scenario
 list.
 
 ## Modes
 
-![The scenario list with the five featured actions](media/title-1280.webp)
+The title screen is the game menu. It shows your rank and stars and offers four cards.
+
+```mermaid
+flowchart LR
+  menu["Game menu<br/>rank and stars"] --> service["The Sea Service<br/>ten actions"]
+  menu --> daily["Daily Engagement #N"]
+  menu --> historic["Historical Actions<br/>any scenario, any ship"]
+  menu --> record["Service Record"]
+  service --> brief["An action's briefing<br/>and its commendations"] --> battle["The battle"]
+  daily --> battle
+  historic --> ship["Choose a ship,<br/>name, first broadsides"] --> battle
+  battle --> report["Battle report"]
+  report -->|"N next action, R again"| battle
+  report -->|"M or Esc"| menu
+```
+
+### The Sea Service
+
+![The Sea Service: ten actions on the left, the first open, and its briefing with three commendations](media/service-1280.webp)
+
+Ten actions, one captain’s career, each a historical scenario fought from a chosen ship with a fixed
+seed. The first is open; winning an action opens the next, and any of them can be fought again for
+the stars still missing. Every action can be won. You fight with the captain’s name you last used
+and round shot loaded in both broadsides.
+
+| #   | Action                   | Year | Your ship         | Commendations besides the win               |
+| --- | ------------------------ | ---- | ----------------- | ------------------------------------------- |
+| 1   | First Command            | 1799 | Constellation     | Win by turn 12; rake the enemy              |
+| 2   | The Long Guns            | 1812 | United States     | Take a prize by boarding; win by turn 6     |
+| 3   | In a Gale                | 1812 | Constitution      | Keep 75% of your crew; rake the enemy       |
+| 4   | One Against Two          | 1815 | Constitution      | Take 2 prizes; hull at 60% or better        |
+| 5   | A Drilled Crew           | 1813 | Shannon           | Rake the enemy twice; hull at 70% or better |
+| 6   | Off the Gironde          | 1798 | Ambuscade         | Keep every mast standing; board a prize     |
+| 7   | The First Frigate Action | 1793 | Nymphe            | Take a prize by boarding; hull at 70%       |
+| 8   | A Night Action           | 1800 | Constellation     | Hull at 70% or better; win by turn 12       |
+| 9   | Yardarm to Yardarm       | 1798 | Mars              | Keep every mast standing; hull at 50%       |
+| 10  | Against Two Frigates     | 1797 | Droits de l’Homme | Take 2 prizes; hull at 70% or better        |
+
+A prize is an enemy ship that strikes to your guns or that you take by boarding. While you fight, a
+strip under the top bar lists the battle’s commendations: ◇ still open, ◆ met, ✕ lost for good.
+
+### Daily Engagement
+
+One single-ship action a day, the same for every captain, numbered like the Hall’s daily challenges
+(#1 was 1 September 2026). The date picks the scenario and your ship from twelve duels and the
+battle’s seed. The three commendations are the win, the day’s standing order and a hull at 50% or
+better.
+
+| Day       | Standing order                 |
+| --------- | ------------------------------ |
+| Monday    | Rake the enemy                 |
+| Tuesday   | Hull at 60% or better          |
+| Wednesday | Win by turn 15                 |
+| Thursday  | Keep every mast standing       |
+| Friday    | Take a prize by boarding       |
+| Saturday  | Keep 60% of your crew          |
+| Sunday    | Win with 8 broadsides or fewer |
+
+The first engagement you fight each day, however it ends, is the one on record; fight it again as
+often as you like.
+
+### Historical actions
+
+![The game menu with its four cards](media/title-1280.webp)
 
 Each battle is one scenario of the original, under its original number. Pick one, take command of a
 ship, give your captain a name and choose your opening broadsides.
@@ -161,7 +232,12 @@ Under More historical actions are seventeen more, from a sloop duel in 1778 to a
 1815, each with its own time of day and weather: three are fought by night, four under grey skies
 and two on lakes. Scenarios 2, 3, 9 and 18 are fleet actions of ten ships. The full list of the
 original’s thirty-two scenarios is there too; the ten fanciful ones (22 to 31) are shown but cannot
-be played yet. Broadside has no daily challenge.
+be played yet.
+
+### Service record
+
+Your rank and stars, the ladder of ranks, and your lifetime numbers on this device: battles fought,
+victories, prizes, rakes, broadsides, daily engagements and the best engagement rating.
 
 ## Settings
 
@@ -178,6 +254,20 @@ playback, the camera blends instead of cutting, never shakes, and changes shot a
 seconds. It has a single look; the Hall’s strip follows the Hall’s light or dark appearance.
 
 ## Scoring
+
+![The report of the first action won: two commendations earned and tagged new, the next action opened](media/report-1280.webp)
+
+**Stars and rank.** Each commendation earned in the Sea Service is a star, thirty in all. Stars are
+kept for good, and so is the rank they bring: Midshipman (0), Lieutenant (3), Commander (7),
+Post-Captain (12), Commodore (18), Rear-Admiral (24), Admiral (30).
+
+**Engagement rating.** A won daily engagement scores 1,000, plus 5 for each point of hull kept in
+per cent, 2 for each point of crew, 20 for each turn under thirty, 300 for the standing order and
+150 for the sound hull, minus 5 for each broadside fired. One not won scores 200 for each prize
+taken. Its report gives a share line such as `Broadside · Daily Engagement #32 · ★★☆ · 1,830`,
+with no link.
+
+**Points and the top ten.**
 
 Points come from ships you take. An enemy that strikes to your guns gives you her points value; one
 you capture by boarding gives twice that (once, if she had already struck). If the prisoners rise
@@ -199,15 +289,21 @@ takes a big one ranks high. The Hall records your points (never below zero) as t
 | `heavy-weather`     | Win an action while the wind blows a gale or worse (5 or more).          |
 | `line-of-battle`    | Win a fleet action of ten ships or more (scenarios 2, 3, 9 or 18).       |
 | `a-brace-of-prizes` | Take two enemy ships in one battle, by gunfire or by boarding.           |
+| `first-action`      | Win an action of the Sea Service.                                        |
+| `daily-engagement`  | Win a Daily Engagement.                                                  |
+| `promoted`          | Earn enough commendations to make lieutenant.                            |
+| `full-marks`        | Earn all three commendations in one battle.                              |
+| `sea-service`       | Win all ten actions of the Sea Service.                                  |
 
 ## XP
 
 Every finished battle reports to the Hall. A victory is a win; a defeat (captured, sunk, blown up
 or struck) is a loss; nightfall and the hurricane are draws, since neither side won. Giving up your
 command with `Q` counts as quitting and earns no XP. On top of the battle’s XP, every enemy ship you
-take earns 8 XP, up to 25 in one battle; packages earn 30 (core), 60 (extra) or 120 (rare). Weekly
-goals can ask you to take a number of enemy ships (2 to 5) or fire a number of broadsides (20 to
-60).
+take earns 8 XP, up to 25 in one battle, and every commendation earned 3 XP; the Hall caps a
+battle’s extras at 30, and packages earn 30 (core), 60 (extra) or 120 (rare). A daily engagement
+counts as the day’s daily challenge in the Hall. Weekly goals can ask you to take a number of enemy
+ships (2 to 5), fire a number of broadsides (20 to 60) or earn a number of commendations (3 to 9).
 
 ## Tips
 
@@ -217,6 +313,8 @@ goals can ask you to take a number of enemy ships (2 to 5) or fire a number of b
 - Fight under battle sails. Full sails are for chasing, and they double the damage to your rigging.
 - While you learn to sail, take the sailing master’s suggestion; it is the computer captains’ own
   reckoning, run for your ship.
+- Read the briefing before you take command: “keep every mast standing” or “take a prize by
+  boarding” changes how you should fight the whole action.
 - Watch the wind rose before you turn: heading closer to the wind cuts your allowance.
 - A faster enemy can be slowed: aim at her rigging from long range, or use chain shot within three
   squares.

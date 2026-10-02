@@ -143,6 +143,87 @@
   .kbd { font-family: var(--mono); background: rgba(0,0,0,.08); padding: 0 4px; border-radius: 2px; }
   #fps { position: fixed; left: 8px; bottom: 8px; color: #9fb0bf; font: 11px var(--mono); z-index: 2; text-shadow: 0 1px 2px #000; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  [hidden] { display: none !important; }
+  .dim { color: var(--ink-soft); }
+  /* ---- the game menu and its pages (src/career/deck.js) ---- */
+  .deck { width: min(900px, 94vw); }
+  .deck-rank { margin: -6px 0 12px; font-size: 15px; color: var(--ink-soft); }
+  .deck-rank b { color: var(--accent); letter-spacing: .06em; text-transform: uppercase; font-size: 14px; }
+  .deck-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .deck-card { position: relative; padding: 12px 12px 12px 46px; min-height: 76px; }
+  .deck-card b { font-size: 19px; display: block; }
+  .card-key { position: absolute; left: 12px; top: 13px; width: 24px; height: 24px; display: grid; place-items: center;
+    font: 700 13px var(--mono); color: var(--ink); background: linear-gradient(180deg, #f6e7bd, #d4b673); border: 1px solid #7a5a22; border-radius: 3px; }
+  .deck-foot { margin: 4px 0 0; }
+  .deck-head { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(120,90,40,.35); padding-bottom: 8px; }
+  .deck-head h1 { text-align: center; font-size: 28px; }
+  .deck-meta { min-width: 120px; text-align: right; color: var(--ink-soft); font-size: 14px; }
+  .service { display: grid; grid-template-columns: 290px 1fr; gap: 14px; align-items: start; }
+  .action-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+  .action-row { width: 100%; display: grid; grid-template-columns: 22px 1fr auto; gap: 6px; align-items: center; text-align: left;
+    padding: 4px 8px; font-family: var(--serif); font-size: 14px; color: var(--ink); background: rgba(255,255,255,.22); border: 1px solid #b89c62; cursor: pointer; }
+  .action-row:hover { background: rgba(255,240,200,.5); }
+  .action-row.selected { background: rgba(160,110,30,.22); border-color: #7a5a22; font-weight: 700; }
+  .action-row.locked { color: #8c7b60; }
+  .row-no { font-family: var(--mono); color: var(--ink-soft); }
+  .row-stars { color: var(--brass-2); letter-spacing: .05em; }
+  .row-lock { font-size: 11px; font-style: italic; color: #8c7b60; }
+  .briefing { border: 1px solid #b89c62; background: rgba(255,255,255,.22); padding: 10px 14px; min-height: 100%; }
+  .briefing p { margin: 6px 0; line-height: 1.45; }
+  .brief-kicker { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+  .brief-title { margin: 4px 0; font-size: 24px; text-transform: none; letter-spacing: .02em; color: var(--ink); }
+  .brief-ship { font-style: italic; color: var(--ink-soft); }
+  .brief-label { margin: 10px 0 4px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .brief-locked { font-style: italic; color: var(--ink-soft); }
+  .deck-orders, .report-orders { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 15px; }
+  .deck-orders .mark, .report-orders .mark { color: #9a8a6c; }
+  .deck-orders li.earned .mark, .report-orders li.earned .mark { color: var(--brass-2); text-shadow: 0 0 3px rgba(243,217,139,.9); }
+  .standing-order { padding: 6px 10px; border-left: 4px solid var(--accent); background: rgba(143,42,28,.08); font-size: 16px; }
+  .flown { color: var(--ok); }
+  .recent { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+  .recent li { display: grid; grid-template-columns: 50px 50px 90px 1fr; gap: 6px; }
+  .record { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .record-title { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+  .record-bar { height: 9px; margin: 8px 0 4px; background: #7d6a4c; border-radius: 2px; overflow: hidden; }
+  .record-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--brass-3), var(--brass-1)); }
+  .rank-ladder { list-style: none; padding: 0; margin: 8px 0 0; font-size: 14px; }
+  .rank-ladder li { display: flex; justify-content: space-between; padding: 1px 8px; color: #8c7b60; border-left: 3px solid #cdb98f; }
+  .rank-ladder li.reached { color: var(--ink); border-left-color: var(--brass-2); }
+  .rank-ladder li.current { background: rgba(160,110,30,.18); font-weight: 700; }
+  .record-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+  .record-cell { border: 1px solid #b89c62; background: rgba(255,255,255,.22); padding: 8px 10px; }
+  .record-cell b { display: block; font-size: 22px; }
+  .record-cell span { font-size: 12px; color: var(--ink-soft); }
+  /* ---- the battle report ---- */
+  .report-kicker { margin: 0 0 2px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+  .report-orders { margin: 8px 0; }
+  .report-orders li { color: #8c7b60; }
+  .report-orders li.earned { color: var(--ink); }
+  .fresh { margin-left: 6px; padding: 0 5px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #fff4e0; background: var(--accent); border-radius: 2px; }
+  .report-notes p { margin: 3px 0; }
+  .report-notes b { color: var(--accent); }
+  .share-line span { display: inline-block; padding: 4px 10px; font-family: var(--mono); font-size: 13px; border: 1px dashed #7a5a22; background: rgba(255,255,255,.35); user-select: text; }
+  .report-actions .btn { margin: 0 4px 6px 0; }
+  .report-actions .kbd { font-size: 12px; }
+  pre.board { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
+  /* ---- the orders strip under the top bar, and the counsel panel ---- */
+  #strip { top: 56px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 2px 12px; padding: 3px 12px; max-width: calc(100vw - 560px); font-size: 13px; }
+  #strip .strip-name { font-weight: 700; letter-spacing: .04em; }
+  #strip ul { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 0; padding: 0; list-style: none; }
+  #strip li { white-space: nowrap; }
+  #strip .mark { margin-right: 3px; color: #9a8a6c; }
+  #strip li.met .mark { color: var(--ok); }
+  #strip li.lost { color: #8c7b60; text-decoration: line-through; }
+  #strip li.lost .mark { color: var(--accent); }
+  #strip small { color: var(--ink-soft); font-family: var(--mono); font-size: 11px; }
+  #counsel { right: 10px; bottom: 8px; width: 300px; z-index: 6; font-size: 13px; }
+  #counsel ol { margin: 4px 0; padding-left: 18px; }
+  #counsel li { margin-bottom: 3px; }
+  #counsel li b { display: block; }
+  #counsel li span { color: var(--ink-soft); font-size: 12px; }
+  .counsel-cmds code { font-family: var(--mono); background: rgba(0,0,0,.08); padding: 0 4px; border-radius: 2px; margin-right: 2px; }
+  body.cinematic #strip, body.cinematic #counsel, body.nobattle #strip, body.nobattle #counsel { display: none; }
 
   @media (max-width: 1100px) {
     #log { display: none; }
@@ -174,6 +255,8 @@
 <section id="log" class="panel" aria-label="Signal log" aria-live="polite"></section>
 
 <section id="orders" class="panel rivets" aria-label="Orders for this turn"></section>
+<section id="strip" class="panel" aria-label="This battle's commendations" hidden></section>
+<aside id="counsel" class="panel rivets" aria-label="First lieutenant's counsel" hidden></aside>
 
 <div id="cine" aria-hidden="true"><div id="caption"></div><div id="skiphint">Space — skip</div></div>
 <div id="status" class="sr-only" aria-live="assertive"></div>

@@ -161,7 +161,8 @@ float shipFoam(vec2 p, out float shadowMask) {
     shadowMask = max(shadowMask, smoothstep(1.25, 0.9, e));
     float spd = w.w;
     float bow = smoothstep(hl * 0.3, hl * 1.05, l.y) * ring;
-    foam += ring * (0.25 + 0.5 * spd) + bow * spd * 1.2;
+    // a wet line of broken water all round the hull, so she sits in the sea and not on it
+    foam += ring * (0.45 + 0.4 * spd) + bow * spd * 1.2;
     // Kelvin-ish wake behind the stern (l.y < -hl)
     float back = -l.y - hl;
     if (back > 0.0) {

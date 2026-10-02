@@ -1,6 +1,7 @@
-// Title, scenario and ship selection, help and end-of-battle overlays.
+// The historical actions (scenario and ship selection), the top ten and help.
 // Mirrors the original's start-up dialogue (sail/pl_main.c:64-254):
 // scenario list -> ship list -> "Your name, Captain?" -> initial broadsides.
+// The game menu itself and the battle report live in src/career/.
 
 import {
   SCENARIOS, SPECS, COUNTRY, CLASS_NAME, QUAL_NAME, FEATURED, STAGED, PLAYABLE,
@@ -19,7 +20,7 @@ function saveBoard(b) {
   try { localStorage.setItem(BOARD_KEY, JSON.stringify(b)); } catch { /* private mode */ }
 }
 
-function open(id) {
+export function open(id) {
   const el = $(id);
   el.classList.add('open');
   const f = el.querySelector('button, input, select');
@@ -27,13 +28,24 @@ function open(id) {
 }
 export function close(id) { $(id).classList.remove('open'); }
 
-// Step 1: the scenario list.
-export function showScenarios(onChoose) {
+// Escape on a page behind the game menu goes back a step; the key is marked as used so the
+// Hall's bridge does not take it as a trip home.
+function backOnEscape(el, onBack) {
+  el.onkeydown = (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    onBack();
+  };
+}
+
+// Step 1: the scenario list, the historical actions page of the game menu.
+export function showScenarios(onChoose, onBack) {
   const playable = new Set(PLAYABLE.map((f) => f.id));
   const el = $('menu');
   el.innerHTML = `<div class="panel rivets">
-    <h1 id="menuTitle">Broadside — Wooden Walls</h1>
-    <p class="tag">Dave Riggle's <i>sail</i> (1980), after Avalon Hill's <i>Wooden Ships and Iron Men</i> — every sea, sky, ship and flag drawn by code.</p>
+    <div class="deck-head"><button class="btn" id="histBack">← Game menu</button>
+    <h1 id="menuTitle">Historical Actions</h1><span class="deck-meta"></span></div>
+    <p class="tag">Any action of the original, from any ship and either side. Points from these battles go into the top ten.</p>
     <div class="featured">${FEATURED.map((f) => {
       const sc = SCENARIOS[f.id];
       return `<button class="card" data-sc="${f.id}"><span class="n">${f.id})</span> <b>${esc(sc.name)}</b><br>
@@ -52,16 +64,15 @@ export function showScenarios(onChoose) {
       <div class="scen">${SCENARIOS.map((sc) => `<span class="n">${sc.id})</span><span>${sc.ships.length}</span>
         <button data-sc="${sc.id}" ${playable.has(sc.id) ? '' : 'disabled title="Not staged in this release"'}>${esc(sc.name)}</button>`).join('')}</div>
     </details>
-    <p style="margin-top:12px"><button class="btn" id="btnTop">Top ten sailors</button> <button class="btn" id="btnMenuHelp">How to command</button></p>
   </div>`;
-  el.querySelectorAll('[data-sc]').forEach((b) => { b.onclick = () => showShips(+b.dataset.sc, onChoose); });
-  $('btnTop').onclick = () => showBoard(() => showScenarios(onChoose));
-  $('btnMenuHelp').onclick = () => showHelp();
+  el.querySelectorAll('[data-sc]').forEach((b) => { b.onclick = () => showShips(+b.dataset.sc, onChoose, onBack); });
+  $('histBack').onclick = onBack;
+  backOnEscape(el, onBack);
   open('menu');
 }
 
 // Step 2: "Which ship?" then captain and initial broadsides.
-function showShips(id, onChoose) {
+function showShips(id, onChoose, onBack) {
   const sc = SCENARIOS[id];
   const el = $('menu');
   el.innerHTML = `<div class="panel rivets">
@@ -100,7 +111,8 @@ function showShips(id, onChoose) {
   };
   el.querySelector('#captainForm').addEventListener('keydown', (e) => { if (e.key === 'Enter' && ship !== null) go(); });
   $('sail').onclick = go;
-  $('back').onclick = () => showScenarios(onChoose);
+  $('back').onclick = () => showScenarios(onChoose, onBack);
+  backOnEscape(el, () => showScenarios(onChoose, onBack));
   open('menu');
 }
 
@@ -110,8 +122,9 @@ export function showBoard(onBack) {
   el.innerHTML = `<div class="panel rivets"><h1 id="menuTitle">Top Ten Sailors</h1>
     <p class="tag">Ranked by net points — points won ÷ your own ship's value — as in <span class="kbd">sail -s -l</span>.</p>
     <pre style="font-family:var(--mono);font-size:14px;white-space:pre-wrap">${lines.map(esc).join('\n')}</pre>
-    <button class="btn" id="bBack">Back</button></div>`;
+    <button class="btn" id="bBack">← Game menu</button></div>`;
   $('bBack').onclick = onBack;
+  backOnEscape(el, onBack);
   open('menu');
 }
 
@@ -139,31 +152,16 @@ export function showHelp() {
   open('help');
 }
 
-export function showEnd(st, me, onNew, onReplay) {
-  const r = st.result || { text: 'The battle is over.' };
-  let rank = -1;
+/** Enter a finished battle in the top ten, as the original's log did. Returns the board and the
+ *  captain's place in it (-1 when not entered). */
+export function recordInTopTen(st, me) {
   let board = loadBoard();
-  if (me) {
-    const res = recordScore(board, {
-      captain: me.captain || 'no name', login: 'you', ship: me.name, scenario: st.name,
-      points: me.points, shipPts: me.max.pts, date: new Date().toISOString().slice(0, 10),
-    });
-    board = res.board;
-    rank = res.rank;
-    saveBoard(board);
-  }
-  const el = $('end');
-  // "Captain X relinquishing." — the original's words on quitting (sail/pl_1.c:109)
-  const title = { victory: 'Victory', hurricane: 'Hurricane', nightfall: 'Nightfall', quit: 'Command relinquished' }[r.reason] || 'Defeat';
-  el.innerHTML = `<div class="panel rivets" style="max-width:640px">
-    <h1 id="endTitle">${title}</h1>
-    <p class="tag">${esc(r.text)} — turn ${st.turn}</p>
-    ${me ? `<p>Captain ${esc(me.captain)} of the ${esc(me.name)}: <b>${me.points}</b> points (net ${(me.points / me.max.pts).toFixed(2)}).${rank >= 0 ? ` Entered the log at #${rank + 1}.` : ''}</p>` : ''}
-    <pre style="font-family:var(--mono);font-size:13px;white-space:pre-wrap">${formatBoard(board).map(esc).join('\n')}</pre>
-    <p><button class="btn primary" id="endNew">New battle</button> <button class="btn" id="endReplay">Fight it again</button> <button class="btn" id="endLook">Look around</button></p>
-  </div>`;
-  $('endNew').onclick = () => { close('end'); onNew(); };
-  $('endReplay').onclick = () => { close('end'); onReplay(); };
-  $('endLook').onclick = () => close('end');
-  open('end');
+  if (!me) return { board, rank: -1 };
+  const res = recordScore(board, {
+    captain: me.captain || 'no name', login: 'you', ship: me.name, scenario: st.name,
+    points: me.points, shipPts: me.max.pts, date: new Date().toISOString().slice(0, 10),
+  });
+  board = res.board;
+  saveBoard(board);
+  return { board, rank: res.rank };
 }

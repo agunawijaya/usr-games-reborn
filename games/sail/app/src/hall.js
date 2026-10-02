@@ -3,11 +3,13 @@
 // is missing or reports `hosted: false`, and every call below does nothing.
 //
 // What the Hall hears comes from what the game already knows: the events each turn resolves to,
-// and the result the engine settles on when a battle ends (engine/turn.js, checkEnd).
+// the result the engine settles on when a battle ends (engine/turn.js, checkEnd), and the battle
+// as settled into the Sea Service and the Daily Engagement (career/progress.js).
 
 const hall = globalThis.UsrGamesBridge?.connectToHall({ id: 'sail' }) ?? null;
 const installed = new Set();
 const XP_PER_SHIP_TAKEN = 8;
+const XP_PER_COMMENDATION = 3;
 const GALE = 5;
 const FLEET_ACTION = 10;
 
@@ -22,21 +24,30 @@ if (hall?.hosted && performance.getEntriesByType('navigation')[0]?.type === 'rel
   }
 }
 
+/** True inside the Hall's frame; on its own the game has no Hall to go back to. */
+export const hostedInHall = Boolean(hall?.hosted);
+
+/** The game menu's and the report's "Back to the Hall". */
+export function leaveForHall() {
+  hall?.navigate('hall');
+}
+
 function install(id) {
   if (!hall || installed.has(id)) return;
   installed.add(id);
   hall.achievement(id);
 }
 
-// The scenario list is the game menu: Escape there leads back to the Hall. The same overlay also
-// shows the ship choice and the top ten, which are steps inside the game, and the help overlay
-// can open over it (Escape then closes the help, not the game).
+// The game menu's first page (career/deck.js) is the title screen: Escape there leads back to the
+// Hall. The same overlay also shows the menu's other pages, the historical actions, the ship
+// choice and the top ten, which are steps inside the game and keep Escape for going back; the
+// help overlay can open over it (Escape then closes the help, not the game).
 const menu = document.getElementById('menu');
 const help = document.getElementById('help');
 let onTitle = null;
 function watchTitle() {
   const helpOpen = !!help?.classList.contains('open');
-  const active = !helpOpen && menu.classList.contains('open') && !!menu.querySelector('[data-sc]');
+  const active = !helpOpen && menu.classList.contains('open') && !!menu.querySelector('[data-deck="menu"]');
   if (active === onTitle) return;
   onTitle = active;
   hall?.setTitleScreen(active);
@@ -91,7 +102,16 @@ const OUTCOMES = {
   quit: 'quit',
 };
 
-export function reportBattle(st, me) {
+function installCareerPackages(plan, summary, won) {
+  if (summary.earned.length && summary.earned.every(Boolean)) install('full-marks');
+  if (plan.mode === 'service' && won) install('first-action');
+  if (plan.mode === 'daily' && won) install('daily-engagement');
+  if (summary.rankAfter !== 'Midshipman') install('promoted');
+  if (summary.serviceWon) install('sea-service');
+}
+
+/** The end of a battle. `plan` is what was fought, `summary` what settling it saved. */
+export function reportBattle(st, me, plan, summary) {
   if (!hall || !battle) return;
   const reason = st.result?.reason;
   const outcome = OUTCOMES[reason] ?? 'complete';
@@ -101,13 +121,18 @@ export function reportBattle(st, me) {
     if (st.ships.length >= FLEET_ACTION) install('line-of-battle');
   }
   if (outcome !== 'quit') install('see-it-through');
+  installCareerPackages(plan, summary, outcome === 'win');
   const { shipsTaken, broadsidesFired } = battle;
+  const commendations = summary.earned.filter(Boolean).length;
+  const xpEvents = [];
+  if (shipsTaken > 0) xpEvents.push({ id: 'ships-taken', xp: Math.min(25, shipsTaken * XP_PER_SHIP_TAKEN) });
+  if (commendations > 0) xpEvents.push({ id: 'commendations', xp: commendations * XP_PER_COMMENDATION });
   hall.result({
     outcome,
     score: Math.max(0, Math.round(st.ships[me]?.points ?? 0)),
-    stats: { shipsTaken, broadsidesFired, turns: st.turn },
-    xpEvents:
-      shipsTaken > 0 ? [{ id: 'ships-taken', xp: Math.min(25, shipsTaken * XP_PER_SHIP_TAKEN) }] : [],
+    stats: { shipsTaken, broadsidesFired, turns: st.turn, commendations },
+    xpEvents,
+    daily: plan.mode === 'daily',
     durationSeconds: Math.round((performance.now() - battle.startedAt) / 1000),
   });
   battle = null;

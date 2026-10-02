@@ -1,12 +1,15 @@
 // ShipVisual: one procedurally built ship, kept in sync with an engine ship.
 //
 // Everything visible is driven by engine state: position/heading from the
-// grid, masts from rig1..rig4 (a mast topples when its counter reaches 0),
-// sails from FS (battle vs. full), hull wear from hull points, list from
-// hull/sinking state, flag from struck/captured, fire from explode == 1.
+// grid, masts from rig1..rig4 (a mast topples when its counter reaches 0, its
+// topgallant goes first and its sails are holed as the counter falls), sails
+// from FS (battle vs. full), shot holes, smoke, list and settling from hull
+// points, dismounted guns from each side's gun count, flag from
+// struck/captured, fire from explode == 1.
 
 import * as THREE from 'three';
-import { buildHull, setPorts, MAX_HITS } from './hull.js';
+import { buildHull, setPorts, MAX_HITS, mulberry } from './hull.js';
+import { addFittings } from './fittings.js';
 import { buildRig, trimSails } from './rig.js';
 import { flagMaterial } from './flags.js';
 import { CELL, dirYaw } from './world.js';
@@ -38,6 +41,8 @@ export class ShipVisual {
     this.hull = buildHull(ship.max, ship.nationality);
     this.body.add(this.hull.group);
     this.rig = buildRig(this.hull);
+    this.hull.mastUs = this.rig.masts.map((m) => m.u);
+    addFittings(this.hull);
     for (const m of this.rig.masts) this.body.add(m.pivot);
     this.body.add(this.rig.bow, this.rig.head, this.rig.stays, ...this.rig.jibs);
     this.dim = this.hull.dim;
@@ -81,8 +86,12 @@ export class ShipVisual {
     };
     this.path = null; // { poses: [...], t, dur }
     this.hits = [];
+    this.damageHits = 0; // holes added to match the hull damage, beyond those seen being made
+    this.damageRnd = mulberry(this.index * 7919 + 13);
+    this.hullFrac = 1;
     this.rigState = [ship.specs.rig1, ship.specs.rig2, ship.specs.rig3, ship.specs.rig4];
     this.lowerClosed = false;
+    this.gunsKept = { L: 1, R: 1 };
     setPorts(this.hull, new Set());
     this.placeRoot();
     this.sync(ship, st, true);
@@ -113,7 +122,10 @@ export class ShipVisual {
   sync(ship, st, instant = false) {
     const v = this.v;
     const hullFrac = ship.specs.hull / Math.max(1, ship.max.hull);
+    this.hullFrac = hullFrac;
     v.soot = Math.max(v.soot, (1 - hullFrac) * 0.8);
+    this.showHullDamage(hullFrac);
+    this.showGunDamage(ship);
     v.fullTarget = ship.FS && !ship.struck ? 1 : 0;
     if (instant) v.full = v.fullTarget;
     // list: battered hulls take water; a foundering hulk lists hard
@@ -144,6 +156,12 @@ export class ShipVisual {
       m.mat.userData.u.uTear.value = r > 0 ? tear * 0.8 : 0;
       if (r <= 0 && !m.fallen) this.fell(m, instant);
       if (r > 0 && m.fallen) this.jury(m);
+      // the topgallant mast is shot away once the rigging is down to a third, and a yard below
+      // it hangs sprung from its slings
+      const aloft = max <= 0 || r > max * 0.34 || m.jury;
+      for (const part of m.topgallant) part.visible = aloft;
+      if (m.yards[1]) m.yards[1].rotation.z = max > 0 && r <= max * 0.6 && r > 0 ? (i % 2 ? 0.16 : -0.16) : 0;
+      if (m.body.children.includes(this.pennant)) this.pennant.visible = aloft;
     });
     this.rigState = rig;
     // heading/position (only when not animating a path)
@@ -156,6 +174,47 @@ export class ShipVisual {
       this.root.visible = false;
     }
     this.ship = ship;
+  }
+
+  // Shot holes in proportion to the damage: a hull at half its strength shows a dozen.
+  // Holes seen being made during the cinematic count too, so a replayed turn adds no more.
+  showHullDamage(hullFrac) {
+    const want = Math.round((1 - hullFrac) * 22);
+    const rnd = this.damageRnd;
+    const f = this.hull.form;
+    while (this.hits.length < Math.min(MAX_HITS, want) && this.damageHits < MAX_HITS) {
+      this.damageHits += 1;
+      const u = 0.12 + rnd() * 0.78;
+      const y = 0.9 + rnd() * (f.top(u) - 1.8);
+      const b = f.bottom(u);
+      const p = f.section(u, (y - b) / (f.top(u) - b));
+      const side = rnd() < 0.5 ? 1 : -1;
+      this.addHit(new THREE.Vector3(side * p.x, y, f.zOf(u)), 1.3 + rnd() * 0.8);
+    }
+  }
+
+  // Guns knocked off their carriages leave empty ports with their lids shot away.
+  showGunDamage(ship) {
+    const kept = (side) => {
+      const max = ship.max[`gun${side}`] + ship.max[`car${side}`];
+      return max > 0 ? (ship.specs[`gun${side}`] + ship.specs[`car${side}`]) / max : 1;
+    };
+    const next = { L: kept('L'), R: kept('R') };
+    if (next.L === this.gunsKept.L && next.R === this.gunsKept.R) return;
+    this.gunsKept = next;
+    this.applyPorts();
+  }
+
+  applyPorts() {
+    setPorts(this.hull, this.lowerClosed && this.dim.decks > 1 ? new Set([0]) : new Set(), this.gunsKept);
+  }
+
+  /** A world point at one of the shot holes, for the smoke curling out of it. */
+  smokePoint() {
+    if (!this.hits.length || this.v.hidden) return null;
+    const h = this.hits[Math.floor(Math.random() * this.hits.length)];
+    this.body.updateMatrixWorld(true);
+    return new THREE.Vector3(h.x * 1.05, h.y + 0.4, h.z).applyMatrix4(this.body.matrixWorld);
   }
 
   // A mast goes by the board. dir: +1 falls to starboard, -1 to port.
@@ -235,7 +294,7 @@ export class ShipVisual {
     const m = this.body.matrixWorld;
     const out1 = new THREE.Vector3(side === 'R' ? 1 : -1, 0, 0).transformDirection(m);
     for (const mz of this.hull.muzzles) {
-      if (mz.side !== side) continue;
+      if (mz.side !== side || mz.lost) continue;
       if (this.lowerClosed && mz.deck === 0 && this.dim.decks > 1) continue;
       out.push({ pos: mz.pos.clone().applyMatrix4(m), dir: out1.clone(), deck: mz.deck, u: mz.u });
     }
@@ -385,7 +444,8 @@ export class ShipVisual {
     v.list += (v.listTarget - v.list) * Math.min(1, dt * 0.25);
     // a foundering hulk settles
     if (this.ship && this.ship.sink === 1) v.sink = Math.min(1, v.sink + dt * 0.03);
-    let sinkY = -v.sink * 2.2;
+    // a battered hull takes water and settles a little lower
+    let sinkY = -v.sink * 2.2 - (1 - this.hullFrac) * 0.9;
     let plungePitch = 0;
     if (v.plunge >= 0) {
       v.plunge += dt / 9;
@@ -414,7 +474,7 @@ export class ShipVisual {
     if (this.lowerClosed === closed) return;
     this.lowerClosed = closed;
     // two- and three-deckers shut the lowest tier in heavy seas
-    setPorts(this.hull, closed && this.dim.decks > 1 ? new Set([0]) : new Set());
+    this.applyPorts();
   }
 
   startPlunge() { if (this.v.plunge < 0) this.v.plunge = 0; }

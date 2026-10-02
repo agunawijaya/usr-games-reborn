@@ -101,16 +101,48 @@ The upstream Markdown files carry links too; Markdown is never shipped. Every se
 flag is drawn in code and every sound is synthesised. The in-Hall suite records every request during
 a visit; none leaves the Hall’s origin.
 
+## The career and the counsel (2026-10-02)
+
+The owner asked for Broadside to be gamified like the reborn games (a campaign, a daily or anything
+that makes it more fun), for a hidden “cheat” like Trek's that shows how to win, opened with
+Ctrl+Alt+C, and for more detailed ships whose damage shows when they are hit. Everything for the
+career lives in `app/src/career/`; `main.js`, `menu.js`, `hall.js` and `index.html` changed to host
+it; the engine was not touched.
+
+- **Tuning the counsel** (every staged scenario from every ship, 30 seeds each, 1,890 battles): the
+  first draft, which loaded double shot within one square, won 640; round shot only won 810, so the
+  counsel never loads double (it leaves a broadside empty for two turns). Holding fire beyond six or
+  three squares (801, 805), aiming at the rigging beyond two (779), crowding sail beyond five (754)
+  or never (814), grape at close range (648) and boarding at even crews (804) or only at three to
+  one (778) were no better or worse than the chosen rules. The computer captains won 973 of the same
+  battles, firing double shot every turn as the original lets them.
+- **Choosing the Sea Service's actions**: over 120 seeds the counsel wins Constellation against the
+  Insurgent 119 times, the United States 118, Constitution against the Guerriere 116, Constitution
+  against two sloops 98, Constellation at night 91, the Shannon 85, the Ambuscade 80, the Nymphe 73,
+  the Droits de l'Homme 61 and the Mars 42. Fleet actions were left out: the counsel's ship often wins
+  them without firing a shot. Each action's seed is a win with a sound hull and a short fight, and
+  each threshold was set from the counsel's own result on it: the counsel earns 22 of the 30 stars.
+- **The daily pool** keeps the twelve duels the counsel wins on four seeds in ten or more; 120 days
+  from 2026-09-01 all found a winning seed within the first tries.
+- **Holding fire while boarding**: with every section away there is nobody at the guns, and the
+  engine refuses the broadside. The counsel now says so instead of ordering it; the battles play out
+  the same, since a refused broadside draws no dice.
+- **Visible damage** was built on what the renderer already had (shot holes in the hull shader, sail
+  tears, falling masts): holes now follow the hull points lost, so a battle resumed or staged shows
+  them too, with splintered rims that read on a black hull; the other effects are listed in
+  `ARCHITECTURE.md`. The stern windows had faced inboard and were never seen from astern; fixed.
+
 ## XP and packages
 
-Ten packages: five core, three extra, two rare, all read from what the engine already reports. The
+Fifteen packages: the ten from the adoption and five for the career (three core, one extra, one
+rare). The adoption's notes: ten packages: five core, three extra, two rare, all read from what the engine already reports. The
 `fire` events carry rake and stern-rake flags; `strike` and `capture` events name the ship that
 caused them; the result names the reason the battle ended. A proposed “weight of metal” package was
 dropped because the engine does not expose the side calculation it needs. The one XP event,
 `ships-taken`, gives 8 XP per ship taken, up to 25, inside the Hall’s cap of 30 for a session’s
-events. The weekly goals count `shipsTaken` (2 to 5) and `broadsidesFired` (20 to 60). The manifest
-says `daily: false`, as the catalog placeholder already did: battles are seeded per game, not per
-day. The progression model (`modelPackages` in `packages/kit/src/progression/sim/collection.ts`)
+events. The weekly goals count `shipsTaken` (2 to 5) and `broadsidesFired` (20 to 60), and since
+the career `commendations` (3 to 9), with 3 XP per commendation. With the Daily Engagement the
+manifest and the kit's collection model say `daily: true`. The progression model (`modelPackages` in `packages/kit/src/progression/sim/collection.ts`)
 still counts twelve packages for every game, so it slightly overstates what Broadside can award.
 
 ## Performance
@@ -126,19 +158,25 @@ minutes longer.
 
 ## Decisions log
 
-| Date       | Decision                                                                   | Why                                                                                                                                  |
-| ---------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-10-01 | Title “Broadside”, as the game shows itself                                | Prompt 01 §7; the page’s full title is “Broadside — Wooden Walls”                                                                    |
-| 2026-10-01 | The scenario list is the title screen; the ship choice and top ten are not | They share the overlay but are steps inside the game, each with its own Back button                                                  |
-| 2026-10-01 | A reload inside the Hall drops the saved battle                            | The Hall’s Game menu reloads the frame and should bring back the scenario list; the quality switch is a navigation and still resumes |
-| 2026-10-01 | Nightfall and the hurricane report `draw`                                  | Neither side has won; the hurricane sinks everyone                                                                                   |
-| 2026-10-01 | The typed `Q` reports `quit` and does not earn `see-it-through`            | Handing over command is not seeing the action through; under the Hall’s rules a quit earns no XP                                     |
-| 2026-10-01 | Score is the player’s ship points, never below zero                        | Points can go negative when a prize is retaken                                                                                       |
-| 2026-10-01 | 8 XP per ship taken, at most 25                                            | Taking ships is the game’s real milestone; 25 is the Hall’s limit for one event                                                      |
-| 2026-10-01 | Ten packages; “weight of metal” dropped                                    | The engine does not expose the side calculation it needs                                                                             |
-| 2026-10-01 | The poster is taken 7 s into the first battle                              | The opening sweep over the fleet has settled; before any battle the Hall shows its own key art                                       |
-| 2026-10-01 | The Q key, the end screen and the sound default stay as they are           | Prompt 01 §4: no behaviour or copy changes on adoption; each is logged in `docs/KNOWN-ISSUES.md`                                     |
-| 2026-10-01 | The suites run on the machine’s GPU                                        | Software WebGL made them minutes slower                                                                                              |
+| Date       | Decision                                                                         | Why                                                                                                                                  |
+| ---------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-10-01 | Title “Broadside”, as the game shows itself                                      | Prompt 01 §7; the page’s full title is “Broadside — Wooden Walls”                                                                    |
+| 2026-10-01 | The scenario list is the title screen; the ship choice and top ten are not       | They share the overlay but are steps inside the game, each with its own Back button                                                  |
+| 2026-10-01 | A reload inside the Hall drops the saved battle                                  | The Hall’s Game menu reloads the frame and should bring back the scenario list; the quality switch is a navigation and still resumes |
+| 2026-10-01 | Nightfall and the hurricane report `draw`                                        | Neither side has won; the hurricane sinks everyone                                                                                   |
+| 2026-10-01 | The typed `Q` reports `quit` and does not earn `see-it-through`                  | Handing over command is not seeing the action through; under the Hall’s rules a quit earns no XP                                     |
+| 2026-10-01 | Score is the player’s ship points, never below zero                              | Points can go negative when a prize is retaken                                                                                       |
+| 2026-10-01 | 8 XP per ship taken, at most 25                                                  | Taking ships is the game’s real milestone; 25 is the Hall’s limit for one event                                                      |
+| 2026-10-01 | Ten packages; “weight of metal” dropped                                          | The engine does not expose the side calculation it needs                                                                             |
+| 2026-10-01 | The poster is taken 7 s into the first battle                                    | The opening sweep over the fleet has settled; before any battle the Hall shows its own key art                                       |
+| 2026-10-01 | The Q key, the end screen and the sound default stay as they are                 | Prompt 01 §4: no behaviour or copy changes on adoption; each is logged in `docs/KNOWN-ISSUES.md`                                     |
+| 2026-10-01 | The suites run on the machine’s GPU                                              | Software WebGL made them minutes slower                                                                                              |
+| 2026-10-02 | A game menu: the Sea Service, the Daily Engagement, historical actions, a record | The owner asked for a campaign and a daily like the reborn games                                                                     |
+| 2026-10-02 | Every action and engagement is proven winnable by the counsel                    | The owner tests winnability with the hidden counsel; giving its orders replays the proof                                             |
+| 2026-10-02 | The counsel has no button or help line; Ctrl+Alt+C or `?counsel=1`               | Owner: a testing aid, out of sight for players, as in Trek                                                                           |
+| 2026-10-02 | Career battles start with round shot and the last captain's name                 | The proofs use round shot; the name changes nothing in the battle                                                                    |
+| 2026-10-02 | The report follows the results order, with Look around kept last                 | Navigation standard; KNOWN-ISSUES #24                                                                                                |
+| 2026-10-02 | Damage drawn from engine values: holes, smoke, settling, lost guns, topgallants  | The owner asked to see the damage when a ship is hit                                                                                 |
 
 ## Open questions
 
@@ -150,8 +188,8 @@ sail modification prompt.
   starts.
 - Temporary trademark exceptions: the scenario list’s tagline names the board game it was based on,
   and the full list of the original’s scenarios names a fictional 1960s-television scenario.
-- After Look around on the end screen there is no way in the game to a new battle; the Hall’s Game
-  menu covers it.
+- After Look around on the battle report there is no way in the game back to the game menu; the
+  Hall’s Game menu covers it.
 - Pressing Q outside the command line switches the quality and reloads the page, which is easy to
   confuse with the typed `Q` that gives up command.
 - Sound is on by default, and the Hall’s volume and mute do not reach the game.

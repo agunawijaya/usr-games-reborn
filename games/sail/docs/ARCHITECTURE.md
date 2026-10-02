@@ -8,7 +8,9 @@ It is plain ES modules with no build step, drawn in WebGL 2 through three.js r18
 in `app/src/vendor/` and mapped to `three` by an import map in `index.html`. It uses no web fonts
 (system serif and monospace stacks) and synthesises every sound. The rules are a pure engine ported
 from the C, about 2,700 lines with the generated data tables; everything else shows what the engine
-decided. The upstream design notes are kept in
+decided. The game menu and its career (`app/src/career/`, added on 2026-10-02) wrap the engine in
+the Sea Service, the Daily Engagement and a service record without changing a rule. The upstream
+design notes are kept in
 [`../app/docs/architecture.md`](../app/docs/architecture.md) and its decisions in [`adr/`](adr/).
 
 ## Module map
@@ -25,46 +27,91 @@ flowchart LR
   main --> hall["src/hall.js<br/>results, packages, poster"]
   render --> three["src/vendor/<br/>three.js r186"]
   hall --> bridge
+  main --> career["src/career/<br/>game menu, counsel, Sea Service,<br/>Daily Engagement, report"]
+  career --> engine
 ```
 
-| Path                             | Responsibility                                                                                                                                                                                            |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/index.html`                 | The page: canvas, panels, overlays, all CSS (parchment and brass, no images), the import map                                                                                                              |
-| `app/src/main.js`                | The controller: owns the engine state and this turn’s orders, runs a turn, drives camera and HUD                                                                                                          |
-| `app/src/engine/`                | Rules, data, command-line grammar, top ten, sailing master; no DOM, clock or `Math.random`                                                                                                                |
-| `app/src/render/`                | The three.js world, procedural ships, effects, the turn playback, camera director, chart                                                                                                                  |
-| `app/src/ui/`                    | HUD panels (`hud.js`) and the overlays: scenario list, ship choice, top ten, help, end (`menu.js`)                                                                                                        |
-| `app/src/audio/`                 | Synthesised ambience and one-shots, positioned and delayed by distance                                                                                                                                    |
-| `app/src/hall.js`                | The bridge glue (added on adoption)                                                                                                                                                                       |
-| `app/lab.html`, `app/src/lab.js` | A developer’s visual bench of isolated sea and ship scenes; the site build leaves `lab.html` out (`isAdoptedWorkbench` in `scripts/lib/hosted.ts`, ADR 0011), and nothing on the game page loads `lab.js` |
-| `app/scripts/`                   | Developer tools: static server, screenshot and browser-flow scripts, the raster check, the data extractor                                                                                                 |
+| Path                             | Responsibility                                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/index.html`                 | The page: canvas, panels, overlays, all CSS (parchment and brass, no images), the import map                                                                                                                                                                                                                      |
+| `app/src/main.js`                | The controller: owns the engine state and this turn’s orders, runs a turn, drives camera and HUD                                                                                                                                                                                                                  |
+| `app/src/engine/`                | Rules, data, command-line grammar, top ten, sailing master; no DOM, clock or `Math.random`                                                                                                                                                                                                                        |
+| `app/src/render/`                | The three.js world, procedural ships, effects, the turn playback, camera director, chart                                                                                                                                                                                                                          |
+| `app/src/ui/`                    | HUD panels (`hud.js`) and the overlays: scenario list, ship choice, top ten, help, end (`menu.js`)                                                                                                                                                                                                                |
+| `app/src/audio/`                 | Synthesised ambience and one-shots, positioned and delayed by distance                                                                                                                                                                                                                                            |
+| `app/src/hall.js`                | The bridge glue (added on adoption)                                                                                                                                                                                                                                                                               |
+| `app/src/career/`                | The game menu and its pages (`deck.js`), the first lieutenant's counsel (`counsel.js`) and its autopilot, the Sea Service (`service.js`), the Daily Engagement (`daily.js`), commendations, the logbook, ranks, plans, settling and saving progress, and the strip, counsel panel and battle report (`report.js`) |
+| `app/lab.html`, `app/src/lab.js` | A developer’s visual bench of isolated sea and ship scenes; the site build leaves `lab.html` out (`isAdoptedWorkbench` in `scripts/lib/hosted.ts`, ADR 0011), and nothing on the game page loads `lab.js`                                                                                                         |
+| `app/scripts/`                   | Developer tools: static server, screenshot and browser-flow scripts, the raster check, the data extractor                                                                                                                                                                                                         |
 
 ## State machine
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Scenarios: page opens
+  [*] --> Menu: page opens
   [*] --> Orders: a battle kept in this tab resumes
-  Scenarios --> Ships: pick a scenario
-  Scenarios --> TopTen: Top ten sailors
-  TopTen --> Scenarios: Back
-  Ships --> Scenarios: Back
+  Menu --> Page: S, D or R, or a card
+  Page --> Menu: Esc or Game menu
+  Page --> Orders: Take command (an action or the day's engagement)
+  Menu --> Historic: H, or Historical Actions
+  Historic --> Ships: pick a scenario
   Ships --> Orders: Set sail
+  Historic --> Menu: Esc or Game menu
+  Menu --> TopTen: Top ten sailors
+  TopTen --> Menu: Esc or Game menu
   Orders --> Playback: Make it so
   Playback --> Orders: the turn has played, or Space
-  Playback --> End: the battle is decided
-  Orders --> End: Q typed, command given up
-  End --> Scenarios: New battle
-  End --> Orders: Fight it again
-  End --> Aftermath: Look around
+  Playback --> Report: the battle is decided
+  Orders --> Report: Q typed, command given up
+  Report --> Orders: N next action, R fight it again
+  Report --> Menu: M or Esc
+  Report --> Aftermath: L, Look around
 ```
 
-`Scenarios` is the game menu: while it is open `hall.js` tells the Hall the game is on its title
-screen. `Ships` and `TopTen` are drawn in the same overlay (`#menu`) but are steps inside the game.
-`Aftermath` is the final scene with the end screen closed; nothing in the game leads on from it,
-so the Hall’s Game menu does (see [`docs/KNOWN-ISSUES.md`](../../../docs/KNOWN-ISSUES.md)). A battle
-in progress is saved to `sessionStorage` after every turn so that the quality switch, which reloads
-the page, carries on where it was.
+The game menu's first page (`career/deck.js`, marked `data-deck="menu"`) is the title screen: while
+it is open `hall.js` tells the Hall the game is on its title screen, so Escape there leads home. Its
+other pages, the historical actions, the ship choice and the top ten are drawn in the same overlay
+(`#menu`) and keep Escape for going back. `Aftermath` is the final scene with the report closed;
+nothing in the game leads on from it, so the Hall's Game menu does (see
+[`docs/KNOWN-ISSUES.md`](../../../docs/KNOWN-ISSUES.md)). A battle in progress is saved to
+`sessionStorage` after every turn, with its plan and logbook, so that the quality switch, which
+reloads the page, carries on where it was.
+
+## The game menu and the career
+
+A battle is a **plan** (`career/plans.js`): the scenario, the player's ship, the seed, the name on
+screen and its commendations. The Sea Service's plans come from `service.js` (ten actions with fixed
+seeds), the day's engagement from `daily.js` (the date picks one of twelve duels and its seed), and
+the historical actions make a free plan with a random seed. `main.js` keeps the plan for the whole
+battle, so Fight it again is the same plan once more.
+
+Every resolved turn goes through the **logbook** (`logbook.js`): broadsides, rakes and stern rakes,
+ships struck to your guns, prizes taken by boarding, repair orders, the lowest hull and whether a
+mast was ever lost. Commendations (`commendations.js`) are judged against it and the final state
+when the battle ends, and only on a win; mid-battle their status feeds the strip under the top bar.
+`progress.js` settles a finished battle into the saved progress, under `usr-games:sail:` in the
+collection's `{ v, data }` envelope, so the Hall's “Forget everything” clears it: `service` (per
+action: won, three stars), `engagements` (per date: number, won, rating, stars, turns; only the
+first battle of a day, however it ended) and `record` (battles, victories, prizes, broadsides,
+rakes, engagements). The top ten keeps its own key.
+
+**The first lieutenant's counsel** (`counsel.js`) gives a full set of orders for the player's ship
+each turn, with a reason for each: board a much weaker crew alongside, fire every broadside that
+bears (at the hull when it can be aimed, else the rigging), reload with round shot, full sails beyond
+nine squares and battle sails inside them, and the sailing master's helm. Its tactics were tuned by
+playing every staged scenario from every ship over 30 seeds (`NOTES.md`). It is a testing aid kept
+out of sight: no button and no help line mention it; Ctrl+Alt+C shows or hides its panel, and
+`?counsel=1` opens it at start. Its “Give these orders” button fills in the turn's orders.
+
+**Winnable by design.** `autopilot.js` plays a battle by the counsel alone. The Sea Service's seeds
+were chosen with `app/scripts/counsel-sweep.mjs` among the counsel's wins, and each day's engagement
+is the first of the date's seeds (FNV-1a of `sail:daily:<date>`, then +1, +2…) that the counsel
+wins, a few milliseconds a try, cached for the visit. The engine is deterministic, so a captain who
+gives the counsel's orders every turn replays the proof exactly; the in-browser walkthrough did,
+winning the first action on turn 10 as the autopilot does.
+
+URL options for captures and tests: `mission=<action id>` or `mission=daily` (with `day=YYYY-MM-DD`)
+starts that battle, and `auto=N&autoorders=counsel` plays N turns by the counsel.
 
 ## Engine
 
@@ -106,6 +153,7 @@ the allowance, not by time.
 | Which scenario gets which mood                                  | `FEATURED` and `STAGED` in `app/src/engine/commands.js`                |
 | Rain                                                            | `app/src/render/weather.js`                                            |
 | Hulls: loft, paint per nation, gun ports, shot holes, fire      | `app/src/render/hull.js` (`CLASS_DIM`, `PAINT`)                        |
+| Wales, catheads and anchors, head rails, figurehead, deadeyes   | `app/src/render/fittings.js`                                           |
 | Masts, yards, sails, rigging                                    | `app/src/render/rig.js` ([ADR 005](adr/005-ship-rigging-and-masts.md)) |
 | Ensigns                                                         | `app/src/render/flags.js` (`PAINTERS`)                                 |
 | A ship kept in step with its engine state                       | `app/src/render/ship.js`                                               |
@@ -121,7 +169,12 @@ the allowance, not by time.
 
 Every visual is keyed to an engine value: masts fall when their rigging counter reaches zero, the
 lower ports shut when the engine applies the heavy-seas penalty, smoke drifts down the engine’s
-wind. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read once at
+wind. Damage shows the same way (`ShipVisual.sync` in `ship.js`): shot holes with splintered rims in
+proportion to the hull points lost (holes seen being made count towards them), thin smoke from those
+holes below two-thirds of the hull, the hull settling and listing as it takes water, empty ports
+with their lids gone for every gun lost on that side, round shot holes and rents in the sails as the
+rigging counter falls, the topgallant mast gone at a third and a yard hanging sprung below
+three-fifths. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read once at
 start from the system (`prefers-reduced-motion`, or `?reduced=1`); it skips the opening sweep,
 speeds the playback, blends instead of cutting and turns off camera shake. The Low quality tier
 halves the ocean grid, drops shadows and multisampling, and cuts the particle budgets.
@@ -140,40 +193,43 @@ remembered (`broadside.muted` in `localStorage`).
 All of it lives in `app/src/hall.js`, plus the bridge script tag in `index.html` and one import and
 four calls in `main.js`.
 
-| Broadside moment                                                   | Bridge message                                                                                        |
-| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| The scenario list is open (`#menu.open` holding `[data-sc]` cards) | `title-screen { active: true }`; `false` for the ship choice, the top ten and the battle              |
-| One of your broadsides fires (a `fire` event from your ship)       | `achievement open-fire`; `down-her-length` when it rakes; `stern-rake` when it rakes from astern      |
-| An enemy strikes to your guns (`strike` by your ship)              | `achievement colours-come-down`; `a-brace-of-prizes` at the second ship taken                         |
-| You capture a ship by boarding (`capture` by your ship)            | `achievement prize-crew`; `a-brace-of-prizes` at the second ship taken                                |
-| The battle ends (the top of `endBattle`)                           | `result { outcome, score, stats, xpEvents, durationSeconds }`, then the end packages below            |
-| A win                                                              | `the-day-is-yours`; `heavy-weather` if the wind is 5 or more; `line-of-battle` with ten ships or more |
-| Any end but giving up                                              | `see-it-through`                                                                                      |
-| Seven seconds into the first battle, right after a frame is drawn  | `poster` from `#scene` (`posterFromCanvas`), once per page load                                       |
+| Broadside moment                                                               | Bridge message                                                                                                                    |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| The game menu's first page is open (`#menu.open` holding `[data-deck="menu"]`) | `title-screen { active: true }`; `false` for its other pages, the historical actions, the ship choice, the top ten and the battle |
+| One of your broadsides fires (a `fire` event from your ship)                   | `achievement open-fire`; `down-her-length` when it rakes; `stern-rake` when it rakes from astern                                  |
+| An enemy strikes to your guns (`strike` by your ship)                          | `achievement colours-come-down`; `a-brace-of-prizes` at the second ship taken                                                     |
+| You capture a ship by boarding (`capture` by your ship)                        | `achievement prize-crew`; `a-brace-of-prizes` at the second ship taken                                                            |
+| The battle ends (`endBattle`, once the battle is settled)                      | `result { outcome, score, stats, xpEvents, daily, durationSeconds }`, then the end packages below                                 |
+| A settled battle                                                               | `first-action`, `daily-engagement`, `promoted`, `full-marks`, `sea-service`                                                       |
+| Game menu or report: ← Back to the Hall                                        | `navigate { to: 'hall' }`                                                                                                         |
+| A win                                                                          | `the-day-is-yours`; `heavy-weather` if the wind is 5 or more; `line-of-battle` with ten ships or more                             |
+| Any end but giving up                                                          | `see-it-through`                                                                                                                  |
+| Seven seconds into the first battle, right after a frame is drawn              | `poster` from `#scene` (`posterFromCanvas`), once per page load                                                                   |
 
 `outcome` comes from the engine’s `st.result.reason`: `victory` is `win`; `captured`, `lost` (sunk
 or blown up) and `struck` are `loss`; `nightfall` and `hurricane` are `draw`; `quit` (the typed `Q`
 or `quit`) is `quit`, which earns no XP. Any other reason would report `complete`; none occurs with
 a human aboard. `score` is the player’s ship points, never below zero. `stats` carries `shipsTaken`,
-`broadsidesFired` and `turns`; the first two feed the weekly goals in the manifest. `xpEvents`:
-`ships-taken`, 8 per ship taken, at most 25. Before any battle the Hall shows its own key art for
+`broadsidesFired`, `turns` and `commendations` (earned this battle); all but `turns` feed the weekly
+goals in the manifest. `xpEvents`: `ships-taken`, 8 per ship taken, at most 25, and `commendations`,
+3 each. `daily` is true for a daily engagement, practice included. Before any battle the Hall shows its own key art for
 the game.
 
 The Hall’s Game menu reloads the frame. Because the game restores a battle from `sessionStorage`
 (`broadside.battle`) on load, `hall.js` removes that saved battle when the page load is a reload
 inside the Hall (`PerformanceNavigationTiming` type `reload`), before `main.js` reads it, so Game
-menu brings back the scenario list. The quality switch is a navigation, not a reload, so it still
+menu brings back the game menu. The quality switch is a navigation, not a reload, so it still
 resumes the battle. Broadside ignores the Hall’s pause, appearance and settings messages: it is
 turn-based and waits for the player anyway, it has one look, and it keeps its own sound switch.
 Opened on its own, the bridge script is missing and `hall.js` does nothing.
 
 ## Tests
 
-| Test                     | Command                                           | What it proves                                                                                                                                                                                                                                                                                 |
-| ------------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Upstream unit tests (44) | `pnpm run test:hosted` (or `pnpm test` in `app/`) | `node:test`: geometry truth tables, the canonical scenarios at engine level, determinism and save/continue, every scenario ending under computer play                                                                                                                                          |
-| In the Hall (8)          | `pnpm exec playwright test -c games/sail`         | Opens on the scenario list with no outside requests; Escape closes the help opened over it and stays in the game; giving up command reports the battle (a quit); Game menu during a battle returns to the scenario list; Back to the Hall; Game menu; browser Back; Escape on the title screen |
-| Screenshots              | `SHOTS=1 pnpm exec playwright test -c games/sail` | `docs/media/` (title, play, signature) at 1280×720, staged with the game’s own `?scenario`, `?ship`, `?seed`, `?stage`, `?auto` and `?readyAt` parameters                                                                                                                                      |
+| Test             | Command                                           | What it proves                                                                                                                                                                                                                                                                                                                                                                      |
+| ---------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit tests (56)  | `pnpm run test:hosted` (or `pnpm test` in `app/`) | `node:test`: the 44 upstream tests (geometry truth tables, the canonical scenarios at engine level, determinism and save/continue, every scenario ending under computer play) and `career.test.js`: every action and a month of engagements won by the counsel, the counsel never refused by the engine, numbering, commendations, the logbook, ranks, saving, the report's buttons |
+| In the Hall (10) | `pnpm exec playwright test -c games/sail`         | Opens on the game menu with no outside requests; its pages keep Escape; Escape closes the help over it; giving up command reports the battle (a quit); an action ends on a report with its commendations; Game menu during a battle returns to the game menu; Back to the Hall; Game menu; browser Back; Escape on the title screen                                                 |
+| Screenshots      | `SHOTS=1 pnpm exec playwright test -c games/sail` | `docs/media/` (title, the Sea Service, play, signature, a battered ship, a report) at 1280×720, staged with the game’s own `?scenario`, `?ship`, `?seed`, `?stage`, `?mission`, `?auto`, `?autoorders` and `?readyAt` parameters                                                                                                                                                    |
 
 The in-Hall suites run on the machine’s GPU on Windows (`GPU_LAUNCH_ARGS` in
 `packages/bridge/testing/shots.ts`); with software WebGL they took minutes longer. Set `HALL_PORT`

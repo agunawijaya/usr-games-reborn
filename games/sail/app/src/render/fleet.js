@@ -43,7 +43,16 @@ export class Fleet {
       v.setLowerPortsClosed(lowerPortsClosed(st.ships[i].specs.class, st.windspeed));
       const sp = st.ships[i];
       this.fx.setFire(i, () => v.firePoint(), sp.explode === 1 && sp.dir !== 0 ? 1 : 0);
+      this.smolder(i);
     });
+  }
+
+  // A hull below two-thirds of its strength smokes from its shot holes, thicker as it fails.
+  smolder(i) {
+    const v = this.visuals[i];
+    const sp = this.display.ships[i];
+    const hurt = sp.dir !== 0 && !sp.explode ? Math.max(0, (0.67 - v.hullFrac) / 0.67) : 0;
+    this.fx.setSmolder(i, () => v.smokePoint(), hurt);
   }
 
   at(t, fn, beat = null) {
@@ -265,6 +274,7 @@ export class Fleet {
     const v = this.visuals[index];
     v.sync(sp, disp);
     this.fx.setFire(index, () => v.firePoint(), sp.explode === 1 ? 1 : 0);
+    this.smolder(index);
   }
 
   // Skip the rest of the cinematic: run every pending action now.

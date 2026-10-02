@@ -28,8 +28,14 @@ thirty-two scenarios.
 - A living sea drawn entirely in code: rolling waves, a sky and weather that follow the game’s wind,
   and procedurally built hulls, sails, rigging and flags. There is not a single picture file.
 - Every turn plays back as a short film you can skip, and everything in it is something the rules
-  decided: sails tear as the rigging is shot away, a mast falls when its last point goes, a ship
-  that strikes hauls down her flag.
+  decided: shot holes splinter the hull and smoke, sails are holed and torn as the rigging is shot
+  away, a topgallant goes and then the mast, guns knocked off their carriages leave empty ports, a
+  battered hull settles and lists, and a ship that strikes hauls down her flag.
+- Hulls fitted out as period warships: raised wales along the sheer, red-lined gun-port lids,
+  anchors catted at the bow, head rails and a gilded figurehead, stern windows lit at dusk.
+- A career: the Sea Service’s ten actions take you from midshipman to admiral, each with a briefing
+  and three commendations to earn; a Daily Engagement that every captain fights the same day, with a
+  weekday standing order and a share line; and a service record.
 - Orders by button or by the original typed grammar, a wind rose that shows how far you can sail on
   every heading, and a sailing master who suggests a course.
 - A chart view with range rings, firing arcs and the path of the helm you are typing.
@@ -47,7 +53,7 @@ thirty-two scenarios.
 | Directory       | `/usr/games/strategy`         |
 | Players         | 1                             |
 | Session         | 15–40 minutes                 |
-| Daily challenge | no                            |
+| Daily challenge | yes, the Daily Engagement     |
 | Inspired by     | `sail` (1980, per its manual) |
 
 ## More

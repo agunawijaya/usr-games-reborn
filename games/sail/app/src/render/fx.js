@@ -274,6 +274,7 @@ export function createFx(scene, { quality = 'high', reducedMotion = false } = {}
 
   const wind3 = new THREE.Vector3();
   const burning = new Map(); // shipIndex -> { anchor(), intensity, acc }
+  const smoldering = new Map(); // shipIndex -> { anchor(), intensity, acc }: a battered hull smoking
   const rings = [];
 
   const api = {
@@ -367,6 +368,15 @@ export function createFx(scene, { quality = 'high', reducedMotion = false } = {}
       }
     },
 
+    // Thin grey smoke curling out of a battered hull's shot holes, more as the damage grows.
+    setSmolder(index, anchor, intensity) {
+      if (intensity <= 0) smoldering.delete(index);
+      else {
+        const was = smoldering.get(index);
+        smoldering.set(index, { anchor, intensity, acc: was ? was.acc : 0 });
+      }
+    },
+
     setFire(index, anchor, intensity) {
       if (intensity <= 0) burning.delete(index);
       else burning.set(index, { anchor, intensity, acc: 0, smoke: 0 });
@@ -390,6 +400,15 @@ export function createFx(scene, { quality = 'high', reducedMotion = false } = {}
           }
         }
         if (Math.random() < dt * 8) pulse(b.anchor(), 25 * b.intensity, 0.3, 0xff7a30);
+      }
+      for (const s of smoldering.values()) {
+        s.acc += dt * 2.2 * s.intensity * (hi ? 1 : 0.5);
+        while (s.acc > 1) {
+          s.acc -= 1;
+          const p = s.anchor();
+          if (!p) continue;
+          alpha.spawn({ p: [p.x, p.y, p.z], v: [rnd(-0.6, 0.6), rnd(1.2, 2.6), rnd(-0.6, 0.6)], size: rnd(1.4, 2.6), grow: rnd(1.2, 2), life: rnd(8, 14) * smokeScale + 3, c: [0.42, 0.4, 0.38, 0.45], type: T_SMOKE, drag: 0.8, buoy: 0.7 });
+        }
       }
       for (const L of lights) {
         L.t += dt;
@@ -415,6 +434,7 @@ export function createFx(scene, { quality = 'high', reducedMotion = false } = {}
       alpha.n = 0;
       add.n = 0;
       burning.clear();
+      smoldering.clear();
     },
 
     get count() { return alpha.n + add.n; },
