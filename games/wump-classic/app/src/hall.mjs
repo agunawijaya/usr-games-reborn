@@ -6,11 +6,21 @@
 // when its wumpus is slain and lost when the delver is; leaving one half-way reports a quit.
 
 const pauseHandlers = { pause: () => {}, resume: () => {} };
+// The Hall's master sound, null until it has said. The game has no sound switch of its own (the
+// Drone button only adds the deep-hall hum, and stays as the delver left it), so the Hall's
+// volume and mute set the level every sound plays at: as designed at the Hall's default volume,
+// silent while muted.
+let hallSound = null;
+let setSoundLevel = () => {};
 const hall =
   globalThis.UsrGamesBridge?.connectToHall({
     id: 'wump-classic',
     onPause: () => pauseHandlers.pause(),
     onResume: () => pauseHandlers.resume(),
+    onSound: (sound) => {
+      hallSound = sound;
+      setSoundLevel(globalThis.UsrGamesBridge.soundLevel(sound));
+    },
   }) ?? null;
 const installed = new Set();
 const XP_SLAIN = 10;
@@ -24,6 +34,17 @@ export const hostedInHall = Boolean(hall?.hosted);
 export function onHallPause(pause, resume) {
   pauseHandlers.pause = pause;
   pauseHandlers.resume = resume;
+}
+
+/**
+ * `follow(level)` hears the Hall's sound as a master level for the game's mixer: once when the
+ * Hall greets the game, then whenever its volume or mute changes. On its own the game never
+ * hears it and plays as designed.
+ * @param {(level: number) => void} follow
+ */
+export function onHallSound(follow) {
+  setSoundLevel = follow;
+  if (hallSound) follow(globalThis.UsrGamesBridge.soundLevel(hallSound));
 }
 
 /** The report's "Back to the Hall". */

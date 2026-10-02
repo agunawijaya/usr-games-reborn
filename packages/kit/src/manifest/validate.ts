@@ -1,5 +1,5 @@
-import { type PackageDefinition, validatePackages } from '../achievements/packages';
-import { isHexColor } from '../color/color';
+import { type PackageDefinition, validatePackages } from '../achievements/packages.ts';
+import { isHexColor } from '../color/color.ts';
 import {
   CATEGORIES,
   type Category,
@@ -9,7 +9,7 @@ import {
   hostedOutput,
   TAGLINE_MAX,
   TEASER_MAX,
-} from './manifest';
+} from './manifest.ts';
 
 export type ValidationResult<T> = { ok: true; value: T } | { ok: false; errors: string[] };
 

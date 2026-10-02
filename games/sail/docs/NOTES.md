@@ -32,12 +32,13 @@ Adopted on 2026-10-01 by prompt 01 (adopt eight finished games). Broadside is a 
 
 ### Integration changes (every file touched)
 
-| File               | Change                                                                                                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app/index.html`   | The bridge script tag (`../../bridge/bridge.js`), with a one-line comment, before the module script                                                                                                          |
-| `app/src/hall.js`  | New: the bridge glue (title screen, results, packages, poster, and dropping the saved battle on a reload inside the Hall)                                                                                    |
-| `app/src/main.js`  | One import and four calls: `noteBattleStarted()` in `startBattle`, `noteTurn(res.events, me)` in `commit`, `reportBattle(st, me)` at the top of `endBattle`, and the poster offer right after `world.render` |
-| `app/package.json` | `serve` on the collection’s port for sail, 5205                                                                                                                                                              |
+| File                     | Change                                                                                                                                                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/index.html`         | The bridge script tag (`../../bridge/bridge.js`), with a one-line comment, before the module script; since prompt C1, its reduced-motion rules repeated under `:root[data-reduced-motion]`                                                                                                             |
+| `app/src/hall.js`        | New: the bridge glue (title screen, results, packages, poster, and dropping the saved battle on a reload inside the Hall; since prompt C1 also the Hall’s sound, motion and pause)                                                                                                                     |
+| `app/src/main.js`        | One import and four calls: `noteBattleStarted()` in `startBattle`, `noteTurn(res.events, me)` in `commit`, `reportBattle(st, me)` at the top of `endBattle`, and the poster offer right after `world.render`; since prompt C1, the `followHall` hand-over and the `hallPaused` check in the frame loop |
+| `app/src/audio/audio.js` | Prompt C1: `MASTER_LEVEL` (0.8, as designed), `setLevel`, `level` and `context`                                                                                                                                                                                                                        |
+| `app/package.json`       | `serve` on the collection’s port for sail, 5205                                                                                                                                                                                                                                                        |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors. No fonts needed replacing.
 Its 44 tests pass unchanged.
@@ -158,25 +159,26 @@ minutes longer.
 
 ## Decisions log
 
-| Date       | Decision                                                                         | Why                                                                                                                                  |
-| ---------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-10-01 | Title “Broadside”, as the game shows itself                                      | Prompt 01 §7; the page’s full title is “Broadside — Wooden Walls”                                                                    |
-| 2026-10-01 | The scenario list is the title screen; the ship choice and top ten are not       | They share the overlay but are steps inside the game, each with its own Back button                                                  |
-| 2026-10-01 | A reload inside the Hall drops the saved battle                                  | The Hall’s Game menu reloads the frame and should bring back the scenario list; the quality switch is a navigation and still resumes |
-| 2026-10-01 | Nightfall and the hurricane report `draw`                                        | Neither side has won; the hurricane sinks everyone                                                                                   |
-| 2026-10-01 | The typed `Q` reports `quit` and does not earn `see-it-through`                  | Handing over command is not seeing the action through; under the Hall’s rules a quit earns no XP                                     |
-| 2026-10-01 | Score is the player’s ship points, never below zero                              | Points can go negative when a prize is retaken                                                                                       |
-| 2026-10-01 | 8 XP per ship taken, at most 25                                                  | Taking ships is the game’s real milestone; 25 is the Hall’s limit for one event                                                      |
-| 2026-10-01 | Ten packages; “weight of metal” dropped                                          | The engine does not expose the side calculation it needs                                                                             |
-| 2026-10-01 | The poster is taken 7 s into the first battle                                    | The opening sweep over the fleet has settled; before any battle the Hall shows its own key art                                       |
-| 2026-10-01 | The Q key, the end screen and the sound default stay as they are                 | Prompt 01 §4: no behaviour or copy changes on adoption; each is logged in `docs/KNOWN-ISSUES.md`                                     |
-| 2026-10-01 | The suites run on the machine’s GPU                                              | Software WebGL made them minutes slower                                                                                              |
-| 2026-10-02 | A game menu: the Sea Service, the Daily Engagement, historical actions, a record | The owner asked for a campaign and a daily like the reborn games                                                                     |
-| 2026-10-02 | Every action and engagement is proven winnable by the counsel                    | The owner tests winnability with the hidden counsel; giving its orders replays the proof                                             |
-| 2026-10-02 | The counsel has no button or help line; Ctrl+Alt+C or `?counsel=1`               | Owner: a testing aid, out of sight for players, as in Trek                                                                           |
-| 2026-10-02 | Career battles start with round shot and the last captain's name                 | The proofs use round shot; the name changes nothing in the battle                                                                    |
-| 2026-10-02 | The report follows the results order, with Look around kept last                 | Navigation standard; KNOWN-ISSUES #24                                                                                                |
-| 2026-10-02 | Damage drawn from engine values: holes, smoke, settling, lost guns, topgallants  | The owner asked to see the damage when a ship is hit                                                                                 |
+| Date       | Decision                                                                         | Why                                                                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Broadside”, as the game shows itself                                      | Prompt 01 §7; the page’s full title is “Broadside — Wooden Walls”                                                                                       |
+| 2026-10-01 | The scenario list is the title screen; the ship choice and top ten are not       | They share the overlay but are steps inside the game, each with its own Back button                                                                     |
+| 2026-10-01 | A reload inside the Hall drops the saved battle                                  | The Hall’s Game menu reloads the frame and should bring back the scenario list; the quality switch is a navigation and still resumes                    |
+| 2026-10-01 | Nightfall and the hurricane report `draw`                                        | Neither side has won; the hurricane sinks everyone                                                                                                      |
+| 2026-10-01 | The typed `Q` reports `quit` and does not earn `see-it-through`                  | Handing over command is not seeing the action through; under the Hall’s rules a quit earns no XP                                                        |
+| 2026-10-01 | Score is the player’s ship points, never below zero                              | Points can go negative when a prize is retaken                                                                                                          |
+| 2026-10-01 | 8 XP per ship taken, at most 25                                                  | Taking ships is the game’s real milestone; 25 is the Hall’s limit for one event                                                                         |
+| 2026-10-01 | Ten packages; “weight of metal” dropped                                          | The engine does not expose the side calculation it needs                                                                                                |
+| 2026-10-01 | The poster is taken 7 s into the first battle                                    | The opening sweep over the fleet has settled; before any battle the Hall shows its own key art                                                          |
+| 2026-10-01 | The Q key, the end screen and the sound default stay as they are                 | Prompt 01 §4: no behaviour or copy changes on adoption; each is logged in `docs/KNOWN-ISSUES.md`                                                        |
+| 2026-10-01 | The suites run on the machine’s GPU                                              | Software WebGL made them minutes slower                                                                                                                 |
+| 2026-10-02 | A game menu: the Sea Service, the Daily Engagement, historical actions, a record | The owner asked for a campaign and a daily like the reborn games                                                                                        |
+| 2026-10-02 | Every action and engagement is proven winnable by the counsel                    | The owner tests winnability with the hidden counsel; giving its orders replays the proof                                                                |
+| 2026-10-02 | The counsel has no button or help line; Ctrl+Alt+C or `?counsel=1`               | Owner: a testing aid, out of sight for players, as in Trek                                                                                              |
+| 2026-10-02 | Career battles start with round shot and the last captain's name                 | The proofs use round shot; the name changes nothing in the battle                                                                                       |
+| 2026-10-02 | The report follows the results order, with Look around kept last                 | Navigation standard; KNOWN-ISSUES #24                                                                                                                   |
+| 2026-10-02 | Damage drawn from engine values: holes, smoke, settling, lost guns, topgallants  | The owner asked to see the damage when a ship is hit                                                                                                    |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)               | ADR 0012; the Hall’s state is never saved into the remembered sound switch, and a pause holds the frame loop, which is where everything that moves runs |
 
 ## Open questions
 
@@ -184,15 +186,16 @@ All but the last two are logged in [`docs/KNOWN-ISSUES.md`](../../../docs/KNOWN-
 sail modification prompt.
 
 - A light appearance: Broadside has one look.
-- The Hall’s reduced-motion setting does not reach the game, which reads the system setting when it
-  starts.
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches the game live,
+  where before it read the system setting when it started.
 - Temporary trademark exceptions: the scenario list’s tagline names the board game it was based on,
   and the full list of the original’s scenarios names a fictional 1960s-television scenario.
 - After Look around on the battle report there is no way in the game back to the game menu; the
   Hall’s Game menu covers it.
 - Pressing Q outside the command line switches the quality and reloads the page, which is easy to
   confuse with the typed `Q` that gives up command.
-- Sound is on by default, and the Hall’s volume and mute do not reach the game.
+- Sound is on by default when the game runs on its own. Answered by prompt C1 (2026-10-02): in the
+  Hall it now follows the Hall’s volume and mute.
 - Giving up is only the typed command `Q` (or `quit`); there is no button for it.
 - Escape in the help opened from the scenario list used to close the help and also take the player
   back to the Hall (the game does not mark the key as handled). Fixed on 2026-10-01 in `hall.js`: the

@@ -36,6 +36,10 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      # The build opens each hosted game in the built Hall to capture its key art (ADR 0012).
+      - name: Install Playwright's Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       # A project site is served from /<repo>/; base_path is empty for a user site.
       - name: Build the static site
         run: pnpm build

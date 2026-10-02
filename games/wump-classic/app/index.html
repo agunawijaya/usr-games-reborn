@@ -696,12 +696,18 @@
     let audioCtx = null;
     let ambientGain = null;
     let audioPlaying = false;
+    // Every sound passes through this on its way out, so the Hall's volume and mute reach them all.
+    let masterGain = null;
+    let masterLevel = 1;
 
     function initAudio() {
       if (audioCtx) return;
       try {
         const AudioClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioClass();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = masterLevel;
+        masterGain.connect(audioCtx.destination);
 
         // The deep-hall drone
         const osc1 = audioCtx.createOscillator();
@@ -717,7 +723,7 @@
 
         osc1.connect(ambientGain);
         osc2.connect(ambientGain);
-        ambientGain.connect(audioCtx.destination);
+        ambientGain.connect(masterGain);
 
         osc1.start();
         osc2.start();
@@ -760,7 +766,7 @@
         gain.gain.setValueAtTime(0.3, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(masterGain);
         osc.start(now);
         osc.stop(now + 0.25);
       } else if (type === 'victory') {
@@ -772,7 +778,7 @@
           gain.gain.setValueAtTime(0.2, now + idx * 0.12);
           gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.8);
           osc.connect(gain);
-          gain.connect(audioCtx.destination);
+          gain.connect(masterGain);
           osc.start(now + idx * 0.12);
           osc.stop(now + idx * 0.12 + 0.85);
         });
@@ -786,7 +792,7 @@
         gain.gain.setValueAtTime(0.4, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(masterGain);
         osc.start(now);
         osc.stop(now + 1.05);
       }
@@ -1845,6 +1851,11 @@
       /** The Hall's pause silences the drone; resuming brings it back if it was playing. */
       pauseSound: () => audioCtx?.suspend(),
       resumeSound: () => { if (audioPlaying) audioCtx?.resume(); },
+      /** The Hall's sound: 1 as designed, 0 while it is muted. */
+      setSoundLevel(level) {
+        masterLevel = level;
+        if (masterGain) masterGain.gain.value = level;
+      },
     };
 
     // --- Bootstrap ---

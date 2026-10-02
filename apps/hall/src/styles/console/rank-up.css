@@ -213,6 +213,7 @@
 
 [data-style='console'] .ch-rankup__eyebrow,
 [data-style='console'] .ch-rankup__title,
+[data-style='console'] .ch-rankup__line,
 [data-style='console'] .ch-rankup__unlock {
   position: relative;
   z-index: 3;
@@ -257,6 +258,17 @@
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0;
+}
+
+[data-style='console'] .ch-rankup__line {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--ug-ink-2);
+  font-size: 1.15rem;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+  animation-delay: 0.78s;
 }
 
 [data-style='console'] .ch-rankup__unlock {

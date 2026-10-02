@@ -650,14 +650,24 @@
   color: var(--ug-mark);
 }
 
-/* ---- Hosted games: the frame and its strip -------------------------------------------- */
+/* ---- Hosted games: the strip and the frame below it ----------------------------------- */
+
+/*
+ * The strip is part of the layout, not an overlay: the frame starts where the strip ends, so a
+ * game's own top bar is never covered, and nothing slides in or out over the game while it runs.
+ */
+.pl-page--hosted {
+  --pl-strip-height: 42px;
+  display: flex;
+  flex-direction: column;
+}
 
 .pl-frame {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: block;
+  flex: 1 1 auto;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   border: 0;
   background: var(--ug-bg);
 }
@@ -667,27 +677,16 @@
 }
 
 .pl-strip {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
+  position: relative;
   z-index: 10;
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 18px;
-  min-height: 54px;
-  padding: 7px var(--pl-gutter);
-  border-bottom: 1px solid var(--ug-line);
-  background: color-mix(in srgb, var(--ug-surface) 94%, transparent);
-  box-shadow: 0 12px 30px -24px var(--ug-shadow);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  transform: translateY(calc(-100% - 12px));
-  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.is-strip-open .pl-strip {
-  transform: none;
+  gap: 14px;
+  height: var(--pl-strip-height);
+  padding: 0 calc(var(--pl-gutter) * 0.75);
+  border-bottom: 1px solid var(--ug-line-strong);
+  background: var(--ug-surface);
 }
 
 .pl-strip__title {
@@ -697,25 +696,32 @@
   min-width: 0;
   overflow: hidden;
   font-family: var(--pl-title-font);
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   font-weight: var(--pl-title-weight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.pl-strip__title > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .pl-strip__pid {
   color: var(--ug-ink-2);
   font-family: var(--ug-font-mono);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
 }
 
 .pl-strip__hint {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 0.45em;
   color: var(--ug-ink-2);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+  white-space: nowrap;
 }
 
 .pl-strip__hint[hidden] {
@@ -724,45 +730,32 @@
 
 .pl-strip__actions {
   display: flex;
-  gap: 8px;
+  flex: none;
+  align-items: center;
+  gap: 4px;
   margin-left: auto;
 }
 
 .pl-strip .pl-button {
-  min-height: 40px;
-  padding-block: 0.4em;
+  min-height: 32px;
+  padding: 0.2em 0.85em;
+  font-size: 0.9rem;
 }
 
-/* A thin zone along the top edge notices the pointer; its tab hints that the strip is there. */
-.pl-hotzone {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 11;
-  height: 14px;
+.pl-strip .pl-strip__mute {
+  width: 34px;
+  padding: 0;
 }
 
-.pl-hotzone::after {
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  width: 44px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--ug-line-strong);
-  content: '';
-  opacity: 0.8;
-  transform: translateX(-50%);
-  transition: opacity 0.2s ease;
+.pl-strip__mute[aria-pressed='true'] {
+  color: var(--ug-accent);
 }
 
-.is-strip-open .pl-hotzone {
-  pointer-events: none;
-}
-
-.is-strip-open .pl-hotzone::after {
-  opacity: 0;
+@media (max-width: 560px) {
+  .pl-strip__hint,
+  .pl-strip__pid {
+    display: none;
+  }
 }
 
 /* ---- Not launchable ------------------------------------------------------------------- */
@@ -936,10 +929,9 @@
   background: repeating-linear-gradient(90deg, var(--ug-accent) 0 6px, transparent 6px 8px);
 }
 
+/* The strip reads as the title bar of the terminal window the game runs in. */
 [data-player-style='machine-room'] .pl-strip {
-  min-height: 46px;
-  border-bottom-color: var(--ug-line-strong);
-  background: var(--ug-surface);
+  border-bottom: 2px solid var(--ug-accent);
 }
 
 [data-player-style='machine-room'] .pl-toast {
@@ -994,6 +986,15 @@
   border-radius: 20px;
 }
 
+[data-player-style='console'] .pl-strip {
+  border-bottom-color: color-mix(in srgb, var(--ug-line-strong) 55%, transparent);
+  background: linear-gradient(
+    to bottom,
+    var(--ug-surface-2),
+    color-mix(in srgb, var(--ug-surface) 92%, var(--ug-bg))
+  );
+}
+
 /* ---- Holo Collection: a foil-edged card ----------------------------------------------- */
 
 [data-style='player'][data-player-style='holo'] {
@@ -1029,6 +1030,14 @@
 
 [data-player-style='holo'] .pl-level__fill {
   background: linear-gradient(90deg, var(--pl-foil-stops));
+}
+
+/* A thin line of foil along the strip's lower edge, like the edge of a card. */
+[data-player-style='holo'] .pl-strip {
+  border-bottom: 0;
+  background:
+    linear-gradient(to top, transparent 2px, var(--ug-surface) 2px),
+    linear-gradient(90deg, var(--pl-foil-stops));
 }
 
 [data-player-style='holo'] .pl-toast {

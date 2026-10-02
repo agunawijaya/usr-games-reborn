@@ -12,7 +12,9 @@ import { assist } from './helpers.js';
 import { store } from './store.js';
 import { FlightController } from './flight.js';
 import { Soundscape } from '../audio/audio.js';
-import { afterStageFrame, noteAutoplayUsed, noteEvents, noteGameStarted, reportGameOver } from '../hall.js';
+import {
+  afterStageFrame, followHall, hallPaused, noteAutoplayUsed, noteEvents, noteGameStarted, reportGameOver,
+} from '../hall.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -292,7 +294,7 @@ function startAutoplay() {
   $('hint-auto').setAttribute('aria-pressed', 'true');
   autoplay = setInterval(() => {
     if (!game || ended) return stopAutoplay();
-    if (flight) return;
+    if (flight || hallPaused()) return;
     const h = nextHint(game, game.request);
     if (h.cmd === null || h.cmd === undefined) return stopAutoplay();
     submit(h.cmd, false);
@@ -451,6 +453,20 @@ $('dlg-title').addEventListener('close', () => {
 // ---------------------------------------------------------------- boot
 await initRenderer();
 sound.setMuted(!settings.sound);
+// /usr/games Reborn: inside the Hall its sound, reduced motion and pause reach the game (src/hall.js).
+followHall({
+  settings,
+  sound,
+  soundButton: $('btn-sound'),
+  stage,
+  flight: () => flight,
+  setReducedMotion(on) {
+    settings.motion = on || params.get('motion') === 'reduce';
+    document.body.classList.toggle('reduce-motion', settings.motion);
+    if (stage) stage.reducedMotion = settings.motion;
+    if (stage?.cockpit) stage.cockpit.reduced = settings.motion;
+  },
+});
 if (params.get('autostart') === '1' || params.get('fresh') === '1') {
   newGame({ seed: parseInt(params.get('seed'), 10) || 1, username: params.get('wizard') === '1' ? 'riggle' : (params.get('user') || '') });
 } else openTitle();

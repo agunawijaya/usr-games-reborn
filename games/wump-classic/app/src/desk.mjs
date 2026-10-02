@@ -7,7 +7,7 @@ import { clearedCount, DELVES, delveById, emptyCareer, isOpen, nextDelve, rankOf
 import { addToLedger, chronicleLines, emptyLedger } from './chronicle.mjs';
 import { emptyCodex, newPages, PAGES } from './codex.mjs';
 import { dailyDelve, dailyShareLine, localDateKey } from './daily.mjs';
-import { hostedInHall, install, leaveForHall, offerPoster, onHallPause, reportDelve, setOnGameMenu } from './hall.mjs';
+import { hostedInHall, install, leaveForHall, offerPoster, onHallPause, onHallSound, reportDelve, setOnGameMenu } from './hall.mjs';
 import { taskText, tasksMet } from './quests.mjs';
 import { noteChart, noteMove as runMove, noteShot as runShot, startRun, summarize } from './run.mjs';
 import { loadSaved, save } from './store.mjs';
@@ -661,6 +661,7 @@ onHallPause(
   () => play.pauseSound(),
   () => play.resumeSound(),
 );
+onHallSound((level) => play.setSoundLevel(level));
 
 showMenu();
 // The Hall's key art: the cave behind the menu, once it has been drawn for a moment.

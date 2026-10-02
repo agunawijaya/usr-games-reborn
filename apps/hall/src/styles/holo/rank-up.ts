@@ -135,7 +135,7 @@ function overlay(moment: RankUpMoment, rank: CardRank, onSkip: () => void): HTML
           `Level ${moment.level}`,
           h('span', { class: 'hc-level__rank hc-rankup__rank' }, rank),
         ),
-        h('p', { id: 'hc-rankup-line', class: 'hc-rankup__line' }, RANK_CARD_LOOKS[rank].line),
+        h('p', { id: 'hc-rankup-line', class: 'hc-rankup__line' }, moment.plainFlavour),
         unlockList(moment, rank),
         h('p', { class: 'hc-rankup__note' }, 'It is in your album now. Pick a foil in Settings.'),
       ),

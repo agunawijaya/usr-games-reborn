@@ -13,24 +13,24 @@ louder the crowd, the more each one is worth.
 Robots is played with the keyboard; the mouse zooms the camera and works the buttons. Keys are the
 game’s own and cannot be remapped from the Hall.
 
-| Action                                | Keyboard                                | Mouse                                       |
-| ------------------------------------- | --------------------------------------- | ------------------------------------------- |
-| Pick a mode on the game menu          | Tab and Enter                           | Click a mode                                |
-| Start the match from its card         | ↵                                       | Start                                       |
-| Step one square (eight directions)    | h j k l y u b n, or the number keys 1–9 | —                                           |
-| Step one square (four directions)     | ← ↑ → ↓                                 | —                                           |
-| Stay where you are for one turn       | `.`, Space or 5                         | —                                           |
-| Teleport to a random square           | t                                       | —                                           |
-| Wait safely until the wave is decided | w or `>` (any key stops it)             | —                                           |
-| Danger preview on or off              | p                                       | preview                                     |
-| Sound on or off (off at the start)    | m                                       | ♪                                           |
-| Zoom in or out                        | + / −                                   | The wheel, or the + and − buttons           |
-| Next wave, after a clear              | ↵                                       | Next wave                                   |
-| After a match: next match, again      | ↵ (Grand Tour), R                       | Next match, Play again                      |
-| Back to the game menu                 | Esc on the menu’s screens               | Game menu (on the match report)             |
-| Help                                  | ?                                       | ? help, or How to play on the menu          |
-| Leave for the Hall                    | Esc on the game menu, or H after a run  | Move to the top edge; ← Back to the Hall    |
-| Start afresh                          | Tab to the Hall’s strip                 | Move to the top edge; Game menu, then Leave |
+| Action                                | Keyboard                                | Mouse                                     |
+| ------------------------------------- | --------------------------------------- | ----------------------------------------- |
+| Pick a mode on the game menu          | Tab and Enter                           | Click a mode                              |
+| Start the match from its card         | ↵                                       | Start                                     |
+| Step one square (eight directions)    | h j k l y u b n, or the number keys 1–9 | —                                         |
+| Step one square (four directions)     | ← ↑ → ↓                                 | —                                         |
+| Stay where you are for one turn       | `.`, Space or 5                         | —                                         |
+| Teleport to a random square           | t                                       | —                                         |
+| Wait safely until the wave is decided | w or `>` (any key stops it)             | —                                         |
+| Danger preview on or off              | p                                       | preview                                   |
+| Sound on or off (see Settings)        | m                                       | ♪                                         |
+| Zoom in or out                        | + / −                                   | The wheel, or the + and − buttons         |
+| Next wave, after a clear              | ↵                                       | Next wave                                 |
+| After a match: next match, again      | ↵ (Grand Tour), R                       | Next match, Play again                    |
+| Back to the game menu                 | Esc on the menu’s screens               | Game menu (on the match report)           |
+| Help                                  | ?                                       | ? help, or How to play on the menu        |
+| Leave for the Hall                    | Esc on the game menu, or H after a run  | ← Back to the Hall on the Hall’s strip    |
+| Start afresh                          | Shift+Tab to the Hall’s strip           | Game menu on the Hall’s strip, then Leave |
 
 ## Rules
 
@@ -118,10 +118,13 @@ mode. A Daily Showdown report can copy a one-line summary to share.
 
 ## Settings
 
-The danger preview (`p`) and the sound (`m`) are toggles in the game. It follows your system’s
-reduced-motion setting: no camera shake, slow motion, flashes or meter animation, and a shorter
-opening. The stadium has a single night look; the Hall’s strip follows the Hall’s light or dark
-appearance.
+The danger preview (`p`) and the sound (`m`) are toggles in the game. It follows the Hall’s
+reduced-motion setting as soon as you change it (on its own, your system’s): no camera shake, slow
+motion, flashes or meter animation, and a shorter opening. In the Hall its sound follows the
+Hall’s: on at the Hall’s volume, off while the Hall is muted, and `m` still switches it during the
+visit; the ♪ switch shows where it stands. On its own it starts silent. While the Hall pauses, or
+the tab is hidden, a Blitz clock and a safe wait stop and the stadium falls quiet. The stadium has
+a single night look; the Hall’s strip follows the Hall’s light or dark appearance.
 
 ## Records
 

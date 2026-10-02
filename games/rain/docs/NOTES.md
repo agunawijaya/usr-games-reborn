@@ -26,18 +26,21 @@ game like Selene.
 
 ### Integration changes (every file touched)
 
-| File                       | Change                                                                                                                                                                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/index.html`           | The bridge script tag `../../bridge/bridge.js` added. Rain loads no web fonts (it uses system font stacks), so nothing was replaced                                                                                                             |
-| `app/src/hall.js`          | New: the bridge glue (visit, packages, poster)                                                                                                                                                                                                  |
-| `app/src/main.js`          | One import and calls into `hall.js`: `noteView` in the `onView` callback (views the player picks, not the one set at start-up), `noteSound` after the sound toggle, `noteDelay` in `changeDelay`, the poster offer right after `renderer.frame` |
-| `app/tests/engine.test.js` | The test that compares frames with captures of the real binary now looks for them in `tests/fixtures/captures/` and is skipped while they are absent                                                                                            |
-| `app/package.json`         | `start` serves on the collection’s port for rain, 5204                                                                                                                                                                                          |
+| File                       | Change                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/index.html`           | The bridge script tag `../../bridge/bridge.js` added. Rain loads no web fonts (it uses system font stacks), so nothing was replaced. Since prompt C1, the Show controls button                                                                                                                                                             |
+| `app/src/hall.js`          | New: the bridge glue (visit, packages, poster; since prompt C1 also the Hall’s sound, motion and pause)                                                                                                                                                                                                                                    |
+| `app/src/main.js`          | One import and calls into `hall.js`: `noteView` in the `onView` callback (views the player picks, not the one set at start-up), `noteSound` after the sound toggle, `noteDelay` in `changeDelay`, the poster offer right after `renderer.frame`; since prompt C1, the `followHall` hand-over and the `isHeldStill` check in the frame loop |
+| `app/src/audio/audio.js`   | Prompt C1: `setVolume` (the master level, still 0.9 by default), `context()` and `gain()`                                                                                                                                                                                                                                                  |
+| `app/src/ui/controls.js`   | Prompt C1: one listener, Show controls removes `hidden-ui`                                                                                                                                                                                                                                                                                 |
+| `app/src/ui/style.css`     | Prompt C1: the Show controls button, and the `--fade` rule repeated under `:root[data-reduced-motion]`                                                                                                                                                                                                                                     |
+| `app/tests/engine.test.js` | The test that compares frames with captures of the real binary now looks for them in `tests/fixtures/captures/` and is skipped while they are absent                                                                                                                                                                                       |
+| `app/package.json`         | `start` serves on the collection’s port for rain, 5204                                                                                                                                                                                                                                                                                     |
 
 The captures lived beside the game in the earlier project, outside the adopted folder, so they did
 not come with it; the skipped test is logged in `docs/KNOWN-ISSUES.md`. Lights out is noticed by a
-`MutationObserver` on the body’s `hidden-ui` class, so `controls.js` is untouched. Nothing else
-changed: no rebalancing, restyling, copy edits or refactors.
+`MutationObserver` on the body’s `hidden-ui` class, so `controls.js` needs no call into `hall.js`.
+Nothing else changed: no rebalancing, restyling, copy edits or refactors.
 
 ## Verified behaviour of the original
 
@@ -93,29 +96,29 @@ and the Lite profile.
 
 ## Decisions log
 
-| Date       | Decision                                              | Why                                                                               |
-| ---------- | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Rain on Still Water”, as the game shows itself | Prompt 01 §7: the final title is the one the game already shows                   |
-| 2026-10-01 | No title-screen signal                                | It has no title screen; the Hall’s strip carries the ways out                     |
-| 2026-10-01 | A visit counts once, on the first key press or click  | Toys must never reward being left open; pointer movement only wakes the controls  |
-| 2026-10-01 | `lights-out` instead of “a thousand drops”            | Counting drops would have rewarded leaving the toy running                        |
-| 2026-10-01 | Only views the player picks earn packages             | A view set by `?view=` at start-up is not a choice                                |
-| 2026-10-01 | Lights out watched with a `MutationObserver`          | Keeps `controls.js` unchanged (ADR 0011: changes are single calls into `hall.js`) |
-| 2026-10-01 | The captures test is skipped, not deleted             | It runs again as soon as the captures are put back                                |
-| 2026-10-01 | The poster is taken from `#pond` 5 s after opening    | By then the first rings have spread across the water                              |
+| Date       | Decision                                                           | Why                                                                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Rain on Still Water”, as the game shows itself              | Prompt 01 §7: the final title is the one the game already shows                                                                                                                         |
+| 2026-10-01 | No title-screen signal                                             | It has no title screen; the Hall’s strip carries the ways out                                                                                                                           |
+| 2026-10-01 | A visit counts once, on the first key press or click               | Toys must never reward being left open; pointer movement only wakes the controls                                                                                                        |
+| 2026-10-01 | `lights-out` instead of “a thousand drops”                         | Counting drops would have rewarded leaving the toy running                                                                                                                              |
+| 2026-10-01 | Only views the player picks earn packages                          | A view set by `?view=` at start-up is not a choice                                                                                                                                      |
+| 2026-10-01 | Lights out watched with a `MutationObserver`                       | Keeps `controls.js` unchanged (ADR 0011: changes are single calls into `hall.js`)                                                                                                       |
+| 2026-10-01 | The captures test is skipped, not deleted                          | It runs again as soon as the captures are put back                                                                                                                                      |
+| 2026-10-01 | The poster is taken from `#pond` 5 s after opening                 | By then the first rings have spread across the water                                                                                                                                    |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1) | ADR 0012; the pond plays at the Hall’s level, reduced motion applies live, a pause or hidden tab freezes and silences it; only the player’s own Sound button or M earns `hear-the-pond` |
 
 ## Open questions
 
 - Rain on Still Water has only its dark night look; a light appearance is listed among the missing
   appearances in `docs/KNOWN-ISSUES.md`.
-- The Hall’s reduced-motion setting does not reach it: it reads `prefers-reduced-motion` once, at
-  start (`docs/KNOWN-ISSUES.md`).
-- The rain’s hiss keeps playing while the tab is hidden; nothing listens for the page becoming
-  hidden.
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches it live, where
+  before it read `prefers-reduced-motion` once, at start.
+- Answered by prompt C1 (2026-10-02): a hidden tab now holds the pond still and suspends its hiss.
 - Fullscreen (F) needs the frame to allow it (`allow="fullscreen"`); the Hall grants it, but any
   other host would have to as well.
-- H hides every control, the help button included, and only H brings them back, which a mouse-only
-  player cannot do.
+- Answered by prompt C1 (2026-10-02): with every control hidden (H), a faint Show controls button
+  (bottom centre) stays reachable by mouse and Tab and brings them back like H.
 - The captures of the real binary are missing, so one engine test is skipped
   (`docs/KNOWN-ISSUES.md`).
 - The two messages for a bad delay are the original’s own wording (derived under its BSD licence);

@@ -12,22 +12,22 @@ a while.
 The controls fade after about three seconds of stillness and come back when you move the mouse or
 press a key. Keys are the game’s own and cannot be remapped from the Hall.
 
-| Action                                 | Keyboard                | Mouse                                        |
-| -------------------------------------- | ----------------------- | -------------------------------------------- |
-| Heavier or lighter rain                | → / ← (or + / −)        | Drag the Intensity slider                    |
-| A preset                               | —                       | Drizzle, Rain, Downpour, Deluge or 9600 baud |
-| Rain at 9600-baud pace                 | 0                       | 9600 baud                                    |
-| The pond                               | 1                       | Modern                                       |
-| Split view (or back to the pond)       | 2 (S switches it)       | Split                                        |
-| The 1980 screen (or back to the pond)  | 3 (C switches it)       | Classic                                      |
-| Sound on or off (off at the start)     | M                       | Sound, top right                             |
-| Quality High or Low                    | Q                       | The High / Low button                        |
-| Fullscreen                             | F                       | The fullscreen button                        |
-| Hide every control, or bring them back | H                       | —                                            |
-| The list of shortcuts                  | ?                       | The ? button                                 |
-| Close the list of shortcuts            | Esc                     | Close                                        |
-| Leave for the Hall                     | Tab to the Hall’s strip | Move to the top edge; ← Back to the Hall     |
-| Start Rain on Still Water afresh       | Tab to the Hall’s strip | Move to the top edge; Game menu, then Leave  |
+| Action                                 | Keyboard                      | Mouse                                          |
+| -------------------------------------- | ----------------------------- | ---------------------------------------------- |
+| Heavier or lighter rain                | → / ← (or + / −)              | Drag the Intensity slider                      |
+| A preset                               | —                             | Drizzle, Rain, Downpour, Deluge or 9600 baud   |
+| Rain at 9600-baud pace                 | 0                             | 9600 baud                                      |
+| The pond                               | 1                             | Modern                                         |
+| Split view (or back to the pond)       | 2 (S switches it)             | Split                                          |
+| The 1980 screen (or back to the pond)  | 3 (C switches it)             | Classic                                        |
+| Sound on or off (see Settings)         | M                             | Sound, top right                               |
+| Quality High or Low                    | Q                             | The High / Low button                          |
+| Fullscreen                             | F                             | The fullscreen button                          |
+| Hide every control, or bring them back | H                             | Show controls, bottom centre, brings them back |
+| The list of shortcuts                  | ?                             | The ? button                                   |
+| Close the list of shortcuts            | Esc                           | Close                                          |
+| Leave for the Hall                     | Shift+Tab to the Hall’s strip | ← Back to the Hall on the Hall’s strip         |
+| Start Rain on Still Water afresh       | Shift+Tab to the Hall’s strip | Game menu on the Hall’s strip, then Leave      |
 
 ## Rules
 
@@ -69,13 +69,18 @@ There is no daily challenge.
 | Intensity | 999 down to 1 ms between frames; Drizzle (400), Rain (120), Downpour (10), Deluge (1); 9600 baud (0) | Rain, `-d 120` (Drizzle with reduced motion) |
 | View      | Modern · Split · Classic                                                                             | Modern                                       |
 | Quality   | High · Low                                                                                           | High                                         |
-| Sound     | on · off                                                                                             | off                                          |
+| Sound     | on · off                                                                                             | off (in the Hall, as the Hall’s sound is)    |
 
 On a machine without a GPU the pond runs in a lighter profile by itself, and if High runs slowly in
-the first seconds it switches to Low once, with a notice. Rain on Still Water follows your system’s
-reduced-motion setting: it starts in a drizzle, holds the view still, softens the splashes, thins
-the streaks and shows the controls without fading. It has a single night look; the Hall’s strip
-follows the Hall’s light or dark appearance.
+the first seconds it switches to Low once, with a notice. Rain on Still Water follows the Hall’s
+reduced-motion setting as soon as you change it (on its own, your system’s): it starts in a
+drizzle, holds the view still, softens the splashes, thins the streaks and shows the controls
+without fading; a pond still raining as it started moves between rain and drizzle with the
+setting. In the Hall its sound follows the Hall’s: on at the Hall’s volume, silent while the Hall
+is muted, and the Sound button and M still work during the visit (if the browser held the sound
+back, your first key or click starts it). On its own it starts silent. While the Hall pauses, or
+the tab is hidden, the pond holds still and quiet and carries on where it was. It has a single
+night look; the Hall’s strip follows the Hall’s light or dark appearance.
 
 ## Scoring
 
@@ -85,7 +90,7 @@ None. Rain on Still Water is a toy.
 
 | Package            | How to earn it                                                                              |
 | ------------------ | ------------------------------------------------------------------------------------------- |
-| `hear-the-pond`    | Turn the sound on.                                                                          |
+| `hear-the-pond`    | Turn the sound on yourself, with the Sound button or M.                                     |
 | `nine-six-hundred` | Let it rain at 9600-baud pace: press 0 or pick 9600 baud.                                   |
 | `downpour`         | Turn the rain up to 10 ms between frames or less: Downpour, Deluge or the slider’s far end. |
 | `side-by-side`     | Switch to the split view.                                                                   |
@@ -107,4 +112,5 @@ goals.
 - The screen lies over the water with its rows running into the distance, so a drop in the top-left
   of the classic screen lands far out on the left of the pond.
 - With sound on in a light rain, listen for the plinks: only about one drop in four traps a bubble.
-- H leaves nothing but the rain; press H again to bring the controls back.
+- H leaves nothing but the rain and a faint Show controls at the bottom; press H again, or click
+  it, to bring the controls back.

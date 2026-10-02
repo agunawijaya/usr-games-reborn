@@ -27,35 +27,35 @@ Control Room 1986 is played by typing orders at the `>` line under the radar. Th
 title screen, the switches along the top of the console and the sector buttons in the sidebar.
 Keys are the game’s own and cannot be remapped from the Hall.
 
-| Action                                   | Keyboard                          | Mouse                                        |
-| ---------------------------------------- | --------------------------------- | -------------------------------------------- |
-| Career, Open shift, Daily Traffic        | 1, 2, 3 (or ← →)                  | The tabs on the game menu                    |
-| Choose an assignment or a sector         | ↑ ↓                               | Click it                                     |
-| Open the logbook (game menu)             | L                                 | LOGBOOK                                      |
-| Read another page of the logbook         | ↑ ↓                               | Click a row                                  |
-| Close the logbook                        | Esc or L                          | Outside the pages                            |
-| Begin the shift (game menu)              | Enter or Space                    | ▶ BEGIN SHIFT ◀                              |
-| Take the position (briefing)             | Enter or Space                    | Outside the clipboard                        |
-| Back to the game menu (briefing)         | Esc                               | —                                            |
-| Type an order                            | Letters, digits, `+`, `-` and `@` | —                                            |
-| Give the order                           | Enter                             | —                                            |
-| Force the next tick now                  | Enter on an empty line            | —                                            |
-| Delete the last character                | Backspace                         | —                                            |
-| Clear the line                           | Esc                               | —                                            |
-| Tutorial (pauses the shift)              | ? (during a shift)                | —                                            |
-| Close the tutorial                       | ? or Esc                          | ✕ close, or outside its panel                |
-| Reference card of every order            | `\`                               | ≡ help, ✕ on the card                        |
-| Subtitles, voice, sound                  | —                                 | ✎ subs, ◉ voice, ♪ sound                     |
-| Start an open shift on another sector    | —                                 | Easy, Default or Killer in the sidebar       |
-| Finish printing the report               | Any key                           | Click the paper                              |
-| Next assignment (report)                 | Enter                             | NEXT ASSIGNMENT                              |
-| Try again or a new shift (report)        | R                                 | AGAIN, TRY AGAIN or NEW SHIFT                |
-| Copy the Daily's share line (report)     | S                                 | COPY SHARE LINE                              |
-| Game menu (report)                       | M                                 | GAME MENU                                    |
-| Back to the Hall (report)                | H                                 | ← BACK TO THE HALL                           |
-| Leave for the Hall from the title screen | Esc                               | Move to the top edge; ← Back to the Hall     |
-| Leave for the Hall during a shift        | Tab to the Hall’s strip           | Move to the top edge; ← Back to the Hall     |
-| Back to the title screen                 | Tab to the Hall’s strip           | Move to the top edge; Game menu (then Leave) |
+| Action                                   | Keyboard                          | Mouse                                     |
+| ---------------------------------------- | --------------------------------- | ----------------------------------------- |
+| Career, Open shift, Daily Traffic        | 1, 2, 3 (or ← →)                  | The tabs on the game menu                 |
+| Choose an assignment or a sector         | ↑ ↓                               | Click it                                  |
+| Open the logbook (game menu)             | L                                 | LOGBOOK                                   |
+| Read another page of the logbook         | ↑ ↓                               | Click a row                               |
+| Close the logbook                        | Esc or L                          | Outside the pages                         |
+| Begin the shift (game menu)              | Enter or Space                    | ▶ BEGIN SHIFT ◀                           |
+| Take the position (briefing)             | Enter or Space                    | Outside the clipboard                     |
+| Back to the game menu (briefing)         | Esc                               | —                                         |
+| Type an order                            | Letters, digits, `+`, `-` and `@` | —                                         |
+| Give the order                           | Enter                             | —                                         |
+| Force the next tick now                  | Enter on an empty line            | —                                         |
+| Delete the last character                | Backspace                         | —                                         |
+| Clear the line                           | Esc                               | —                                         |
+| Tutorial (pauses the shift)              | ? (during a shift)                | —                                         |
+| Close the tutorial                       | ? or Esc                          | ✕ close, or outside its panel             |
+| Reference card of every order            | `\`                               | ≡ help, ✕ on the card                     |
+| Subtitles, voice, sound                  | —                                 | ✎ subs, ◉ voice, ♪ sound                  |
+| Start an open shift on another sector    | —                                 | Easy, Default or Killer in the sidebar    |
+| Finish printing the report               | Any key                           | Click the paper                           |
+| Next assignment (report)                 | Enter                             | NEXT ASSIGNMENT                           |
+| Try again or a new shift (report)        | R                                 | AGAIN, TRY AGAIN or NEW SHIFT             |
+| Copy the Daily's share line (report)     | S                                 | COPY SHARE LINE                           |
+| Game menu (report)                       | M                                 | GAME MENU                                 |
+| Back to the Hall (report)                | H                                 | ← BACK TO THE HALL                        |
+| Leave for the Hall from the title screen | Esc                               | ← Back to the Hall on the Hall’s strip    |
+| Leave for the Hall during a shift        | Shift+Tab to the Hall’s strip     | ← Back to the Hall on the Hall’s strip    |
+| Back to the title screen                 | Shift+Tab to the Hall’s strip     | Game menu on the Hall’s strip, then Leave |
 
 ### Orders
 
@@ -218,24 +218,30 @@ The briefing card in the sidebar follows each task as you work: `[✓]` done, `[
 
 ## Settings
 
-All of them live in the bar along the top of the console and are remembered on this device.
+All of them live in the bar along the top of the console and are remembered on this device. In the
+Hall the sound switch follows the Hall’s mute instead, without changing what is remembered.
 
-| Setting        | Options                                            | Default |
-| -------------- | -------------------------------------------------- | ------- |
-| Sound          | The console hum and the beeps, on or off           | On      |
-| Voice          | Pilots and you speak the radio lines aloud, or not | Off     |
-| Subtitles      | The radio lines written under the radar, or not    | On      |
-| Reference card | Every order on one card beside the radar           | Shown   |
+| Setting        | Options                                            | Default                                  |
+| -------------- | -------------------------------------------------- | ---------------------------------------- |
+| Sound          | The console hum and the beeps, on or off           | On (in the Hall, as the Hall’s sound is) |
+| Voice          | Pilots and you speak the radio lines aloud, or not | Off                                      |
+| Subtitles      | The radio lines written under the radar, or not    | On                                       |
+| Reference card | Every order on one card beside the radar           | Shown                                    |
 
 The voice uses only a speech voice that runs on your own device; where the browser offers none,
-the radio stays silent and the subtitles carry on. The tutorial opens by itself when you take the
-position for the first time.
+the radio stays silent and the subtitles carry on. In the Hall the hum, the beeps and the voice
+are as loud as the Hall’s volume allows, and while the Hall is muted the room and the voice are
+silent; the subtitles carry on. The tutorial opens by itself when you take the position for the
+first time.
 
 The shift clock stops while the briefing is open, while the tutorial is open, while the Hall's
 pause menu is up and while the page is hidden; the room goes quiet in the last two.
 
 Your career, service record and logbook are kept in this browser with the rest of the collection,
 and the Hall's "Forget everything" clears them too.
+
+The Hall’s reduced-motion setting (on its own, your system’s) prints the shift report at once and
+stops the title’s pulse; the radar sweep and the other small animations still run.
 
 Control Room 1986 has a single dark look; the Hall’s strip follows the Hall’s light or dark
 appearance.

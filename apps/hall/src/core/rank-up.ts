@@ -19,7 +19,10 @@ import { playSound } from './sound';
 export interface RankUpMoment {
   from: RankId;
   to: RankId;
+  /** The new rank's welcome in Unix words (the Machine Room). */
   flavour: string;
+  /** The same welcome in plain words (Console Home and Holo Collection). */
+  plainFlavour: string;
   /** The first level of the new rank, for the plain-word styles. */
   level: number;
   /**
@@ -39,6 +42,7 @@ export function rankUpMoment(store: HallStore): RankUpMoment | null {
     from: pending.from,
     to: pending.to,
     flavour: rankById(pending.to).flavour,
+    plainFlavour: rankById(pending.to).plainFlavour,
     level: firstLevelOfRank(pending.to),
     reachedLevel: levelForXp(progression.xp).level,
     unlocked: cosmeticsForRank(pending.to),

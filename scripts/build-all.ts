@@ -4,9 +4,12 @@
  *   dist/               the Hall (native games are code-split chunks of it)
  *   dist/bridge/        bridge.js (classic script) and bridge.mjs for hosted games
  *   dist/play/<id>/     each hosted game, copied or built by its own Vite step
+ *   dist/play/posters.js, dist/play/<id>/poster.*
+ *                       key art of each hosted game, captured from the built site
  *
  * `SITE_BASE` sets the public path (GitHub Pages serves a project at `/<repo>/`).
  * `--fixtures` (or `HALL_FIXTURES=1`) adds the bridge fixture games, for end-to-end tests.
+ * `--no-posters` skips the poster capture (it needs Playwright's Chromium).
  */
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { extname, join } from 'node:path';
@@ -14,6 +17,7 @@ import { gzipSync } from 'node:zlib';
 import { hostedEntries, readCatalog, type ResolvedEntry } from './lib/catalog';
 import { buildHostedViteGame, copyStaticGame, loadBuildBridge, normaliseBase } from './lib/hosted';
 import { fromRepo, isMainModule } from './lib/paths';
+import { capturePosters, writePosterList } from './lib/posters';
 import { dim, green, red, yellow } from './lib/report';
 import { walkFiles } from './lib/walk';
 
@@ -151,10 +155,43 @@ function printSizes(firstLoads: FirstLoads): number {
   return failures === 0 ? 0 : 1;
 }
 
+/** Key art for every hosted game that was built, so first visits show the games themselves. */
+async function buildPosters(base: string, hosted: ResolvedEntry[], skip: boolean): Promise<void> {
+  const ids = hosted
+    .filter((entry) => {
+      const build = entry.manifest!.build;
+      return build.kind !== 'native' && existsSync(join(DIST, build.output));
+    })
+    .map((entry) => entry.id);
+  if (skip || ids.length === 0) {
+    writePosterList(DIST, []);
+    console.log(dim(skip ? '  skipped (--no-posters)' : '  no hosted games'));
+    return;
+  }
+  const captures = await capturePosters({ dist: DIST, base, ids });
+  if (!captures) {
+    console.warn(
+      yellow(
+        '  ! no headless Chromium (pnpm exec playwright install chromium); the Hall keeps its own art',
+      ),
+    );
+    return;
+  }
+  for (const capture of captures) {
+    if (capture.how === 'failed') console.warn(yellow(`  ! ${capture.id}: no poster`));
+    else
+      console.log(
+        `  ${green('✓')} ${capture.id} ${dim(capture.how === 'snapshot' ? 'its own snapshot' : 'a still of its frame')}`,
+      );
+  }
+}
+
 function listPlayFolders(): string[] {
   const play = join(DIST, 'play');
   if (!existsSync(play)) return [];
+  // Only the games' folders: play/posters.js beside them is the Hall's, not a game.
   return walkFiles({ root: play, includeDist: true })
+    .filter((file) => file.path.includes('/'))
     .map((file) => `play/${file.path.split('/')[0]}`)
     .filter((folder, index, all) => all.indexOf(folder) === index);
 }
@@ -183,6 +220,9 @@ async function main(): Promise<number> {
   const hosted = hostedEntries(catalog, withFixtures);
   if (hosted.length === 0) console.log(dim('  none yet'));
   for (const entry of hosted) await buildHostedGame(entry, base);
+
+  console.log('\nPosters');
+  await buildPosters(base, hosted, process.argv.includes('--no-posters'));
 
   // GitHub Pages would otherwise run Jekyll and hide folders that start with an underscore.
   writeFileSync(join(DIST, '.nojekyll'), '');

@@ -11,7 +11,7 @@ import {
   type ThemeTokenMap,
 } from './protocol';
 
-export { BRIDGE_PROTOCOL, BRIDGE_VERSION } from './protocol';
+export { BRIDGE_PROTOCOL, BRIDGE_REVISION, BRIDGE_VERSION } from './protocol';
 
 /**
  * The game side of the bridge. A hosted game calls `connectToHall` once at startup and then
@@ -20,14 +20,42 @@ export { BRIDGE_PROTOCOL, BRIDGE_VERSION } from './protocol';
  * becomes a quiet no-op, so a game never needs two code paths.
  */
 
+/** The Hall's master sound, as a hosted game needs it. */
+export interface SoundSettings {
+  /** Master volume, 0–1. */
+  volume: number;
+  muted: boolean;
+}
+
 export interface ConnectOptions {
   /** The game's catalog id, e.g. `pom`. */
   id: string;
   onHello?: (hello: HelloPayload) => void;
   onAppearanceChange?: (appearance: AppearancePayload) => void;
   onSettingsChange?: (settings: BridgeSettings) => void;
+  /**
+   * The Hall's pause: its tab was hidden, or it is asking the player something over the game.
+   * Stop the game's clocks and silence it until `onResume`.
+   */
   onPause?: () => void;
   onResume?: () => void;
+  /**
+   * Since 1.1. The Hall's master volume and mute: once when the hello arrives, then whenever
+   * either changes. Muted means silent, whatever the game's own switch says; `soundLevel` turns
+   * the volume into a level for the game's own mixer.
+   */
+  onSound?: (sound: SoundSettings) => void;
+  /**
+   * Since 1.1. Whether the player wants reduced motion (the Hall's setting, or the system's when
+   * they chose that): once when the hello arrives, then whenever it changes.
+   */
+  onReducedMotion?: (reduced: boolean) => void;
+  /**
+   * Since 1.1. Also pause while this page itself is hidden, folded together with the Hall's
+   * pause: `onPause` when either begins, `onResume` once neither holds. It works when the game
+   * runs on its own as well, so a background tab falls quiet either way.
+   */
+  pauseWhenHidden?: boolean;
   /**
    * Writes the Hall's theme tokens as CSS custom properties on the document root (plus
    * `data-ug-appearance`, `data-ug-theme` and `color-scheme`), for games that style themselves
@@ -70,7 +98,62 @@ const POSTER_QUALITY = 0.82;
 /** When the Hall has not answered yet, `ready` is repeated after these delays (milliseconds). */
 export const READY_RETRY_DELAYS = [250, 500, 1000, 2000, 4000] as const;
 
-function standaloneConnection(): HallConnection {
+/**
+ * The Hall's starting master volume (the kit's default setting). At this volume a hosted game
+ * sounds exactly as it was designed; the Hall's slider scales it from there.
+ */
+export const HALL_DEFAULT_VOLUME = 0.35;
+
+/**
+ * A level for the game's own mixer from the Hall's sound: silent when muted, `designed` (the
+ * level the game would use on its own) at the Hall's default volume, scaled with the Hall's
+ * slider and never above 1.
+ */
+export function soundLevel(sound: SoundSettings, designed = 1): number {
+  if (sound.muted || sound.volume <= 0) return 0;
+  return Math.min(1, designed * (sound.volume / HALL_DEFAULT_VOLUME));
+}
+
+/**
+ * Folds the Hall's pause and this page being hidden into one paused state, so the game hears
+ * one `onPause` when either begins and one `onResume` when both are over.
+ */
+function pauseFolder(win: Window, options: ConnectOptions) {
+  let hallPaused = false;
+  let pageHidden = options.pauseWhenHidden ? win.document.hidden : false;
+  let paused = hallPaused || pageHidden;
+
+  function settle() {
+    const next = hallPaused || pageHidden;
+    if (next === paused) return;
+    paused = next;
+    if (paused) options.onPause?.();
+    else options.onResume?.();
+  }
+  function onVisibility() {
+    pageHidden = win.document.hidden;
+    settle();
+  }
+  if (options.pauseWhenHidden) win.document.addEventListener('visibilitychange', onVisibility);
+  return {
+    setHallPaused(next: boolean) {
+      if (!options.pauseWhenHidden) {
+        // Without the option every Hall pause and resume reaches the game as it comes, as in 1.0.
+        if (next) options.onPause?.();
+        else options.onResume?.();
+        return;
+      }
+      hallPaused = next;
+      settle();
+    },
+    stop() {
+      win.document.removeEventListener('visibilitychange', onVisibility);
+    },
+  };
+}
+
+function standaloneConnection(win: Window, options: ConnectOptions): HallConnection {
+  const pause = pauseFolder(win, options);
   return {
     hosted: false,
     state: () => null,
@@ -81,7 +164,7 @@ function standaloneConnection(): HallConnection {
     requestSettings: () => {},
     poster: () => {},
     posterFromCanvas: () => {},
-    disconnect: () => {},
+    disconnect: () => pause.stop(),
   };
 }
 
@@ -112,7 +195,7 @@ function writeTokens(
 
 export function connectToHall(options: ConnectOptions): HallConnection {
   const win = options.window ?? window;
-  if (win.parent === win) return standaloneConnection();
+  if (win.parent === win) return standaloneConnection(win, options);
 
   const hall = win.parent;
   const origin = win.location.origin;
@@ -120,6 +203,22 @@ export function connectToHall(options: ConnectOptions): HallConnection {
   let onTitleScreen = false;
   let retry: ReturnType<typeof setTimeout> | undefined;
   let connected = true;
+  const pause = pauseFolder(win, options);
+  let lastSound: SoundSettings | null = null;
+  let lastReducedMotion: boolean | null = null;
+
+  /** Tells the game about sound and motion when they first arrive and whenever they change. */
+  function followSettings(settings: Pick<BridgeSettings, 'volume' | 'muted' | 'reducedMotion'>) {
+    const { volume, muted, reducedMotion } = settings;
+    if (!lastSound || lastSound.volume !== volume || lastSound.muted !== muted) {
+      lastSound = { volume, muted };
+      options.onSound?.(lastSound);
+    }
+    if (lastReducedMotion !== reducedMotion) {
+      lastReducedMotion = reducedMotion;
+      options.onReducedMotion?.(reducedMotion);
+    }
+  }
 
   function send(message: GameMessage) {
     if (!connected) return;
@@ -157,6 +256,7 @@ export function connectToHall(options: ConnectOptions): HallConnection {
         clearTimeout(retry);
         applyAppearance({ ...hello, reducedMotion: hello.settings.reducedMotion });
         options.onHello?.(hello);
+        followSettings(hello.settings);
         break;
       case 'appearance-changed':
         if (hello) {
@@ -171,16 +271,19 @@ export function connectToHall(options: ConnectOptions): HallConnection {
         }
         applyAppearance(message.payload);
         options.onAppearanceChange?.(message.payload);
+        if (lastSound)
+          followSettings({ ...lastSound, reducedMotion: message.payload.reducedMotion });
         break;
       case 'settings-changed':
         if (hello) hello = { ...hello, settings: message.payload.settings };
         options.onSettingsChange?.(message.payload.settings);
+        followSettings(message.payload.settings);
         break;
       case 'pause':
-        options.onPause?.();
+        pause.setHallPaused(true);
         break;
       case 'resume':
-        options.onResume?.();
+        pause.setHallPaused(false);
         break;
     }
   }
@@ -224,6 +327,7 @@ export function connectToHall(options: ConnectOptions): HallConnection {
       clearTimeout(pendingEscape);
       win.removeEventListener('message', onMessage);
       win.removeEventListener('keydown', onKeyDown);
+      pause.stop();
       connected = false;
     },
   };

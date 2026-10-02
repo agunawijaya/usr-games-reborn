@@ -13,19 +13,19 @@ those characters were drawing: rain on water.
 
 ## Changes
 
-| Area             | Original                                                     | Rain on Still Water                                                  | Why                                                 |
-| ---------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- | --------------------------------------------------- |
-| Presentation     | Dots, `o`, `O` and rings of dashes and slashes on a terminal | A night pond with a wave simulation; the 80×24 screen kept as a view | Show what the characters were drawing               |
-| A drop’s stages  | Characters in and around one cell                            | Each age pushes on the water; rings spread, cross and interfere      | Real rings instead of drawn ones                    |
-| Timing on screen | Drawn at once                                                | Both views run 350 ms behind the engine                              | So each drop is seen falling before it lands        |
-| `-d 0`           | Waits for the terminal to send its output                    | Paced as a 9600-baud line would take the frame, about 150 ms         | A browser has no line to wait for                   |
-| Terminal size    | Whatever the terminal was                                    | Always 80×24                                                         | The captures were 80×24; the pond needs no grid     |
-| A drop’s spot    | One character cell                                           | A fixed point inside that cell                                       | So the drops of a downpour do not line up in rows   |
-| Intensity        | `-d` on the command line, once                               | A slider, presets and keys, applied at once                          | Changing the rain is the point                      |
-| A bad delay      | An error, and the program exits                              | The same message in a notice; it rains at the default delay          | A page has no exit status                           |
-| A hidden tab     | —                                                            | The engine skips the time it was hidden                              | Replaying minutes of rain in one frame helps no one |
-| Stopping         | A signal ends it and restores the terminal                   | Leave the page                                                       | Browsers have no signals                            |
-| Sound            | None                                                         | An optional hiss, splashes and bubble plinks, off until asked for    | The sound of rain on a pond                         |
+| Area             | Original                                                     | Rain on Still Water                                                                                       | Why                                                 |
+| ---------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Presentation     | Dots, `o`, `O` and rings of dashes and slashes on a terminal | A night pond with a wave simulation; the 80×24 screen kept as a view                                      | Show what the characters were drawing               |
+| A drop’s stages  | Characters in and around one cell                            | Each age pushes on the water; rings spread, cross and interfere                                           | Real rings instead of drawn ones                    |
+| Timing on screen | Drawn at once                                                | Both views run 350 ms behind the engine                                                                   | So each drop is seen falling before it lands        |
+| `-d 0`           | Waits for the terminal to send its output                    | Paced as a 9600-baud line would take the frame, about 150 ms                                              | A browser has no line to wait for                   |
+| Terminal size    | Whatever the terminal was                                    | Always 80×24                                                                                              | The captures were 80×24; the pond needs no grid     |
+| A drop’s spot    | One character cell                                           | A fixed point inside that cell                                                                            | So the drops of a downpour do not line up in rows   |
+| Intensity        | `-d` on the command line, once                               | A slider, presets and keys, applied at once                                                               | Changing the rain is the point                      |
+| A bad delay      | An error, and the program exits                              | The same message in a notice; it rains at the default delay                                               | A page has no exit status                           |
+| A hidden tab     | —                                                            | The engine skips the time it was hidden                                                                   | Replaying minutes of rain in one frame helps no one |
+| Stopping         | A signal ends it and restores the terminal                   | Leave the page                                                                                            | Browsers have no signals                            |
+| Sound            | None                                                         | A hiss, splashes and bubble plinks, following the Hall’s sound in the Hall, otherwise off until asked for | The sound of rain on a pond                         |
 
 ## Quirks and bugs in the original
 

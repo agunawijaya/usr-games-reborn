@@ -27,13 +27,13 @@ static (no build step) kind of hosted game.
 
 ### Integration changes (every file touched)
 
-| File                 | Change                                                                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app/index.html`     | Google Fonts links replaced by the local `fonts.css`; the bridge script tag added                                                                            |
-| `app/src/ui/fonts/*` | New: `fonts.css` and four Latin woff2 files (Cormorant Garamond ×2, Inter, JetBrains Mono)                                                                   |
-| `app/src/hall.js`    | New: the bridge glue (results and packages)                                                                                                                  |
-| `app/src/ui/app.js`  | One import and four calls into `hall.js`, the `settledHour` watch in the frame loop, and the once-per-visit full-Moon key-art frame beside the normal render |
-| `app/package.json`   | `start` serves on the collection’s port for pom, 5201                                                                                                        |
+| File                 | Change                                                                                                                                                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/index.html`     | Google Fonts links replaced by the local `fonts.css`; the bridge script tag added                                                                                                                                      |
+| `app/src/ui/fonts/*` | New: `fonts.css` and four Latin woff2 files (Cormorant Garamond ×2, Inter, JetBrains Mono)                                                                                                                             |
+| `app/src/hall.js`    | New: the bridge glue (results and packages; since prompt C1 also the Hall’s reduced motion, `followHallMotion`)                                                                                                        |
+| `app/src/ui/app.js`  | One import and four calls into `hall.js`, the `settledHour` watch in the frame loop, and the once-per-visit full-Moon key-art frame beside the normal render; since prompt C1, `setReducedMotion`, handed to `hall.js` |
+| `app/package.json`   | `start` serves on the collection’s port for pom, 5201                                                                                                                                                                  |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors.
 
@@ -84,17 +84,18 @@ because headless Chromium otherwise falls back to SwiftShader and the lite profi
 
 ## Decisions log
 
-| Date       | Decision                                                               | Why                                                                           |
-| ---------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Selene”, as the game shows itself                               | Prompt 01 §7: the final title is the one the game already shows               |
-| 2026-10-01 | No title-screen signal                                                 | Selene has no title screen; the Hall strip would stay over its toolbar        |
-| 2026-10-01 | A visit counts once, on the first real journey through time            | Toys must never reward being left open                                        |
-| 2026-10-01 | “Resting on an hour” watched in the frame loop, not in the text update | The text update can skip the last frame of a jump; found by the in-Hall suite |
+| Date       | Decision                                                               | Why                                                                                                                             |
+| ---------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Selene”, as the game shows itself                               | Prompt 01 §7: the final title is the one the game already shows                                                                 |
+| 2026-10-01 | No title-screen signal                                                 | Selene has no title screen; the Hall strip would stay over its toolbar                                                          |
+| 2026-10-01 | A visit counts once, on the first real journey through time            | Toys must never reward being left open                                                                                          |
+| 2026-10-01 | “Resting on an hour” watched in the frame loop, not in the text update | The text update can skip the last frame of a jump; found by the in-Hall suite                                                   |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)     | ADR 0012; Selene is silent and has nothing to pause, so only the Hall’s reduced motion is mapped, live (`?motion=0` still wins) |
 
 ## Open questions
 
 - Selene has only its night look; a light appearance is logged in `docs/KNOWN-ISSUES.md`.
-- The Hall’s reduced-motion setting does not reach Selene, which reads the system setting when it
-  starts (logged in `docs/KNOWN-ISSUES.md`).
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches Selene live,
+  where before it read only the system setting when it started.
 - The one-line answer is the original’s own wording, reproduced by design (see
   [`CHANGES-FROM-ORIGINAL.md`](CHANGES-FROM-ORIGINAL.md) and `docs/KNOWN-ISSUES.md`).

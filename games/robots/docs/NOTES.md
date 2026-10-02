@@ -31,14 +31,16 @@ reports (see “The modes” below).
 
 ### Integration changes (every file touched)
 
-| File                 | Change                                                                                |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| `app/index.html`     | Google Fonts links replaced by the local `fonts.css`                                  |
-| `app/src/ui/fonts/*` | New: `fonts.css` and four Latin woff2 files (Orbitron, Rajdhani 500/600/700)          |
-| `app/src/hall.ts`    | New: the bridge glue (results and packages)                                           |
-| `app/src/Game.tsx`   | One import and one call, `reportRunEnded(state)`, where the run’s high score is saved |
-| `app/vite.config.ts` | Modulepreload polyfill left out (a `fetch` call); a comment on how the base is set    |
-| `app/package.json`   | `@usr-games/bridge` (workspace) added; dev and preview on the collection’s port, 5202 |
+| File                   | Change                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/index.html`       | Google Fonts links replaced by the local `fonts.css`                                                                                             |
+| `app/src/ui/fonts/*`   | New: `fonts.css` and four Latin woff2 files (Orbitron, Rajdhani 500/600/700)                                                                     |
+| `app/src/hall.ts`      | New: the bridge glue (results and packages; since prompt C1 also the Hall’s sound, motion and a hidden page)                                     |
+| `app/src/Game.tsx`     | One import and one call, `reportRunEnded(state)`, where the run’s high score is saved; since prompt C1, `onHallSound` keeps the ♪ switch in step |
+| `app/src/audio/sfx.ts` | Prompt C1: `level`, the master gain while sound is on (0.85 as designed), which the Hall scales                                                  |
+| `app/src/ui/modes.css` | Prompt C1: its two reduced-motion rules repeated under `[data-reduced-motion]`                                                                   |
+| `app/vite.config.ts`   | Modulepreload polyfill left out (a `fetch` call); a comment on how the base is set                                                               |
+| `app/package.json`     | `@usr-games/bridge` (workspace) added; dev and preview on the collection’s port, 5202                                                            |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors. Its 72 tests and its type
 check pass unchanged.
@@ -135,25 +137,26 @@ JavaScript file of 1,197 KB (341 KB gzipped) plus 58 KB of fonts.
 
 ## Decisions log
 
-| Date       | Decision                                          | Why                                                                                                      |
-| ---------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Robots”, as the game shows itself          | Prompt 01 §7                                                                                             |
-| 2026-10-01 | `daily: false`                                    | The game has no daily run; the Hall must not promise one or set cron jobs for it                         |
-| 2026-10-01 | A run that clears at least one wave reports `win` | The original never ends in victory; without this the first-win bonus could never apply                   |
-| 2026-10-01 | The result waits 1.5 s after the run ends         | The last turn’s crashes land on the visual clock, after the state already says “caught”                  |
-| 2026-10-01 | `q` stays unbound                                 | It is declared but does nothing in the port; leaving mid-run belongs to the Hall strip, which asks first |
-| 2026-10-02 | `daily: true`                                     | The Daily Showdown is a daily run: the same seeded waves for everyone, the first finished run counts     |
-| 2026-10-02 | Modes around the rules, not inside them           | The owner asked for a gamified Robots that keeps the adopted game; every mode plays the same engine      |
-| 2026-10-02 | Caught: an ovation, no exclamation, no boos       | Hard rule 11; the crowd rises to applaud the run and the report follows                                  |
-| 2026-10-02 | The game opens on its game menu                   | It is now a title screen: Escape there goes back to the Hall (navigation standard)                       |
-| 2026-10-02 | Points carry the crowd; the classic score is kept | The Hall records points; the report also shows the original’s ten a robot                                |
-| 2026-10-02 | Only the first Showdown of a day counts           | One honest attempt for the day; later runs are practice and say so                                       |
-| 2026-10-02 | Custom matches keep no records                    | They can start anywhere, with any teleports; records would not compare                                   |
+| Date       | Decision                                                           | Why                                                                                                                         |
+| ---------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Robots”, as the game shows itself                           | Prompt 01 §7                                                                                                                |
+| 2026-10-01 | `daily: false`                                                     | The game has no daily run; the Hall must not promise one or set cron jobs for it                                            |
+| 2026-10-01 | A run that clears at least one wave reports `win`                  | The original never ends in victory; without this the first-win bonus could never apply                                      |
+| 2026-10-01 | The result waits 1.5 s after the run ends                          | The last turn’s crashes land on the visual clock, after the state already says “caught”                                     |
+| 2026-10-01 | `q` stays unbound                                                  | It is declared but does nothing in the port; leaving mid-run belongs to the Hall strip, which asks first                    |
+| 2026-10-02 | `daily: true`                                                      | The Daily Showdown is a daily run: the same seeded waves for everyone, the first finished run counts                        |
+| 2026-10-02 | Modes around the rules, not inside them                            | The owner asked for a gamified Robots that keeps the adopted game; every mode plays the same engine                         |
+| 2026-10-02 | Caught: an ovation, no exclamation, no boos                        | Hard rule 11; the crowd rises to applaud the run and the report follows                                                     |
+| 2026-10-02 | The game opens on its game menu                                    | It is now a title screen: Escape there goes back to the Hall (navigation standard)                                          |
+| 2026-10-02 | Points carry the crowd; the classic score is kept                  | The Hall records points; the report also shows the original’s ten a robot                                                   |
+| 2026-10-02 | Only the first Showdown of a day counts                            | One honest attempt for the day; later runs are practice and say so                                                          |
+| 2026-10-02 | Custom matches keep no records                                     | They can start anywhere, with any teleports; records would not compare                                                      |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1) | ADR 0012; a hidden page now pauses it too, also on its own, and a pause silences the stadium as well as stopping its clocks |
 
 ## Open questions
 
 - A light appearance: the stadium has only its night look (`docs/KNOWN-ISSUES.md`).
-- The Hall’s reduced-motion setting does not reach the game, which reads the system setting when it
-  starts (`docs/KNOWN-ISSUES.md`).
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches the game live,
+  except the very first opening on a warm load, which can begin before it arrives.
 - The tour bot plays turn by turn; a bot that plays Blitz in real time would calibrate Clockwork
   better.

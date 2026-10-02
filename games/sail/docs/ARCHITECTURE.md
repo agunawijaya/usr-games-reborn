@@ -174,9 +174,10 @@ proportion to the hull points lost (holes seen being made count towards them), t
 holes below two-thirds of the hull, the hull settling and listing as it takes water, empty ports
 with their lids gone for every gun lost on that side, round shot holes and rents in the sails as the
 rigging counter falls, the topgallant mast gone at a third and a yard hanging sprung below
-three-fifths. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read once at
-start from the system (`prefers-reduced-motion`, or `?reduced=1`); it skips the opening sweep,
-speeds the playback, blends instead of cutting and turns off camera shake. The Low quality tier
+three-fifths. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read at
+start from the system (`prefers-reduced-motion`, or `?reduced=1`) and, in the Hall, follows the
+Hall’s setting live (`?reduced=1` still wins); it skips the opening sweep, speeds the playback,
+blends instead of cutting and turns off camera shake. The Low quality tier
 halves the ocean grid, drops shadows and multisampling, and cuts the particle budgets.
 
 ## Where sounds are defined
@@ -185,13 +186,17 @@ Everything is synthesised in `app/src/audio/audio.js` (no audio files): looping 
 rigging whistle from a gale up, and rain, all following the engine’s wind; one-shots for cannon,
 impacts, splashes, explosions, a ship foundering, the bell, musketry, creaking timber and thunder.
 One-shots are panned and filtered by distance from the camera and delayed by the speed of sound.
-Sound starts with the first key or click and is on by default; M mutes it and the choice is
-remembered (`broadside.muted` in `localStorage`).
+Sound starts with the first key or click and, on its own, is on by default; M mutes it and the
+choice is remembered (`broadside.muted` in `localStorage`). In the Hall the Hall’s sound wins:
+silent while the Hall is muted, otherwise the master level (`MASTER_LEVEL`, 0.8) scaled by the
+Hall’s volume. M and the Sound button still work during the visit, and what the Hall sets is never
+written into the remembered switch.
 
 ## Hall integration
 
-All of it lives in `app/src/hall.js`, plus the bridge script tag in `index.html` and one import and
-four calls in `main.js`.
+All of it lives in `app/src/hall.js`, plus the bridge script tag in `index.html` and, in `main.js`,
+one import, four calls, the hand-over of its audio, Sound button and a reduced-motion setter
+(`followHall`) and a hold check (`hallPaused`) at the top of the frame loop.
 
 | Broadside moment                                                               | Bridge message                                                                                                                    |
 | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -204,7 +209,7 @@ four calls in `main.js`.
 | Game menu or report: ← Back to the Hall                                        | `navigate { to: 'hall' }`                                                                                                         |
 | A win                                                                          | `the-day-is-yours`; `heavy-weather` if the wind is 5 or more; `line-of-battle` with ten ships or more                             |
 | Any end but giving up                                                          | `see-it-through`                                                                                                                  |
-| Seven seconds into the first battle, right after a frame is drawn              | `poster` from `#scene` (`posterFromCanvas`), once per page load                                                                   |
+| Seven seconds into the first battle (paused time left out), after a frame      | `poster` from `#scene` (`posterFromCanvas`), once per page load                                                                   |
 
 `outcome` comes from the engine’s `st.result.reason`: `victory` is `win`; `captured`, `lost` (sunk
 or blown up) and `struck` are `loss`; `nightfall` and `hurricane` are `draw`; `quit` (the typed `Q`
@@ -212,15 +217,23 @@ or `quit`) is `quit`, which earns no XP. Any other reason would report `complete
 a human aboard. `score` is the player’s ship points, never below zero. `stats` carries `shipsTaken`,
 `broadsidesFired`, `turns` and `commendations` (earned this battle); all but `turns` feed the weekly
 goals in the manifest. `xpEvents`: `ships-taken`, 8 per ship taken, at most 25, and `commendations`,
-3 each. `daily` is true for a daily engagement, practice included. Before any battle the Hall shows its own key art for
-the game.
+3 each. `daily` is true for a daily engagement, practice included. `durationSeconds` leaves out the time
+the Hall held the game still. Before the first battle of a visit the Hall shows the snapshot kept
+from an earlier visit, or the poster `pnpm build` captured (ADR 0012).
 
 The Hall’s Game menu reloads the frame. Because the game restores a battle from `sessionStorage`
 (`broadside.battle`) on load, `hall.js` removes that saved battle when the page load is a reload
 inside the Hall (`PerformanceNavigationTiming` type `reload`), before `main.js` reads it, so Game
 menu brings back the game menu. The quality switch is a navigation, not a reload, so it still
-resumes the battle. Broadside ignores the Hall’s pause, appearance and settings messages: it is
-turn-based and waits for the player anyway, it has one look, and it keeps its own sound switch.
+resumes the battle. Broadside ignores the Hall’s appearance messages (it has one look). Since
+bridge 1.1 it follows the Hall’s sound, motion and pause:
+
+| In `hall.js`                              | What it does                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onSound` → `followHallSound`             | Sets the master level to the Hall’s volume scaled from 0.8 (`soundLevel`, `audio.setLevel`), mutes while the Hall is muted and keeps the Sound button’s `aria-pressed` in step; nothing is written to `broadside.muted`. The AudioContext still waits for a key or click                                             |
+| `onReducedMotion` → `followHallMotion`    | Calls the setter `main.js` hands over (`reduced`, `director.reduced`, `fx.reduced`: the opening sweep, the turn cinematics, camera cuts and shake), live, and toggles `data-reduced-motion` on the root, where the `<style>` block repeats its reduced-motion rules                                                  |
+| `pauseWhenHidden`, `onPause` / `onResume` | The Hall’s pause and a hidden tab hold the frame loop (`hallPaused`), and with it the sea, the fleet’s cinematic and its timed beats, the camera, the creaks and the thunder; the AudioContext is suspended. Resume carries on from exactly there; the battle’s duration and the poster’s timing leave the pause out |
+
 Opened on its own, the bridge script is missing and `hall.js` does nothing.
 
 ## Tests

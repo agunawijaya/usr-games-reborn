@@ -19,12 +19,12 @@ code), the five PNG screenshots in `media/`, and the port's `CLAUDE.md` pointer.
 
 ### Integration changes (every file touched)
 
-| File           | Change                                                                                                                                                                                                                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.html`   | Our title and names; local fonts; the bridge, `art.js` and `desk.mjs` loaded; the gate and vine from `art.js`, the wind drawn by `RuneArt.drawWind`, the ceiling by `RuneArt.drawCeiling`; hooks for the desk; `RuneGatesPlay`; Esc that closes a dialog calls `preventDefault`; planner chips are buttons; a Menu button |
-| `README.md`    | A note on top that it is upstream history; the screenshot table (whose images were not copied) replaced by a link                                                                                                                                                                                                         |
-| `package.json` | Renamed `@usr-games/wump-classic-app`; the test script also runs the desk's tests                                                                                                                                                                                                                                         |
-| new            | `src/art.js`, `src/desk.mjs`, `src/desk.css`, `src/career.mjs`, `src/quests.mjs`, `src/daily.mjs`, `src/run.mjs`, `src/chronicle.mjs`, `src/codex.mjs`, `src/store.mjs`, `src/hall.mjs`, `src/fonts/`, `tests/*.test.mjs`                                                                                                 |
+| File           | Change                                                                                                                                                                                                                                                                                                                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.html`   | Our title and names; local fonts; the bridge, `art.js` and `desk.mjs` loaded; the gate and vine from `art.js`, the wind drawn by `RuneArt.drawWind`, the ceiling by `RuneArt.drawCeiling`; hooks for the desk; `RuneGatesPlay`; Esc that closes a dialog calls `preventDefault`; planner chips are buttons; a Menu button; since prompt C1, one master gain for every sound and `RuneGatesPlay.setSoundLevel` |
+| `README.md`    | A note on top that it is upstream history; the screenshot table (whose images were not copied) replaced by a link                                                                                                                                                                                                                                                                                             |
+| `package.json` | Renamed `@usr-games/wump-classic-app`; the test script also runs the desk's tests                                                                                                                                                                                                                                                                                                                             |
+| new            | `src/art.js`, `src/desk.mjs`, `src/desk.css`, `src/career.mjs`, `src/quests.mjs`, `src/daily.mjs`, `src/run.mjs`, `src/chronicle.mjs`, `src/codex.mjs`, `src/store.mjs`, `src/hall.mjs`, `src/fonts/`, `tests/*.test.mjs`                                                                                                                                                                                     |
 
 ## The owner's decisions (2026-10-02)
 
@@ -77,14 +77,15 @@ can choose to do (fewer moves, no bats, arrows kept, the chart left closed), nev
 
 ## Decisions log
 
-| Date       | Decision                                                                            | Why                                                                        |
-| ---------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 2026-10-02 | The game opens on its own game menu, laid over a live cave                          | A title screen for the Hall's Escape, and somewhere for the career to live |
-| 2026-10-02 | A delve is won when its wumpus is slain; a delve left half-way reports a quit       | Honest results (ADR 0011)                                                  |
-| 2026-10-02 | Seals only on delves whose wumpus is slain; stars are the best seals of a delve     | Quests reward how you won, never a loss                                    |
-| 2026-10-02 | Only the first Daily Delve of the day counts; replays are practice in the same cave | The same cave for everyone, one result each                                |
-| 2026-10-02 | The game's setup dialog stays, for free delves only                                 | It is the port's own; career and daily delves bring their own caves        |
-| 2026-10-02 | The planner's chambers became buttons                                               | An arrow could only be aimed with the mouse (hard rule 5)                  |
+| Date       | Decision                                                                            | Why                                                                                                                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-10-02 | The game opens on its own game menu, laid over a live cave                          | A title screen for the Hall's Escape, and somewhere for the career to live                                                                                                                 |
+| 2026-10-02 | A delve is won when its wumpus is slain; a delve left half-way reports a quit       | Honest results (ADR 0011)                                                                                                                                                                  |
+| 2026-10-02 | Seals only on delves whose wumpus is slain; stars are the best seals of a delve     | Quests reward how you won, never a loss                                                                                                                                                    |
+| 2026-10-02 | Only the first Daily Delve of the day counts; replays are practice in the same cave | The same cave for everyone, one result each                                                                                                                                                |
+| 2026-10-02 | The game's setup dialog stays, for free delves only                                 | It is the port's own; career and daily delves bring their own caves                                                                                                                        |
+| 2026-10-02 | The planner's chambers became buttons                                               | An arrow could only be aimed with the mouse (hard rule 5)                                                                                                                                  |
+| 2026-10-02 | Prompt C1: follows the Hall's sound, motion and pause (bridge 1.1)                  | ADR 0012; every sound passes one master level that follows the Hall's volume and mute, the Drone button stays the delver's; the pause already worked; no reduced-motion path exists to map |
 
 ## Open questions
 
@@ -92,3 +93,5 @@ can choose to do (fewer moves, no bats, arrows kept, the chart left closed), nev
   arrow slaying the wumpus as it passes through its chamber. Kept as built; the owner may want the
   original's rules as an option one day.
 - One night look only, as built.
+- No reduced-motion path: neither the Hall's setting nor the system's reaches the mist, spores and
+  wind (`docs/KNOWN-ISSUES.md`); prompt C1 did not invent one.

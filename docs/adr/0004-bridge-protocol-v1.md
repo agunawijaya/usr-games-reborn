@@ -1,6 +1,7 @@
 # 0004 — Bridge protocol v1 for hosted games
 
-- **Status:** Accepted
+- **Status:** Accepted; the host strip and the following of sound, motion and pause amended by
+  [0012](0012-bridge-1-1-strip-and-posters.md) (revision 1.1, same wire format)
 - **Date:** 2026-09-28
 
 ## Context

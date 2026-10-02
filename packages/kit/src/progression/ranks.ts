@@ -10,8 +10,10 @@ export type RankId = (typeof RANK_IDS)[number];
 export interface Rank {
   id: RankId;
   threshold: number;
-  /** The one-line welcome shown on rank-up and in the profile. */
+  /** The one-line welcome shown on rank-up and in the profile, in the Machine Room's Unix words. */
   flavour: string;
+  /** The same welcome in plain words, for Console Home and Holo Collection. */
+  plainFlavour: string;
 }
 
 export const RANKS: readonly Rank[] = [
@@ -19,26 +21,31 @@ export const RANKS: readonly Rank[] = [
     id: 'guest',
     threshold: 0,
     flavour: 'Just looking around. Pull up a chair; the machine does not mind.',
+    plainFlavour: 'Just looking around. Every game is open to you; pick one and press play.',
   },
   {
     id: 'user',
     threshold: 150,
     flavour: 'A home directory of your own, with your name on the door.',
+    plainFlavour: 'Your name is on the door now, with a shelf of your own for what you win.',
   },
   {
     id: 'staff',
     threshold: 2_700,
     flavour: 'Trusted around the machine. The night operator nods when you come in.',
+    plainFlavour: 'A regular here. The games have started to know your face.',
   },
   {
     id: 'wheel',
     threshold: 14_800,
     flavour: 'One step from the top. You know where the spare keys are kept.',
+    plainFlavour: 'One step from the top. You know where the spare keys are kept.',
   },
   {
     id: 'root',
     threshold: 48_000,
     flavour: 'The whole machine is yours. Listen: the server closet hums back.',
+    plainFlavour: 'The top of the collection. Listen: the server closet hums back.',
   },
 ];
 

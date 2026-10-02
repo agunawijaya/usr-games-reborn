@@ -39,24 +39,24 @@ takes you back to the Hall.
 The game is played by typing; the mouse works the buttons and the exits. Keys are the game’s own
 and cannot be remapped from the Hall.
 
-| Action                                   | Keyboard                                                           | Mouse                                    |
-| ---------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------- |
-| Do something                             | Type a command, then Enter                                         | —                                        |
-| Move                                     | `ahead`, `back`, `left`, `right`, `up`, `down` (or `a b l r u d`)  | The exit buttons on the scene            |
-| Complete a word                          | Tab (Shift+Tab goes back through the choices)                      | —                                        |
-| Repeat an earlier command                | ↑ / ↓                                                              | —                                        |
-| Hints                                    | `` ` ``                                                            | Hints                                    |
-| Override panel and world map             | Shift+`` ` `` (`~`) or Ctrl+M                                      | Override or Map                          |
-| Save                                     | Type `save` and name the slot                                      | Save                                     |
-| Load a saved game                        | —                                                                  | Load                                     |
-| Back to the title dialog                 | —                                                                  | New                                      |
-| Settings                                 | —                                                                  | Settings                                 |
-| Sound on or off (off at the start)       | —                                                                  | Sound                                    |
-| How to play                              | F1                                                                 | Help                                     |
-| Close a panel or dialog                  | Esc                                                                | × or the dialog’s button                 |
-| Leave for the Hall from the title dialog | Esc                                                                | ← Back to the Hall on the Hall’s strip   |
-| Leave for the Hall during a game         | Type `quit`, close the end dialog, then Esc; or the browser’s Back | Move to the top edge; ← Back to the Hall |
-| Start again from the Hall’s strip        | —                                                                  | Move to the top edge; Game menu          |
+| Action                                   | Keyboard                                                           | Mouse                                     |
+| ---------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------- |
+| Do something                             | Type a command, then Enter                                         | —                                         |
+| Move                                     | `ahead`, `back`, `left`, `right`, `up`, `down` (or `a b l r u d`)  | The exit buttons on the scene             |
+| Complete a word                          | Tab (Shift+Tab goes back through the choices)                      | —                                         |
+| Repeat an earlier command                | ↑ / ↓                                                              | —                                         |
+| Hints                                    | `` ` ``                                                            | Hints                                     |
+| Override panel and world map             | Shift+`` ` `` (`~`) or Ctrl+M                                      | Override or Map                           |
+| Save                                     | Type `save` and name the slot                                      | Save                                      |
+| Load a saved game                        | —                                                                  | Load                                      |
+| Back to the title dialog                 | —                                                                  | New                                       |
+| Settings                                 | —                                                                  | Settings                                  |
+| Sound on or off (see Settings)           | —                                                                  | Sound                                     |
+| How to play                              | F1                                                                 | Help                                      |
+| Close a panel or dialog                  | Esc                                                                | × or the dialog’s button                  |
+| Leave for the Hall from the title dialog | Esc                                                                | ← Back to the Hall on the Hall’s strip    |
+| Leave for the Hall during a game         | Type `quit`, close the end dialog, then Esc; or the browser’s Back | ← Back to the Hall on the Hall’s strip    |
+| Start again from the Hall’s strip        | —                                                                  | Game menu on the Hall’s strip, then Leave |
 
 ### Dogfight keys
 
@@ -125,19 +125,24 @@ challenge. A game can be saved in named slots and continued later in the same br
 
 ## Settings
 
-The game’s own Settings dialog; the Hall’s settings apply to the Hall around it.
+The game’s own Settings dialog. Of the Hall’s settings, its sound and reduced motion reach the game
+too (below); the rest apply to the Hall around it.
 
 | Setting              | Options                | Default                                                                               |
 | -------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
 | Graphics             | High · Low · Text only | Chosen for your machine: High with a graphics card, Low without, Text without WebGL 2 |
 | High contrast        | on · off               | off                                                                                   |
-| Reduce motion        | on · off               | Your system’s setting the first time                                                  |
+| Reduce motion        | on · off               | Your system’s setting the first time; in the Hall, the Hall’s setting                 |
 | Turn-based dogfights | on · off               | On when your system asks for reduced motion                                           |
 | Strict parser        | on · off               | off (typo help on)                                                                    |
-| Sound                | on · off (top bar)     | off                                                                                   |
+| Sound                | on · off (top bar)     | off (in the Hall, as the Hall’s sound is, from your first click or key)               |
 
 Changing Graphics or Reduce motion reloads the page; the title dialog then offers to Continue
-from the automatic save.
+from the automatic save. A change to the Hall’s reduced-motion setting applies at once, without a
+reload. In the Hall the sound follows the Hall’s: silent while the Hall is muted, otherwise on at
+the Hall’s volume from your first click or key in the game; the Sound button still works during
+the visit. While the Hall pauses, or the tab is hidden, the scene, a dogfight’s clock, the hint
+panel’s autoplay and the sound all wait, and carry on exactly where they were.
 
 ## Scoring
 

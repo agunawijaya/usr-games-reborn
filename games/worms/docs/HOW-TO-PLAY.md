@@ -13,23 +13,23 @@ The toolbar fades after about three seconds without input and comes back when yo
 or press a key. Keys are the game’s own and cannot be remapped from the Hall; the letter keys are
 ignored while you are typing in a settings field.
 
-| Action                                | Keyboard                                     | Mouse                                       |
-| ------------------------------------- | -------------------------------------------- | ------------------------------------------- |
-| Open or close the settings            | S (Esc also closes them)                     | The settings button (sliders icon)          |
-| Classic terminal view on or off       | C                                            | Classic                                     |
-| Split view on or off                  | V                                            | Split                                       |
-| Back to the abyss                     | C or V again                                 | Abyssal                                     |
-| Move the split divider                | Tab to the divider, then ← / →               | Drag the divider                            |
-| Pause or resume the worms             | Space                                        | —                                           |
-| Restart with the same options         | R                                            | Restart, in the settings                    |
-| Sound on or off (off at the start)    | M                                            | The speaker button                          |
-| Fullscreen                            | F                                            | The fullscreen button                       |
-| How many, how long, how fast          | Tab to a slider in the settings, then ← / →  | The `-n`, `-l` and `-d` sliders             |
-| Letter field, trails                  | Tab to the box, then Space                   | The `-f` and `-t` boxes                     |
-| Start from a command line             | Type after `$ worms` in the settings, then ↵ | —                                           |
-| Cell size, quality, a new random seed | Tab to them in the settings                  | The lower half of the settings              |
-| Leave for the Hall                    | Tab to the Hall’s strip                      | Move to the top edge; ← Back to the Hall    |
-| Start Abyssal Worms afresh            | Tab to the Hall’s strip                      | Move to the top edge; Game menu, then Leave |
+| Action                                | Keyboard                                     | Mouse                                     |
+| ------------------------------------- | -------------------------------------------- | ----------------------------------------- |
+| Open or close the settings            | S (Esc also closes them)                     | The settings button (sliders icon)        |
+| Classic terminal view on or off       | C                                            | Classic                                   |
+| Split view on or off                  | V                                            | Split                                     |
+| Back to the abyss                     | C or V again                                 | Abyssal                                   |
+| Move the split divider                | Tab to the divider, then ← / →               | Drag the divider                          |
+| Pause or resume the worms             | Space                                        | —                                         |
+| Restart with the same options         | R                                            | Restart, in the settings                  |
+| Sound on or off (see Settings)        | M                                            | The speaker button                        |
+| Fullscreen                            | F                                            | The fullscreen button                     |
+| How many, how long, how fast          | Tab to a slider in the settings, then ← / →  | The `-n`, `-l` and `-d` sliders           |
+| Letter field, trails                  | Tab to the box, then Space                   | The `-f` and `-t` boxes                   |
+| Start from a command line             | Type after `$ worms` in the settings, then ↵ | —                                         |
+| Cell size, quality, a new random seed | Tab to them in the settings                  | The lower half of the settings            |
+| Leave for the Hall                    | Shift+Tab to the Hall’s strip                | ← Back to the Hall on the Hall’s strip    |
+| Start Abyssal Worms afresh            | Shift+Tab to the Hall’s strip                | Game menu on the Hall’s strip, then Leave |
 
 ## Rules
 
@@ -81,9 +81,14 @@ There is no daily challenge.
 Terminal pace is how fast a 9600-baud terminal could draw the worms: about 12.5 ms a step for each
 worm, never quicker than 33 ms. Sliders and boxes change the worms live; a command line, a new cell
 size or a new seed starts a fresh launch, and so does resizing the window, like opening a new
-terminal. Abyssal Worms follows your system’s reduced-motion setting: no shimmer, sway or drifting
-snow, and no more than about seven steps a second. It has a single night look; the Hall’s strip
-follows the Hall’s light or dark appearance.
+terminal. Abyssal Worms follows the Hall’s reduced-motion setting as soon as you change it (on its
+own, your system’s): no shimmer, sway or drifting snow, and no more than about seven steps a second.
+In the Hall its sound follows the Hall’s: on at the Hall’s volume, silent while the Hall is muted,
+and the speaker button and M still work during the visit (if the browser held the sound back, your
+first key or click starts it). On its own it starts silent. While the Hall pauses, or the tab is
+hidden, the abyss holds still and quiet and carries on exactly where it was; your own pause and
+mute stay as you left them. It has a single night look; the Hall’s strip follows the Hall’s light
+or dark appearance.
 
 ## Scoring
 

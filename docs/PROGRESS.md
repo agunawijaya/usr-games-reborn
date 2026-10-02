@@ -10,6 +10,8 @@ Status values: `coming-soon`, `adopting`, `in progress`, `hero frames` (waiting 
 
 **Foundation:** 00 foundation + 00a Hall styles — approved by the owner on 2026-09-30. The Hall in three styles (Console Home, the default; Holo Collection; the Machine Room in Phosphor, Manual Page and Sunset Lab), every screen in each, light and dark: login, style picker, Home, game page, player (pause, results, hosted strip), profile, settings, About, server closet, rank-up. Screenshots in `docs/media/hall/`.
 
+**Consolidation C1** (2026-10-02, waiting for the owner at its review checkpoint): the Hall's config loads under Vite's native loader; `pnpm run docs:readme`; Robots builds with its own Vite everywhere; the Mermaid test no longer times out; the dev server follows new manifests; settings choices take pictures; plain-word rank welcomes in the kit; the hosted strip sits above the game (Mute · Game menu · Back to the Hall) and never covers it; bridge revision 1.1: every hosted game but trek follows the Hall's sound, motion and pause; Hunt playable by keyboard alone; Rain's Show controls; hosted posters kept between visits and captured at build time (ADR 0012). Review shots and critique of Lightkeeper, Zoomies and Control Room 1986 in `docs/media/review/REVIEW.md`.
+
 | id | Title | Kind | Status | Prompt | Notes |
 | --- | --- | --- | --- | --- | --- |
 | pom | Selene | hosted | shipped | 01 | adopted as built; toy XP once a day; light look missing (KNOWN-ISSUES) |

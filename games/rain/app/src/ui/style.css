@@ -96,6 +96,29 @@ body.idle .bar { transform: translate(-50%, 8px); }
 body.idle { cursor: none; }
 body.hidden-ui .chrome, body.hidden-ui .caption { display: none; }
 
+/* With every control hidden (H): one quiet way back, in the captions' voice, that fades with
+   the rest when the pointer rests, unless the keyboard has put it in focus. */
+.show-ui {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 12px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+  transition: opacity var(--fade) ease, color var(--fade) ease;
+}
+.show-ui kbd { letter-spacing: 0; color: var(--ink-dim); }
+.show-ui:hover, .show-ui:focus-visible { color: var(--ink); }
+body.hidden-ui .show-ui { display: inline-flex; }
+body.idle .show-ui:not(:focus-visible) { opacity: 0; pointer-events: none; }
+
 #title {
   position: fixed;
   left: 22px;
@@ -287,3 +310,5 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   :root { --fade: 0.01s; }
 }
+/* the same, when the Hall's own reduced-motion setting asks for it (hall.js) */
+:root[data-reduced-motion] { --fade: 0.01s; }

@@ -1,11 +1,14 @@
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { fromRepo } from './paths';
+import { fromRepo } from './paths.ts';
 
 export type BridgeFiles = { 'bridge.js': string; 'bridge.mjs': string };
+
+/** Where the built site lists the hosted games' build-time posters (see posters.ts). */
+export const POSTER_LIST = 'play/posters.js';
 export type BuildBridge = (options?: { outDir?: string; write?: boolean }) => Promise<BridgeFiles>;
 
 /**
@@ -97,40 +100,64 @@ export function viteCliFor(source: string): { cli: string; own: boolean } {
   };
 }
 
+export interface ViteCliRun {
+  status: number | null;
+  /** What the CLI printed, when it was asked to stay quiet. */
+  output: string;
+}
+
 /**
- * Runs a hosted game's own Vite build. The CLI runs under Node with an argument array and no
- * shell, so `--base /play/<id>/` reaches Vite untouched (Git Bash would otherwise rewrite a
- * leading-slash argument into a Windows path). If the CLI build fails, the workspace's Vite
- * JS API is the fallback.
+ * Runs a Vite CLI build under Node with an argument array and no shell, so `--base /play/<id>/`
+ * reaches Vite untouched (Git Bash would otherwise rewrite a leading-slash argument into a
+ * Windows path). It runs as a child process, so the dev server's event loop keeps serving.
+ */
+export function runViteCli(
+  cli: string,
+  options: { source: string; base: string; outDir: string; quiet: boolean },
+): Promise<ViteCliRun> {
+  const args = [cli, 'build', '--base', options.base, '--outDir', options.outDir, '--emptyOutDir'];
+  return new Promise((resolveRun, rejectRun) => {
+    const child = spawn(process.execPath, args, {
+      cwd: options.source,
+      // The dev server runs with NODE_ENV=development, which would hand the game a
+      // development build of its libraries; the game is always served as it ships.
+      env: { ...process.env, NODE_ENV: 'production' },
+      stdio: options.quiet ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+    });
+    let output = '';
+    child.stdout?.on('data', (chunk: Buffer) => (output += chunk.toString()));
+    child.stderr?.on('data', (chunk: Buffer) => (output += chunk.toString()));
+    child.on('error', rejectRun);
+    child.on('close', (status) => resolveRun({ status, output }));
+  });
+}
+
+/**
+ * Builds a hosted game with its own Vite, the one its config and plugins were written for, so
+ * the dev server and `pnpm build` produce the same game (Robots stays on its Vite 5 and its
+ * React plugin). Only when no CLI resolves, or it fails, does the workspace's Vite JS API try.
+ * `quiet` keeps the CLI's output for the error instead of printing it (the dev server).
  */
 export async function buildHostedViteGame(
   source: string,
   base: string,
   outDir: string,
+  options: { quiet?: boolean } = {},
 ): Promise<'own' | 'workspace'> {
+  let failure = '';
   try {
     const { cli, own } = viteCliFor(source);
-    const result = spawnSync(
-      process.execPath,
-      [cli, 'build', '--base', base, '--outDir', outDir, '--emptyOutDir'],
-      {
-        cwd: source,
-        stdio: 'inherit',
-      },
-    );
-    if (result.status === 0) return own ? 'own' : 'workspace';
+    const run = await runViteCli(cli, { source, base, outDir, quiet: options.quiet ?? false });
+    if (run.status === 0) return own ? 'own' : 'workspace';
+    failure = run.output;
   } catch {
     // No resolvable Vite CLI: fall through to the JS API below.
   }
-  await buildWithViteApi(source, base, outDir);
+  try {
+    await buildWithViteApi(source, base, outDir);
+  } catch (error) {
+    if (failure) (error as Error).message += `\n\nThe game's own Vite said:\n${failure}`;
+    throw error;
+  }
   return 'workspace';
-}
-
-/** The dev server builds without blocking its event loop, so it goes straight to the JS API. */
-export async function buildHostedViteGameInProcess(
-  source: string,
-  base: string,
-  outDir: string,
-): Promise<void> {
-  await buildWithViteApi(source, base, outDir);
 }

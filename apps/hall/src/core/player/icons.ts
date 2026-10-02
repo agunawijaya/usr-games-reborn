@@ -13,6 +13,8 @@ const PATHS = {
   flag: 'M6 21V4M6 4h11l-2.5 4L17 12H6',
   bolt: 'M13 3L5 13.5h6L10 21l8-10.5h-6z',
   rank: 'M12 3l2.4 4.8 5.3.8-3.9 3.7.9 5.3-4.7-2.5-4.7 2.5.9-5.3-3.9-3.7 5.3-.8zM8 21h8',
+  sound: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.6 7.6 0 0 1 0 10.8',
+  muted: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5',
 } as const;
 
 export type PlayerIconName = keyof typeof PATHS;

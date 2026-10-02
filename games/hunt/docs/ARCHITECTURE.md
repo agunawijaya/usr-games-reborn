@@ -131,9 +131,10 @@ Ottos.
 
 There is one dark look; the game does not read the Hall’s tokens. Auto quality picks High on a
 GPU and Lite on a software renderer, and drops a level after three seconds below 38 fps; without
-WebGL the terminal view takes over. Reduced motion is read once from the system at start
-(`reduced` in `main.js`, passed to the renderer): no camera shake or colour fringing, a softer hurt
-flash, faster easing of the light fields. No image or audio file is loaded anywhere
+WebGL the terminal view takes over. Reduced motion is read from the system at start (`reduced` in
+`main.js`, passed to the renderer) and, in the Hall, follows the Hall’s setting live through
+`renderer.reduced`: no camera shake, hit jolts or colour fringing, a softer hurt flash, faster
+easing of the light fields. No image or audio file is loaded anywhere
 (`app/tests/no-raster.test.js`).
 
 ## Where sounds are defined
@@ -143,15 +144,17 @@ position and quieter with distance. The renderer emits an `sfx` event at the mom
 event plays out (`renderer.js`): fire, ricochet, scatter, boom, crumble, regrow, splat, death,
 enter, whoosh (thrown), land, absorb, zing, volcano, and the small ones (move, turn, bump, hot,
 scan, cloak, trip, defuse, boots). `main.js` adds the hurt sound and a soft tick when the key queue
-is full. Sound is off until the player presses SOUND; the first press creates the audio context.
-The Hall’s volume settings do not reach it.
+is full. On its own, sound is off until the player presses SOUND; the first press creates the
+audio context and ramps the master gain to 0.8. In the Hall it starts at the Hall’s level instead
+(0.8 scaled by the Hall’s volume, silent while the Hall is muted), and the audio context starts on
+the first click or key in the frame.
 
 ## Hall integration
 
 `app/src/hall.js` holds all of it. `index.html` loads the bridge as a classic script
 (`../../bridge/bridge.js`, after the import map and just before `main.js`), and `hall.js` connects
-with `globalThis.UsrGamesBridge?.connectToHall({ id: 'hunt' })`; opened on its own, the script is
-missing or not hosted and every call does nothing. Everything is read from the events each engine
+with `globalThis.UsrGamesBridge?.connectToHall({ id: 'hunt', onSound, onReducedMotion })`; opened
+on its own, the script is missing or not hosted and every call does nothing. Everything is read from the events each engine
 step already returns, through `noteEvents` in `main.js`’s `syncFrame`.
 
 | Hunt moment                                                     | Bridge message                                                |
@@ -175,8 +178,15 @@ the player ends it from the pause menu. `score` is the player’s tags (`gkills`
 `defused`; `tags` and `bankShots` feed the manifest’s weekly goals. `xpEvents`: `tags`, 3 XP per
 tag, at most 25. Once any Override flag has been turned on (`g.cheated`), the result has no score,
 `tags` is 0, there are no XP events, and no further packages are sent. Packages are sent once per
-page load. Hunt ignores the Hall’s pause, appearance and settings messages: it has its own pause,
-one look and its own sound switch.
+page load. Hunt ignores the Hall’s appearance messages (it has one look) and, for now, its pause:
+a match keeps running while the Hall pauses or the tab is hidden (an open issue; Esc is the game’s
+own pause). Since bridge 1.1 it follows the Hall’s sound and reduced motion:
+
+| In `hall.js`                          | What it does                                                                                                                                                                                                                                          |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `followHall`                          | Called once by `main.js` with the audio, the SOUND switch and the renderer; in the Hall it listens for the first click or key in the frame (`wakeSound`), which creates or resumes the audio context                                                  |
+| `onSound` → `applyHallSound`          | Sets `audio.muted` and the master gain to the Hall’s volume scaled from the switch’s 0.8 (`soundLevel`), silent while the Hall is muted, and writes the switch’s own label and `aria-pressed`; SOUND still works until the Hall’s sound changes again |
+| `onReducedMotion` → `applyHallMotion` | Replaces `renderer.reduced`, which the renderer reads as it draws (camera shake, hit jolts, colour fringing, how slowly sight lines light up) and the hurt flash in `main.js` reads too                                                               |
 
 **Why `main.js` asks for the trip to the Hall itself.** The bridge normally sends
 `navigate { to: 'hall' }` for Escape on the title screen, but only when the page has not handled the
@@ -188,6 +198,9 @@ The changes to the game’s own files are one import and these calls in `main.js
 URL-only warp); `reportMatchEnded` before Restart seed (`p-restart`) and New match (`p-new`);
 `leaveFromSetup` for Escape on the setup; and the poster offer after `renderer.frame`. Plus the
 font and bridge lines in `index.html` and the port in `package.json` (see [NOTES](NOTES.md)).
+Prompt C1 added `followHall` once the renderer is built, the hurt flash reading `r.reduced`, and
+one line in `input.js` that leaves Tab to the browser outside live play, so it moves focus on the
+setup and pause menus and out of the frame to the Hall’s strip.
 
 ## Tests
 

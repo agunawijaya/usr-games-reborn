@@ -44,6 +44,9 @@ export class Input {
     const ui = UI_KEYS[e.key] || UI_CODES[e.code];
     if (ui) {
       if (isTextField(e.target) && ui !== 'pause') return;
+      // Tab is the scoreboard only in live play; on the setup and pause menus it moves focus
+      // between their buttons, and out of the frame when the game runs inside the Hall.
+      if (ui === 'scores' && !this.enabled) return;
       e.preventDefault();
       if (!e.repeat) this.onUi(ui, e);
       return;

@@ -6,6 +6,9 @@
 
 import * as THREE from 'three';
 
+/** The master gain while sound is on, as the mix was designed. */
+export const MASTER_LEVEL = 0.8;
+
 export function createAudio() {
   let ctx = null;
   let master;
@@ -16,6 +19,8 @@ export function createAudio() {
   let brownBuf;
   let started = false;
   let muted = false;
+  // Inside /usr/games Reborn the Hall's volume slider scales this (src/hall.js).
+  let level = MASTER_LEVEL;
   let camera = null;
   const amb = {};
   let windLevel = 3;
@@ -73,7 +78,7 @@ export function createAudio() {
     comp.threshold.value = -16;
     comp.ratio.value = 4;
     master = ctx.createGain();
-    master.gain.value = muted ? 0 : 0.8;
+    master.gain.value = muted ? 0 : level;
     master.connect(comp).connect(ctx.destination);
     reverb = ctx.createConvolver();
     reverb.buffer = impulse(3.2, 2.6);
@@ -181,9 +186,16 @@ export function createAudio() {
     setWind,
     setMuted(m) {
       muted = m;
-      if (master) master.gain.setTargetAtTime(m ? 0 : 0.8, ctx.currentTime, 0.1);
+      if (master) master.gain.setTargetAtTime(m ? 0 : level, ctx.currentTime, 0.1);
     },
     get muted() { return muted; },
+    setLevel(l) {
+      level = l;
+      if (master && !muted) master.gain.setTargetAtTime(l, ctx.currentTime, 0.1);
+    },
+    get level() { return level; },
+    /** The AudioContext once a gesture has started it, else null. */
+    get context() { return ctx; },
 
     cannon(pos, load = 3) {
       if (!ok()) return;

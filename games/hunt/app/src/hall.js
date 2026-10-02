@@ -6,11 +6,22 @@
 // match counts as a session when the player ends it from the pause menu: New match or Restart.
 // Everything else is read from the events each engine step already returns. Overridden
 // (cheated) matches earn no packages, no XP events and no score.
+//
+// In the Hall the game's sound and motion follow the Hall's settings (followHall).
 
 import { SLIME } from './engine/constants.js';
 import { scoreboard } from './engine/match.js';
 
-const hall = globalThis.UsrGamesBridge?.connectToHall({ id: 'hunt' }) ?? null;
+let hallSound = null; // the Hall's latest { volume, muted }
+let hallReducedMotion = null;
+let gameHandles = null; // { audio, soundSwitch, renderer }, once main.js has built them
+
+const hall =
+  globalThis.UsrGamesBridge?.connectToHall({
+    id: 'hunt',
+    onSound: (sound) => { hallSound = sound; applyHallSound(); },
+    onReducedMotion: (reduced) => { hallReducedMotion = reduced; applyHallMotion(); },
+  }) ?? null;
 const installed = new Set();
 const WALL_BREAKER_CHARGE = 49; // a 7×7 charge
 const XP_PER_TAG = 3;
@@ -133,4 +144,52 @@ export function posterWanted() {
 export function offerPoster(canvas) {
   posterSent = true;
   hall.posterFromCanvas(canvas);
+}
+
+// Sound: on its own the game starts silent and its SOUND switch ramps the master gain to 0.8. In
+// the Hall it starts at the Hall's level instead, and the Hall's mute silences it. The switch
+// keeps working during the visit; the next change of the Hall's volume or mute wins again.
+const SWITCHED_ON_GAIN = 0.8;
+
+/** main.js hands over what the Hall's settings act on, once the renderer is built (or null). */
+export function followHall({ audio, soundSwitch, renderer }) {
+  if (!hall?.hosted) return;
+  gameHandles = { audio, soundSwitch, renderer };
+  // The browser lets an AudioContext start only from a gesture; on its own that gesture is the
+  // SOUND switch, here it is the player's first click or key in the frame.
+  addEventListener('pointerdown', wakeSound, true);
+  addEventListener('keydown', wakeSound, true);
+  applyHallSound();
+  applyHallMotion();
+}
+
+function applyHallSound() {
+  if (!gameHandles || !hallSound) return;
+  const { audio, soundSwitch } = gameHandles;
+  const level = globalThis.UsrGamesBridge.soundLevel(hallSound, SWITCHED_ON_GAIN);
+  audio.muted = level === 0;
+  // The switch's own labels, as main.js writes them.
+  soundSwitch.textContent = audio.muted ? 'SOUND: OFF' : 'SOUND: ON';
+  soundSwitch.setAttribute('aria-pressed', String(!audio.muted));
+  if (!audio.ctx) return; // wakeSound makes it on the first gesture
+  const now = audio.ctx.currentTime;
+  audio.master.gain.cancelScheduledValues(now);
+  audio.master.gain.setTargetAtTime(level, now, 0.05);
+}
+
+function wakeSound() {
+  const { audio } = gameHandles;
+  if (audio.muted || audio.ctx?.state === 'running') return;
+  if (!audio.ctx) audio.init();
+  if (audio.ctx.state === 'suspended') audio.ctx.resume();
+  applyHallSound();
+}
+
+// Reduced motion: the renderer reads its `reduced` flag as it draws (camera shake, hit jolts, how
+// slowly sight lines light up), so the Hall's setting simply replaces the one main.js read from
+// the system. The red hurt flash reads it from the renderer too.
+function applyHallMotion() {
+  if (gameHandles?.renderer && hallReducedMotion !== null) {
+    gameHandles.renderer.reduced = hallReducedMotion;
+  }
 }

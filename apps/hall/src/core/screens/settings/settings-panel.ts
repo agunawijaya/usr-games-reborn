@@ -55,6 +55,12 @@ export interface SettingsPanelOptions {
   gameId?: string;
   /** Called after "Forget my data" has wiped everything. */
   onForget?: () => void;
+  /**
+   * A picture for each choice of a section, drawn by the style in its own chrome (Console Home
+   * shows its skins as swatches, Holo Collection its foils). It sits before the choice's label and
+   * is decoration only: the label still names the choice.
+   */
+  choiceMedia?: Partial<Record<SettingsSection, (value: string) => Child>>;
 }
 
 export interface SettingsPanel {
@@ -99,7 +105,14 @@ function radioGroup<T extends string>(options: {
   name: string;
   legend: string;
   hint?: string;
-  choices: { value: T; label: string; detail?: string; disabled?: boolean; note?: string }[];
+  choices: {
+    value: T;
+    label: string;
+    detail?: string;
+    disabled?: boolean;
+    note?: string;
+    media?: Child;
+  }[];
   selected: T;
   layout: 'pills' | 'cards';
   onChange: (value: T) => void;
@@ -161,6 +174,9 @@ function radioGroup<T extends string>(options: {
               arrowed = false;
             },
           }),
+          choice.media
+            ? h('span', { class: 'set-choice__media', 'aria-hidden': 'true' }, choice.media)
+            : null,
           h('span', { class: 'set-choice__label' }, choice.label),
           choice.detail ? h('span', { class: 'set-choice__detail' }, choice.detail) : null,
           choice.note ? h('span', { class: 'set-choice__note' }, choice.note) : null,
@@ -220,7 +236,12 @@ function unlockNote(cosmetic: Cosmetic, wording: Wording): string {
     : `Unlocks at rank ${rank}`;
 }
 
-function paletteSection(store: HallStore, wording: Wording, name: string): HTMLElement {
+function paletteSection(
+  store: HallStore,
+  wording: Wording,
+  name: string,
+  media?: (value: string) => Child,
+): HTMLElement {
   const { settings, progression, appearance } = store.snapshot();
   if (settings.style === 'machine-room') {
     return section(
@@ -253,6 +274,7 @@ function paletteSection(store: HallStore, wording: Wording, name: string): HTMLE
     detail?: string;
     disabled?: boolean;
     note?: string;
+    media?: Child;
   }[] = [
     { value: 'default', label: 'Standard' },
     ...COSMETICS.filter((c) => c.kind === kind).map((c) => {
@@ -265,7 +287,7 @@ function paletteSection(store: HallStore, wording: Wording, name: string): HTMLE
         ...(unlocked ? {} : { note: unlockNote(c, wording) }),
       };
     }),
-  ];
+  ].map((choice) => (media ? { ...choice, media: media(choice.value) } : choice));
   const current = settings[key];
   const selected = choices.some((c) => c.value === current && !c.disabled) ? current : 'default';
   return section(
@@ -469,7 +491,7 @@ function renderSections(options: SettingsPanelOptions, name: string, rerender: (
         );
         break;
       case 'palette':
-        built.push(paletteSection(store, wording, `${name}-palette`));
+        built.push(paletteSection(store, wording, `${name}-palette`, options.choiceMedia?.palette));
         break;
       case 'appearance':
         built.push(

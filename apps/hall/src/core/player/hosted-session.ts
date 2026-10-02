@@ -8,9 +8,10 @@ import {
 import { paletteOf, tokensToCss } from '@usr-games/kit';
 import type { HallSnapshot } from '../../store/hall-store';
 import { h } from '../../ui/h';
-import { rememberGamePoster } from '../art/art';
+import { keepGamePoster } from '../art/poster-shelf';
 import { tokensFor } from '../palette';
 import { hallLink, keyCap, labelNodes } from './chrome';
+import { playerIcon } from './icons';
 import type { Session, SessionOptions } from './native-session';
 import { confirmDialog } from './overlays';
 import { announcements, packageLookup } from './receipt';
@@ -18,12 +19,14 @@ import { createToasts } from './toasts';
 import { LABELS } from './wording';
 
 /**
- * Runs a hosted game: its own page in a full-screen frame, talking to the Hall over the bridge.
- * The game draws its own menus and results; the Hall adds a slim strip along the top with the
- * way out, which tucks itself away during play and comes back on hover or keyboard focus.
+ * Runs a hosted game: its own page in a frame, talking to the Hall over the bridge. The game
+ * draws its own menus and results. Above it the Hall keeps a slim strip with the ways out and
+ * the Hall's mute, always in view: the frame is laid out below the strip, so it never covers
+ * the game's own top bar, and the game never changes size while it runs.
  */
 
-const STRIP_LINGER_MS = 2_500;
+/** Why the Hall is holding the game still: its tab is hidden, or it is asking the player. */
+type PauseReason = 'hidden' | 'asking';
 
 export function appearancePayload(snapshot: HallSnapshot): AppearancePayload {
   const theme = paletteOf(snapshot.settings);
@@ -57,16 +60,34 @@ export function helloFor(gameId: string, snapshot: HallSnapshot): HelloPayload {
   };
 }
 
+/** The Hall's mute as a toggle on the strip; it silences the Hall and the game alike. */
+function muteToggle(options: Pick<SessionOptions, 'store'>) {
+  const { store } = options;
+  const button = h('button', {
+    type: 'button',
+    class: 'pl-button pl-button--quiet pl-strip__mute',
+    'aria-label': 'Mute',
+    title: 'Mute the Hall and this game',
+    dataset: { testid: 'pl-strip-mute' },
+    onclick: () => store.settings.update({ muted: !store.snapshot().settings.muted }),
+  });
+  const show = (muted: boolean) => {
+    button.setAttribute('aria-pressed', String(muted));
+    button.replaceChildren(playerIcon(muted ? 'muted' : 'sound'));
+  };
+  show(store.snapshot().settings.muted);
+  return { element: button, show };
+}
+
 export function startHostedSession(options: SessionOptions & { frameUrl: string }): Session {
   const { entry, store, wording } = options;
   const gameId = entry.manifest.id;
   const lookup = packageLookup(store.catalog);
 
   let onTitle = false;
-  let pointerOnStrip = false;
-  let lingerTimer: ReturnType<typeof setTimeout> | undefined;
   let confirming: { close(): void } | null = null;
   let destroyed = false;
+  const pauseReasons = new Set<PauseReason>();
 
   const frame = h('iframe', {
     class: 'pl-frame',
@@ -91,6 +112,7 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
     },
     labelNodes(LABELS.gameMenu),
   );
+  const mute = muteToggle({ store });
   const strip = h(
     'header',
     { class: 'pl-strip', dataset: { testid: 'pl-strip' } },
@@ -104,57 +126,46 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
     h(
       'nav',
       { class: 'pl-strip__actions', 'aria-label': 'Leave the game' },
+      mute.element,
       menuButton,
       hallLink('pl-strip__hall', () => options.leave()),
     ),
   );
-  // The frame swallows pointer events, so a thin zone above it notices the pointer arriving.
-  const hotZone = h('div', { class: 'pl-hotzone', 'aria-hidden': 'true' });
   const layer = h('div', { class: 'pl-layer' });
   const toasts = createToasts({ persist: options.frozen });
   const element = h(
     'main',
     {
       id: 'screen',
-      class: 'pl-page pl-page--hosted is-strip-open',
+      class: 'pl-page pl-page--hosted',
       'aria-label': entry.manifest.title,
       dataset: { game: gameId },
     },
-    hotZone,
     strip,
     frame,
     layer,
     toasts.element,
   );
 
-  function stripWanted(): boolean {
-    return onTitle || pointerOnStrip || strip.contains(document.activeElement) || !!confirming;
-  }
-
-  function showStrip() {
-    clearTimeout(lingerTimer);
-    element.classList.add('is-strip-open');
-  }
-
-  function tuckStripSoon() {
-    clearTimeout(lingerTimer);
-    if (options.frozen) return;
-    lingerTimer = setTimeout(() => {
-      if (!stripWanted()) element.classList.remove('is-strip-open');
-    }, STRIP_LINGER_MS);
-  }
-
   function setTitleScreen(active: boolean) {
     onTitle = active;
     hint.hidden = !active;
     element.classList.toggle('is-on-title', active);
-    if (active) showStrip();
-    else tuckStripSoon();
   }
 
   function focusFrame() {
     frame.focus({ preventScroll: true });
     frame.contentWindow?.focus();
+  }
+
+  function holdGame(reason: PauseReason, held: boolean) {
+    const wasPaused = pauseReasons.size > 0;
+    if (held) pauseReasons.add(reason);
+    else pauseReasons.delete(reason);
+    const paused = pauseReasons.size > 0;
+    if (paused === wasPaused) return;
+    if (paused) host.pause();
+    else host.resume();
   }
 
   function reloadGame() {
@@ -167,7 +178,7 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
     focusFrame();
   }
 
-  /** Mid-round, Game menu asks first; the game's own title screen reloads straight away. */
+  /** Mid-round, Game menu asks first (holding the game still); its title screen reloads at once. */
   async function toGameMenu() {
     if (!onTitle) {
       const dialog = confirmDialog(layer, {
@@ -177,12 +188,13 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
         confirm: 'Leave',
       });
       confirming = dialog;
+      holdGame('asking', true);
       const confirmed = await dialog.result;
       confirming = null;
       if (destroyed) return;
+      holdGame('asking', false);
       if (!confirmed) {
         focusFrame();
-        tuckStripSoon();
         return;
       }
     }
@@ -210,18 +222,18 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
       else reloadGame();
     },
     onTitleScreen: setTitleScreen,
-    onPoster: (poster) => rememberGamePoster(gameId, poster.image),
+    onPoster: (poster) => keepGamePoster(store.storage, gameId, poster.image),
   });
 
   const stopStore = store.subscribe((snapshot, change) => {
     if (change !== 'settings' && change !== 'reset') return;
+    mute.show(snapshot.settings.muted);
     host.sendAppearance(appearancePayload(snapshot));
     host.sendSettings(bridgeSettings(snapshot));
   });
 
   function onVisibility() {
-    if (document.hidden) host.pause();
-    else host.resume();
+    holdGame('hidden', document.hidden);
   }
 
   // Focus sits on the strip here; inside the frame, the bridge handles Escape itself.
@@ -232,29 +244,16 @@ export function startHostedSession(options: SessionOptions & { frameUrl: string 
     else focusFrame();
   }
 
-  hotZone.addEventListener('pointerenter', showStrip);
-  strip.addEventListener('pointerenter', () => {
-    pointerOnStrip = true;
-    showStrip();
-  });
-  strip.addEventListener('pointerleave', () => {
-    pointerOnStrip = false;
-    tuckStripSoon();
-  });
-  strip.addEventListener('focusin', showStrip);
-  strip.addEventListener('focusout', tuckStripSoon);
   frame.addEventListener('load', () => {
     if (!strip.contains(document.activeElement) && !confirming) focusFrame();
   });
   window.addEventListener('keydown', onKeyDown);
   document.addEventListener('visibilitychange', onVisibility);
-  tuckStripSoon();
 
   return {
     element,
     destroy() {
       destroyed = true;
-      clearTimeout(lingerTimer);
       confirming?.close();
       host.destroy();
       stopStore();

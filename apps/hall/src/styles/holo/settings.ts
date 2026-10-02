@@ -61,6 +61,11 @@ function sampleCard(context: HoloContext): HTMLElement {
   return card;
 }
 
+/** Each foil finish as a little card of the foil itself, beside its name in the panel. */
+function foilSwatch(finish: string): HTMLElement {
+  return h('span', { class: 'hc-foil-swatch', dataset: { finish } });
+}
+
 const FOCUSABLE = 'input:not([disabled]), button:not([disabled]), select:not([disabled])';
 
 /** Buttons that bring a section into view and put focus on its first control. */
@@ -105,7 +110,11 @@ function sectionIndex(panel: HTMLElement, context: HoloContext): HTMLElement {
 }
 
 export function settingsScreen(context: HoloContext): HoloScreen {
-  const panel = settingsPanel({ store: context.store, wording: 'plain' });
+  const panel = settingsPanel({
+    store: context.store,
+    wording: 'plain',
+    choiceMedia: { palette: foilSwatch },
+  });
   const caption = h('p', { class: 'hc-settings-sample__caption' }, finishName(context.snapshot));
   const aside = h(
     'div',

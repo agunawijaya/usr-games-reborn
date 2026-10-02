@@ -12,37 +12,38 @@ match and reports it to the Hall. Your Hall score is the number of rivals you ta
 ![The match setup, Hunt’s game menu, inside the Hall](media/title-1280.webp)
 
 The match setup is the game menu. Pick your options and press **ENTER THE MAZE**. Esc here takes
-you back to the Hall. Every choice is remembered on this device.
+you back to the Hall. Every choice is remembered on this device. In a 1280×720 window the setup
+scrolls, and ENTER THE MAZE sits below the fold.
 
 ## Controls
 
 The Modern scheme is the default; the Classic scheme is the original program’s own keys. Choose
 one under **Controls** on the setup. Either way, every action is a single original keystroke.
 
-| Action                                   | Modern                   | Classic                | Mouse (Modern only)                          |
-| ---------------------------------------- | ------------------------ | ---------------------- | -------------------------------------------- |
-| Step left, down, up, right (never turns) | A S W D                  | h j k l                | —                                            |
-| Face left, down, up, right               | ← ↓ ↑ →                  | H J K L                | Point where you want to face                 |
-| Shot (1 ammo)                            | Space or 1               | f or 1                 | Left button                                  |
-| Grenade, 3×3 blast (9)                   | E or 2                   | g or 2                 | Right button                                 |
-| Satchel charge, 5×5 (25)                 | R or 3                   | F or 3                 | —                                            |
-| Bomb, 7×7 (49)                           | 4                        | G or 4                 | —                                            |
-| Bigger bombs, 9×9 to 19×19 (81 to 361)   | 5 6 7 8 9 0              | 5 6 7 8 9 0            | —                                            |
-| Bomb, 21×21 (441)                        | unbound; set in Controls | @                      | —                                            |
-| Slime, 5 / 10 / 15 / 20 ammo             | Z X C V                  | o O p P                | —                                            |
-| Scan (1)                                 | Q                        | s                      | —                                            |
-| Cloak (1)                                | F                        | c                      | —                                            |
-| Pause and resume                         | Esc                      | Esc                    | Resume                                       |
-| How to play                              | `?`                      | `?`                    | How to play, Help                            |
-| Coach (ricochet preview)                 | `` ` ``                  | `` ` ``                | —                                            |
-| Override panel                           | `\`                      | `\`                    | —                                            |
-| Show or hide the scoreboard              | Tab                      | Tab                    | —                                            |
-| Next view: 3D, split, terminal           | F2                       | F2                     | View, in the pause menu                      |
-| Camera: overview or follow               | F3                       | F3                     | Camera, in the pause menu                    |
-| How to re-enter, while you are hit out   | C, S or F                | C, S or F              | Cloaked, Scanning, Flying                    |
-| Sound on or off (off at the start)       | —                        | —                      | SOUND                                        |
-| Leave for the Hall                       | Esc on the match setup   | Esc on the match setup | Top edge, then ← Back to the Hall            |
-| Start afresh on the match setup          | —                        | —                      | Top edge, then Game menu on the Hall’s strip |
+| Action                                   | Modern                                                      | Classic                | Mouse (Modern only)                       |
+| ---------------------------------------- | ----------------------------------------------------------- | ---------------------- | ----------------------------------------- |
+| Step left, down, up, right (never turns) | A S W D                                                     | h j k l                | —                                         |
+| Face left, down, up, right               | ← ↓ ↑ →                                                     | H J K L                | Point where you want to face              |
+| Shot (1 ammo)                            | Space or 1                                                  | f or 1                 | Left button                               |
+| Grenade, 3×3 blast (9)                   | E or 2                                                      | g or 2                 | Right button                              |
+| Satchel charge, 5×5 (25)                 | R or 3                                                      | F or 3                 | —                                         |
+| Bomb, 7×7 (49)                           | 4                                                           | G or 4                 | —                                         |
+| Bigger bombs, 9×9 to 19×19 (81 to 361)   | 5 6 7 8 9 0                                                 | 5 6 7 8 9 0            | —                                         |
+| Bomb, 21×21 (441)                        | unbound; set in Controls                                    | @                      | —                                         |
+| Slime, 5 / 10 / 15 / 20 ammo             | Z X C V                                                     | o O p P                | —                                         |
+| Scan (1)                                 | Q                                                           | s                      | —                                         |
+| Cloak (1)                                | F                                                           | c                      | —                                         |
+| Pause and resume                         | Esc                                                         | Esc                    | Resume                                    |
+| How to play                              | `?`                                                         | `?`                    | How to play, Help                         |
+| Coach (ricochet preview)                 | `` ` ``                                                     | `` ` ``                | —                                         |
+| Override panel                           | `\`                                                         | `\`                    | —                                         |
+| Show or hide the scoreboard              | Tab, during a match                                         | Tab, during a match    | —                                         |
+| Next view: 3D, split, terminal           | F2                                                          | F2                     | View, in the pause menu                   |
+| Camera: overview or follow               | F3                                                          | F3                     | Camera, in the pause menu                 |
+| How to re-enter, while you are hit out   | C, S or F                                                   | C, S or F              | Cloaked, Scanning, Flying                 |
+| Sound on or off (see Settings)           | —                                                           | —                      | SOUND                                     |
+| Leave for the Hall                       | Esc on the match setup                                      | Esc on the match setup | ← Back to the Hall on the Hall’s strip    |
+| Start afresh on the match setup          | Shift+Tab to the Hall’s strip, from the setup or pause menu | The same               | Game menu on the Hall’s strip, then Leave |
 
 - **Remapping.** Every Modern game key can be changed under **Controls** (on the setup or in the
   pause menu): click a binding, then press the new key; Esc cancels. The new keys are saved on this
@@ -53,9 +54,10 @@ one under **Controls** on the setup. Either way, every action is a single origin
 - **The mouse** turns your drone toward the pointer, four ways only, with a small dead zone near the
   diagonals so it does not flicker. A click that needs a new facing turns first and fires on the next
   step.
-- **Keyboard focus.** Inside the game, Tab shows and hides the scoreboard, so it does not move focus
-  between buttons or out of the frame (it still works in the name and seed fields). Use the mouse for
-  the setup and pause buttons; Esc on the setup leads back to the Hall.
+- **Keyboard focus.** On the setup and in the pause menu, Tab moves between the buttons and out of
+  the frame to the Hall’s strip (Shift+Tab goes the other way). In a running match Tab shows and
+  hides the scoreboard instead, so press Esc first to reach the buttons. Esc on the setup leads back
+  to the Hall.
 
 ## Rules
 
@@ -130,24 +132,27 @@ Every bot plays fair: it knows only what its own screen shows and types keys lik
 
 ## Settings
 
-| Setting  | Options                                                  | Default  |
-| -------- | -------------------------------------------------------- | -------- |
-| Name     | Up to ten characters                                     | you      |
-| Bots     | 1 to 8                                                   | 4        |
-| Map seed | Any whole number, or Random                              | 1985     |
-| Speed    | Relaxed (8 steps a second), Standard (10), Frantic (14)  | Standard |
-| Enter as | Cloaked, Scanning, Flying                                | Cloaked  |
-| Controls | Modern (WASD and mouse), Classic (hjkl)                  | Modern   |
-| View     | 3D, Split (terminal beside the 3D follow view), Terminal | 3D       |
-| Camera   | Overview, Follow                                         | Overview |
-| Quality  | Auto, High, Low                                          | Auto     |
-| Sound    | On, Off                                                  | Off      |
+| Setting  | Options                                                  | Default                                   |
+| -------- | -------------------------------------------------------- | ----------------------------------------- |
+| Name     | Up to ten characters                                     | you                                       |
+| Bots     | 1 to 8                                                   | 4                                         |
+| Map seed | Any whole number, or Random                              | 1985                                      |
+| Speed    | Relaxed (8 steps a second), Standard (10), Frantic (14)  | Standard                                  |
+| Enter as | Cloaked, Scanning, Flying                                | Cloaked                                   |
+| Controls | Modern (WASD and mouse), Classic (hjkl)                  | Modern                                    |
+| View     | 3D, Split (terminal beside the 3D follow view), Terminal | 3D                                        |
+| Camera   | Overview, Follow                                         | Overview                                  |
+| Quality  | Auto, High, Low                                          | Auto                                      |
+| Sound    | On, Off                                                  | Off (in the Hall, as the Hall’s sound is) |
 
 Auto quality starts High on a graphics card and Lite on a software renderer, and steps down if the
-frame rate stays low. Without WebGL the game plays in the terminal view. Hunt follows your
-system’s reduced-motion setting when it starts: no camera shake, no colour fringing on big blasts
-and a gentler flash when you are hurt. It has one dark look; the Hall’s strip follows the Hall’s
-light or dark appearance.
+frame rate stays low. Without WebGL the game plays in the terminal view. Hunt follows the Hall’s
+reduced-motion setting as soon as you change it (on its own, your system’s, when it starts): no
+camera shake, no colour fringing on big blasts and a gentler flash when you are hurt. In the Hall
+its sound follows the Hall’s: on at the Hall’s volume from your first click or key in the game,
+silent while the Hall is muted, and SOUND still works during the visit. On its own it starts
+silent. A match does not pause by itself when the Hall pauses or the tab is hidden; press Esc to
+pause it. It has one dark look; the Hall’s strip follows the Hall’s light or dark appearance.
 
 ## Coach and Override
 

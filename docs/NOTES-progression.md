@@ -11,7 +11,10 @@ Re-run on 2026-10-02 with 32 entries, after Zoomies joined and Control Room 1986
 Traffic (`daily: true`): casual reaches `staff` on day 15 (p10 11, p90 20), regular reaches
 `wheel` on day 34 (29–40), enthusiast reaches `root` on day 54 (52–57, fastest 50) and the
 marathon bot on day 29 (28–30). Every target is still met; the tables below are the 2026-09-28
-run.
+run. Re-run on 2026-10-02 (prompt C1) with all 34 entries, after Noodle Nine and Full Pockets
+shipped with daily challenges (`worm` 2–10 minutes, `snake` 3–10): casual reaches `staff` on day
+15 (11–22), regular reaches `wheel` on day 30 (23–40), enthusiast reaches `root` on day 51 (49–54,
+fastest 48) and the marathon bot on day 27 (26–28). Every target is still met.
 
 ## Rules as simulated
 

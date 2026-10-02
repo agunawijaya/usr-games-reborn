@@ -4,11 +4,14 @@
 // Most packages are read from the game's own event bus (src/fx/bus.ts), the same turn-by-turn
 // story the scene, the HUD and the sound already follow. Game.tsx adds the rest: when a run
 // starts and ends (the result carries the run tracker's points), the moments only the modes
-// know about, whether the game menu is showing, and the Hall's pause.
+// know about, whether the game menu is showing, and the Hall's pause. The Hall's sound and
+// reduced motion drive the game's own switches (src/audio/sfx.ts, src/fx/store.ts).
 
 import { addAfterEffect } from '@react-three/fiber';
-import { connectToHall } from '@usr-games/bridge';
+import { connectToHall, soundLevel, type SoundSettings } from '@usr-games/bridge';
+import { sfx } from './audio/sfx';
 import { fxBus } from './fx/bus';
+import { quality } from './fx/store';
 import type { MatchPlan } from './modes/plans';
 import type { RunSummary } from './modes/tracker';
 
@@ -24,18 +27,63 @@ const FULL_HOUSE = 40;
 
 type PauseListener = (paused: boolean) => void;
 const pauseListeners = new Set<PauseListener>();
+type SoundListener = (on: boolean) => void;
+const soundListeners = new Set<SoundListener>();
+/** The game's own master level: at the Hall's default volume the stadium sounds as designed. */
+const DESIGNED_LEVEL = sfx.level;
+let hallPaused = false;
+let hallSoundOn: boolean | null = null;
 
 const hall = connectToHall({
   id: 'robots',
-  onPause: () => pauseListeners.forEach((l) => l(true)),
-  onResume: () => pauseListeners.forEach((l) => l(false)),
+  // A hidden page counts as a pause too, also when the game runs on its own.
+  pauseWhenHidden: true,
+  onPause: () => setHallPaused(true),
+  onResume: () => setHallPaused(false),
+  onSound: followHallSound,
+  onReducedMotion: followHallMotion,
 });
 const loadedAt = performance.now();
 const installed = new Set<string>();
 
+function setHallPaused(paused: boolean): void {
+  hallPaused = paused;
+  // Held still means quiet: the hum and the crowd's murmur would otherwise drone on.
+  if (paused) void sfx.ctx?.suspend();
+  else void sfx.ctx?.resume();
+  pauseListeners.forEach((l) => l(paused));
+}
+
+/**
+ * The sound follows the Hall: on at the Hall's volume, off while the Hall is muted. The game's
+ * own switch (M) keeps working during the visit, at the Hall's volume, until the Hall's sound
+ * changes again.
+ */
+function followHallSound(sound: SoundSettings): void {
+  sfx.level = soundLevel({ ...sound, muted: false }, DESIGNED_LEVEL);
+  const on = soundLevel(sound) > 0;
+  hallSoundOn = on;
+  sfx.setOn(on);
+  if (hallPaused) void sfx.ctx?.suspend();
+  soundListeners.forEach((l) => l(on));
+}
+
+/** The game reads `quality.reducedMotion` as it goes; the attribute mirrors its CSS rules. */
+function followHallMotion(reduced: boolean): void {
+  quality.reducedMotion = reduced;
+  document.documentElement.toggleAttribute('data-reduced-motion', reduced);
+}
+
 export function onHallPause(listener: PauseListener): () => void {
   pauseListeners.add(listener);
   return () => pauseListeners.delete(listener);
+}
+
+/** Game.tsx shows the Hall's sound on its own switch; the latest state arrives at once. */
+export function onHallSound(listener: SoundListener): () => void {
+  soundListeners.add(listener);
+  if (hallSoundOn !== null) listener(hallSoundOn);
+  return () => soundListeners.delete(listener);
 }
 
 export function setTitleScreen(active: boolean): void {

@@ -12,6 +12,7 @@ export class Ambience {
   constructor() {
     this.ctx = null;
     this.muted = true;
+    this.volume = 0.8;  // master level while unmuted; the Hall scales it to its own volume
     this.nextBubble = 0;
     this.lastChime = 0;
   }
@@ -109,7 +110,7 @@ export class Ambience {
     if (!muted && this.ctx.state === 'suspended') this.ctx.resume();
     const g = this.master.gain;
     g.cancelScheduledValues(this.ctx.currentTime);
-    g.setTargetAtTime(muted ? 0 : 0.8, this.ctx.currentTime, muted ? 0.15 : 1.2);
+    g.setTargetAtTime(muted ? 0 : this.volume, this.ctx.currentTime, muted ? 0.15 : 1.2);
   }
 
   bubble(pan = 0) {

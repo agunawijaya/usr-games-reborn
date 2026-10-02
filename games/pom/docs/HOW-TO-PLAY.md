@@ -11,23 +11,23 @@ something: the next full moon, the night you were born, a month with two full mo
 Selene is played with the keyboard or the mouse; nothing needs both. Keys are Selene’s own and
 cannot be remapped from the Hall.
 
-| Action                                 | Keyboard                   | Mouse                                       |
-| -------------------------------------- | -------------------------- | ------------------------------------------- |
-| One hour back or forward               | ← / →                      | Drag along the time bar                     |
-| One day back or forward                | Shift + ← / →              | The ‹ and › buttons                         |
-| One lunar month back or forward        | Page Up / Page Down        | —                                           |
-| Play a month-long timelapse, or stop   | Space                      | Timelapse                                   |
-| Back to the live Moon                  | N                          | Now                                         |
-| Open or close the Moon calendar        | C                          | Calendar                                    |
-| High contrast on or off                | H                          | Contrast                                    |
-| About Selene and its shortcuts         | ?                          | About                                       |
-| Close the calendar or the About dialog | Esc                        | The × button                                |
-| Ask pom about a date                   | Type in the `pom` field, ↵ | —                                           |
-| Pick a date and hour                   | The date field             | The date field                              |
-| Rock the Moon on its axis              | —                          | Drag the Moon (it springs back)             |
-| Name a sea or crater                   | —                          | Point at it                                 |
-| Leave for the Hall                     | Tab to the Hall’s strip    | Move to the top edge; ← Back to the Hall    |
-| Start Selene afresh                    | Tab to the Hall’s strip    | Move to the top edge; Game menu, then Leave |
+| Action                                 | Keyboard                      | Mouse                                     |
+| -------------------------------------- | ----------------------------- | ----------------------------------------- |
+| One hour back or forward               | ← / →                         | Drag along the time bar                   |
+| One day back or forward                | Shift + ← / →                 | The ‹ and › buttons                       |
+| One lunar month back or forward        | Page Up / Page Down           | —                                         |
+| Play a month-long timelapse, or stop   | Space                         | Timelapse                                 |
+| Back to the live Moon                  | N                             | Now                                       |
+| Open or close the Moon calendar        | C                             | Calendar                                  |
+| High contrast on or off                | H                             | Contrast                                  |
+| About Selene and its shortcuts         | ?                             | About                                     |
+| Close the calendar or the About dialog | Esc                           | The × button                              |
+| Ask pom about a date                   | Type in the `pom` field, ↵    | —                                         |
+| Pick a date and hour                   | The date field                | The date field                            |
+| Rock the Moon on its axis              | —                             | Drag the Moon (it springs back)           |
+| Name a sea or crater                   | —                             | Point at it                               |
+| Leave for the Hall                     | Shift+Tab to the Hall’s strip | ← Back to the Hall on the Hall’s strip    |
+| Start Selene afresh                    | Shift+Tab to the Hall’s strip | Game menu on the Hall’s strip, then Leave |
 
 ## Rules
 
@@ -58,9 +58,10 @@ flowchart LR
 ## Settings
 
 Selene’s own toggles live in its toolbar: high contrast (also on when your system asks for more
-contrast). It follows your system’s reduced-motion setting: no twinkle or ripples, instant jumps,
-a stepped timelapse. Selene has a single night look; the Hall’s strip follows the Hall’s light or
-dark appearance.
+contrast). It follows the Hall’s reduced-motion setting as soon as you change it (on its own, your
+system’s): no twinkle or ripples, instant jumps, a stepped timelapse. Selene makes no sound, so the
+Hall’s volume and mute have nothing to change. Selene has a single night look; the Hall’s strip
+follows the Hall’s light or dark appearance.
 
 ## Scoring
 

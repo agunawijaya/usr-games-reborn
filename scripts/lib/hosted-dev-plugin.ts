@@ -2,14 +2,15 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
-import { hostedEntries, readCatalog, type ResolvedEntry } from './catalog';
+import { hostedEntries, readCatalog, type ResolvedEntry } from './catalog.ts';
 import {
-  buildHostedViteGameInProcess,
+  buildHostedViteGame,
   type BridgeFiles,
   loadBuildBridge,
   normaliseBase,
-} from './hosted';
-import { REPO_ROOT, toPosix } from './paths';
+  POSTER_LIST,
+} from './hosted.ts';
+import { REPO_ROOT, toPosix } from './paths.ts';
 
 /**
  * Makes the Hall's dev server behave like the built site for hosted games:
@@ -120,11 +121,9 @@ function viteGameFolder(state: PluginState, entry: ResolvedEntry): Promise<strin
   if (manifest.build.kind === 'native') return Promise.reject(new Error(`${entry.id} is native`));
   const source = join(state.repoRoot, manifest.build.source);
   const outDir = join(state.repoRoot, 'node_modules/.cache/usr-games/play', entry.id);
-  const building = buildHostedViteGameInProcess(
-    source,
-    `${state.base}play/${entry.id}/`,
-    outDir,
-  ).then(() => outDir);
+  const building = buildHostedViteGame(source, `${state.base}play/${entry.id}/`, outDir, {
+    quiet: true,
+  }).then(() => outDir);
   building.catch(() => state.viteBuilds.delete(entry.id));
   state.viteBuilds.set(entry.id, building);
   return building;
@@ -198,6 +197,10 @@ export function createHostedMiddleware(state: PluginState) {
 
     const bridge = /^\/bridge\/(bridge\.m?js)$/.exec(path);
     if (bridge) return void serveBridge(state, bridge[1] as string, res);
+
+    // Build-time posters exist only in a built site (scripts/lib/posters.ts); here, none.
+    if (path === `/${POSTER_LIST}`)
+      return send(res, 200, 'export default {};\n', CONTENT_TYPES['.js']);
 
     const play = /^\/play\/([a-z][a-z0-9-]*)(\/.*)?$/.exec(path);
     if (!play) return next();

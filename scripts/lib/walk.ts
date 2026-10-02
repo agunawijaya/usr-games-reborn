@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
-import { REPO_ROOT, repoRelative } from './paths';
+import { REPO_ROOT, repoRelative } from './paths.ts';
 
 /** Folders no guard ever needs to look inside, wherever they appear. */
 const ALWAYS_SKIPPED = new Set([

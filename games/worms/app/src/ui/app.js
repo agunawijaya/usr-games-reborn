@@ -9,6 +9,7 @@ import { WormRenderer } from '../render/renderer.js';
 import { ClassicView } from '../render/classic.js';
 import { Ambience } from '../audio/ambience.js';
 import {
+  followHall, isHeldStill,
   noteCommandLine, noteLettersEaten, noteOptions, noteSplitMoved, noteView, offerPoster, posterWanted,
 } from '../hall.js';
 
@@ -210,6 +211,12 @@ export function startApp() {
   };
   $('btn-sound').addEventListener('click', toggleSound);
 
+  followHall({
+    audio,
+    setMuted: (muted) => { S.muted = muted; audio.setMuted(muted); syncUI(); },
+    setReducedMotion: (reduced) => { S.motion = !reduced; },
+  });
+
   const toggleFull = () => {
     if (document.fullscreenElement) document.exitFullscreen?.();
     else document.documentElement.requestFullscreen?.().catch(() => {});
@@ -284,6 +291,7 @@ export function startApp() {
   let slow = 0;           // EMA of "this frame missed 40 fps"
   function frame() {
     const now = performance.now();
+    if (isHeldStill()) { last = now; requestAnimationFrame(frame); return; }
     const rawDt = (now - last) / 1000;
     const dt = clamp(rawDt, 0, 0.1);
     last = now;
@@ -335,7 +343,7 @@ export function startApp() {
       }
     }
     audio.update(world, panOf);
-    window.__abyss = { ready: revealed, S, world, renderer };
+    window.__abyss = { ready: revealed, S, world, renderer, audio };
     requestAnimationFrame(frame);
   }
 

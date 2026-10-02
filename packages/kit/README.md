@@ -315,7 +315,7 @@ pendingRankUp(state); // { from, to } until acknowledgeRank(state) is saved
 | `engine`        | `applyResult`, `installGamePackage`, `recordLogin`, `recordManPageRead`, `recordThemeSeen`, `recordStyleSeen`, `syncWeek`, `pendingRankUp`, `acknowledgeRank` |
 | `levels`        | `levelForXp` (Level 1–99, an even split of each rank's XP band), `firstLevelOfRank`, `MAX_LEVEL`, `RANK_TOOLTIP`                                              |
 | `rules`         | `XP_RULES`, `sessionXp`, `sameGameMultiplier`, `eventsXp`, `applySoftCap`, `isToy`, `GameInfo`                                                                |
-| `ranks`         | `RANKS`, `RANK_IDS`, `rankForXp`, `nextRank`, `rankProgress` (exact numbers for the XP bar)                                                                   |
+| `ranks`         | `RANKS` (each with its welcome in Unix words, `flavour`, and in plain words, `plainFlavour`), `RANK_IDS`, `rankForXp`, `nextRank`, `rankProgress`             |
 | `cron`          | `generateCronJobs(week, shippedGames)`, `advanceCronJobs`, `JOBS_PER_WEEK`, `plainLabel` / `questLabel` (the plain-word quest names)                          |
 | `streak`        | `registerActivity`, `streakAsOf`, `FREEZES_PER_WEEK`                                                                                                          |
 | `hall-packages` | `HALL_PACKAGES` (ten collection-wide packages) and their conditions                                                                                           |

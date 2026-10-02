@@ -1,6 +1,7 @@
 # 0011 — Adopting finished games
 
-- **Status:** Accepted
+- **Status:** Accepted; key art kept beyond one visit, and captured at build time, since
+  [0012](0012-bridge-1-1-strip-and-posters.md)
 - **Date:** 2026-10-01
 
 ## Context

@@ -107,6 +107,11 @@
   cursor: not-allowed;
 }
 
+/* A style's picture for the choice; the wrapper steps aside so the style lays out its picture. */
+.set-choice__media {
+  display: contents;
+}
+
 .set-choice__label {
   font-weight: 700;
 }

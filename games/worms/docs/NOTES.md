@@ -27,13 +27,15 @@ game like Selene.
 
 ### Integration changes (every file touched)
 
-| File                 | Change                                                                                                                                                                                                                                                                                          |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/index.html`     | Google Fonts links replaced by the local `fonts.css`; the bridge script tag `../../bridge/bridge.js` added                                                                                                                                                                                      |
-| `app/src/ui/fonts/*` | New: `fonts.css` and two Latin woff2 files (Inter, JetBrains Mono)                                                                                                                                                                                                                              |
-| `app/src/hall.js`    | New: the bridge glue (visit, packages, poster)                                                                                                                                                                                                                                                  |
-| `app/src/ui/app.js`  | One import and calls into `hall.js`: `noteLettersEaten` in `doStep` while the field is on, `noteOptions` in `applyOpts`, `noteCommandLine` after an accepted command line, `noteView` in `setView`, `noteSplitMoved` on a divider drag or arrow key, the poster offer after a successful render |
-| `app/package.json`   | `start` serves on the collection’s port for worms, 5203                                                                                                                                                                                                                                         |
+| File                        | Change                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/index.html`            | Google Fonts links replaced by the local `fonts.css`; the bridge script tag `../../bridge/bridge.js` added                                                                                                                                                                                                                                                                                 |
+| `app/src/ui/fonts/*`        | New: `fonts.css` and two Latin woff2 files (Inter, JetBrains Mono)                                                                                                                                                                                                                                                                                                                         |
+| `app/src/hall.js`           | New: the bridge glue (visit, packages, poster; since prompt C1 also the Hall’s sound, motion and pause)                                                                                                                                                                                                                                                                                    |
+| `app/src/ui/app.js`         | One import and calls into `hall.js`: `noteLettersEaten` in `doStep` while the field is on, `noteOptions` in `applyOpts`, `noteCommandLine` after an accepted command line, `noteView` in `setView`, `noteSplitMoved` on a divider drag or arrow key, the poster offer after a successful render; since prompt C1, the `followHall` hand-over and the `isHeldStill` check in the frame loop |
+| `app/src/audio/ambience.js` | Prompt C1: the master level became `volume` (still 0.8 by default), so the Hall can scale it                                                                                                                                                                                                                                                                                               |
+| `app/src/ui/styles.css`     | Prompt C1: its reduced-motion rule repeated under `:root[data-reduced-motion]`                                                                                                                                                                                                                                                                                                             |
+| `app/package.json`          | `start` serves on the collection’s port for worms, 5203                                                                                                                                                                                                                                                                                                                                    |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors.
 
@@ -92,21 +94,22 @@ falls back to SwiftShader and Low quality.
 
 ## Decisions log
 
-| Date       | Decision                                                     | Why                                                                             |
-| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Abyssal Worms”, as the game shows itself              | Prompt 01 §7: the final title is the one the game already shows                 |
-| 2026-10-01 | No title-screen signal                                       | Abyssal Worms has no title screen; the Hall’s strip carries the ways out        |
-| 2026-10-01 | A visit counts once, on the first key press or click         | Toys must never reward being left open; pointer movement only wakes the toolbar |
-| 2026-10-01 | Packages only for moments the controller already knows about | Changes to the game stay single calls into `hall.js` (ADR 0011)                 |
-| 2026-10-01 | The poster is taken from `#abyss` 5 s after opening          | By then the worms have left the corner and spread across the floor              |
+| Date       | Decision                                                           | Why                                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Abyssal Worms”, as the game shows itself                    | Prompt 01 §7: the final title is the one the game already shows                                                                                           |
+| 2026-10-01 | No title-screen signal                                             | Abyssal Worms has no title screen; the Hall’s strip carries the ways out                                                                                  |
+| 2026-10-01 | A visit counts once, on the first key press or click               | Toys must never reward being left open; pointer movement only wakes the toolbar                                                                           |
+| 2026-10-01 | Packages only for moments the controller already knows about       | Changes to the game stay single calls into `hall.js` (ADR 0011)                                                                                           |
+| 2026-10-01 | The poster is taken from `#abyss` 5 s after opening                | By then the worms have left the corner and spread across the floor                                                                                        |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1) | ADR 0012; the ambience plays at the Hall’s level, reduced motion applies live, and a pause or hidden tab freezes the abyss, which then carries on exactly |
 
 ## Open questions
 
 - Abyssal Worms has only its dark night look; a light appearance is listed among the missing
   appearances in `docs/KNOWN-ISSUES.md`.
-- The Hall’s reduced-motion setting does not reach it: it reads `prefers-reduced-motion` once, at
-  start (`docs/KNOWN-ISSUES.md`).
-- The sound keeps playing while the tab is hidden; nothing listens for the page becoming hidden.
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches it live, where
+  before it read `prefers-reduced-motion` once, at start.
+- Answered by prompt C1 (2026-10-02): a hidden tab now holds the abyss still and suspends its sound.
 - Resizing the window restarts the worms, by design upstream (a new terminal), which can surprise.
 - Its shortcuts are single letters (C, V, S, M, R, F) and Space, with no modifier.
 - The command line’s usage and error messages are the original’s own wording (derived under its

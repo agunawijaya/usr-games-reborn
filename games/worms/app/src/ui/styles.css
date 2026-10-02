@@ -303,6 +303,10 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+/* the same, when the Hall's own reduced-motion setting asks for it (hall.js) */
+:root[data-reduced-motion] *, :root[data-reduced-motion] *::before, :root[data-reduced-motion] *::after {
+  animation-duration: 0.001ms !important; transition-duration: 0.001ms !important;
+}
 
 @media (max-width: 640px) {
   .brand p { display: none; }

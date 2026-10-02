@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
-import { hostedGamesDevPlugin } from '../../scripts/lib/hosted-dev-plugin';
+import { catalogDevPlugin } from '../../scripts/lib/catalog-dev-plugin.ts';
+import { hostedGamesDevPlugin } from '../../scripts/lib/hosted-dev-plugin.ts';
 
 export default defineConfig({
   // GitHub Pages serves the project under /<repo>/; the Pages workflow sets SITE_BASE.
   base: process.env.SITE_BASE ?? '/',
-  plugins: [hostedGamesDevPlugin()],
+  plugins: [catalogDevPlugin(), hostedGamesDevPlugin()],
   server: { port: 5173, strictPort: true },
   preview: { port: 5173, strictPort: true },
   build: {

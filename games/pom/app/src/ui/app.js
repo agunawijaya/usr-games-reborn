@@ -11,7 +11,8 @@ import { Renderer, sunVector, surfaceRotation } from '../render/renderer.js';
 import { featureAt } from '../render/features.js';
 import { Calendar, paintMoon } from './calendar.js';
 import {
-  noteMomentVisited, notePomAnswered, noteTimelapseFinished, noteTimelapseStarted, offerPoster, posterWanted,
+  followHallMotion, noteMomentVisited, notePomAnswered, noteTimelapseFinished, noteTimelapseStarted, offerPoster,
+  posterWanted,
 } from '../hall.js';
 
 const HOUR = 3600;
@@ -507,11 +508,17 @@ export function startApp() {
   let slow = 0;
   // With frozen shader time (lite or reduced motion) nothing moves unless the
   // state changes, so identical frames are skipped: zero CPU/GPU when idle.
-  const shaderMotion = S.motion && !lite;
+  let shaderMotion = S.motion && !lite;
   let lastDrawKey = '';
   let drewLast = false;
   let settledHour = null;   // /usr/games Reborn: the hour the view last came to rest on
   const veilText = $('veil-text');
+  // /usr/games Reborn: the Hall's reduced-motion setting, live (hall.js); ?motion=0 still wins.
+  function setReducedMotion(reduced) {
+    S.motion = !reduced && qs.get('motion') !== '0';
+    shaderMotion = S.motion && !lite;
+    document.body.classList.toggle('still', !S.motion);
+  }
   function frame() {
     // one clock for everything (rAF timestamps can lag performance.now())
     const ms = performance.now();
@@ -623,5 +630,6 @@ export function startApp() {
   if (qs.get('calendar') === '1') setCalendar(true);
   updateText(true);
   requestAnimationFrame(frame);
+  followHallMotion(setReducedMotion);
   window.__seleneApp = { S, goTo, goNow, startLapse, stopLapse, setCalendar, setHC, renderer };
 }

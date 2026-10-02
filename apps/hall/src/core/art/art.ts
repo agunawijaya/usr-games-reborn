@@ -1,6 +1,7 @@
 import type { Appearance, PosterHandle } from '@usr-games/kit';
 import type { CatalogEntry } from '../../catalog/catalog';
 import { cachedStill, sizeBucket, stillKey } from './cache';
+import { gamePosterSource, onPosterChange, posterLoaded } from './game-posters';
 import { imageArt } from './image-art';
 import { pomArt } from './key-art/pom';
 import { robotsArt } from './key-art/robots';
@@ -9,13 +10,22 @@ import { trekArt } from './key-art/trek';
 import { proceduralArt } from './procedural';
 import { makeCanvas } from './shapes';
 
+export {
+  forgetGamePoster,
+  onPosterChange,
+  rememberBuildPoster,
+  rememberGamePoster,
+} from './game-posters';
+
 /**
  * Game art for the styles that show real key art (Console Home, Holo Collection).
  *
- * Every game gets a poster: its own `poster()` when it ships one, otherwise the Hall's
- * placeholder key art for a few planned games, otherwise a procedural poster made from its
- * emblem and accent. Only a single poster animates at a time at full size (the Console Home hero,
- * or the focused card); everything else is a still frame rendered once and cached.
+ * Every game gets a poster: its own `poster()` when it ships one; for a hosted game, a snapshot it
+ * sent of itself (this visit or an earlier one, see poster-shelf.ts), else the still `pnpm build`
+ * captured of it; otherwise the Hall's placeholder key art for a few games, otherwise a procedural
+ * poster made from its emblem and accent. Only a single poster animates at a time at full size
+ * (the Console Home hero, or the focused card); everything else is a still frame rendered once
+ * and cached.
  */
 
 export interface PosterFrame {
@@ -77,36 +87,48 @@ const KEY_ART: Readonly<Record<string, PosterArt>> = {
   pom: pomArt,
 };
 
-/** Snapshots hosted games sent over the bridge (`poster` message), kept for this session only. */
-const gamePosters = new Map<string, PosterArt>();
+/** Image art per source, so a game's snapshot is decoded once however often it is drawn. */
+const imageArts = new Map<string, PosterArt>();
+const IMAGE_ARTS_KEPT = 24;
 
-/**
- * Keeps key art a hosted game drew of itself (a validated inline data URL from the bridge) and
- * uses it for that game from now on.
- */
-export function rememberGamePoster(gameId: string, image: string): void {
-  gamePosters.set(gameId, imageArt(image));
-}
-
-export function forgetGamePoster(gameId: string): void {
-  gamePosters.delete(gameId);
+function artFromImage(gameId: string, url: string): PosterArt {
+  let art = imageArts.get(url);
+  if (!art) {
+    art = imageArt(url, () => posterLoaded(gameId, url));
+    imageArts.set(url, art);
+    if (imageArts.size > IMAGE_ARTS_KEPT) imageArts.delete(imageArts.keys().next().value as string);
+  }
+  return art;
 }
 
 function isSleeping(entry: CatalogEntry): boolean {
   return entry.manifest.status === 'coming-soon';
 }
 
-export function posterArtFor(entry: CatalogEntry): { kind: PosterKind; art: PosterArt } {
+export interface ChosenArt {
+  kind: PosterKind;
+  art: PosterArt;
+  /** Names this exact art for the still cache. */
+  cacheId: string;
+}
+
+export function posterArtFor(entry: CatalogEntry): ChosenArt {
   const { id, category } = entry.manifest;
   // Coming-soon games always get the calm procedural poster: key art would promise a game
   // that cannot be launched yet.
   if (!isSleeping(entry)) {
-    const fromGame = gamePosters.get(id);
-    if (fromGame) return { kind: 'game', art: fromGame };
+    const fromGame = gamePosterSource(id);
+    if (fromGame) {
+      return {
+        kind: 'game',
+        art: artFromImage(id, fromGame.url),
+        cacheId: `game:${id}:${fromGame.revision}`,
+      };
+    }
     const keyArt = KEY_ART[id];
-    if (keyArt) return { kind: 'key-art', art: keyArt };
+    if (keyArt) return { kind: 'key-art', art: keyArt, cacheId: `key-art:${id}` };
   }
-  return { kind: 'procedural', art: proceduralArt(category) };
+  return { kind: 'procedural', art: proceduralArt(category), cacheId: `procedural:${id}` };
 }
 
 function frameFor(
@@ -146,17 +168,11 @@ export function posterStill(
   width: number,
   height: number,
 ): HTMLCanvasElement {
-  const { kind, art } = posterArtFor(entry);
+  const { art, cacheId } = posterArtFor(entry);
   const ratio = devicePixelRatio();
   const bucketWidth = sizeBucket(width);
   const bucketHeight = sizeBucket(height);
-  const key = stillKey(
-    `${kind}:${entry.manifest.id}:${isSleeping(entry)}`,
-    appearance,
-    width,
-    height,
-    ratio,
-  );
+  const key = stillKey(`${cacheId}:${isSleeping(entry)}`, appearance, width, height, ratio);
   return cachedStill(key, () => {
     const canvas = makeCanvas(bucketWidth * ratio, bucketHeight * ratio);
     const context = canvas.getContext('2d');
@@ -199,7 +215,7 @@ export function mountPoster(
   entry: CatalogEntry,
   options: PosterOptions,
 ): MountedPoster {
-  const source = posterArtFor(entry);
+  let source = posterArtFor(entry);
   const canvas = document.createElement('canvas');
   canvas.className = options.className ?? 'poster';
   canvas.setAttribute('aria-hidden', 'true');
@@ -289,6 +305,14 @@ export function mountPoster(
   });
   resize.observe(host);
 
+  // A hosted game's snapshot can arrive (or finish loading) while its poster is on screen.
+  const stopListening = onPosterChange((gameId) => {
+    if (gameId !== entry.manifest.id || gameHandle) return;
+    source = posterArtFor(entry);
+    mounted.kind = source.kind;
+    restart();
+  });
+
   const mounted: MountedPoster = {
     canvas,
     kind: source.kind,
@@ -311,6 +335,7 @@ export function mountPoster(
       cancelAnimationFrame(frame);
       if (gameHandle) gameHandle.stop();
       resize.disconnect();
+      stopListening();
       canvas.remove();
     },
   };

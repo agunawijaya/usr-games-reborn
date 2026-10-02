@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { LISTED, SHIPPED, SLEEPING } from './catalog';
 import { emptyProgression } from '../../../packages/kit/src/progression/state';
 
 /**
@@ -87,10 +88,12 @@ async function axeViolations(page: Page): Promise<string[]> {
 test('Home shows today’s pick and every game as a card, set by set', async ({ page }) => {
   await page.goto(scene('holo-home'));
   await expect(page.locator('html')).toHaveAttribute('data-style', 'holo');
-  await expect(page.locator('.hc-card--pick')).toContainText('Broadside');
+  // Today's pick is one shipped game, chosen by the scene's pinned date.
+  const pick = (await page.locator('.hc-card--pick .hc-card__name').textContent()) ?? '';
+  expect(SHIPPED.map((game) => game.title)).toContain(pick.trim());
   await expect(page.locator('.hc-card__sticker')).toContainText('Daily #');
-  await expect(page.locator('.hc-grid .hc-card')).toHaveCount(30);
-  await expect(page.locator('.hc-card--asleep')).toHaveCount(22);
+  await expect(page.locator('.hc-grid .hc-card')).toHaveCount(LISTED.length);
+  await expect(page.locator('.hc-card--asleep')).toHaveCount(SLEEPING.length);
   await expect(page.locator('.hc-level')).toContainText('Level');
 });
 
@@ -198,6 +201,12 @@ test('settings show every section, with finishes locked until their level', asyn
   await expect(finish('finish-galaxy')).toBeEnabled();
   await expect(finish('finish-gold')).toBeDisabled();
   await expect(page.locator('.set-choice.is-locked').first()).toContainText('Unlocks at Level 25');
+  // Each finish shows its foil as a swatch the shared panel draws, decoration beside the name.
+  const galaxy = page.locator('.set-choice', { has: finish('finish-galaxy') });
+  await expect(
+    galaxy.locator('.set-choice__media[aria-hidden="true"] .hc-foil-swatch'),
+  ).toHaveAttribute('data-finish', 'finish-galaxy');
+  await expect(page.locator('.hc-foil-swatch')).toHaveCount(5);
   await page.locator('.set-choice', { has: finish('finish-galaxy') }).click();
   await expect(page.locator('.hc-app')).toHaveClass(/hc-finish-galaxy/);
   await expect(page.locator('.hc-settings-sample__caption')).toHaveText('Galaxy foil');
@@ -305,6 +314,9 @@ test('a rank-up reveals the new level card once, and Escape skips it', async ({ 
   const reveal = page.getByRole('dialog', { name: /Level 10/ });
   await expect(reveal).toBeVisible();
   await expect(reveal).toContainText('Galaxy foil');
+  await expect(reveal.locator('.hc-rankup__line')).toHaveText(
+    'A regular here. The games have started to know your face.',
+  );
   await expect(page.getByRole('status').filter({ hasText: 'Level up!' })).toContainText(
     'You reached Level 10',
   );

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { matchesGlob } from './glob';
-import { REPO_ROOT } from './paths';
+import { matchesGlob } from './glob.ts';
+import { REPO_ROOT } from './paths.ts';
 
 /** An exception to a guard. `match` narrows it to lines containing that text. */
 export interface AllowEntry {

@@ -1,9 +1,13 @@
-import type { PackageDefinition } from '../achievements/packages';
+import type { PackageDefinition } from '../achievements/packages.ts';
 
 /**
  * The manifest is everything the Hall knows about a game without loading its code: how it
  * appears in the process list and on its man page, how it is built, and where it came from.
  * It is plain JSON so the build script, the docs script and the Hall all read the same file.
+ *
+ * This module and `validate.ts` are also loaded by Node itself, through the Hall's Vite config
+ * (`scripts/lib/catalog.ts`), so their relative imports name the `.ts` file and they use only
+ * syntax Node can strip.
  */
 
 export const CATEGORIES = [

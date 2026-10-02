@@ -13,41 +13,41 @@ Broadside is played with the keyboard or the mouse; every order has both. You ca
 the command line at the bottom of the screen, exactly as captains did in 1980, or click the buttons
 above it: both edit the same orders. Keys are the game’s own and cannot be remapped from the Hall.
 
-| Action                                      | Keyboard (type on the command line unless noted)                             | Mouse                                            |
-| ------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ |
-| Go to the command line                      | `/` or `:`                                                                   | Click it                                         |
-| Helm order                                  | `3`, `l1r1r2`, `d` (see Sailing below)                                       | ↶ l, 1–7, r ↷, d and ⌫ in the Helm box           |
-| Take the sailing master’s suggestion        | —                                                                            | Take it                                          |
-| Fire a broadside at the hull or the rigging | `f l h` (port, hull), `f r r` (starboard, rigging)                           | Hull or Rig under Port or Starboard              |
-| Fire both broadsides at the hull            | `f`                                                                          | Hull on both sides                               |
-| Load an empty broadside                     | `ld l d` (port, double), `ld b r` (both, round)                              | R, D, C or G under that side                     |
-| Unload both broadsides                      | `L`                                                                          | L                                                |
-| Battle or full sails                        | `c` (switch), `c full`, `c battle`                                           | Battle or Full                                   |
-| Repair hull, guns or rigging                | `rp h`, `rp g`, `rp r`                                                       | ⚒ H, ⚒ G or ⚒ R                                  |
-| Grapple or ungrapple a ship alongside       | `g b0`, `g b0 u`                                                             | Grapple or Ungrapple under Close action          |
-| Try to cut free of a fouled ship            | `u b0`                                                                       | Unfoul                                           |
-| Send boarders (1 to 3 crew sections)        | `b b0 2`                                                                     | Board 1, 2 or 3                                  |
-| Keep sections back to repel boarders        | `b repel 1`                                                                  | Repel 1, 2 or 3                                  |
-| Recall all boarding parties                 | `B`                                                                          | Recall                                           |
-| Report on the nearest ship, or all ships    | `i` (or `i b0`), `I`; `F f?` finds a French ship                             | Click a ship, its label or its line in The Fleet |
-| Earlier commands                            | ↑ / ↓ on the command line                                                    | —                                                |
-| Make it so (play the turn)                  | Enter on an empty command line, or `.`                                       | Make it so ⏎                                     |
-| Skip the turn’s playback                    | Space, Esc or Enter                                                          | —                                                |
-| Chart view on or off                        | T (anywhere but the command line)                                            | Chart                                            |
-| Rendering quality, High or Low              | Q (anywhere but the command line)                                            | High / Low                                       |
-| Sound on or off                             | M (anywhere but the command line)                                            | Sound                                            |
-| Help                                        | ? (or `?` on the command line)                                               | ? or How to command                              |
-| Turn the camera (pan on the chart)          | ← ↑ → ↓                                                                      | Drag                                             |
-| Zoom                                        | + / −                                                                        | The wheel                                        |
-| Look at another ship, or your own           | 1–9, 0                                                                       | Click the ship                                   |
-| Give up your command                        | Type `Q` or `quit` on the command line                                       | —                                                |
-| Open a page of the game menu                | S Sea Service, D Daily Engagement, H Historical Actions, R Service Record    | The four cards                                   |
-| Move between the menu’s buttons             | Arrow keys (Tab works too), then Enter                                       | —                                                |
-| Back to the game menu from one of its pages | Esc                                                                          | ← Game menu                                      |
-| On the battle report                        | N next action, R fight it again, M (or Esc) game menu, H Hall, L look around | The report’s buttons                             |
-| Copy a daily engagement’s share line        | S on its report                                                              | Copy share line                                  |
-| Leave for the Hall                          | Esc on the game menu; Tab to the Hall’s strip                                | ← Back to the Hall; or the top edge’s            |
-| Back to the game menu during a battle       | Tab to the Hall’s strip                                                      | Move to the top edge; Game menu, then Leave      |
+| Action                                      | Keyboard (type on the command line unless noted)                             | Mouse                                                    |
+| ------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Go to the command line                      | `/` or `:`                                                                   | Click it                                                 |
+| Helm order                                  | `3`, `l1r1r2`, `d` (see Sailing below)                                       | ↶ l, 1–7, r ↷, d and ⌫ in the Helm box                   |
+| Take the sailing master’s suggestion        | —                                                                            | Take it                                                  |
+| Fire a broadside at the hull or the rigging | `f l h` (port, hull), `f r r` (starboard, rigging)                           | Hull or Rig under Port or Starboard                      |
+| Fire both broadsides at the hull            | `f`                                                                          | Hull on both sides                                       |
+| Load an empty broadside                     | `ld l d` (port, double), `ld b r` (both, round)                              | R, D, C or G under that side                             |
+| Unload both broadsides                      | `L`                                                                          | L                                                        |
+| Battle or full sails                        | `c` (switch), `c full`, `c battle`                                           | Battle or Full                                           |
+| Repair hull, guns or rigging                | `rp h`, `rp g`, `rp r`                                                       | ⚒ H, ⚒ G or ⚒ R                                          |
+| Grapple or ungrapple a ship alongside       | `g b0`, `g b0 u`                                                             | Grapple or Ungrapple under Close action                  |
+| Try to cut free of a fouled ship            | `u b0`                                                                       | Unfoul                                                   |
+| Send boarders (1 to 3 crew sections)        | `b b0 2`                                                                     | Board 1, 2 or 3                                          |
+| Keep sections back to repel boarders        | `b repel 1`                                                                  | Repel 1, 2 or 3                                          |
+| Recall all boarding parties                 | `B`                                                                          | Recall                                                   |
+| Report on the nearest ship, or all ships    | `i` (or `i b0`), `I`; `F f?` finds a French ship                             | Click a ship, its label or its line in The Fleet         |
+| Earlier commands                            | ↑ / ↓ on the command line                                                    | —                                                        |
+| Make it so (play the turn)                  | Enter on an empty command line, or `.`                                       | Make it so ⏎                                             |
+| Skip the turn’s playback                    | Space, Esc or Enter                                                          | —                                                        |
+| Chart view on or off                        | T (anywhere but the command line)                                            | Chart                                                    |
+| Rendering quality, High or Low              | Q (anywhere but the command line)                                            | High / Low                                               |
+| Sound on or off                             | M (anywhere but the command line)                                            | Sound                                                    |
+| Help                                        | ? (or `?` on the command line)                                               | ? or How to command                                      |
+| Turn the camera (pan on the chart)          | ← ↑ → ↓                                                                      | Drag                                                     |
+| Zoom                                        | + / −                                                                        | The wheel                                                |
+| Look at another ship, or your own           | 1–9, 0                                                                       | Click the ship                                           |
+| Give up your command                        | Type `Q` or `quit` on the command line                                       | —                                                        |
+| Open a page of the game menu                | S Sea Service, D Daily Engagement, H Historical Actions, R Service Record    | The four cards                                           |
+| Move between the menu’s buttons             | Arrow keys (Tab works too), then Enter                                       | —                                                        |
+| Back to the game menu from one of its pages | Esc                                                                          | ← Game menu                                              |
+| On the battle report                        | N next action, R fight it again, M (or Esc) game menu, H Hall, L look around | The report’s buttons                                     |
+| Copy a daily engagement’s share line        | S on its report                                                              | Copy share line                                          |
+| Leave for the Hall                          | Esc on the game menu; Shift+Tab to the Hall’s strip                          | ← Back to the Hall, on the game menu or the Hall’s strip |
+| Back to the game menu during a battle       | Shift+Tab to the Hall’s strip                                                | Game menu on the Hall’s strip, then Leave                |
 
 `b0`, `F1` and the like are a ship’s mark, shown on its label, in The Fleet and in the log: the
 first letter of its nation (a capital when it carries full sails) and a number. A `!`, `~` or `#` in
@@ -241,17 +241,22 @@ victories, prizes, rakes, broadsides, daily engagements and the best engagement 
 
 ## Settings
 
-| Setting            | Options                                 | Default                                                                |
-| ------------------ | --------------------------------------- | ---------------------------------------------------------------------- |
-| View               | 3D view · chart (T)                     | 3D view                                                                |
-| Quality            | High · Low (Q)                          | High; remembered, and switching reloads the page with your battle kept |
-| Sound              | On · off (M)                            | On, from your first key or click; remembered                           |
-| Captain’s name     | Any name up to 19 characters            | The last name you used                                                 |
-| Opening broadsides | Round, double, chain or grape, per side | Round                                                                  |
+| Setting            | Options                                 | Default                                                                            |
+| ------------------ | --------------------------------------- | ---------------------------------------------------------------------------------- |
+| View               | 3D view · chart (T)                     | 3D view                                                                            |
+| Quality            | High · Low (Q)                          | High; remembered, and switching reloads the page with your battle kept             |
+| Sound              | On · off (M)                            | On, from your first key or click; remembered (in the Hall, as the Hall’s sound is) |
+| Captain’s name     | Any name up to 19 characters            | The last name you used                                                             |
+| Opening broadsides | Round, double, chain or grape, per side | Round                                                                              |
 
-Broadside follows your system’s reduced-motion setting: no opening sweep over the fleet, a quicker
-playback, the camera blends instead of cutting, never shakes, and changes shot at most every four
-seconds. It has a single look; the Hall’s strip follows the Hall’s light or dark appearance.
+Broadside follows the Hall’s reduced-motion setting as soon as you change it (on its own, your
+system’s): no opening sweep over the fleet, a quicker playback, the camera blends instead of
+cutting, never shakes, and changes shot at most every four seconds. In the Hall its sound follows
+the Hall’s: silent while the Hall is muted, otherwise at the Hall’s volume; M and the Sound button
+still work during the visit, and the Hall never changes the choice Broadside remembers. While the
+Hall pauses, or the tab is hidden, the sea, the playback and the camera hold still and quiet, and
+carry on exactly where they were. It has a single look; the Hall’s strip follows the Hall’s light
+or dark appearance.
 
 ## Scoring
 

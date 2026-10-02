@@ -30,14 +30,15 @@ Adopted on 2026-10-01 by prompt 01 (adopt eight finished games). Pajamas to Para
 
 ### Integration changes (every file touched)
 
-| File                      | Change                                                                                                                                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app/index.html`          | Google Fonts links replaced by the local `src/ui/fonts/fonts.css`; the bridge script tag added after the import map, before the module script                                                                |
-| `app/src/ui/fonts/*`      | New: `fonts.css` and eight Latin woff2 files: Cormorant Garamond (normal and italic, variable), IBM Plex Mono 400, 500 and 600, Rajdhani 500, 600 and 700                                                    |
-| `app/src/hall.js`         | New: the bridge glue (title screen, Escape, results, packages, poster)                                                                                                                                       |
-| `app/src/ui/app.js`       | One import and four calls: `noteEvents(game, r.events)` after `events()`, `reportGameOver(game, r.endKind)` at the top of `gameOver`, `noteGameStarted()` in `newGame`, `stage.afterFrame = afterStageFrame` |
-| `app/src/render/stage.js` | One line, `this.afterFrame?.(this.canvas)` right after `post.render`, so the poster is captured in the same task as the drawing                                                                              |
-| `app/package.json`        | `start` serves on the collection’s port for battlestar, 5207                                                                                                                                                 |
+| File                      | Change                                                                                                                                                                                                                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/index.html`          | Google Fonts links replaced by the local `src/ui/fonts/fonts.css`; the bridge script tag added after the import map, before the module script                                                                                                                                                                     |
+| `app/src/ui/fonts/*`      | New: `fonts.css` and eight Latin woff2 files: Cormorant Garamond (normal and italic, variable), IBM Plex Mono 400, 500 and 600, Rajdhani 500, 600 and 700                                                                                                                                                         |
+| `app/src/hall.js`         | New: the bridge glue (title screen, Escape, results, packages, poster; since prompt C1 also the Hall’s sound, motion and pause)                                                                                                                                                                                   |
+| `app/src/ui/app.js`       | One import and four calls: `noteEvents(game, r.events)` after `events()`, `reportGameOver(game, r.endKind)` at the top of `gameOver`, `noteGameStarted()` in `newGame`, `stage.afterFrame = afterStageFrame`; since prompt C1, the `followHall` hand-over at boot and `hallPaused()` in the hint panel’s autoplay |
+| `app/src/audio/audio.js`  | Prompt C1: `MASTER_LEVEL` (0.8, as designed), `masterLevel` and `setMasterLevel`, so the Hall can scale the mix                                                                                                                                                                                                   |
+| `app/src/render/stage.js` | One line, `this.afterFrame?.(this.canvas)` right after `post.render`, so the poster is captured in the same task as the drawing                                                                                                                                                                                   |
+| `app/package.json`        | `start` serves on the collection’s port for battlestar, 5207                                                                                                                                                                                                                                                      |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors. Its 98 tests pass
 unchanged.
@@ -132,17 +133,18 @@ provenance guard allows `games/battlestar/app` (`scripts/guards.config.json`).
 
 ## Decisions log
 
-| Date       | Decision                                                                             | Why                                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Pajamas to Paradise”, the game’s own subtitle                                 | Its brand word ties it to the 1970s television series its names come from                           |
-| 2026-10-01 | Ship the original text unchanged, as an exception to hard rule 11                    | The owner’s choice, until the battlestar modification prompt revises the text                       |
-| 2026-10-01 | The title dialog is the game menu; `hall.js` takes Escape there in the capture phase | Closing the native dialog in any way starts a game, so Escape there must never reach it             |
-| 2026-10-01 | `outcome`: won → `win`, died → `loss`, quit → `quit`                                 | The original’s three endings map directly; a quit earns no XP                                       |
-| 2026-10-01 | Score is the highest of Pleasure, Power and Ego                                      | The same figure the original’s rating uses                                                          |
-| 2026-10-01 | No score, XP events or packages for wizard-name or Override games                    | Those games are not played by the original’s rules; becoming a wizard in play still counts          |
-| 2026-10-01 | `daily: false`                                                                       | Each game takes its own seed; there is no daily run                                                 |
-| 2026-10-01 | Weekly goal “Explore {n} places” (30–100) from `placesExplored`                      | Exploring is what every game of it does, win or not                                                 |
-| 2026-10-01 | Poster: the stage canvas 8 s after a game starts, once per visit                     | A real room by then; captured right after `post.render`, before the browser clears the WebGL canvas |
+| Date       | Decision                                                                             | Why                                                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-10-01 | Title “Pajamas to Paradise”, the game’s own subtitle                                 | Its brand word ties it to the 1970s television series its names come from                                                                                          |
+| 2026-10-01 | Ship the original text unchanged, as an exception to hard rule 11                    | The owner’s choice, until the battlestar modification prompt revises the text                                                                                      |
+| 2026-10-01 | The title dialog is the game menu; `hall.js` takes Escape there in the capture phase | Closing the native dialog in any way starts a game, so Escape there must never reach it                                                                            |
+| 2026-10-01 | `outcome`: won → `win`, died → `loss`, quit → `quit`                                 | The original’s three endings map directly; a quit earns no XP                                                                                                      |
+| 2026-10-01 | Score is the highest of Pleasure, Power and Ego                                      | The same figure the original’s rating uses                                                                                                                         |
+| 2026-10-01 | No score, XP events or packages for wizard-name or Override games                    | Those games are not played by the original’s rules; becoming a wizard in play still counts                                                                         |
+| 2026-10-01 | `daily: false`                                                                       | Each game takes its own seed; there is no daily run                                                                                                                |
+| 2026-10-01 | Weekly goal “Explore {n} places” (30–100) from `placesExplored`                      | Exploring is what every game of it does, win or not                                                                                                                |
+| 2026-10-01 | Poster: the stage canvas 8 s after a game starts, once per visit                     | A real room by then; captured right after `post.render`, before the browser clears the WebGL canvas                                                                |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)                   | ADR 0012; the Hall’s sound works through the game’s own Sound switch, its reduced motion through `settings.motion`, and a pause stops everything that runs in time |
 
 ## Open questions
 
@@ -150,9 +152,11 @@ The first five are the game’s entries in `docs/KNOWN-ISSUES.md`; the last two 
 writing these docs and are not listed there yet.
 
 - A light appearance: the game has one dark look.
-- The Hall’s reduced-motion setting does not reach the game, which has its own toggle in Settings
-  (taken from the system the first time); changing quality or motion there reloads the page.
-- The dogfight clock keeps ticking while the tab is hidden; the game also ignores the Hall’s pause.
+- Answered by prompt C1 (2026-10-02): the Hall’s reduced-motion setting now reaches the game live,
+  through its own Settings toggle’s path; changing quality or motion in the game’s Settings still
+  reloads the page.
+- Answered by prompt C1 (2026-10-02): the Hall’s pause and a hidden tab now stop the dogfight
+  clock, the scene, the hint panel’s autoplay and the sound.
 - The end dialog’s “Hall of fame” button (the game’s local list of past games) and the top bar’s
   “Game menu” label (its accessible name) echo the Hall’s own words.
 - The content decision above, and the trademark exceptions: the brand word on the top bar and

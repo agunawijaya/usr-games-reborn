@@ -37,7 +37,7 @@ jobs:
         run: pnpm check
 
       - name: README games table is current
-        run: pnpm run docs --check
+        run: pnpm run docs:readme --check
 
       - name: Install Playwright's Chromium
         run: pnpm exec playwright install --with-deps chromium

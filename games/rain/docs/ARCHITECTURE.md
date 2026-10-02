@@ -28,19 +28,19 @@ flowchart LR
   hall --> bridge
 ```
 
-| Path                         | Responsibility                                                                         |
-| ---------------------------- | -------------------------------------------------------------------------------------- |
-| `app/index.html`             | The page: the pond canvas, the classic `<pre>`, title, sound button, control bar, help |
-| `app/src/main.js`            | Boot, the frame loop, where each drop lies on the water, views, the quality fallback   |
-| `app/src/engine/rain.js`     | The original loop on a persistent 80×24 screen, `-d` parsing, the 9600-baud pace       |
-| `app/src/engine/timeline.js` | An engine frame every delay; the queue both views read 350 ms later                    |
-| `app/src/engine/random.js`   | glibc’s `random()`; seed 1 is the original’s sequence                                  |
-| `app/src/render/`            | WebGL2 helpers, the wave simulation, sky and water, particles, bloom, pond geometry    |
-| `app/src/ui/controls.js`     | Intensity slider and presets, views, quality, sound, fullscreen, help, keys, idle fade |
-| `app/src/ui/classic.js`      | The classic view, sized to fit its pane                                                |
-| `app/src/ui/style.css`       | Layout and the night look, with system font stacks (no web fonts)                      |
-| `app/src/audio/audio.js`     | Synthesised hiss, splashes and plinks                                                  |
-| `app/src/hall.js`            | The bridge glue (added on adoption)                                                    |
+| Path                         | Responsibility                                                                                        |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `app/index.html`             | The page: the pond canvas, the classic `<pre>`, title, sound button, control bar, help, Show controls |
+| `app/src/main.js`            | Boot, the frame loop, where each drop lies on the water, views, the quality fallback                  |
+| `app/src/engine/rain.js`     | The original loop on a persistent 80×24 screen, `-d` parsing, the 9600-baud pace                      |
+| `app/src/engine/timeline.js` | An engine frame every delay; the queue both views read 350 ms later                                   |
+| `app/src/engine/random.js`   | glibc’s `random()`; seed 1 is the original’s sequence                                                 |
+| `app/src/render/`            | WebGL2 helpers, the wave simulation, sky and water, particles, bloom, pond geometry                   |
+| `app/src/ui/controls.js`     | Intensity slider and presets, views, quality, sound, fullscreen, help, keys, idle fade, Show controls |
+| `app/src/ui/classic.js`      | The classic view, sized to fit its pane                                                               |
+| `app/src/ui/style.css`       | Layout and the night look, with system font stacks (no web fonts)                                     |
+| `app/src/audio/audio.js`     | Synthesised hiss, splashes and plinks                                                                 |
+| `app/src/hall.js`            | The bridge glue (added on adoption)                                                                   |
 
 ## State machine
 
@@ -89,14 +89,16 @@ checked `-d`.
 | Control bar, help, notices                          | `app/src/ui/style.css`                        | CSS custom properties at the top           |
 
 Rain on Still Water has one night look and does not read the Hall’s tokens. Reduced motion comes
-from the system (`prefers-reduced-motion`) or `?reduced`. The renderer steps down a ladder instead
+from the system (`prefers-reduced-motion`) or `?reduced` at start-up and, in the Hall, from the
+Hall’s setting, live. The renderer steps down a ladder instead
 of failing: High, then Low once if High runs under 40 fps in the first seconds, Lite on a software
 rasteriser, and the classic view when WebGL2 or float render targets are missing.
 
 ## Where sounds are defined
 
 All sound is synthesised in `app/src/audio/audio.js` (no samples), and nothing is created until
-the player first turns sound on.
+sound is first turned on: by the player, or in the Hall by the Hall’s sound when it is not muted.
+The master level is its designed 0.9, scaled in the Hall through `setVolume`.
 
 | Sound           | Defined in                                                             | Plays when                                                                                       |
 | --------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -107,12 +109,14 @@ the player first turns sound on.
 ## Hall integration
 
 All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and, in
-`app/src/main.js`, one import and calls at four moments the page already handled.
+`app/src/main.js`, one import, calls at four moments the page already handled, the hand-over of
+its audio and two setters (`followHall`) and a hold check (`isHeldStill`) at the top of the frame
+loop.
 
 | Rain on Still Water moment                      | Bridge message                                                    |
 | ----------------------------------------------- | ----------------------------------------------------------------- |
 | The first key press or click                    | `result { outcome: 'complete', durationSeconds }`, once per visit |
-| Sound turned on                                 | `achievement hear-the-pond`                                       |
+| Sound turned on with its own button or M        | `achievement hear-the-pond`                                       |
 | The delay set to 0 (9600 baud)                  | `achievement nine-six-hundred`                                    |
 | The delay set to 1–10 ms                        | `achievement downpour`                                            |
 | The player picks the split view                 | `achievement side-by-side`                                        |
@@ -120,11 +124,21 @@ All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and, i
 | H hides every control (`hidden-ui` on `<body>`) | `achievement lights-out`                                          |
 | The first pond frame drawn 5 s after opening    | `poster`, from `#pond` through `posterFromCanvas`                 |
 
-Lights out is noticed by a `MutationObserver` on the body’s class, so `controls.js` stays as it
-was. A view set by `?view=` at start-up is not a choice and earns nothing. Rain on Still Water sends
-no title-screen signal: it has no title screen, and the Hall’s strip carries the ways out. It does
-not act on pause or appearance messages. Opened on its own, the bridge script is missing and
-`hall.js` does nothing.
+Lights out is noticed by a `MutationObserver` on the body’s class, so `controls.js` needs no call
+into `hall.js`. A view set by `?view=` at start-up is not a choice and earns nothing. Rain on Still
+Water sends no title-screen signal: it has no title screen, and the Hall’s strip carries the ways
+out. It does not act on appearance messages (it has one look). Since bridge 1.1 it follows the
+Hall’s sound, motion and pause:
+
+| In `hall.js`                              | What it does                                                                                                                                                                                                                                                                                                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onSound` → `applyHallSound`              | Sets the pond’s level to the Hall’s volume scaled from its own 0.9 (`soundLevel`, `setVolume`) and turns sound on, or off while the Hall is muted; the Sound button and M still work until the Hall’s sound changes again. Only the player’s own button or M counts towards `hear-the-pond`                                                             |
+| `startSoundOnGesture`                     | If the browser held audio back, the first key or click in the frame starts it                                                                                                                                                                                                                                                                           |
+| `onReducedMotion` → `applyHallMotion`     | Sets the loop’s `reducedMotion` (softer splashes, thinner streaks) and `renderer.reducedMotion` (a still camera) live, through the setter `main.js` hands over; a pond still at its start-up intensity moves to the one the setting starts with (400 or 120 ms). Toggles `data-reduced-motion` on the root, where `style.css` repeats its `--fade` rule |
+| `pauseWhenHidden`, `onPause` / `onResume` | The Hall’s pause and a hidden tab hold the frame loop (`isHeldStill`) and suspend the audio context; on resume the rain carries on where it was                                                                                                                                                                                                         |
+
+Opened on its own, the bridge script is missing, `hall.js` does nothing and the pond starts silent
+as before.
 
 ## Tests
 

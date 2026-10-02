@@ -2,7 +2,7 @@ import { spawnSync, type SpawnSyncReturns } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
-import { REPO_ROOT } from './paths';
+import { REPO_ROOT } from './paths.ts';
 
 const requireFromRoot = createRequire(join(REPO_ROOT, 'package.json'));
 

@@ -76,7 +76,8 @@ same Moon.
 | Fonts                                 | `app/src/ui/fonts/fonts.css`       | Swap the woff2 files and update the credits   |
 
 Selene has one night look and does not read the Hall’s tokens. Reduced motion comes from the
-system (`prefers-reduced-motion`); high contrast from the system or its own toggle.
+system (`prefers-reduced-motion`) at start-up and, in the Hall, from the Hall’s setting, live
+(`?motion=0` always wins); high contrast from the system or its own toggle.
 
 ## Where sounds are defined
 
@@ -84,8 +85,8 @@ Selene makes no sound.
 
 ## Hall integration
 
-All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and four calls in
-`app/src/ui/app.js`.
+All of it lives in `app/src/hall.js`, plus one script tag in `index.html`, four calls and the
+motion hand-over (`followHallMotion`) in `app/src/ui/app.js`.
 
 | Selene moment                                              | Bridge message                                                                                                                              |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -97,10 +98,13 @@ All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and fo
 | pom accepts a typed date                                   | `achievement ask-pom`                                                                                                                       |
 | 1.5 s after the Moon is baked, once per visit              | `poster` (via `posterFromCanvas`): a full Moon drawn for the Hall’s key art in the same task as a normal frame, so the player never sees it |
 
-Selene sends no title-screen signal: it has no title screen, and the Hall’s strip would otherwise
-stay over its toolbar. It does not act on pause or appearance messages (nothing runs that needs
-pausing, and it has one look). Opened on its own, the bridge script is missing and `hall.js` does
-nothing.
+Selene sends no title-screen signal: it has no title screen, and Esc belongs to its calendar and
+About dialog. Of the Hall’s settings (bridge 1.1) only reduced motion reaches it, since Selene makes
+no sound: `onReducedMotion` in `hall.js` passes the Hall’s choice to `setReducedMotion` in `app.js`
+(handed over once through `followHallMotion`), which sets `S.motion`, the shader’s motion and the
+`still` class live; `?motion=0` still wins. It does not act on pause or appearance messages
+(nothing runs that needs pausing, a hidden tab stops its animation frames anyway, and it has one
+look). Opened on its own, the bridge script is missing and `hall.js` does nothing.
 
 ## Tests
 

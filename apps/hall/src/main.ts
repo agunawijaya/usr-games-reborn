@@ -2,6 +2,8 @@ import './fonts';
 import './base.css';
 import { browserPreferences, browserStorage, fixedPreferences } from '@usr-games/kit';
 import { loadCatalog } from './catalog/catalog';
+import { loadBuildPosters } from './core/art/build-posters';
+import { restoreGamePosters } from './core/art/poster-shelf';
 import { startStyleHost, type StyleLoaders } from './core/style-host';
 import { createRouter } from './router';
 import { createHallStore } from './store/hall-store';
@@ -23,6 +25,11 @@ const store = createHallStore({
 });
 
 if (scene) window.history.replaceState(null, '', `${url.pathname}${url.search}${scene.hash}`);
+// Screenshot scenes draw only the Hall's own art, so they look the same on every machine.
+if (!scene) {
+  restoreGamePosters(store.storage, catalog);
+  void loadBuildPosters();
+}
 if (scene?.frozen) document.documentElement.dataset.frozen = 'true';
 
 // Each style is its own chunk: a player downloads only the style they use.

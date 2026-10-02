@@ -12,11 +12,28 @@ const DAY = 86400;
 const NEAR_AN_EVENT = 12 * HOUR;
 const CENTURY = 100 * 365.25 * DAY;
 
-const hall = globalThis.UsrGamesBridge?.connectToHall({ id: 'pom' }) ?? null;
+// Selene makes no sound, so of the Hall's settings only reduced motion reaches it: app.js
+// hands over its motion switch (followHallMotion) and the Hall's choice flips it, live.
+let applyReducedMotion = null;
+let hallReducedMotion = null;
+
+const hall = globalThis.UsrGamesBridge?.connectToHall({
+  id: 'pom',
+  onReducedMotion(reduced) {
+    hallReducedMotion = reduced;
+    applyReducedMotion?.(reduced);
+  },
+}) ?? null;
 const openedAt = performance.now();
 const installed = new Set();
 let visitReported = false;
 let timelapseWatched = false;
+
+/** app.js calls this once with its motion switch; the Hall's latest choice applies at once. */
+export function followHallMotion(apply) {
+  applyReducedMotion = apply;
+  if (hallReducedMotion !== null) apply(hallReducedMotion);
+}
 
 function install(id) {
   if (!hall || installed.has(id)) return;

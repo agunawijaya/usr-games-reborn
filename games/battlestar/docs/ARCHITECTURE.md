@@ -123,15 +123,18 @@ that count walking, flying, launching and landing, and the amulet’s jump; it w
 | Quality ladder (High, Low, Text)                                             | `probeGL()` and `Stage` in `stage.js`; `setDetail` in `model.js` builds coarser pieces on Low                        |
 
 All render files above are in `app/src/render/`. The game has one dark look and does not read the
-Hall’s tokens. Reduced motion is its own setting (first taken from the system), which removes the
+Hall’s tokens. Reduced motion is its own setting (first taken from the system; in the Hall it
+follows the Hall’s setting, live, through the same `settings.motion` path), which removes the
 travel slides and camera shake; high contrast is its own setting too. Every texture is drawn by
 code at run time; there are no image files.
 
 ## Where sounds are defined
 
 Every sound is synthesised in `app/src/audio/audio.js` from noise buffers, filters, oscillators and
-envelopes; there are no audio files. The `AudioContext` is created on the first unmute, and sound is
-off until the player turns it on.
+envelopes; there are no audio files. The `AudioContext` is created on the first unmute. On its own,
+sound is off until the player turns it on; in the Hall the Hall’s sound turns the Sound switch on
+at the frame’s first click or key press when the Hall is not muted, at the master level
+(`MASTER_LEVEL`, 0.8) scaled by the Hall’s volume.
 
 | Sound                                                                                 | Defined in                         | Plays when                           |
 | ------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------ |
@@ -143,7 +146,7 @@ off until the player turns it on.
 ## Hall integration
 
 All of it lives in `app/src/hall.js`, plus the bridge script tag in `index.html`, one import and
-four calls in `app/src/ui/app.js` and one line in `app/src/render/stage.js`:
+these calls in `app/src/ui/app.js` and one line in `app/src/render/stage.js`:
 
 - `noteGameStarted()` in `newGame`, once the engine exists (a new game, a loaded slot or
   Continue);
@@ -151,26 +154,28 @@ four calls in `app/src/ui/app.js` and one line in `app/src/render/stage.js`:
 - `reportGameOver(game, r.endKind)` at the top of `gameOver`;
 - `stage.afterFrame = afterStageFrame` when the stage is created, and in `stage.js`
   `this.afterFrame?.(this.canvas)` right after `post.render`, so the poster is captured in the same
-  task as the drawing.
+  task as the drawing;
+- `followHall({ settings, sound, soundButton, stage, flight, setReducedMotion })` once at boot, and
+  `hallPaused()` in the hint panel’s autoplay, which waits while the Hall holds the game still.
 
-| Game moment                                              | Bridge message                                                 |
-| -------------------------------------------------------- | -------------------------------------------------------------- |
-| The title dialog opens or closes                         | `title-screen { active }` (a `MutationObserver` on its `open`) |
-| Escape while the title dialog is the topmost open dialog | `navigate { to: 'hall' }`                                      |
-| `launch` from the launch tube (room 7)                   | `achievement out-of-pajamas`                                   |
-| `land`                                                   | `achievement touchdown`                                        |
-| `teleport` by the amulet                                 | `achievement amulet-hop`                                       |
-| `napkinMap`                                              | `achievement napkin-map`                                       |
-| `darkLordFlees`                                          | `achievement outwitted`                                        |
-| `wedding` (the three charms returned to the throne)      | `achievement prince-liverwort`                                 |
-| The engine’s event for a destroyed raider                | `achievement clean-shot`                                       |
-| `seaCaveOpens`                                           | `achievement low-tide`                                         |
-| `wizard` (all three charms held)                         | `achievement three-charms`                                     |
-| `dusk`                                                   | `achievement island-night`                                     |
-| 150 places visited in one game                           | `achievement surveyor`                                         |
-| Ego reaches 20                                           | `achievement generous-heart`                                   |
-| The game ends                                            | `result { outcome, score, stats, xpEvents, durationSeconds }`  |
-| 8 s after a game starts, once per visit                  | `posterFromCanvas(stage canvas)`                               |
+| Game moment                                                       | Bridge message                                                 |
+| ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| The title dialog opens or closes                                  | `title-screen { active }` (a `MutationObserver` on its `open`) |
+| Escape while the title dialog is the topmost open dialog          | `navigate { to: 'hall' }`                                      |
+| `launch` from the launch tube (room 7)                            | `achievement out-of-pajamas`                                   |
+| `land`                                                            | `achievement touchdown`                                        |
+| `teleport` by the amulet                                          | `achievement amulet-hop`                                       |
+| `napkinMap`                                                       | `achievement napkin-map`                                       |
+| `darkLordFlees`                                                   | `achievement outwitted`                                        |
+| `wedding` (the three charms returned to the throne)               | `achievement prince-liverwort`                                 |
+| The engine’s event for a destroyed raider                         | `achievement clean-shot`                                       |
+| `seaCaveOpens`                                                    | `achievement low-tide`                                         |
+| `wizard` (all three charms held)                                  | `achievement three-charms`                                     |
+| `dusk`                                                            | `achievement island-night`                                     |
+| 150 places visited in one game                                    | `achievement surveyor`                                         |
+| Ego reaches 20                                                    | `achievement generous-heart`                                   |
+| The game ends                                                     | `result { outcome, score, stats, xpEvents, durationSeconds }`  |
+| 8 s of play after a game starts (pauses left out), once per visit | `posterFromCanvas(stage canvas)`                               |
 
 `PACKAGE_FOR_EVENT` in `hall.js` holds the event-to-package table. `outcome` maps `won` to `win`,
 `died` to `loss` and `quit` to `quit` (no XP). `score` is the highest of Pleasure, Power and Ego,
@@ -186,9 +191,16 @@ normally handle Escape there itself, but the native dialog closes on Escape and 
 starts a game. So `hall.js` listens on `window` in the capture phase and, when the title dialog is
 the topmost open dialog, calls `preventDefault()` and `stopPropagation()` and navigates to the
 Hall; the bridge sees the prevented key and leaves it alone ([ADR 0011](../../../docs/adr/0011-adopting-finished-games.md)).
-`connectToHall` is given no pause, resume, appearance or settings handlers: the game ignores those
-messages. Opened on its own, the bridge script is missing, `hall` is `null`, and every call does
-nothing.
+The game ignores appearance messages (it has one look). Since bridge 1.1 `connectToHall` is given
+sound, reduced-motion and pause handlers:
+
+| In `hall.js`                                | What it does                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onSound` → `followHallSound`, `syncSwitch` | Sets the master level to the Hall’s volume scaled from 0.8 (`setMasterLevel`) and moves the game’s own Sound switch to match: off while the Hall is muted; on, when it is not, at the frame’s first click or key press (a browser keeps sound made before a gesture silent). The switch still works during the visit, until the Hall’s sound changes again |
+| `onReducedMotion` → `followHallMotion`      | Calls the setter `app.js` hands over: `settings.motion` (`?motion=reduce` still wins), the `reduce-motion` class and the stage’s and cockpit’s reduced flags, live                                                                                                                                                                                         |
+| `pauseWhenHidden`, `onPause` / `onResume`   | The Hall’s pause and a hidden tab stop the scene’s frame loop, the dogfight’s one-second clock and its autopilot, the hint panel’s autoplay (`hallPaused`) and the sound; each carries on from exactly there, and play time (`durationSeconds`, the poster’s 8 s) leaves the pause out                                                                     |
+
+Opened on its own, the bridge script is missing, `hall` is `null`, and every call does nothing.
 
 ## Tests
 

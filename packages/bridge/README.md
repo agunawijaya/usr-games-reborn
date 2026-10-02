@@ -27,6 +27,37 @@ import { connectToHall } from '@usr-games/bridge';
 const hall = connectToHall({ id: 'robots', onPause: pauseTheGame, onResume: resumeTheGame });
 ```
 
+### Follow the Hall's sound, motion and pause (revision 1.1)
+
+Every hosted game follows the player's Hall settings, mapped onto its own controls:
+
+```js
+const hall = UsrGamesBridge.connectToHall({
+  id: 'rain',
+  // Muted means silent; otherwise the game's own level, scaled by the Hall's volume.
+  onSound: (sound) => mixer.setLevel(UsrGamesBridge.soundLevel(sound, 0.6)),
+  // Into the game's existing reduced-motion path, live.
+  onReducedMotion: (reduced) => (pond.reducedMotion = reduced),
+  // The Hall's pause and a hidden page, folded into one pause and one resume.
+  pauseWhenHidden: true,
+  onPause: () => pond.freeze(),
+  onResume: () => pond.thaw(),
+});
+```
+
+- `onSound({ volume, muted })` and `onReducedMotion(reduced)` are called once when the hello
+  arrives, then only when a value changes (the Hall sends its settings on every change).
+- `soundLevel(sound, designed)` is 0 while muted, `designed` (the level the game uses on its own)
+  at the Hall's default volume (`HALL_DEFAULT_VOLUME`, 0.35), scaled with the Hall's slider and never
+  above 1. A game whose sound started on now follows the Hall; one that started silent starts at the
+  Hall's level, as native games do. Its own sound switch still works during the visit.
+- Map reduced motion onto the game's **existing** path (a flag read from `matchMedia`, its motion
+  toggle). A game with none is listed in `docs/KNOWN-ISSUES.md` rather than given an invented one.
+- The Hall pauses the game while its tab is hidden and while it asks the player something over the
+  game ("Leave this round?"). On `onPause` stop the clocks and fall silent; on `onResume` restore
+  exactly what was running, never un-pausing something the player paused. `pauseWhenHidden` also
+  pauses on the page's own `visibilitychange`, which covers the game running on its own too.
+
 Then report what happens:
 
 ```js
@@ -46,8 +77,16 @@ connectToHall(options: {
   onSettingsChange?: (settings: BridgeSettings) => void;
   onPause?: () => void;
   onResume?: () => void;
+  onSound?: (sound: { volume: number; muted: boolean }) => void; // since 1.1
+  onReducedMotion?: (reduced: boolean) => void; // since 1.1
+  pauseWhenHidden?: boolean; // since 1.1: fold the page's own visibility into onPause/onResume
   applyTokens?: boolean; // write the Hall's theme tokens as CSS custom properties on :root
 }): HallConnection;
+
+soundLevel(sound: { volume: number; muted: boolean }, designed?: number): number; // since 1.1
+HALL_DEFAULT_VOLUME; // 0.35, the kit's default master volume
+BRIDGE_VERSION; // 1, the envelope version
+BRIDGE_REVISION; // '1.1'
 
 interface HallConnection {
   readonly hosted: boolean;
@@ -80,9 +119,16 @@ createBridgeHost(options: {
 Opened on its own, outside the Hall, `connectToHall` returns a connection with `hosted: false`, and
 every call is a harmless no-op. A game never needs a second code path.
 
-## Protocol v1
+## Protocol v1, revision 1.1
 
 Every message is an envelope `{ protocol: 'usr-games-bridge', version: 1, type, payload }`.
+
+**Revision 1.1 is backwards compatible both ways.** No message gained, lost or changed a key, and
+envelopes still say `version: 1`, so a game written for 1.0 works with a 1.1 Hall and a 1.1 game with
+a 1.0 Hall. What 1.1 adds is a contract and helpers: hosted games follow the Hall's mute, volume,
+reduced motion and pause (all of which the Hall already sent), with `onSound`, `onReducedMotion`,
+`pauseWhenHidden` and `soundLevel` on the game side, and the Hall now also pauses a game while it
+asks the player something over it ([ADR 0012](../../docs/adr/0012-bridge-1-1-strip-and-posters.md)).
 
 ```mermaid
 sequenceDiagram
@@ -92,9 +138,12 @@ sequenceDiagram
     Frame->>Hall: ready { id }
     Note over Frame: repeats ready after 250, 500, 1000, 2000 and 4000 ms until hello arrives
     Hall->>Frame: hello { version, gameId, appearance, theme, tokens, settings }
+    Note over Frame: onSound and onReducedMotion fire once
     Frame->>Hall: title-screen { active: true }
-    Hall->>Frame: appearance-changed, settings-changed, pause, resume
-    Frame->>Hall: result, achievement
+    Hall->>Frame: appearance-changed, settings-changed
+    Note over Frame: onSound / onReducedMotion fire again only on a real change
+    Hall->>Frame: pause (tab hidden, or the Hall asking), then resume
+    Frame->>Hall: result, achievement, poster
     Frame->>Hall: navigate { to: hall or game-menu }
 ```
 
@@ -147,20 +196,25 @@ Hosted games have two routes, in order of preference:
    once the browser has shown the frame. The adopted games do exactly that (see
    `games/pom/app/src/hall.js` and `games/robots/app/src/hall.ts`).
 
-   The Hall keeps the latest poster for that game in memory and uses it wherever it shows the
-   game's art. Only inline PNG, JPEG or WebP data URLs pass validation: no remote URLs (the Hall
+   The Hall keeps the latest poster for that game on its poster shelf, a versioned save in its own
+   storage (at most 400 000 characters a poster, 1 600 000 in all; the oldest leave first), and
+   uses it wherever it shows the game's art, on later visits too. `isPosterImage` in
+   `src/protocol.ts` is the check a poster passes, on arrival and again when read back. Only inline PNG, JPEG or WebP data URLs pass validation: no remote URLs (the Hall
    makes no network requests) and no SVG (which can carry script). Aim for 16:9 at about
    1280×720 so the art reads both as a wide hero and as a portrait card crop; keep the strongest
    detail right of centre, because the Console Home hero puts the title bottom-left.
 
-2. **A still generated at build time.** A game that cannot snapshot itself (for example, one
-   that never draws until the player starts) gets a still frame rendered from a live run during
-   `pnpm build` into `dist/play/<id>/poster.webp`. The file exists only in `dist/`: it is never
-   committed, because the repository holds no raster files (ADR 0002). Prompt 01 adds that step to
-   the build script for the games that need it.
+2. **A still captured at build time.** After building the hosted games, `pnpm build` opens each of
+   them in the built Hall in headless Chromium (`scripts/lib/posters.ts`). It keeps the game's own
+   snapshot when the game sends one by itself within 14 seconds, otherwise a still of its frame once
+   the page has settled, in `dist/play/<id>/poster.webp` (or `.jpg` for a frame still), listed in
+   `dist/play/posters.js`, which the Hall imports at start-up. The files exist only in `dist/`: they
+   are never committed, because the repository holds no raster files (ADR 0002, ADR 0012). Without
+   Chromium, or with `pnpm build --no-posters`, the list is empty.
 
-Until either route supplies art, the Hall draws a procedural poster from the game's emblem and
-accent colour, so every game always has something beautiful to show.
+For a hosted game the Hall shows, in order: its snapshot (this visit or kept), its build-time
+poster, the Hall's placeholder key art (pom, robots, sail, trek), and otherwise a procedural poster
+from the game's emblem and accent colour, so every game always has something beautiful to show.
 
 ## Security
 
@@ -199,11 +253,14 @@ Both show the appearance they received (`#appearance`) and offer `#start`, `#win
 the Hall, in its frame.
 
 - `hall.ts`: `hostedSuiteConfig()` (the Hall dev server on `HALL_PORT`, default 5173),
-  `runInHall(page, id)` (a signed-in guest opens the Hall, then the game), `waitForGame` and
-  `inGame` (evaluate in the game's page, for its own test hooks), `toasts`, `savedGameStats` (what
-  the Hall's progression save holds for the game), `watchForeignRequests` (every request that
-  leaves the Hall's origin), and `describeWaysOut(game)`, the navigation-standard tests: Back to the
-  Hall, Game menu, the browser's Back button and, for games with a title screen, Escape there.
+  `runInHall(page, id, seed)` (a signed-in guest opens the Hall, then the game; the seed sets the
+  style, appearance, motion, volume and mute), `waitForGame` and `inGame` (evaluate in the game's
+  page, for its own test hooks), `toasts`, `savedGameStats` (what the Hall's progression save holds
+  for the game), `watchForeignRequests` (every request that leaves the Hall's origin),
+  `expectStripAboveFrame` (the strip never covers the game), `setTabHidden` (the Hall and the game
+  both report a hidden tab), `recordBridgeMessages` with `bridgeLog` (what the Hall told the game),
+  and `describeWaysOut(game)`, the navigation-standard tests: Back to the Hall, Game menu, the
+  browser's Back button and, for games with a title screen, Escape there.
 - `shots.ts`: `describeScenes(game, media, scenes)` takes one documentation screenshot per scene at
   1280×720 (a scene may reopen the game's page with its own staging parameters), saved as WebP under
   800 KB; `GPU_LAUNCH_ARGS` let headless Chromium draw WebGL on the machine's GPU, where the adopted
@@ -213,4 +270,7 @@ the Hall, in its frame.
 
 `pnpm vitest run --project bridge` covers the validators, the full handshake and message flow
 between a host and a game through a simulated pair of windows (origin and source checks, retries,
-Escape on the title screen, cleanup), the fixture manifests and the in-memory build.
+Escape on the title screen, cleanup), revision 1.1 (sound and motion delivered once and on change,
+`soundLevel`, the folded pause, the unchanged wire format), the fixture manifests and the in-memory
+build. `apps/hall/e2e/hosted-games.spec.ts` runs every hosted game in the catalog through the strip
+layout, the settings and pause messages, and a keyboard-only way in and out.

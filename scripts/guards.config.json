@@ -28,6 +28,10 @@
       {
         "path": "games/battlestar/app/scripts/contact.mjs",
         "reason": "A developer tool of the adopted starship adventure that builds a contact sheet of screenshots; it sits in the workbench the build leaves out and never ships (ADR 0011)."
+      },
+      {
+        "path": "dist/play/*/poster.*",
+        "reason": "Build-time key art of each hosted game, captured from the built site by scripts/lib/posters.ts; it exists only in dist/ and is never committed (ADR 0012)."
       }
     ]
   },

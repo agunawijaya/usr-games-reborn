@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { SHIPPED } from './catalog';
 import {
   emptyProgression,
   PROGRESSION_VERSION,
@@ -91,17 +92,19 @@ async function expectNoAxeViolations(page: Page) {
 
 test('the rail starts on Today’s pick and the hero follows the keyboard', async ({ page }) => {
   await openScene(page, 'console-home');
+  // Today's pick is one shipped game, chosen by the scene's pinned date.
   const selected = page.locator('.ch-tile.is-selected');
-  await expect(selected).toHaveAttribute('data-game', 'sail');
+  const pick = (await selected.getAttribute('data-game')) ?? '';
+  expect(SHIPPED.map((game) => game.id)).toContain(pick);
   await expect(page.locator('.ch-hero__layer').last().locator('.ch-hero__title')).toContainText(
-    'Broadside',
+    SHIPPED.find((game) => game.id === pick)!.title.split(' — ')[0]!,
   );
   await expect(page.locator('.ch-eyebrow--pick').last()).toContainText('Today’s pick');
 
   await selected.focus();
   await page.keyboard.press('ArrowRight');
   const next = page.locator('.ch-tile.is-selected');
-  await expect(next).not.toHaveAttribute('data-game', 'sail');
+  await expect(next).not.toHaveAttribute('data-game', pick);
   await expect(next).toBeFocused();
   const nextTitle = await next.locator('.ch-tile__title').textContent();
   await expect(page.locator('.ch-hero__layer').last().locator('.ch-hero__title')).toHaveText(
@@ -173,7 +176,8 @@ test.describe('the profile', () => {
   }) => {
     await openRoute(page, '#/home');
     await expect(page.locator('#ch-profile-name')).toHaveText('ada');
-    await expect(page.locator('.ch-profile-hero__rank')).toContainText('Level 16');
+    // ada's month of play is simulated over the shipped games, so her level grows with them.
+    await expect(page.locator('.ch-profile-hero__rank')).toContainText(/Level \d+/);
     await expect(page.locator('.ch-rank-chip')).toContainText('staff');
     await expect(page.locator('.ch-quests-card .ch-quest')).toHaveCount(3);
     await expect(page.locator('.ch-games tbody tr')).toHaveCount(8);
@@ -235,7 +239,12 @@ test.describe('settings', () => {
     const sunset = page.locator('.set-choice', { hasText: 'Sunset' });
     await expect(sunset).toContainText('Unlocks at Level 40');
     await expect(sunset.locator('input')).toBeDisabled();
-    await expect(sunset.locator('.ch-swatch')).toHaveCount(1);
+    await expect(sunset.locator('.set-choice__media[aria-hidden="true"] .ch-swatch')).toHaveCount(
+      1,
+    );
+    // The swatches come with the panel: changing a setting re-renders it, swatches and all.
+    await page.locator('[data-section="appearance"] .set-choice', { hasText: /^Day$/ }).click();
+    await expect(page.locator('[data-section="palette"] .ch-swatch')).toHaveCount(5);
   });
 
   test('the section list jumps to a section and moves focus there', async ({ page }) => {
@@ -319,6 +328,10 @@ test.describe('the rank-up moment', () => {
     await openRoute(page, '#/', { player: 'rankup' });
     await expect(page.locator('.ch-rankup')).toBeVisible();
     await expect(page.locator('.ch-app > [role="status"]')).toContainText('Level up!');
+    // The kit's plain welcome for the new rank, not the Machine Room's Unix one.
+    await expect(page.locator('.ch-rankup__line')).toHaveText(
+      'A regular here. The games have started to know your face.',
+    );
     await page.getByRole('button', { name: 'Skip', exact: true }).click();
     await expect(page.locator('.ch-rankup')).toHaveCount(0);
     const keepsake = page.locator('.ch-keepsake');

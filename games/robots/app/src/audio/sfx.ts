@@ -29,6 +29,8 @@ class Sfx {
   bed!: GainNode;
   bedFilter!: BiquadFilterNode;
   on = false;
+  /** The master gain while sound is on; inside the Hall it follows the Hall's volume (hall.ts). */
+  level = 0.85;
   private lastOoh = -10;
 
   private ensure() {
@@ -130,7 +132,7 @@ class Sfx {
     if (on) this.ensure();
     if (!this.ctx) return;
     if (this.ctx.state === 'suspended') void this.ctx.resume();
-    this.master.gain.setTargetAtTime(on ? 0.85 : 0, this.ctx.currentTime, 0.08);
+    this.master.gain.setTargetAtTime(on ? this.level : 0, this.ctx.currentTime, 0.08);
   }
 
   private get t() { return this.ctx ? this.ctx.currentTime : 0; }

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { CATALOG, LISTED, SLEEPING } from './catalog';
 
 /**
  * The Machine Room's end-to-end pass: Home, the directory filters, man pages with keyboard
@@ -42,9 +43,9 @@ test('Home lists every planned game as a process with the today strip above', as
   await freshHall(page);
   await expect(page.locator('.today__cron')).toBeVisible();
   await expect(page.locator('.today__fortune blockquote')).not.toBeEmpty();
-  await expect(page.locator('.proc')).toHaveCount(30);
-  await expect(page.locator('.proc--sleeping')).toHaveCount(22);
-  await expect(page.locator('.topline')).toContainText('30 total');
+  await expect(page.locator('.proc')).toHaveCount(LISTED.length);
+  await expect(page.locator('.proc--sleeping')).toHaveCount(SLEEPING.length);
+  await expect(page.locator('.topline')).toContainText(`${LISTED.length} total`);
 });
 
 test('directory filters narrow the list, and Back returns to every directory', async ({ page }) => {
@@ -54,7 +55,7 @@ test('directory filters narrow the list, and Back returns to every directory', a
   await expect(page.locator('.shelf')).toHaveCount(1);
   await expect(page.locator('.proc')).toHaveCount(5);
   await page.goBack();
-  await expect(page.locator('.proc')).toHaveCount(30);
+  await expect(page.locator('.proc')).toHaveCount(LISTED.length);
 });
 
 test('sorting A–Z flattens the rack into one shelf in title order', async ({ page }) => {
@@ -74,6 +75,9 @@ test('a man page opens from its tile and arrow keys walk its sections', async ({
   await expect(page.locator('#man-name')).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('#man-synopsis')).toBeFocused();
+  // Skyloom has shipped, so its page offers Run; a sleeping game's says it is coming.
+  await expect(page.locator('.button--run')).toContainText('Run');
+  await page.goto(`/#/man/${SLEEPING[0]!.id}`);
   await expect(page.locator('.button--sleeping')).toContainText('Coming soon');
 });
 
@@ -227,7 +231,7 @@ test('About tells the story and credits every original program', async ({ page }
   await expect(page.locator('.page-head__title')).toHaveText('About this machine');
   await expect(page.locator('.console .prompt')).toContainText('cat /etc/motd');
   await expect(page.locator('.ab-content')).toContainText('bsd-games');
-  await expect(page.locator('.ab-credit')).toHaveCount(30);
+  await expect(page.locator('.ab-credit')).toHaveCount(CATALOG.length);
 });
 
 test('the footer leads to About, Settings and the closet from every screen', async ({ page }) => {

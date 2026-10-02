@@ -84,13 +84,15 @@ between steps, equal to the grid at every step boundary (upstream ADR 003).
 | Fonts                                              | `app/src/ui/fonts/fonts.css`                                     | Swap the woff2 files and the credits |
 
 Abyssal Worms has one night look and does not read the Hall’s tokens. Reduced motion comes from the
-system (`prefers-reduced-motion`) or `?motion=0`. A software renderer gets Low quality at once, and
-slow frames on High switch to Low once, with a notice.
+system (`prefers-reduced-motion`) or `?motion=0` at start-up and, in the Hall, from the Hall’s
+setting, live. A software renderer gets Low quality at once, and slow frames on High switch to Low
+once, with a notice.
 
 ## Where sounds are defined
 
 All sound is synthesised in `app/src/audio/ambience.js` (no audio files), and nothing is created
-until the player first turns sound on.
+until sound is first turned on: by the player, or in the Hall by the Hall’s sound when it is not
+muted. The master level is the ambience’s `volume` (its designed 0.8, scaled in the Hall).
 
 | Sound                 | Defined in                                           | Plays when                                             |
 | --------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
@@ -101,7 +103,9 @@ until the player first turns sound on.
 ## Hall integration
 
 All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and, in
-`app/src/ui/app.js`, one import and calls at six moments the controller already knew about.
+`app/src/ui/app.js`, one import, calls at six moments the controller already knew about, the
+hand-over of the ambience and two setters (`followHall`) and a hold check (`isHeldStill`) at the top
+of the frame loop.
 
 | Abyssal Worms moment                                      | Bridge message                                                    |
 | --------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -115,8 +119,18 @@ All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and, i
 | The first abyss frame drawn 5 s after opening             | `poster`, from `#abyss` through `posterFromCanvas`                |
 
 Abyssal Worms sends no title-screen signal: it has no title screen, and the Hall’s strip carries
-the ways out. It does not act on pause or appearance messages. Opened on its own, the bridge script
-is missing and `hall.js` does nothing.
+the ways out. It does not act on appearance messages (it has one look). Since bridge 1.1 it follows
+the Hall’s sound, motion and pause:
+
+| In `hall.js`                              | What it does                                                                                                                                                                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onSound` → `applyHallSound`              | Sets the ambience’s `volume` to the Hall’s volume scaled from its own 0.8 (`soundLevel`) and turns sound on, or off while the Hall is muted; the speaker button and M still work until the Hall’s sound changes again |
+| `startAmbienceOnGesture`                  | If the browser held audio back, the first key or click in the frame starts it                                                                                                                                         |
+| `onReducedMotion` → `applyHallMotion`     | Sets `S.motion` live through the setter `app.js` hands over, and toggles `data-reduced-motion` on the root, where `styles.css` repeats its one reduced-motion rule                                                    |
+| `pauseWhenHidden`, `onPause` / `onResume` | The Hall’s pause and a hidden tab hold the frame loop (`isHeldStill`) and suspend the audio context; on resume the worms carry on exactly, and the player’s own pause (Space) and mute (M) survive                    |
+
+Opened on its own, the bridge script is missing, `hall.js` does nothing and the abyss starts silent
+as before.
 
 ## Tests
 

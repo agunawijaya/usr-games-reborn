@@ -2,14 +2,16 @@ import type { PosterArt } from './art';
 import { linear } from './shapes';
 
 /**
- * Art from an image a hosted game drew of itself and sent over the bridge. It fills the frame
- * like a poster (cropping, never stretching), keeping the right of centre where games are asked
- * to put their strongest detail; until the image has decoded it shows a quiet gradient.
+ * Art from an image of a hosted game: a snapshot it sent over the bridge, or the still the build
+ * captured. It fills the frame like a poster (cropping, never stretching), keeping the right of
+ * centre where games are asked to put their strongest detail; until the image has decoded it
+ * shows a quiet gradient, and `onLoad` says when the real picture is there.
  */
-export function imageArt(dataUrl: string): PosterArt {
+export function imageArt(source: string, onLoad?: () => void): PosterArt {
   const image = new Image();
   image.decoding = 'async';
-  image.src = dataUrl;
+  if (onLoad) image.addEventListener('load', onLoad, { once: true });
+  image.src = source;
   return {
     animated: false,
     draw(context, frame) {

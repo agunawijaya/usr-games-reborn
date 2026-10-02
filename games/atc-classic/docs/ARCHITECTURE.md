@@ -147,12 +147,17 @@ planes a shift on average over 30 seeds, on Default 2.6 over 20, and every run e
 | Fonts                                                       | `app/src/fonts/fonts.css`                                         |
 
 Everything is drawn in code; the game has no images. It has one dark look and does not read the
-Hall’s tokens, appearance or reduced-motion setting.
+Hall’s tokens or appearance. Reduced motion (in the Hall the Hall’s setting, on its own the
+system’s) reaches two things: the shift report prints at once instead of line by line, and the
+title’s pulse stops (`index.html` repeats that rule under `:root[data-motion='reduce']`). The radar
+sweep, the title fade, the bezel blink, the hint pulse and the cursor blink always run.
 
 ## Where sounds are defined
 
-Every sound is synthesised in `app/src/main.js` with Web Audio; there are no audio files. Sound is
-on by default and starts with the first shift (the audio graph needs a user gesture).
+Every sound is synthesised in `app/src/main.js` with Web Audio; there are no audio files. On its
+own, sound is on by default and starts with the first shift (the audio graph needs a user gesture).
+In the Hall the sound switch follows the Hall’s mute for the visit (never saved), and the hum, the
+beeps and the voice play at their designed levels scaled by the Hall’s volume (`hallLevel`).
 
 | Sound                                  | Function                      | Plays when                          |
 | -------------------------------------- | ----------------------------- | ----------------------------------- |
@@ -167,7 +172,8 @@ on by default and starts with the first shift (the audio graph needs a user gest
 
 The radio voice is the browser’s speech synthesis (`speak` in `main.js`), off by default. Since
 adoption it speaks only with a voice whose `localService` is true, so nothing is sent to an online
-speech service; without one it stays silent and the subtitles still show.
+speech service; without one it stays silent and the subtitles still show. While the Hall is muted
+it says nothing either, and the subtitles carry on.
 
 ## Hall integration
 
@@ -184,6 +190,8 @@ calls it at the moments below.
 | A radar frame drawn six seconds into the first shift, with a plane in the air | `poster`, through `posterFromCanvas` on `#radar`, once per visit                                                                                                                                            |
 | The report's Back to the Hall                                                 | `navigate { to: 'hall' }`                                                                                                                                                                                   |
 | The Hall's `pause` and `resume` (its pause menu, its hidden tab)              | `onHallPause` stops and restarts the clock and quiets the room                                                                                                                                              |
+| The Hall's sound arrives or changes                                           | `onHallSound` turns the sound switch with the Hall's mute, for the visit only; `hallLevel(level)` scales the hum, the beeps and the voice by the Hall's volume (0 while muted, so the voice stays silent)   |
+| The Hall's reduced motion arrives or changes                                  | `hallReducedMotion()` decides whether the report prints at once; `data-motion` on the root stops the title's pulse                                                                                          |
 
 - **Outcome.** A career assignment is `win` when its relief arrives and `loss` when a plane is lost
   first. An open shift or the Daily is `win` when at least one plane was brought home before the
@@ -203,7 +211,7 @@ calls it at the moments below.
 
 Escape on the game menu leads to the Hall; on the briefing it goes back to the game menu; the
 tutorial cannot open on the menu, and during a shift the game marks the Escape that closes it as
-handled. The game does not follow the Hall's appearance or settings messages. Opened on its own,
+handled. The game does not follow the Hall's appearance messages. Opened on its own,
 the bridge script is missing and `hall.js` does nothing; the report then offers no Back to the
 Hall, and the page's own `visibilitychange` still pauses the clock.
 

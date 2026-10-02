@@ -37,14 +37,14 @@ the game and the cheat panel kept out of sight. That work is recorded in "Gamifi
 
 ### Integration changes (every file touched)
 
-| File                     | Change                                                                                                                                                                                                                                                                                                            |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/index.html`         | The three lines that loaded web fonts from a font CDN (two preconnects and the stylesheet) replaced by the local `src/fonts/fonts.css`; the bridge script tag added before the module script                                                                                                                      |
-| `app/src/fonts/*`        | New: `fonts.css` and two Latin woff2 files (VT323 400, Share Tech Mono 400) from `@fontsource/vt323` 5.3.0 and `@fontsource/share-tech-mono` 5.3.0                                                                                                                                                                |
-| `app/src/hall.js`        | New: the bridge glue (title screen, results, packages, poster)                                                                                                                                                                                                                                                    |
-| `app/src/main.js`        | One import and five calls (`noteShiftStarted` at the end of `startNewGame`, `noteTick` after `tick`, `noteShiftEnded` at the top of `endGame`, `noteCommand` once an order is accepted, the poster after `render()`); `pickTtsVoice` keeps only on-device voices and `speak` stays silent without one (see below) |
-| `app/package.json`       | New, minimal: the unit-test script, so `pnpm run test:hosted` runs the upstream tests                                                                                                                                                                                                                             |
-| `app/UPSTREAM-AGENTS.md` | New: the folded agent guides                                                                                                                                                                                                                                                                                      |
+| File                     | Change                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/index.html`         | The three lines that loaded web fonts from a font CDN (two preconnects and the stylesheet) replaced by the local `src/fonts/fonts.css`; the bridge script tag added before the module script; since prompt C1, the title-pulse rule repeated under `:root[data-motion='reduce']`                                                                                                                                                           |
+| `app/src/fonts/*`        | New: `fonts.css` and two Latin woff2 files (VT323 400, Share Tech Mono 400) from `@fontsource/vt323` 5.3.0 and `@fontsource/share-tech-mono` 5.3.0                                                                                                                                                                                                                                                                                         |
+| `app/src/hall.js`        | New: the bridge glue (title screen, results, packages, poster; since prompt C1 also the Hall’s sound and reduced motion)                                                                                                                                                                                                                                                                                                                   |
+| `app/src/main.js`        | One import and five calls (`noteShiftStarted` at the end of `startNewGame`, `noteTick` after `tick`, `noteShiftEnded` at the top of `endGame`, `noteCommand` once an order is accepted, the poster after `render()`); `pickTtsVoice` keeps only on-device voices and `speak` stays silent without one (see below); since prompt C1, `onHallSound`, `hallLevel` on the hum, the beeps and the voice, and `hallReducedMotion` for the report |
+| `app/package.json`       | New, minimal: the unit-test script, so `pnpm run test:hosted` runs the upstream tests                                                                                                                                                                                                                                                                                                                                                      |
+| `app/UPSTREAM-AGENTS.md` | New: the folded agent guides                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 Nothing else changed: no rebalancing, restyling, copy edits or refactors. The 65 upstream tests
 pass unchanged (re-run 2026-10-01), one more than the upstream README counts. The test script is `node --test "tests/*.test.js"`: on Node 22 a bare `tests/` is read
@@ -259,15 +259,16 @@ re-run and every target still holds (`docs/NOTES-progression.md`). A second week
 
 ### Decisions
 
-| Date       | Decision                                                                                                        | Why                                                                                   |
-| ---------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 2026-10-02 | The cheat panel stays in the page but hidden: no button, off by default, `?cheat=1` or Ctrl+Alt+C for one visit | The owner's testing aid for checking a shift can be won by hand; players never see it |
-| 2026-10-02 | An assignment ends when its target is home ("your relief takes over"), as a win                                 | Gives the endless shift a finish line without changing the rules                      |
-| 2026-10-02 | Stamps count only on a pass, and a replay keeps the best                                                        | Progress never goes backwards; a failed shift costs nothing                           |
-| 2026-10-02 | Keeping tasks (no refused order, no minimum fuel) count only at the end, if unbroken                            | They are about the whole shift                                                        |
-| 2026-10-02 | The Daily's first flight of the day is the one on record; later flights are practice                            | A fair, shared result                                                                 |
-| 2026-10-02 | The clock stops for the briefing, the tutorial, the Hall's pause and a hidden page                              | With rewards at stake, nobody should lose a plane while away                          |
-| 2026-10-02 | The licence number comes from the clock, not `Math.random`                                                      | The in-Hall suites seed `Math.random` so the engine's traffic repeats                 |
+| Date       | Decision                                                                                                        | Why                                                                                                                                                              |
+| ---------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-02 | The cheat panel stays in the page but hidden: no button, off by default, `?cheat=1` or Ctrl+Alt+C for one visit | The owner's testing aid for checking a shift can be won by hand; players never see it                                                                            |
+| 2026-10-02 | An assignment ends when its target is home ("your relief takes over"), as a win                                 | Gives the endless shift a finish line without changing the rules                                                                                                 |
+| 2026-10-02 | Stamps count only on a pass, and a replay keeps the best                                                        | Progress never goes backwards; a failed shift costs nothing                                                                                                      |
+| 2026-10-02 | Keeping tasks (no refused order, no minimum fuel) count only at the end, if unbroken                            | They are about the whole shift                                                                                                                                   |
+| 2026-10-02 | The Daily's first flight of the day is the one on record; later flights are practice                            | A fair, shared result                                                                                                                                            |
+| 2026-10-02 | The clock stops for the briefing, the tutorial, the Hall's pause and a hidden page                              | With rewards at stake, nobody should lose a plane while away                                                                                                     |
+| 2026-10-02 | The licence number comes from the clock, not `Math.random`                                                      | The in-Hall suites seed `Math.random` so the engine's traffic repeats                                                                                            |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)                                              | ADR 0012; the pause already worked; the Hall’s mute turns the sound switch for the visit only, and reduced motion reaches the two places the game had a path for |
 
 ## Open questions
 
@@ -278,8 +279,10 @@ Listed in `docs/KNOWN-ISSUES.md` for the owner or a modification prompt:
 - Upstream wording: the loss reasons repeat the original’s messages almost word for word.
 - One dark look only; no light appearance.
 - Fixed 2026-10-02: the Hall's pause and a hidden page now stop the clock and quiet the room.
-- No `:focus-visible` styles, no ARIA beyond a hidden subtitle bar, and no reduced-motion handling
-  (the sweep and the title’s fade always run).
+- No `:focus-visible` styles, no ARIA beyond a hidden subtitle bar, and little reduced-motion
+  handling: since prompt C1 the Hall’s setting prints the report at once and stops the title’s
+  pulse, but the sweep, the title’s fade, the bezel blink, the hint pulse and the cursor blink
+  always run.
 - Fixed 2026-10-02: the game menu has keys for everything (1 2 3, ↑ ↓, L, Enter); Enter on a
   Tab-focused button still begins the shift with the choice the desk shows.
 - The sidebar’s sector buttons abandon a running shift without asking.
@@ -288,7 +291,8 @@ Listed in `docs/KNOWN-ISSUES.md` for the owner or a modification prompt:
 - The delay suffix is accepted and silently ignored.
 - Fixed 2026-10-02: the shift report offers the way on, then Again (R), Game menu (M) and Back to
   the Hall (H).
-- The Hall’s volume and mute settings do not reach the game, which has its own switches.
+- Answered by prompt C1 (2026-10-02): the Hall’s volume and mute now reach the game; its own
+  switches still work, and what they remember is unchanged.
 - This session’s screenshots and in-Hall runs used a Hall that Playwright started on port 5209:
   the Hall already running on 5174 had read the games’ manifests before this one existed, and its
   dev server does not notice new manifest files until it restarts.

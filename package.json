@@ -22,7 +22,7 @@
     "e2e": "pnpm --filter @usr-games/hall e2e",
     "shots": "pnpm --filter @usr-games/hall shots",
     "shots:all": "pnpm --filter @usr-games/hall shots:all",
-    "docs": "tsx scripts/docs.ts",
+    "docs:readme": "tsx scripts/docs.ts",
     "sim": "tsx packages/kit/src/progression/sim/report.ts",
     "check": "tsx scripts/check.ts",
     "check:catalog": "tsx scripts/check-catalog.ts",

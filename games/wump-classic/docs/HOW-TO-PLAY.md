@@ -38,7 +38,8 @@ what lies one or two tunnels out:
 | Back to the Hall (chronicle)  | `H`                   | Back to the Hall               | no         |
 | Next delve (chronicle)        | `N`                   | Next                           | no         |
 
-On the game menu, Esc goes back to the Hall.
+On the game menu, Esc goes back to the Hall. At any time, ← Back to the Hall and Game menu are on
+the Hall's strip above the game; from the keyboard, Shift+Tab reaches it.
 
 ## Rules
 
@@ -123,7 +124,10 @@ beast, riding with the bats, clinging to an outcrop, clearing a hall.
 
 The game's own setup (free delves only): the cave (the twenty-chamber plan or one dug by chance,
 with its number of chambers), easy or hard, the quiver's size. The deep-hall drone is off until you
-turn it on. The Hall's volume and appearance settings apply to the Hall around the game.
+turn it on. In the Hall, the Hall's volume and mute set how loud every sound in the game plays
+(silent while muted); the Drone button stays your choice. The Hall's appearance applies to the
+Hall around the game, and its reduced-motion setting does not reach the game yet: the mist, spores
+and wind keep moving.
 
 ## Scoring
 

@@ -3,6 +3,7 @@ import {
   firstLevelOfRank,
   levelForXp,
   RANK_IDS,
+  rankById,
   type RankId,
   rankForXp,
 } from '@usr-games/kit/progression';
@@ -26,8 +27,6 @@ interface RankCardLook {
   foil: 'rainbow' | 'sparkle' | 'gold' | 'chrome';
   frameFrom: string;
   frameTo: string;
-  /** Plain words for the card; the Unix flavour lives in the Machine Room. */
-  line: string;
 }
 
 export const RANK_CARD_LOOKS: Readonly<Record<CardRank, RankCardLook>> = {
@@ -36,30 +35,31 @@ export const RANK_CARD_LOOKS: Readonly<Record<CardRank, RankCardLook>> = {
     foil: 'rainbow',
     frameFrom: '#ff7ac6',
     frameTo: '#6fd3ff',
-    line: 'Your first level card. The album has your name on it now.',
   },
   staff: {
     finish: 'finish-galaxy',
     foil: 'sparkle',
     frameFrom: '#5b5bff',
     frameTo: '#c07bff',
-    line: 'A regular here. The cards have started to know your face.',
   },
   wheel: {
     finish: 'finish-gold',
     foil: 'gold',
     frameFrom: '#f7d774',
     frameTo: '#c9912f',
-    line: 'One step from the top. You know where the spare keys are kept.',
   },
   root: {
     finish: 'finish-chrome',
     foil: 'chrome',
     frameFrom: '#f1f4f9',
     frameTo: '#8b96a8',
-    line: 'The top of the collection. Listen: the server closet hums back.',
   },
 };
+
+/** The card's line: the rank's welcome in the kit's plain words, shared with Console Home. */
+export function cardLine(rank: CardRank): string {
+  return rankById(rank).plainFlavour;
+}
 
 export function finishName(rank: CardRank): string {
   return COSMETICS.find((c) => c.id === RANK_CARD_LOOKS[rank].finish)?.name ?? 'A new foil';
@@ -112,7 +112,7 @@ export function levelCard(
       style: { '--hc-frame-from': look.frameFrom, '--hc-frame-to': look.frameTo },
       dataset: { rank },
       'aria-label': earned
-        ? `Level card: Level ${level}, ${rank}. ${look.line} Unlocks ${finishName(rank)}. Earned.`
+        ? `Level card: Level ${level}, ${rank}. ${cardLine(rank)} Unlocks ${finishName(rank)}. Earned.`
         : `Level card: Level ${level}. Reach Level ${level} to earn it. Not earned yet.`,
     },
     h(
@@ -130,7 +130,7 @@ export function levelCard(
           h(
             'span',
             { class: 'hc-card__tagline' },
-            earned ? look.line : `Reach Level ${level} to add this card.`,
+            earned ? cardLine(rank) : `Reach Level ${level} to add this card.`,
           ),
           h(
             'span',

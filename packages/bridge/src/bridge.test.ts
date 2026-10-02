@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { connectToHall, READY_RETRY_DELAYS } from './game';
+import { connectToHall, HALL_DEFAULT_VOLUME, READY_RETRY_DELAYS, soundLevel } from './game';
 import { createBridgeHost } from './host';
 import {
   BRIDGE_PROTOCOL,
@@ -542,5 +542,126 @@ describe('standalone', () => {
       game.poster('data:image/png;base64,iVBO', 1, 1);
       game.disconnect();
     }).not.toThrow();
+  });
+});
+
+/** Stands in for the browser hiding and showing the page (jsdom's page is always visible). */
+function setPageHidden(hidden: boolean) {
+  Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden });
+  document.dispatchEvent(new Event('visibilitychange'));
+}
+
+describe('revision 1.1: sound, motion and pause', () => {
+  afterEach(() => {
+    delete (document as { hidden?: boolean }).hidden;
+  });
+
+  it('tells the game the Hall’s sound and motion on hello, then only when they change', () => {
+    const { channel, host } = wire();
+    const seen: string[] = [];
+    connectToHall({
+      id: 'pom',
+      window: channel.gameWindow,
+      onSound: ({ volume, muted }) => seen.push(`sound:${volume}${muted ? ' muted' : ''}`),
+      onReducedMotion: (reduced) => seen.push(`reduced:${reduced}`),
+    });
+    channel.flush();
+    expect(seen).toEqual(['sound:0.35', 'reduced:false']);
+
+    // The Hall sends both messages for any settings change; only real changes reach the game.
+    host.sendAppearance({ appearance: 'light', theme: 'manual', tokens: {}, reducedMotion: false });
+    host.sendSettings(settings);
+    host.sendSettings({ ...settings, muted: true });
+    host.sendAppearance({ appearance: 'light', theme: 'manual', tokens: {}, reducedMotion: true });
+    host.sendSettings({ ...settings, muted: true, reducedMotion: true, volume: 0.6 });
+    channel.flush();
+    expect(seen).toEqual([
+      'sound:0.35',
+      'reduced:false',
+      'sound:0.35 muted',
+      'reduced:true',
+      'sound:0.6 muted',
+    ]);
+  });
+
+  it('turns the Hall’s volume into a level for the game’s own mixer', () => {
+    expect(soundLevel({ volume: HALL_DEFAULT_VOLUME, muted: false })).toBe(1);
+    expect(soundLevel({ volume: HALL_DEFAULT_VOLUME, muted: false }, 0.6)).toBeCloseTo(0.6);
+    expect(soundLevel({ volume: HALL_DEFAULT_VOLUME / 2, muted: false }, 0.6)).toBeCloseTo(0.3);
+    expect(soundLevel({ volume: 1, muted: false }, 0.6)).toBe(1);
+    expect(soundLevel({ volume: 1, muted: true }, 0.6)).toBe(0);
+    expect(soundLevel({ volume: 0, muted: false })).toBe(0);
+  });
+
+  it('folds the Hall’s pause and a hidden page into one pause and one resume', () => {
+    const { channel, host } = wire();
+    const seen: string[] = [];
+    connectToHall({
+      id: 'pom',
+      window: channel.gameWindow,
+      pauseWhenHidden: true,
+      onPause: () => seen.push('pause'),
+      onResume: () => seen.push('resume'),
+    });
+    channel.flush();
+
+    setPageHidden(true);
+    host.pause();
+    channel.flush();
+    host.resume();
+    channel.flush();
+    expect(seen).toEqual(['pause']);
+    setPageHidden(false);
+    expect(seen).toEqual(['pause', 'resume']);
+
+    host.pause();
+    channel.flush();
+    setPageHidden(true);
+    setPageHidden(false);
+    expect(seen).toEqual(['pause', 'resume', 'pause']);
+  });
+
+  it('pauses a game running on its own while its page is hidden', () => {
+    const { channel } = wire();
+    const onPause = vi.fn();
+    const onResume = vi.fn();
+    const game = connectToHall({
+      id: 'pom',
+      window: channel.hallWindow,
+      pauseWhenHidden: true,
+      onPause,
+      onResume,
+    });
+    expect(game.hosted).toBe(false);
+    setPageHidden(true);
+    setPageHidden(false);
+    expect(onPause).toHaveBeenCalledTimes(1);
+    expect(onResume).toHaveBeenCalledTimes(1);
+
+    game.disconnect();
+    setPageHidden(true);
+    expect(onPause).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the wire format of 1.0, so games and Halls of either revision understand each other', () => {
+    expect(BRIDGE_VERSION).toBe(1);
+    const { channel, host } = wire();
+    const onSound = vi.fn();
+    // A game written for 1.0 passes none of the new options and hears exactly what it did.
+    const seen: string[] = [];
+    connectToHall({
+      id: 'pom',
+      window: channel.gameWindow,
+      onPause: () => seen.push('pause'),
+      onResume: () => seen.push('resume'),
+    });
+    connectToHall({ id: 'pom', window: channel.gameWindow, onSound });
+    channel.flush();
+    host.pause();
+    host.pause();
+    host.resume();
+    channel.flush();
+    expect(seen).toEqual(['pause', 'pause', 'resume']);
+    expect(onSound).toHaveBeenCalledWith({ volume: 0.35, muted: false });
   });
 });

@@ -49,7 +49,7 @@ already done or half done, **stop and tell the owner** instead of redoing work.
    _why_, no filler or AI-sounding comments, no commented-out code. TypeScript strict. ESLint and
    Prettier clean.
 7. **Stay inside the folders your prompt names.** Shared files (the Hall catalog, the README through
-   `pnpm run docs`, `docs/PROGRESS.md`, `docs/KNOWN-ISSUES.md`, `CREDITS.md`, `LICENSES/`) only at the
+   `pnpm run docs:readme`, `docs/PROGRESS.md`, `docs/KNOWN-ISSUES.md`, `CREDITS.md`, `LICENSES/`) only at the
    very end: re-read each first and edit only your own line.
 8. **No commits, no pushes.** The owner or the architect commits.
 9. **Docs in Markdown; diagrams in Mermaid only.** No images of diagrams, no other diagram syntaxes.
@@ -140,8 +140,12 @@ Hosted games live in `games/<id>/app/` exactly as adopted and run in a same-orig
 `games/<id>/app` and `build.output` is `play/<id>/`. Include the bridge with one line
 (`<script src="../../bridge/bridge.js"></script>` for static games, `import` from
 `@usr-games/bridge` for Vite games), send `ready`, map existing end states to `result`, milestones
-to `xpEvents`, and send `title-screen` so Escape on the game's own title returns to the Hall. See
-[ADR 0004](docs/adr/0004-bridge-protocol-v1.md) and `packages/bridge/README.md`.
+to `xpEvents`, and send `title-screen` so Escape on the game's own title returns to the Hall. The
+game follows the Hall's mute and volume (`onSound`, `soundLevel`), its reduced motion
+(`onReducedMotion`, onto the game's own existing path) and its pause (`onPause`/`onResume`, with
+`pauseWhenHidden`): bridge revision 1.1. The Hall lays the game out below its strip, so the game
+keeps its whole frame. See [ADR 0004](docs/adr/0004-bridge-protocol-v1.md),
+[ADR 0012](docs/adr/0012-bridge-1-1-strip-and-posters.md) and `packages/bridge/README.md`.
 
 ## 9. Navigation standard
 
@@ -203,7 +207,7 @@ Re-read each file right before editing it and change only your own line or row:
    `status: "shipped"` in your own manifest. Leave the placeholder file alone.
 2. **Progress:** update your row in `docs/PROGRESS.md` (it starts with `| <id> |`). The file is
    excluded from Prettier; keep its table format.
-3. **README:** run `pnpm run docs`; never hand-edit the games table.
+3. **README:** run `pnpm run docs:readme`; never hand-edit the games table.
 4. **Known issues, credits, licences:** add your own rows only.
 
 ## 13. Guards

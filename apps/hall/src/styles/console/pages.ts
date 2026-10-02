@@ -72,26 +72,17 @@ function page(context: ConsoleContext, className: string, labelledBy: string, ..
 }
 
 /**
- * The shared panel lists skins by name; Console shows each one as a swatch of its own chrome,
- * the same swatch as on the profile, so players see the colour before they choose it.
+ * The shared panel names each skin; Console shows it as a swatch of its own chrome, the same
+ * swatch as on the profile, so players see the colour before they choose it.
  */
-function paintSkinSwatches(panel: HTMLElement) {
-  for (const input of panel.querySelectorAll<HTMLInputElement>(
-    '.set-section--palette .set-radio',
-  )) {
-    const label = input.closest('.set-choice');
-    if (!label || label.querySelector('.ch-swatch')) continue;
-    label.insertBefore(
-      h(
-        'span',
-        { class: 'ch-swatch', dataset: { skin: input.value }, 'aria-hidden': 'true' },
-        h('span', { class: 'ch-swatch__ring' }),
-        h('span', { class: 'ch-swatch__pill' }),
-        h('span', { class: 'ch-swatch__chip' }),
-      ),
-      input.nextSibling,
-    );
-  }
+function skinSwatch(skin: string): HTMLElement {
+  return h(
+    'span',
+    { class: 'ch-swatch', dataset: { skin } },
+    h('span', { class: 'ch-swatch__ring' }),
+    h('span', { class: 'ch-swatch__pill' }),
+    h('span', { class: 'ch-swatch__chip' }),
+  );
 }
 
 /** Jump links to each settings section; the one in view is marked as it scrolls past. */
@@ -157,13 +148,9 @@ function sectionNav(panel: HTMLElement, reducedMotion: boolean) {
     observer.disconnect();
     panel.querySelectorAll('[data-section]').forEach((section) => observer.observe(section));
   };
-  const refresh = () => {
-    observe();
-    paintSkinSwatches(panel);
-  };
-  refresh();
+  observe();
   // The panel re-renders its sections when a setting changes; follow the new elements.
-  const watcher = new MutationObserver(refresh);
+  const watcher = new MutationObserver(observe);
   watcher.observe(panel, { childList: true });
   return {
     nav,
@@ -175,7 +162,11 @@ function sectionNav(panel: HTMLElement, reducedMotion: boolean) {
 }
 
 export function settingsScreen(context: ConsoleContext): ConsoleScreen {
-  const panel = settingsPanel({ store: context.store, wording: 'plain' });
+  const panel = settingsPanel({
+    store: context.store,
+    wording: 'plain',
+    choiceMedia: { palette: skinSwatch },
+  });
   const navigation = sectionNav(panel.element, context.theme.reducedMotion);
   const element = page(
     context,

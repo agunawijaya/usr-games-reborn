@@ -10,8 +10,8 @@ import { parseCommand, describeCommand, PARSE } from './parser.js';
 import * as chatter from './chatter.js';
 import { hintForPlane, sortHintsByPriority } from './hints.js';
 import {
-  hostedInHall, leaveForHall, noteCommand, noteShiftEnded, noteShiftStarted, noteTick, offerPoster,
-  onHallPause, posterWanted,
+  hallLevel, hallReducedMotion, hostedInHall, leaveForHall, noteCommand, noteShiftEnded, noteShiftStarted,
+  noteTick, offerPoster, onHallPause, onHallSound, posterWanted,
 } from './hall.js';
 import {
   ASSIGNMENTS, isUnlocked, newCareer, nextAssignmentIndex, nextRankNeed, RANKS, rankIndex,
@@ -289,6 +289,9 @@ function pickTtsVoice() {
 function speak(text) {
   if (!voiceEnabled || !text) return null;
   if (!('speechSynthesis' in window)) return null;
+  // In the Hall the radio is as loud as the Hall's sound allows, and says nothing while it is muted.
+  const volume = hallLevel(0.9);
+  if (volume === 0) return null;
   try {
     // cancel any in-flight utterance so we don't queue up backlog
     window.speechSynthesis.cancel();
@@ -299,7 +302,7 @@ function speak(text) {
     u.voice = ttsVoice;
     u.rate = 1.05;
     u.pitch = 0.95;
-    u.volume = 0.9;
+    u.volume = volume;
     window.speechSynthesis.speak(u);
     return u;
   } catch (_) { return null; }
@@ -322,7 +325,7 @@ function initAudio() {
   const AC = window.AudioContext || window.webkitAudioContext;
   audioCtx = new AC();
   ambientBed = createAmbientBed(audioCtx);
-  if (ambientBed) ambientBed.master.gain.value = audioEnabled ? 0.10 : 0;
+  if (ambientBed) ambientBed.master.gain.value = audioEnabled ? hallLevel(0.10) : 0;
 }
 
 function createAmbientBed(ctx) {
@@ -371,7 +374,7 @@ function playBeep(freq, duration = 0.08, type = 'square', vol = 0.15) {
   o.frequency.value = freq;
   const g = audioCtx.createGain();
   g.gain.value = 0;
-  g.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.005);
+  g.gain.linearRampToValueAtTime(hallLevel(vol), audioCtx.currentTime + 0.005);
   g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
   o.connect(g).connect(audioCtx.destination);
   o.start();
@@ -1122,7 +1125,7 @@ function printShiftReport(summary, shift) {
 }
 
 function prefersReducedMotion() {
-  return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  return hallReducedMotion() ?? globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
 
 /** What a report button does; the keys in onKeyDown lead here too. */
@@ -1391,7 +1394,7 @@ function resumeGame(reason) {
 
 /** While the Hall's pause menu is up or the page is hidden, the room hum and the radio go quiet. */
 function quietRoom(quiet) {
-  if (ambientBed) ambientBed.master.gain.value = quiet || !audioEnabled ? 0 : 0.10;
+  if (ambientBed) ambientBed.master.gain.value = quiet || !audioEnabled ? 0 : hallLevel(0.10);
   if (quiet && 'speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
@@ -1812,7 +1815,15 @@ function boot() {
   audioToggle.addEventListener('click', () => {
     audioEnabled = !audioEnabled;
     saveBool(SOUND_ON_KEY, audioEnabled);
-    if (ambientBed) ambientBed.master.gain.value = audioEnabled ? 0.10 : 0;
+    if (ambientBed) ambientBed.master.gain.value = audioEnabled ? hallLevel(0.10) : 0;
+    refreshToggleButtons();
+  });
+  // In the Hall the sound switch follows the Hall's mute, for this visit only: the choice the
+  // game saves is the one made on its own switch.
+  onHallSound((on) => {
+    audioEnabled = on;
+    quietRoom(pauseReasons.has('hall') || pauseReasons.has('hidden'));
+    if (!on && 'speechSynthesis' in window) window.speechSynthesis.cancel();
     refreshToggleButtons();
   });
 

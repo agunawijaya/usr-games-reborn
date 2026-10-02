@@ -12,18 +12,18 @@ computed it, and turns it into something to sit and watch.
 
 ## Changes
 
-| Area         | Original                                           | Abyssal Worms                                                                         | Why                                               |
-| ------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Presentation | One character per cell on a curses terminal        | Glowing worms on a sea floor they light themselves; the terminal kept as a view       | Make a screensaver worth watching again           |
-| Motion       | Jumps one character per step                       | A smooth glide that equals the grid at every step boundary                            | Organic motion without misdrawing the grid        |
-| Speed        | No `-d`: as fast as the terminal could take output | No `-d`: paced like a 9600-baud terminal                                              | On a modern screen the original pace is a blur    |
-| Screen size  | The terminal’s columns and lines                   | Columns and lines from the window and a cell size; a resize starts afresh             | A browser has no terminal to measure              |
-| Options      | Read once, at start                                | Changed live in a settings panel, or typed as a command line with the same checks     | Playing with the options is most of the fun       |
-| Trail `-t`   | Dots that stay                                     | Classic view: the same dots. Abyss: a glowing wake that fades                         | Light that never fades would fill the sea         |
-| Field `-f`   | The word WORM repeated across the whole screen     | Classic view: the same letters. Abyss: faint plankton writing, eaten letter by letter | The same rule, seen as feeding                    |
-| Randomness   | The C library’s `random()`, never seeded           | The same generator from seed 1, plus a New seed button                                | Keep the original’s runs and still offer new ones |
-| Stopping     | A signal ends it and restores the terminal         | Leave the page                                                                        | Browsers have no signals                          |
-| Sound        | None                                               | An optional drone, bubbles and crossing chimes, off until asked for                   | A quiet deep-sea mood                             |
+| Area         | Original                                           | Abyssal Worms                                                                                               | Why                                               |
+| ------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Presentation | One character per cell on a curses terminal        | Glowing worms on a sea floor they light themselves; the terminal kept as a view                             | Make a screensaver worth watching again           |
+| Motion       | Jumps one character per step                       | A smooth glide that equals the grid at every step boundary                                                  | Organic motion without misdrawing the grid        |
+| Speed        | No `-d`: as fast as the terminal could take output | No `-d`: paced like a 9600-baud terminal                                                                    | On a modern screen the original pace is a blur    |
+| Screen size  | The terminal’s columns and lines                   | Columns and lines from the window and a cell size; a resize starts afresh                                   | A browser has no terminal to measure              |
+| Options      | Read once, at start                                | Changed live in a settings panel, or typed as a command line with the same checks                           | Playing with the options is most of the fun       |
+| Trail `-t`   | Dots that stay                                     | Classic view: the same dots. Abyss: a glowing wake that fades                                               | Light that never fades would fill the sea         |
+| Field `-f`   | The word WORM repeated across the whole screen     | Classic view: the same letters. Abyss: faint plankton writing, eaten letter by letter                       | The same rule, seen as feeding                    |
+| Randomness   | The C library’s `random()`, never seeded           | The same generator from seed 1, plus a New seed button                                                      | Keep the original’s runs and still offer new ones |
+| Stopping     | A signal ends it and restores the terminal         | Leave the page                                                                                              | Browsers have no signals                          |
+| Sound        | None                                               | A drone, bubbles and crossing chimes, following the Hall’s sound in the Hall, otherwise off until asked for | A quiet deep-sea mood                             |
 
 ## Quirks and bugs in the original
 

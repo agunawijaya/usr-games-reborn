@@ -1,7 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import {
+  bridgeLog,
   expectBackInHall,
+  expectStripAboveFrame,
   frameReloaded,
+  inGame,
+  recordBridgeMessages,
   revealStrip,
   runInHall,
   savedGameStats,
@@ -64,6 +68,91 @@ test('a timelapse watched to the end installs A whole lunation', async ({ page }
   await expect(toasts(page)).toContainText('Achievement unlocked: A whole lunation', {
     timeout: 40_000,
   });
+});
+
+for (const viewport of [
+  { width: 1280, height: 720 },
+  { width: 1920, height: 1080 },
+]) {
+  test(`the strip sits above the toy at ${viewport.width}×${viewport.height}, with and without the calendar`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const frame = await runInHall(page, 'pom');
+    await waitForGame(page, BAKED);
+    await expectStripAboveFrame(page);
+    await expect(frame.locator('#btn-calendar')).toBeInViewport();
+    await frame.locator('#btn-calendar').click();
+    await expect(frame.locator('#calendar')).toBeVisible();
+    await expectStripAboveFrame(page);
+  });
+}
+
+test.describe('the Hall’s reduced motion', () => {
+  /** Selene's own motion switch and the still class its stylesheet keys on (src/ui/app.js). */
+  const motion = (page: Page) =>
+    inGame<{ motion: boolean; still: boolean }>(
+      page,
+      `({ motion: window.__seleneApp.S.motion, still: document.body.classList.contains('still') })`,
+    );
+
+  test('a Hall set to reduced motion holds the sky still', async ({ page }) => {
+    await runInHall(page, 'pom', { motion: 'reduce' });
+    await waitForGame(page, BAKED);
+    await expect.poll(() => motion(page)).toEqual({ motion: false, still: true });
+  });
+
+  test('with the system’s motion setting, a change there reaches the toy live', async ({
+    page,
+  }) => {
+    await recordBridgeMessages(page);
+    await runInHall(page, 'pom', { motion: 'system' });
+    await waitForGame(page, BAKED);
+    await expect
+      .poll(async () => (await bridgeLog(page)).some((message) => message.type === 'hello'))
+      .toBe(true);
+    expect(await motion(page)).toEqual({ motion: true, still: false });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect.poll(() => motion(page)).toEqual({ motion: false, still: true });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect.poll(() => motion(page)).toEqual({ motion: true, still: false });
+  });
+});
+
+test('keyboard alone: travel and play a timelapse, step out to the strip and back, and leave', async ({
+  page,
+}) => {
+  const frame = await runInHall(page, 'pom');
+  await waitForGame(page, BAKED);
+  const inStrip = () =>
+    page.evaluate(() =>
+      Boolean(document.querySelector('[data-testid="pl-strip"]')?.contains(document.activeElement)),
+    );
+  const inFrame = () =>
+    page.evaluate(() => document.activeElement?.getAttribute('data-testid') === 'pl-frame');
+  const hallLink = page.locator('.pl-strip__hall');
+
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(frame.locator('#cap-cmd')).not.toHaveText('pom');
+  await page.keyboard.press('Space');
+  await expect(frame.locator('#btn-play')).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Space');
+  await expect(frame.locator('#btn-play')).toHaveAttribute('aria-pressed', 'false');
+
+  // Shift+Tab walks out of the toy to the strip above it; Tab walks back in.
+  for (let i = 0; i < 30 && !(await inStrip()); i++) await page.keyboard.press('Shift+Tab');
+  expect(await inStrip()).toBe(true);
+  for (let i = 0; i < 30 && !(await inFrame()); i++) await page.keyboard.press('Tab');
+  expect(await inFrame()).toBe(true);
+  expect(await inGame(page, 'document.activeElement !== document.body')).toBe(true);
+
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Shift+Tab');
+    if (await hallLink.evaluate((link) => link === document.activeElement)) break;
+  }
+  await expect(hallLink).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expectBackInHall(page);
 });
 
 test.describe('the ways out', () => {

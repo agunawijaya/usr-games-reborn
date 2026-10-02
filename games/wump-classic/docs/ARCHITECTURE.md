@@ -40,7 +40,7 @@ flowchart LR
 | `app/src/chronicle.mjs` | The written account of a delve; the ledger                                                           |
 | `app/src/codex.mjs`     | The sixteen lore pages and how each is found                                                         |
 | `app/src/store.mjs`     | Saves under `usr-games:wump-classic:`                                                                |
-| `app/src/hall.mjs`      | Bridge glue: results, packages, title screen, pause, key art                                         |
+| `app/src/hall.mjs`      | Bridge glue: results, packages, title screen, pause, sound, key art                                  |
 | `app/src/desk.css`      | The desk's styles; `app/src/fonts/` the self-hosted Cinzel                                           |
 
 ## State machine
@@ -99,8 +99,11 @@ There is one look, night in the deep halls (listed in `docs/KNOWN-ISSUES.md`).
 ## Where sounds are defined
 
 All in `index.html`, synthesised with Web Audio: the drone (two low sines, off until turned on),
-the bowstring, the victory fanfare and the wumpus's roar. The Hall's pause suspends the audio
-context (`RuneGatesPlay.pauseSound`).
+the bowstring, the victory fanfare and the wumpus's roar. Every sound passes one master gain
+(`masterGain`), which in the Hall follows the Hall's volume and mute through
+`RuneGatesPlay.setSoundLevel` (1, as designed, at the Hall's default volume; 0 while muted); the
+Drone button stays the delver's choice. The Hall's pause suspends the audio context
+(`RuneGatesPlay.pauseSound`).
 
 ## Hall integration
 
@@ -111,6 +114,11 @@ context (`RuneGatesPlay.pauseSound`).
 - **Packages.** The twelve in the manifest, offered by `installPackages` in `desk.mjs`.
 - **Title screen.** The game menu reports `title-screen`, so Esc there leads to the Hall; the
   page's own Esc that closes a dialog calls `preventDefault`, so the bridge leaves it alone.
+- **Sound, motion and pause (bridge 1.1).** `onSound` in `hall.mjs` turns the Hall's sound into a
+  level (`soundLevel(sound)`) and hands it to `onHallSound` in `desk.mjs`, which calls
+  `RuneGatesPlay.setSoundLevel`; on its own the game never hears it and plays as designed. The
+  Hall's pause still suspends the audio context through `onHallPause`. The game has no
+  reduced-motion path for the Hall's setting to reach (an open issue).
 - **Key art.** The cave behind the menu, flattened from the five layers, two and a half seconds
   after the page opens.
 - **Saves.** `usr-games:wump-classic:` `career`, `ledger`, `codex`, `daily`, `drone`, each at

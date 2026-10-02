@@ -28,6 +28,7 @@ export function createAudio() {
   let meter = null;
   let splashBuf = null;
   let muted = true;
+  let volume = 0.9; // master level while unmuted; the Hall scales it to its own volume
   let budget = MAX_DROPS_PER_S;
   let lastT = 0;
   let seed = 99;
@@ -153,12 +154,15 @@ export function createAudio() {
     if (!m && !ac) build();
     if (!ac) return;
     if (!m && ac.state === 'suspended') await ac.resume();
-    master.gain.setTargetAtTime(m ? 0 : 0.9, ac.currentTime, 0.25);
+    master.gain.setTargetAtTime(m ? 0 : volume, ac.currentTime, 0.25);
   }
 
   return {
     setMuted,
     isMuted: () => muted,
+    setVolume: (v) => { volume = v; },
+    context: () => ac,
+    gain: () => (master ? master.gain.value : 0),
     setRain,
     plink,
     state: () => (ac ? ac.state : 'none'),

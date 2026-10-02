@@ -36,7 +36,7 @@ import { advanceClock, after, clearScheduled, slowMotion, vclock } from './fx/cl
 import { playerWorld, quality, shake } from './fx/store';
 import { dangerCells, diffTurn, type Dying } from './fx/turnDiff';
 import { sfx } from './audio/sfx';
-import { backToHall, install, onHallPause, reportRun, setTitleScreen, startRun } from './hall';
+import { backToHall, install, onHallPause, onHallSound, reportRun, setTitleScreen, startRun } from './hall';
 import type { Call } from './modes/calls';
 import { line } from './modes/commentary';
 import { localDateKey } from './modes/daily';
@@ -362,6 +362,9 @@ export function Game() {
     if (isPaused) setWaiting(false);
     else resetTempo();
   }), [resetTempo]);
+
+  // In the Hall the sound follows the Hall's mute (hall.ts); the switch shows where it stands.
+  useEffect(() => onHallSound(setSound), []);
 
   // Escape on the game menu belongs to the Hall (the bridge sends it back there).
   useEffect(() => setTitleScreen(screen === 'menu'), [screen]);
@@ -734,6 +737,8 @@ export function Game() {
       screen: () => screenRef.current,
       tracker: () => tracker.current,
       setZoom: (z: number) => { userZoomed.current = true; setZoom(z); },
+      sfx,
+      quality,
     };
   }, [handleAction, handleAdvance, startMatch, today]);
 

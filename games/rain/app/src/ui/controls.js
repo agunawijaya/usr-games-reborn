@@ -80,6 +80,8 @@ export function createControls(h) {
     if (show) $('help-close').focus();
   };
   $('help-btn').addEventListener('click', () => toggleHelp());
+  // with every control hidden (H), the way back for a mouse or the Tab key
+  $('show-ui').addEventListener('click', () => body.classList.remove('hidden-ui'));
   $('help-close').addEventListener('click', () => toggleHelp(false));
 
   // ---- keys

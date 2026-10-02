@@ -112,31 +112,37 @@ flowchart LR
 | Quality tiers and reduced motion      | `app/src/fx/store.ts`                                                   |
 
 The stadium has one night look and does not read the Hall’s tokens. Software renderers get a
-lighter tier automatically.
+lighter tier automatically. Reduced motion is `quality.reducedMotion` in `fx/store.ts`: the
+system’s setting at start and, in the Hall, the Hall’s, live.
 
 ## Where sounds are defined
 
 Every sound is synthesised in `app/src/audio/sfx.ts` from `fxBus` events (no audio files): the hum,
 steps, servos, crashes pitched up a chain, teleports, the crowd (a gasp, then applause when you are
-caught), fireworks. Sound is off until the player presses `m`.
+caught), fireworks. On its own, sound is off until the player presses `m`; in the Hall it follows
+the Hall’s sound (below). `sfx.level` is the master gain while sound is on, 0.85 as designed.
 
 ## Hall integration
 
 `app/src/hall.ts` listens to the same bus as the scene and the sound, plus calls from `Game.tsx`
 when a run starts and ends, when the crowd reaches Showtime, and whether the game menu is showing.
+Since bridge 1.1 it also drives the game’s own sound and reduced-motion switches from the Hall’s
+settings.
 
-| Robots moment                            | Bridge message                                                                                                                |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| A run ends (after the last crashes land) | `result { outcome, score, stats, xpEvents, daily, durationSeconds }`                                                          |
-| A wave cleared                           | packages `first-wave`, `feet-on-the-ground`, `full-house`, `blitz-wave` (when the robots keep time)                           |
-| The run’s third wave starts              | package `third-wave`                                                                                                          |
-| A chain of 3, 5 or 8                     | packages `pile-up`, `chain-reaction`, `meltdown`                                                                              |
-| Teleport with a robot one step away      | package `close-call`                                                                                                          |
-| The crowd reaches Showtime               | package `showtime`                                                                                                            |
-| A Daily Showdown ends; the tour won      | packages `daily-showdown`; `grand-final`                                                                                      |
-| The game menu shows or hides             | `setTitleScreen`: Escape on the menu goes back to the Hall                                                                    |
-| Pause and resume from the Hall           | The Blitz clock and the safe wait stop; the clock starts afresh on resume                                                     |
-| 6.5 s after loading, once per visit      | `poster` (via `posterFromCanvas`): the stadium, captured by react-three-fiber’s `addAfterEffect` right after a frame is drawn |
+| Robots moment                                                                           | Bridge message                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A run ends (after the last crashes land)                                                | `result { outcome, score, stats, xpEvents, daily, durationSeconds }`                                                                                                                                                                                                           |
+| A wave cleared                                                                          | packages `first-wave`, `feet-on-the-ground`, `full-house`, `blitz-wave` (when the robots keep time)                                                                                                                                                                            |
+| The run’s third wave starts                                                             | package `third-wave`                                                                                                                                                                                                                                                           |
+| A chain of 3, 5 or 8                                                                    | packages `pile-up`, `chain-reaction`, `meltdown`                                                                                                                                                                                                                               |
+| Teleport with a robot one step away                                                     | package `close-call`                                                                                                                                                                                                                                                           |
+| The crowd reaches Showtime                                                              | package `showtime`                                                                                                                                                                                                                                                             |
+| A Daily Showdown ends; the tour won                                                     | packages `daily-showdown`; `grand-final`                                                                                                                                                                                                                                       |
+| The game menu shows or hides                                                            | `setTitleScreen`: Escape on the menu goes back to the Hall                                                                                                                                                                                                                     |
+| Pause and resume from the Hall, or the page hidden (`pauseWhenHidden`, also on its own) | The Blitz clock and the safe wait stop and the audio context is suspended; the clock starts afresh on resume                                                                                                                                                                   |
+| The Hall’s sound arrives or changes                                                     | `followHallSound`: `sfx.level` becomes the Hall’s volume scaled from 0.85 (`soundLevel`) and the sound turns on, or off while the Hall is muted; `onHallSound` shows it on the HUD’s ♪ switch, and `m` keeps working at the Hall’s volume until the Hall’s sound changes again |
+| The Hall’s reduced motion arrives or changes                                            | `followHallMotion`: sets `quality.reducedMotion`, which the game reads as it goes, and toggles `data-reduced-motion` on the root, where `modes.css` repeats its two reduced-motion rules. Only the very first opening on a warm load can begin before it arrives               |
+| 6.5 s after loading, once per visit                                                     | `poster` (via `posterFromCanvas`): the stadium, captured by react-three-fiber’s `addAfterEffect` right after a frame is drawn                                                                                                                                                  |
 
 `score` is the run’s points, the crowd’s multiplier and the calls included. `outcome` is `win` or
 `loss` for a Grand Tour match; any other run is a `win` when it cleared at least one wave. `stats`

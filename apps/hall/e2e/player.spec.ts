@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type FrameLocator, type Page, test } from '@playwright/test';
+import { SLEEPING } from './catalog';
 
 /**
  * The player that runs games (`#/run/<id>`): the hosted fixture in its bridge frame with the
@@ -13,7 +14,7 @@ const STYLES: readonly Style[] = ['console', 'holo', 'machine-room'];
 interface Seed {
   style?: Style;
   appearance?: 'light' | 'dark';
-  motion?: 'full' | 'reduce';
+  motion?: 'full' | 'reduce' | 'system';
 }
 
 /**
@@ -65,10 +66,44 @@ async function openHosted(page: Page, seed: Seed = {}): Promise<FrameLocator> {
   return frame;
 }
 
-/** The strip tucks itself away during play; the pointer at the top edge brings it back. */
-async function revealStrip(page: Page) {
-  await page.mouse.move(640, 4);
-  await expect(page.locator('.pl-page')).toHaveClass(/is-strip-open/);
+/** Every bridge message the game's page has received, recorded by `recordHallMessages`. */
+async function hallMessages(
+  page: Page,
+): Promise<{ type: string; payload: Record<string, unknown> }[]> {
+  const frame = page.frame({ url: /\/play\// });
+  return ((await frame?.evaluate('window.__bridgeLog')) ?? []) as {
+    type: string;
+    payload: Record<string, unknown>;
+  }[];
+}
+
+async function recordHallMessages(page: Page) {
+  await page.addInitScript(`
+    if (window.top !== window) {
+      window.__bridgeLog = [];
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.protocol === 'usr-games-bridge') window.__bridgeLog.push(event.data);
+      });
+    }
+  `);
+}
+
+/** Headless pages are never hidden; this makes the Hall and the game both believe they are. */
+async function setTabHidden(page: Page, hidden: boolean) {
+  const script = `(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => ${hidden} });
+    document.dispatchEvent(new Event('visibilitychange'));
+  })()`;
+  for (const frame of page.frames()) await frame.evaluate(script).catch(() => undefined);
+}
+
+async function expectStripAboveFrame(page: Page) {
+  const viewport = page.viewportSize()!;
+  const strip = (await page.getByTestId('pl-strip').boundingBox())!;
+  const frame = (await page.getByTestId('pl-frame').boundingBox())!;
+  expect(strip.y).toBe(0);
+  expect(Math.abs(frame.y - (strip.y + strip.height))).toBeLessThanOrEqual(1);
+  expect(Math.abs(frame.y + frame.height - viewport.height)).toBeLessThanOrEqual(1);
 }
 
 const menuEntries = (page: Page) =>
@@ -112,7 +147,6 @@ test.describe('hosted games', () => {
     const frame = await openHosted(page);
     await frame.getByTestId('start').click();
     await expect(frame.getByTestId('win')).toBeVisible();
-    await revealStrip(page);
     await page.getByTestId('pl-strip-menu').click();
     const dialog = page.getByRole('alertdialog', { name: 'Leave this round?' });
     await expect(dialog).toBeVisible();
@@ -120,11 +154,102 @@ test.describe('hosted games', () => {
     await dialog.getByRole('button', { name: 'Keep playing' }).click();
     await expect(dialog).toBeHidden();
     await expect(frame.getByTestId('win')).toBeVisible();
-    await revealStrip(page);
     await page.getByTestId('pl-strip-menu').click();
     await page.getByRole('alertdialog').getByRole('button', { name: 'Leave' }).click();
     await expect(frame.getByTestId('start')).toBeVisible();
     await expect(frame.getByTestId('appearance')).not.toHaveText('standalone');
+  });
+
+  for (const viewport of [
+    { width: 1280, height: 720 },
+    { width: 1920, height: 1080 },
+  ]) {
+    test(`the strip sits above the game, never over it, at ${viewport.width}×${viewport.height}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      const frame = await openHosted(page);
+      await expectStripAboveFrame(page);
+      // It stays put during play too: nothing slides over the game's own top bar.
+      await frame.getByTestId('start').click();
+      await page.mouse.move(viewport.width / 2, 2);
+      await page.mouse.move(viewport.width / 2, viewport.height / 2);
+      await page.waitForTimeout(400);
+      await expectStripAboveFrame(page);
+      await expect(page.getByTestId('pl-strip')).toBeInViewport();
+    });
+  }
+
+  test('Tab leaves the game for the strip, and the strip’s ways out work by keyboard', async ({
+    page,
+  }) => {
+    const frame = await openHosted(page);
+    await frame.getByTestId('start').focus();
+    // Shift+Tab from the game's first control lands on the strip's last one.
+    await page.keyboard.press('Shift+Tab');
+    const back = page.getByRole('link', { name: 'Back to the Hall' });
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.getByTestId('pl-strip-menu')).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.getByTestId('pl-strip-mute')).toBeFocused();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expectHall(page);
+  });
+
+  test('the strip’s mute and the Hall’s motion reach the game over the bridge', async ({
+    page,
+  }) => {
+    await recordHallMessages(page);
+    await openHosted(page, { motion: 'system' });
+    const hello = (await hallMessages(page)).find((message) => message.type === 'hello');
+    expect(hello?.payload.settings).toMatchObject({
+      volume: 0.35,
+      muted: false,
+      reducedMotion: false,
+    });
+
+    const mute = page.getByTestId('pl-strip-mute');
+    await expect(mute).toHaveAttribute('aria-pressed', 'false');
+    await mute.click();
+    await expect(mute).toHaveAttribute('aria-pressed', 'true');
+    await expect
+      .poll(
+        async () =>
+          (await hallMessages(page)).filter((m) => m.type === 'settings-changed').at(-1)?.payload,
+      )
+      .toMatchObject({ settings: { muted: true } });
+
+    // The player chose "match my device": the system turning on reduced motion reaches the game.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect
+      .poll(
+        async () =>
+          (await hallMessages(page)).filter((m) => m.type === 'settings-changed').at(-1)?.payload,
+      )
+      .toMatchObject({ settings: { muted: true, reducedMotion: true } });
+  });
+
+  test('the game is paused while the Hall asks, and while the tab is hidden', async ({ page }) => {
+    await recordHallMessages(page);
+    const frame = await openHosted(page);
+    await frame.getByTestId('start').click();
+    const pauses = async () =>
+      (await hallMessages(page))
+        .map((message) => message.type)
+        .filter((type) => type === 'pause' || type === 'resume');
+
+    await page.getByTestId('pl-strip-menu').click();
+    await expect.poll(pauses).toEqual(['pause']);
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Keep playing' }).click();
+    await expect.poll(pauses).toEqual(['pause', 'resume']);
+
+    await setTabHidden(page, true);
+    await expect.poll(pauses).toEqual(['pause', 'resume', 'pause']);
+    await setTabHidden(page, false);
+    await expect.poll(pauses).toEqual(['pause', 'resume', 'pause', 'resume']);
   });
 
   test('a result and an achievement each bring an XP toast', async ({ page }) => {
@@ -275,12 +400,13 @@ test.describe('native games', () => {
   });
 
   test('an unknown game gets a still page with the ways onward', async ({ page }) => {
-    await openPlayer(page, 'atc');
+    const sleeping = SLEEPING[0]!.id;
+    await openPlayer(page, sleeping);
     const closed = page.getByTestId('pl-closed');
     await expect(closed.getByRole('heading', { name: 'Coming soon' })).toBeVisible();
     await expect(closed.getByRole('link', { name: 'About this game' })).toHaveAttribute(
       'href',
-      '#/game/atc',
+      `#/game/${sleeping}`,
     );
     await openPlayer(page, 'no-such-game');
     await expect(closed.getByRole('heading', { level: 1 })).toHaveText(

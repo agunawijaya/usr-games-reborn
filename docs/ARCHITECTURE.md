@@ -14,7 +14,7 @@ flowchart LR
   end
   subgraph packages
     kit["packages/kit<br/>RNG · audio · input · settings · saves<br/>tokens · progression · contract"]
-    bridge["packages/bridge<br/>postMessage protocol v1<br/>host + game client"]
+    bridge["packages/bridge<br/>postMessage protocol v1 (rev 1.1)<br/>host + game client"]
   end
   subgraph games["games/&lt;id&gt;"]
     native["native games<br/>src/index.ts → GameModule"]
@@ -56,6 +56,8 @@ in development and in `pnpm build --fixtures`.
 
 Every manifest follows `GameManifest` in `packages/kit/src/manifest/manifest.ts` and is validated by
 `validateManifest` in unit tests, at Hall start-up in development, and by `pnpm check:catalog`.
+The Hall's dev server watches `games/*/manifest.json` (`scripts/lib/catalog-dev-plugin.ts`), so a
+manifest added, changed or removed while it runs reloads the catalog without a restart.
 Statuses: `coming-soon` (sleeping in the process list), `adopting` (a hosted game on its way),
 `shipped` (runnable) and `unlisted` (hidden).
 
@@ -199,15 +201,29 @@ captions in the Machine Room) and scopes its CSS to `pl-` classes under `data-st
   with `presentation: 'hall'`, the results screen (Play again (R) · Game menu · Back to the Hall
   (H)). Play again calls the game's optional `playAgain()`, else remounts it. While a dialog is
   open the stage is `inert`, so keys never reach the game underneath.
-- **Hosted** games run in a same-origin frame (`hosted-session.ts`) under a slim strip with
-  "← Back to the Hall" and "Game menu" that tucks itself away during play. Escape on the game's
-  own title screen returns to the Hall through the bridge's title-screen signal.
+- **Hosted** games run in a same-origin frame (`hosted-session.ts`) laid out below a slim strip
+  (42 px) with the game's title, **Mute** (the Hall's master mute), **Game menu** and
+  **← Back to the Hall**. The strip is part of the layout, never an overlay: the frame starts where
+  it ends, so a game's own top bar is never covered and the frame keeps its size during play
+  ([ADR 0012](adr/0012-bridge-1-1-strip-and-posters.md)). Escape on the game's own title screen
+  returns to the Hall through the bridge's title-screen signal.
+
+```mermaid
+flowchart TB
+  subgraph window["The player's window (#/run/id)"]
+    direction TB
+    strip["strip, 42 px<br/>title · Esc hint on the game's title · Mute · Game menu · ← Back to the Hall"]
+    frame["the game's frame<br/>play/id/, fills the rest of the window"]
+    strip --- frame
+  end
+```
+
 - A game that cannot run yet (coming soon, or not built) gets a still page with its poster and the
   ways back (`not-launchable.ts`); `isLaunchable(entry)` tells a style whether to offer Play.
 - Receipts become toasts: XP, achievements (packages) and a rank change; the rank-up moment itself
   plays in the style when the player returns to the Hall.
 
-## Bridge handshake
+## Bridge handshake (protocol v1, revision 1.1)
 
 ```mermaid
 sequenceDiagram
@@ -216,12 +232,18 @@ sequenceDiagram
   Hall->>Hall: listen for messages from the frame, then set src to play/id/
   Frame->>Hall: ready { id }
   Hall->>Frame: hello { version, gameId, appearance, theme, tokens, settings }
+  Note over Frame: onSound { volume, muted } and onReducedMotion fire once
   Frame->>Hall: title-screen { active: true }
   Note over Frame: Escape here becomes navigate to hall
   Frame->>Hall: title-screen { active: false }
+  Hall->>Frame: settings-changed { settings } (the strip's Mute, a system change)
+  Note over Frame: onSound / onReducedMotion fire only when a value changed
   Hall->>Frame: appearance-changed { appearance, theme, tokens, reducedMotion }
-  Hall->>Frame: pause
-  Hall->>Frame: resume
+  Hall->>Frame: pause (tab hidden, or the Hall asks "Leave this round?")
+  Note over Frame: clocks stop, sound falls silent
+  Hall->>Frame: resume (neither holds any more)
+  Frame->>Hall: poster { image, width, height }
+  Hall->>Hall: keep it on the poster shelf
   Frame->>Hall: achievement { id }
   Frame->>Hall: result { outcome, score, stats, xpEvents }
   Frame->>Hall: navigate { to: game-menu }
@@ -231,8 +253,28 @@ sequenceDiagram
 ```
 
 Every message is an envelope `{ protocol: 'usr-games-bridge', version: 1, type, payload }`,
-checked for origin, source window and a strict schema on arrival. See
+checked for origin, source window and a strict schema on arrival. Revision 1.1 changed no message:
+it made following the Hall's sound, motion and pause part of every hosted game's contract and gave
+the game-side client `onSound`, `onReducedMotion`, `pauseWhenHidden` and `soundLevel`
+([ADR 0012](adr/0012-bridge-1-1-strip-and-posters.md)). See
 [ADR 0004](adr/0004-bridge-protocol-v1.md) and `packages/bridge/README.md`.
+
+## Hosted games' key art
+
+```mermaid
+flowchart LR
+  snapshot["the game's own snapshot<br/>poster message, this visit"] --> shelf[("poster shelf<br/>usr-games:hall:posters<br/>versioned, size-capped")]
+  shelf --> shown{"art for a hosted game"}
+  build["build-time poster<br/>dist/play/id/poster.*<br/>listed in play/posters.js"] --> shown
+  keyArt["the Hall's placeholder key art"] --> shown
+  procedural["procedural poster<br/>emblem and accent"] --> shown
+```
+
+A hosted game's art comes, in order, from its own snapshot (sent this visit or kept on the poster
+shelf from an earlier one), the still `pnpm build` captured of it, the Hall's placeholder key art,
+and finally a procedural poster (`core/art/art.ts`, `core/art/poster-shelf.ts`,
+`core/art/build-posters.ts`). The shelf keeps one poster per game (at most 400 000 characters, the
+whole shelf 1 600 000; the oldest leave first) and is wiped by "Forget my data".
 
 ## Progression flow
 
@@ -269,12 +311,15 @@ flowchart TB
   each -- "source folder missing" --> skip["skip with a warning"]
   each -- "hosted-static" --> copy["copy source<br/>→ dist/play/id/"]
   each -- "hosted-vite" --> vite["game's own Vite build<br/>base = SITE_BASE + play/id/<br/>→ dist/play/id/"]
-  copy --> report["4 · size report"]
-  vite --> report
-  skip --> report
+  copy --> posters["4 · posters<br/>each hosted game opened in the built Hall<br/>its snapshot or a frame still → play/id/poster.*"]
+  vite --> posters
+  skip --> posters
+  posters --> report["5 · size report"]
 ```
 
-`pnpm build --fixtures` adds the bridge fixtures to the catalog and builds them the same way. The
+`pnpm build --fixtures` adds the bridge fixtures to the catalog and builds them the same way.
+The poster step needs Playwright's Chromium (`pnpm exec playwright install chromium`); without it,
+or with `--no-posters`, it writes an empty `play/posters.js` and the Hall keeps its own art. The
 GitHub Actions workflows run `pnpm check`, the unit tests and the Hall's end-to-end tests on every
 push, and deploy `dist/` to Pages from the main branch.
 
@@ -296,11 +341,14 @@ locally) a provenance scan for text copied from them. Allow-lists live in
 | Rank-up data and the chord                      | `apps/hall/src/core/rank-up.ts`                                         |
 | Levels and plain wording                        | `packages/kit/src/progression/levels.ts`, `apps/hall/src/core/plain.ts` |
 | Key art and procedural posters                  | `apps/hall/src/core/art/`                                               |
+| Hosted games' posters (shelf, build-time)       | `apps/hall/src/core/art/poster-shelf.ts`, `scripts/lib/posters.ts`      |
+| The hosted strip                                | `apps/hall/src/core/player/hosted-session.ts`, `player.css`             |
 | XP numbers and rank thresholds                  | `packages/kit/src/progression/rules.ts`, `ranks.ts`                     |
 | Hall packages and cosmetics                     | `packages/kit/src/progression/hall-packages.ts`, `cosmetics.ts`         |
 | Hall sounds                                     | `packages/kit/src/audio/patches.ts`, `apps/hall/src/core/sound.ts`      |
 | Game contract                                   | `packages/kit/src/contract/contract.ts`                                 |
 | Manifest schema                                 | `packages/kit/src/manifest/manifest.ts`, `validate.ts`                  |
 | Bridge protocol                                 | `packages/bridge/src/protocol.ts`                                       |
+| Bridge game client (sound, motion, pause)       | `packages/bridge/src/game.ts`                                           |
 | Catalog                                         | `apps/hall/src/catalog/`                                                |
 | Build and guards                                | `scripts/`                                                              |

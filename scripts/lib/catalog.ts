@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { GameManifest } from '../../packages/kit/src/manifest/manifest';
-import { validateManifest } from '../../packages/kit/src/manifest/validate';
-import { REPO_ROOT } from './paths';
+import type { GameManifest } from '../../packages/kit/src/manifest/manifest.ts';
+import { validateManifest } from '../../packages/kit/src/manifest/validate.ts';
+import { REPO_ROOT } from './paths.ts';
 
 /**
  * The thirty games registered by the foundation prompt (§10), plus the owner's additions (atc-classic,

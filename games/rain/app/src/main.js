@@ -21,10 +21,13 @@ import { termToWorld, createPond } from './render/geometry.js';
 import { createClassic } from './ui/classic.js';
 import { createControls, sliderToDelay, delayToSlider } from './ui/controls.js';
 import { createAudio } from './audio/audio.js';
-import { noteDelay, noteSound, noteView, offerPoster, posterWanted } from './hall.js';
+import {
+  followHall, isHeldStill, noteDelay, noteSound, noteView, offerPoster, posterWanted,
+} from './hall.js';
 
 const qs = new URLSearchParams(location.search);
-const reducedMotion = qs.has('reduced') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+// (the Hall's own setting replaces it once the pond is up: followHall below)
+let reducedMotion = qs.has('reduced') || matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let delayError = null;
 function initialDelay() {
@@ -143,6 +146,7 @@ function watchPerformance(now, dt) {
 // ---------------------------------------------------------------- loop
 let lastNow = performance.now();
 function loop(now) {
+  if (isHeldStill()) { lastNow = now; requestAnimationFrame(loop); return; }
   const dt = Math.min(0.1, (now - lastNow) / 1000);
   lastNow = now;
   advance(timeline, now);
@@ -218,6 +222,21 @@ async function boot() {
   if (renderer?.software && !forcedQuality) {
     ui.say('Running without a GPU (software rendering): Low quality.', 6000);
   }
+  followHall({
+    audio,
+    setSoundOn: (on) => {
+      audio.setMuted(!on);
+      ui.showSound(on);
+      audio.setRain(rainAmount());
+    },
+    setReducedMotion: (reduced) => {
+      const startedByItself = rain.delay === initialDelay();
+      reducedMotion = reduced;
+      if (renderer) renderer.reducedMotion = reduced;
+      // a pond still raining at its start-up intensity starts the way this setting would have
+      if (startedByItself && rain.delay !== initialDelay()) changeDelay(initialDelay());
+    },
+  });
   requestAnimationFrame(loop);
 
   // hooks for the screenshot and UI scripts
@@ -227,7 +246,8 @@ async function boot() {
     setView,
     setDelay: changeDelay,
     view: () => view,
-    audio: () => ({ muted: audio.isMuted(), state: audio.state(), level: audio.level() }),
+    audio: () => ({ muted: audio.isMuted(), state: audio.state(), level: audio.level(), gain: audio.gain() }),
+    reducedMotion: () => ({ loop: reducedMotion, renderer: renderer ? renderer.reducedMotion : null }),
   };
   setInterval(() => {
     window.__info = {

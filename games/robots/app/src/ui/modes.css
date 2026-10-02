@@ -131,6 +131,9 @@ button.rr-mode:hover { transform: translateX(4px); border-color: #fff; }
   .rr-hype-3, .rr-ticker p, .rr-report-wrap { animation: none !important; }
   .rr-mode, .rr-hype-bar i { transition: none !important; }
 }
+/* The same, when the Hall asks for reduced motion (hall.ts sets the attribute). */
+[data-reduced-motion] :is(.rr-hype-3, .rr-ticker p, .rr-report-wrap) { animation: none !important; }
+[data-reduced-motion] :is(.rr-mode, .rr-hype-bar i) { transition: none !important; }
 /* 1280×720 and other short screens: the whole menu still fits without scrolling. */
 @media (max-height: 820px) {
   .rr-menu { padding-top: 60px; padding-bottom: 18px; gap: 10px; }

@@ -5,8 +5,22 @@
 // What the Hall hears comes from what the game already knows: the events each turn resolves to,
 // the result the engine settles on when a battle ends (engine/turn.js, checkEnd), and the battle
 // as settled into the Sea Service and the Daily Engagement (career/progress.js).
+//
+// What the game hears from the Hall: its sound, its reduced-motion setting and its pause, handed
+// to the game through followHall (called once by main.js) and hallPaused.
 
-const hall = globalThis.UsrGamesBridge?.connectToHall({ id: 'sail' }) ?? null;
+import { MASTER_LEVEL } from './audio/audio.js';
+
+const bridge = globalThis.UsrGamesBridge;
+const hall =
+  bridge?.connectToHall({
+    id: 'sail',
+    onSound: followHallSound,
+    onReducedMotion: followHallMotion,
+    pauseWhenHidden: true,
+    onPause: holdStill,
+    onResume: carryOn,
+  }) ?? null;
 const installed = new Set();
 const XP_PER_SHIP_TAKEN = 8;
 const XP_PER_COMMENDATION = 3;
@@ -71,7 +85,20 @@ if (hall?.hosted && menu) {
 let battle = null;
 
 export function noteBattleStarted() {
-  battle = { startedAt: performance.now(), shipsTaken: 0, broadsidesFired: 0 };
+  battle = {
+    startedAt: performance.now(),
+    heldMs: 0,
+    heldSince: paused ? performance.now() : null,
+    shipsTaken: 0,
+    broadsidesFired: 0,
+  };
+}
+
+/** How long the battle has been fought, leaving out the time it was held still. */
+function battleMs() {
+  const now = performance.now();
+  const holding = battle.heldSince === null ? 0 : now - battle.heldSince;
+  return now - battle.startedAt - battle.heldMs - holding;
 }
 
 /** The events of one resolved turn; `me` is the player's ship index. */
@@ -133,7 +160,7 @@ export function reportBattle(st, me, plan, summary) {
     stats: { shipsTaken, broadsidesFired, turns: st.turn, commendations },
     xpEvents,
     daily: plan.mode === 'daily',
-    durationSeconds: Math.round((performance.now() - battle.startedAt) / 1000),
+    durationSeconds: Math.round(battleMs() / 1000),
   });
   battle = null;
 }
@@ -144,16 +171,75 @@ const POSTER_AFTER_MS = 7000;
 let posterSent = false;
 
 export function posterWanted() {
-  return (
-    !!hall?.hosted &&
-    !posterSent &&
-    !!battle &&
-    performance.now() - battle.startedAt > POSTER_AFTER_MS
-  );
+  return !!hall?.hosted && !posterSent && !!battle && battleMs() > POSTER_AFTER_MS;
 }
 
 /** Call right after drawing the canvas, in the same task (see the bridge's posterFromCanvas). */
 export function offerPoster(canvas) {
   posterSent = true;
   hall.posterFromCanvas(canvas);
+}
+
+// ---------------------------------------------------------------------------
+// The Hall's sound, reduced motion and pause
+// ---------------------------------------------------------------------------
+let game = null; // { audio, soundButton, setReducedMotion }, from followHall
+let hallSound = null;
+let hallReducedMotion = null;
+let paused = false;
+let suspendedAudio = false;
+
+/** main.js hands over what the Hall's settings reach; anything already heard applies at once. */
+export function followHall(handles) {
+  game = handles;
+  if (hallSound) followHallSound(hallSound);
+  if (hallReducedMotion !== null) followHallMotion(hallReducedMotion);
+}
+
+// On its own the game starts with sound on and remembers its switch. In the Hall the Hall's sound
+// wins: muted there is silent here, and its volume slider scales the master level. The game's own
+// switch still works during the visit, until the next change in the Hall; what the Hall sets is
+// not written into the switch the game remembers. The AudioContext still waits for a gesture.
+function followHallSound(sound) {
+  hallSound = sound;
+  if (!game) return;
+  game.audio.setLevel(bridge.soundLevel(sound, MASTER_LEVEL));
+  game.audio.setMuted(sound.muted);
+  game.soundButton.setAttribute('aria-pressed', String(!sound.muted));
+}
+
+// The Hall's setting (its own, or the system's when the player chose that) takes over from the
+// game's read of the system at start-up, and keeps following it.
+function followHallMotion(reduced) {
+  hallReducedMotion = reduced;
+  document.documentElement.toggleAttribute('data-reduced-motion', reduced);
+  game?.setReducedMotion(reduced);
+}
+
+/** True while the Hall holds the game still: main.js draws no frames then. */
+export function hallPaused() {
+  return paused;
+}
+
+// The Hall's pause (its tab hidden, or its own question over the game) and this page hidden hold
+// the game still. The game has no pause of its own, but everything that moves in it runs on the
+// frame loop (the sea, the fleet's cinematic and its timed beats, the camera, the creaks), so the
+// held loop stops it where it is; the ambience stops with its AudioContext. Resume carries on
+// from exactly there, and the battle's time leaves the pause out.
+function holdStill() {
+  paused = true;
+  if (battle) battle.heldSince = performance.now();
+  const context = game?.audio.context;
+  suspendedAudio = context?.state === 'running';
+  if (suspendedAudio) context.suspend();
+}
+
+function carryOn() {
+  paused = false;
+  if (battle && battle.heldSince !== null) {
+    battle.heldMs += performance.now() - battle.heldSince;
+    battle.heldSince = null;
+  }
+  if (suspendedAudio) game.audio.context.resume();
+  suspendedAudio = false;
 }

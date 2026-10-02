@@ -22,7 +22,8 @@ import { createAudio } from './audio/audio.js';
 import * as HUD from './ui/hud.js';
 import * as Menu from './ui/menu.js';
 import {
-  hostedInHall, leaveForHall, noteBattleStarted, noteTurn, offerPoster, posterWanted, reportBattle,
+  followHall, hallPaused, hostedInHall, leaveForHall, noteBattleStarted, noteTurn, offerPoster, posterWanted,
+  reportBattle,
 } from './hall.js';
 import { createDeck } from './career/deck.js';
 import { counsel } from './career/counsel.js';
@@ -39,7 +40,7 @@ const store = {
   get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
 };
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || params.get('reduced') === '1';
+let reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || params.get('reduced') === '1';
 const quality = params.get('quality') || store.get('broadside.quality', 'high');
 const MOOD = Object.fromEntries(E.PLAYABLE.map((f) => [f.id, f.mood]));
 const VERSION = 'Broadside — Wooden Walls 1.0 (after BSD sail 1.x, Dave Riggle / Ed Wang / Craig Leres)';
@@ -641,6 +642,16 @@ $('btnSound').onclick = () => {
 };
 if (store.get('broadside.muted', '0') === '1') audio.setMuted(true);
 $('btnSound').setAttribute('aria-pressed', !audio.muted);
+// /usr/games Reborn: inside the Hall its sound and reduced motion take over (src/hall.js).
+followHall({
+  audio,
+  soundButton: $('btnSound'),
+  setReducedMotion(on) {
+    reduced = on || params.get('reduced') === '1';
+    director.reduced = reduced;
+    fx.reduced = reduced;
+  },
+});
 $('btnHelp').onclick = () => Menu.showHelp();
 
 window.addEventListener('keydown', (e) => {
@@ -761,6 +772,7 @@ const camFwd = new THREE.Vector3();
 let menuYaw = 0;
 
 function frame(now) {
+  if (hallPaused()) { last = now; requestAnimationFrame(frame); return; } // held still by the Hall
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   const cam = director.camera;

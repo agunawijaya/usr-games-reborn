@@ -3,6 +3,15 @@ import { nextRank, RANKS, rankForXp, rankProgress } from './ranks';
 import { applySoftCap, eventsXp, sameGameMultiplier, sessionXp, XP_RULES } from './rules';
 
 describe('ranks', () => {
+  it('welcome every rank in Unix words and in plain words', () => {
+    const unixWords = /\b(machine|directory|operator|terminal|shell|sudo|root|wheel|staff)\b/i;
+    for (const rank of RANKS) {
+      expect(rank.flavour.length).toBeGreaterThan(0);
+      expect(rank.plainFlavour).toMatch(/^[A-Z].*\.$/);
+      expect(rank.plainFlavour).not.toMatch(unixWords);
+    }
+  });
+
   it('climbs guest → user → staff → wheel → root in threshold order', () => {
     expect(RANKS.map((r) => r.id)).toEqual(['guest', 'user', 'staff', 'wheel', 'root']);
     for (let i = 1; i < RANKS.length; i++) {

@@ -1,5 +1,12 @@
-import { describe, expect, it } from 'vitest';
-import { fencedBlocks, findDiagramProblems } from './check-mermaid';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { fencedBlocks, findDiagramProblems, mermaidParser } from './check-mermaid';
+
+/**
+ * Loading Mermaid inside jsdom is the slow part: about 8 s alone, several times that while the
+ * whole suite runs on a busy machine. It happens once, in its own hook with room to spare, so
+ * the test below measures only the parsing.
+ */
+const MERMAID_LOAD_MS = 120_000;
 
 describe('fencedBlocks', () => {
   it('finds fenced blocks with their language and opening line', () => {
@@ -23,6 +30,10 @@ describe('fencedBlocks', () => {
 });
 
 describe('findDiagramProblems', () => {
+  beforeAll(async () => {
+    await mermaidParser();
+  }, MERMAID_LOAD_MS);
+
   it('accepts valid Mermaid and rejects broken Mermaid and other diagram tools', async () => {
     const markdown = [
       '```mermaid',
@@ -42,5 +53,5 @@ describe('findDiagramProblems', () => {
     expect(findings.map((f) => f.line)).toEqual([5, 9]);
     expect(findings[0]?.message).toMatch(/does not parse/);
     expect(findings[1]?.message).toMatch(/plantuml/);
-  }, 30_000);
+  });
 });

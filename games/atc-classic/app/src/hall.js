@@ -9,13 +9,29 @@
 // kept out of sight; it only suggests what to type, so it does not change what a shift earns.
 
 // The Hall pauses the game behind its pause menu and while its tab is hidden; main.js decides
-// what pausing means, through onHallPause.
+// what pausing means, through onHallPause. The page's own visibilitychange listener stays in
+// main.js rather than the bridge's pauseWhenHidden: on its own the page may have no bridge.
 const pauseHandlers = { pause: () => {}, resume: () => {} };
+// In the Hall the room's sound follows the Hall's: main.js turns its sound switch with the Hall's
+// mute (through onHallSound) and plays every sound at hallLevel. Null until the Hall has said.
+let hallSound = null;
+let followHallSound = () => {};
+// The Hall's reduced-motion setting, null until it has said; see hallReducedMotion.
+let hallMotionReduced = null;
 const hall =
   globalThis.UsrGamesBridge?.connectToHall({
     id: 'atc-classic',
     onPause: () => pauseHandlers.pause(),
     onResume: () => pauseHandlers.resume(),
+    onSound: (sound) => {
+      hallSound = sound;
+      followHallSound(!sound.muted);
+    },
+    onReducedMotion: (reduced) => {
+      hallMotionReduced = reduced;
+      // index.html mirrors its prefers-reduced-motion rules under this attribute, the Hall's own.
+      document.documentElement.dataset.motion = reduced ? 'reduce' : 'full';
+    },
   }) ?? null;
 const installed = new Set();
 const XP_PER_PLANE = 3;
@@ -36,6 +52,29 @@ if (hostedInHall) document.body.classList.add('in-hall');
 export function onHallPause(pause, resume) {
   pauseHandlers.pause = pause;
   pauseHandlers.resume = resume;
+}
+
+/**
+ * `follow(on)` hears the Hall's sound: once when the Hall greets the game, then whenever its
+ * volume or mute changes. Muted, the room falls silent whatever its own switch says.
+ * @param {(on: boolean) => void} follow
+ */
+export function onHallSound(follow) {
+  followHallSound = follow;
+  if (hallSound) follow(!hallSound.muted);
+}
+
+/**
+ * How loud a sound designed at `level` plays: as designed on its own, and in the Hall as its
+ * volume slider allows (exactly as designed at the Hall's default volume), 0 while it is muted.
+ */
+export function hallLevel(level) {
+  return hallSound ? globalThis.UsrGamesBridge.soundLevel(hallSound, level) : level;
+}
+
+/** The Hall's reduced-motion setting, or null when there is no Hall to ask (or it has not said). */
+export function hallReducedMotion() {
+  return hallMotionReduced;
 }
 
 /** The report's "Back to the Hall". */

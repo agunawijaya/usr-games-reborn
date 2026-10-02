@@ -1566,6 +1566,8 @@
     @media (prefers-reduced-motion: reduce) {
       #title-name, #title-begin { animation: none; }
     }
+    /* The same in the Hall when its own setting asks for reduced motion (set by src/hall.js). */
+    :root[data-motion='reduce'] :is(#title-name, #title-begin) { animation: none; }
 
     @media (max-width: 760px) {
       .desk { grid-template-columns: 1fr; }

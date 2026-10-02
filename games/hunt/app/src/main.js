@@ -19,7 +19,7 @@ import { playerColor, FFA, YOU } from './render/palette.js';
 import { SIZE_OF } from './render/coach.js';
 import { ACTION_LABEL } from './keymap.js';
 import {
-  leaveFromSetup, noteEvents, noteMatchStarted, offerPoster, posterWanted, reportMatchEnded,
+  followHall, leaveFromSetup, noteEvents, noteMatchStarted, offerPoster, posterWanted, reportMatchEnded,
 } from './hall.js';
 
 const $ = (id) => document.getElementById(id);
@@ -105,7 +105,7 @@ async function makeRenderer() {
     r.on('hurt', (e) => {
       const me = g && H.findPlayer(g, humanName);
       if (me && e.who === me.id && e.amt > 0 && !manual) {
-        $('flashred').style.opacity = reduced ? '0.25' : '0.45';
+        $('flashred').style.opacity = r.reduced ? '0.25' : '0.45';
         setTimeout(() => { $('flashred').style.opacity = '0'; }, 140);
         sfx('hurt', me.x, me.y);
       }
@@ -519,6 +519,7 @@ function raf(now) {
 (async () => {
   renderer = await makeRenderer();
   bindSegments();
+  followHall({ audio, soundSwitch: $('sound'), renderer });
   if (!renderer) {
     for (const seg of document.querySelectorAll('[data-opt="view"]')) for (const b of seg.querySelectorAll('button')) b.disabled = b.dataset.v !== 'classic';
   }
@@ -533,6 +534,7 @@ function raf(now) {
     get g() { return g; },
     get renderer() { return renderer; },
     get settings() { return settings; },
+    audio,
     me: () => (g ? H.findPlayer(g, humanName) : null),
     key: (s) => { const me = g && H.findPlayer(g, humanName); if (me) H.key(g, me, s); },
     step: (n = 1) => { for (let i = 0; i < n; i++) oneStep(); },

@@ -1,12 +1,15 @@
 import { expect, type Page, test } from '@playwright/test';
 import {
   describeWaysOut,
+  expectBackInHall,
+  expectStripAboveFrame,
   frameReloaded,
   gameFrame,
   inGame,
   revealStrip,
   runInHall,
   savedGameStats,
+  setTabHidden,
   waitForGame,
   watchForeignRequests,
 } from '../../../packages/bridge/testing/hall';
@@ -20,7 +23,7 @@ import {
 
 const game = {
   id: 'sail',
-  ready: "window.__ready === true && !!document.querySelector('#menu.open [data-deck=\"menu\"]')",
+  ready: 'window.__ready === true && !!document.querySelector(\'#menu.open [data-deck="menu"]\')',
   titleScreen: true,
 };
 
@@ -107,6 +110,157 @@ test('Game menu during a battle returns to the game menu', async ({ page }) => {
   await reloaded;
   await waitForGame(page, game.ready);
   await expect(page.locator('.pl-page')).toHaveClass(/is-on-title/);
+});
+
+test.describe('the Hall’s sound, motion and pause', () => {
+  const audio = 'window.__game.fleet.audio';
+  const audioState = (page: Page) => inGame<string | null>(page, `${audio}.context?.state ?? null`);
+  const seaTime = (page: Page) => inGame<number>(page, 'window.__game.world.time');
+  /** Lets the game's page draw a few frames (or hold them, while it is held still). */
+  const framesPass = (page: Page) =>
+    inGame(
+      page,
+      'new Promise((r) => { let n = 6; const f = () => (--n ? requestAnimationFrame(f) : r()); requestAnimationFrame(f); })',
+    );
+  /** A click on the menu's backdrop: a gesture inside the game, which starts its AudioContext. */
+  const touchTheGame = (page: Page) =>
+    gameFrame(page)
+      .locator('#menu')
+      .click({ position: { x: 4, y: 4 } });
+
+  test('the strip sits above the game, on its menu and mid-battle, at both sizes', async ({
+    page,
+  }) => {
+    await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await expectStripAboveFrame(page);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await expectStripAboveFrame(page);
+    await setSail(page);
+    await expectStripAboveFrame(page);
+    await expect(gameFrame(page).locator('#topbar')).toBeInViewport({ ratio: 1 });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await expectStripAboveFrame(page);
+    await expect(gameFrame(page).locator('#topbar')).toBeInViewport({ ratio: 1 });
+    await expect(gameFrame(page).locator('#orders')).toBeInViewport({ ratio: 1 });
+  });
+
+  test('a muted Hall starts the game silent, though its own sound starts on', async ({ page }) => {
+    await runInHall(page, game.id, { muted: true });
+    await waitForGame(page, game.ready);
+    await touchTheGame(page);
+    await expect.poll(() => audioState(page)).toBe('running');
+    expect(await inGame(page, `${audio}.muted`)).toBe(true);
+    await expect(gameFrame(page).locator('#btnSound')).toHaveAttribute('aria-pressed', 'false');
+
+    // The strip's Mute toggle brings it back at the level the game was mixed for, and silences it again.
+    await page.getByTestId('pl-strip-mute').click();
+    await expect.poll(() => inGame(page, `${audio}.muted`)).toBe(false);
+    expect(await inGame<number>(page, `${audio}.level`)).toBeCloseTo(0.8);
+    await expect(gameFrame(page).locator('#btnSound')).toHaveAttribute('aria-pressed', 'true');
+    await page.getByTestId('pl-strip-mute').click();
+    await expect.poll(() => inGame(page, `${audio}.muted`)).toBe(true);
+    await expect(gameFrame(page).locator('#btnSound')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('the Hall’s volume scales the game, and its own switch works until the next Hall change', async ({
+    page,
+  }) => {
+    await runInHall(page, game.id, { volume: 0.175 });
+    await waitForGame(page, game.ready);
+    expect(await inGame(page, `${audio}.muted`)).toBe(false);
+    expect(await inGame<number>(page, `${audio}.level`)).toBeCloseTo(0.4);
+    await setSail(page);
+    await gameFrame(page).locator('#btnSound').click();
+    expect(await inGame(page, `${audio}.muted`)).toBe(true);
+    await page.getByTestId('pl-strip-mute').click();
+    await page.getByTestId('pl-strip-mute').click();
+    await expect.poll(() => inGame(page, `${audio}.muted`)).toBe(false);
+  });
+
+  test('the Hall’s reduced motion reaches the camera and skips the opening sweep', async ({
+    page,
+  }) => {
+    await runInHall(page, game.id, { motion: 'reduce' });
+    await waitForGame(page, game.ready);
+    expect(await inGame(page, 'window.__game.director.reduced')).toBe(true);
+    expect(await inGame(page, "document.documentElement.hasAttribute('data-reduced-motion')")).toBe(
+      true,
+    );
+    await setSail(page);
+    expect(await inGame(page, 'window.__game.director.mode')).not.toBe('cinematic');
+  });
+
+  test('reduced motion follows the system live when the player left it to the system', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await runInHall(page, game.id, { motion: 'system' });
+    await waitForGame(page, game.ready);
+    expect(await inGame(page, 'window.__game.director.reduced')).toBe(false);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect.poll(() => inGame(page, 'window.__game.director.reduced')).toBe(true);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect.poll(() => inGame(page, 'window.__game.director.reduced')).toBe(false);
+  });
+
+  test('a hidden tab, or the Hall’s own question, holds the battle still and silent', async ({
+    page,
+  }) => {
+    await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await setSail(page);
+    await expect.poll(() => audioState(page)).toBe('running');
+
+    await setTabHidden(page, true);
+    await expect.poll(() => audioState(page)).toBe('suspended');
+    const held = await seaTime(page);
+    await framesPass(page);
+    expect(await seaTime(page)).toBe(held);
+    await setTabHidden(page, false);
+    await expect.poll(() => audioState(page)).toBe('running');
+    await framesPass(page);
+    expect(await seaTime(page)).toBeGreaterThan(held);
+
+    await page.getByTestId('pl-strip-menu').click();
+    await expect(page.getByRole('button', { name: 'Keep playing' })).toBeVisible();
+    await expect.poll(() => audioState(page)).toBe('suspended');
+    const asked = await seaTime(page);
+    await framesPass(page);
+    expect(await seaTime(page)).toBe(asked);
+    await page.getByRole('button', { name: 'Keep playing' }).click();
+    await expect.poll(() => audioState(page)).toBe('running');
+    await framesPass(page);
+    expect(await seaTime(page)).toBeGreaterThan(asked);
+  });
+
+  test('keyboard alone: out to the strip and back, into a battle, and home', async ({ page }) => {
+    await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    const focusInStrip = () =>
+      page.evaluate(() => !!document.activeElement?.closest('[data-testid="pl-strip"]'));
+    const focusInMenu = () => inGame<boolean>(page, "!!document.activeElement?.closest('#menu')");
+    const pressUntil = async (key: string, reached: () => Promise<boolean>) => {
+      for (let presses = 0; presses < 40 && !(await reached()); presses++)
+        await page.keyboard.press(key);
+      expect(await reached()).toBe(true);
+    };
+
+    await expect.poll(focusInMenu).toBe(true);
+    await pressUntil('Shift+Tab', focusInStrip);
+    await expect(page.locator('.pl-strip__hall')).toBeFocused();
+    await pressUntil('Tab', focusInMenu);
+
+    await page.keyboard.press('d');
+    await expect(gameFrame(page).getByRole('button', { name: 'Take command' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.pl-page')).not.toHaveClass(/is-on-title/);
+
+    await pressUntil('Shift+Tab', focusInStrip);
+    await expect(page.locator('.pl-strip__hall')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expectBackInHall(page);
+  });
 });
 
 describeWaysOut(game);

@@ -91,6 +91,7 @@ function stage(moment: RankUpMoment, level: number, onSkip: () => void): HTMLEle
         `Level ${level}`,
         h('span', { class: 'ch-rankup__rank' }, moment.to),
       ),
+      h('p', { class: 'ch-rankup__line' }, moment.plainFlavour),
       skin
         ? h(
             'p',
@@ -210,7 +211,7 @@ export function playRankUp(store: HallStore, staging: Staging): () => void {
   layer.append(view);
 
   const skin = unlockedSkin(moment);
-  announcer.textContent = `Level up! You reached level ${level}, rank ${moment.to}.${skin ? ` New: ${skin.name}.` : ''}`;
+  announcer.textContent = `Level up! You reached level ${level}, rank ${moment.to}. ${moment.plainFlavour}${skin ? ` New: ${skin.name}.` : ''}`;
   if (staging.frozen) return () => view.remove();
 
   rankUpChord(store);

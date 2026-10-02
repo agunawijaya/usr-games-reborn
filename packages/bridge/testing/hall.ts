@@ -11,7 +11,10 @@ export type HallStyle = 'console' | 'holo' | 'machine-room';
 export interface HallSeed {
   style?: HallStyle;
   appearance?: 'light' | 'dark';
-  motion?: 'full' | 'reduce';
+  motion?: 'full' | 'reduce' | 'system';
+  /** The Hall's master volume, 0–1 (the Hall starts at 0.35). */
+  volume?: number;
+  muted?: boolean;
 }
 
 /** The Hall's dev server port for these suites: `HALL_PORT`, else the standard 5173. */
@@ -50,6 +53,8 @@ export async function runInHall(
     style: seed.style ?? 'console',
     appearance: seed.appearance ?? 'dark',
     motion: seed.motion ?? 'full',
+    ...(seed.volume === undefined ? {} : { volume: seed.volume }),
+    ...(seed.muted === undefined ? {} : { muted: seed.muted }),
   };
   await page.addInitScript((seeded) => {
     // Hosted games share the origin; their frames must not touch the Hall's save.
@@ -104,11 +109,69 @@ export async function waitForGame(page: Page, readyExpression: string, timeout =
     .toBeTruthy();
 }
 
-/** The strip tucks itself away during play; the pointer at the top edge brings it back. */
+/**
+ * The strip stays in view above the game (since prompt C1 it no longer tucks itself away); kept
+ * so suites written before then still read naturally.
+ */
 export async function revealStrip(page: Page) {
-  const width = page.viewportSize()?.width ?? 1280;
-  await page.mouse.move(width / 2, 4);
-  await expect(page.locator('.pl-page')).toHaveClass(/is-strip-open/);
+  await expect(page.getByTestId('pl-strip')).toBeInViewport();
+}
+
+/**
+ * The strip's layout promise: the game's frame starts where the strip ends and fills the rest
+ * of the window, so the strip never covers any of the game.
+ */
+export async function expectStripAboveFrame(page: Page) {
+  const viewport = page.viewportSize() ?? { width: 1280, height: 720 };
+  const strip = await page.getByTestId('pl-strip').boundingBox();
+  const frame = await page.getByTestId('pl-frame').boundingBox();
+  expect(strip && frame, 'strip and frame are on screen').toBeTruthy();
+  expect(strip!.y).toBe(0);
+  expect(Math.abs(frame!.y - (strip!.y + strip!.height))).toBeLessThanOrEqual(1);
+  expect(Math.abs(frame!.y + frame!.height - viewport.height)).toBeLessThanOrEqual(1);
+  expect(frame!.width).toBe(viewport.width);
+}
+
+/**
+ * Stands in for the browser hiding the tab (headless pages never are): the Hall's page and the
+ * game's both report hidden and hear `visibilitychange`, as they would for real.
+ */
+export async function setTabHidden(page: Page, hidden: boolean) {
+  const script = `(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => ${hidden} });
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => '${hidden ? 'hidden' : 'visible'}',
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  })()`;
+  for (const frame of page.frames()) await frame.evaluate(script).catch(() => undefined);
+}
+
+/**
+ * Keeps a log, inside the game's page, of every bridge message the Hall sends it, so a test can
+ * check what reached the game (`bridgeLog`). Call before `runInHall`.
+ */
+export async function recordBridgeMessages(page: Page) {
+  await page.addInitScript(`
+    if (window.top !== window) {
+      window.__bridgeLog = [];
+      window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (data && data.protocol === 'usr-games-bridge') window.__bridgeLog.push(data);
+      });
+    }
+  `);
+}
+
+export interface LoggedHallMessage {
+  type: string;
+  payload: Record<string, unknown>;
+}
+
+/** The bridge messages the game's page has received so far (see `recordBridgeMessages`). */
+export async function bridgeLog(page: Page): Promise<LoggedHallMessage[]> {
+  return (await inGame<LoggedHallMessage[] | undefined>(page, 'window.__bridgeLog')) ?? [];
 }
 
 /** Home (`/` or `#/`) or the game's page, and no longer the player. */

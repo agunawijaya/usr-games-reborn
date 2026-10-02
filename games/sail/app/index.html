@@ -233,6 +233,9 @@
     #cine { transition: none; }
     * { scroll-behavior: auto !important; }
   }
+  /* the same when the Hall asks for reduced motion (src/hall.js) */
+  :root[data-reduced-motion] #cine { transition: none; }
+  :root[data-reduced-motion] * { scroll-behavior: auto !important; }
 </style>
 <script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
 </head>

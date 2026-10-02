@@ -1,5 +1,5 @@
 /**
- * Bridge protocol v1: the only language the Hall and a hosted game share.
+ * Bridge protocol v1 (revision 1.1): the only language the Hall and a hosted game share.
  *
  * Every message is an envelope `{ protocol, version, type, payload }` sent with postMessage
  * between same-origin windows. Both sides parse with the strict validators below and drop
@@ -13,6 +13,12 @@
 
 export const BRIDGE_PROTOCOL = 'usr-games-bridge';
 export const BRIDGE_VERSION = 1;
+/**
+ * Revision 1.1 changed no message: every envelope still says version 1, so a game written for
+ * 1.0 keeps working and a 1.1 game works with a 1.0 Hall. It made the sound, motion and pause the
+ * Hall already sends part of the contract, and gave games helpers to follow them (see game.ts).
+ */
+export const BRIDGE_REVISION = '1.1';
 
 export type Appearance = 'light' | 'dark';
 /**
@@ -244,12 +250,22 @@ function isPosterSide(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) > 0 && (value as number) <= LIMITS.posterSide;
 }
 
+/**
+ * An inline PNG, JPEG or WebP data URL within the poster size limit. The Hall checks posters it
+ * kept from earlier visits with this too, before showing them again.
+ */
+export function isPosterImage(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length <= LIMITS.posterDataLength &&
+    POSTER_DATA_PATTERN.test(value)
+  );
+}
+
 function isPoster(value: unknown): value is PosterPayload {
   return (
     hasShape(value, ['image', 'width', 'height']) &&
-    typeof value.image === 'string' &&
-    value.image.length <= LIMITS.posterDataLength &&
-    POSTER_DATA_PATTERN.test(value.image) &&
+    isPosterImage(value.image) &&
     isPosterSide(value.width) &&
     isPosterSide(value.height)
   );

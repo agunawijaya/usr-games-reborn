@@ -1,12 +1,17 @@
 import { expect, type Page, test } from '@playwright/test';
 import {
+  bridgeLog,
   describeWaysOut,
+  expectBackInHall,
+  expectStripAboveFrame,
   frameReloaded,
   gameFrame,
   inGame,
+  recordBridgeMessages,
   revealStrip,
   runInHall,
   savedGameStats,
+  setTabHidden,
   toasts,
   waitForGame,
   watchForeignRequests,
@@ -113,6 +118,204 @@ test('Game menu asks first during a match, then opens on the game menu again', a
   await reloaded;
   await waitForGame(page, READY);
   await expect(frame.getByTestId('rr-menu')).toBeVisible();
+});
+
+for (const viewport of [
+  { width: 1280, height: 720 },
+  { width: 1920, height: 1080 },
+]) {
+  test(`the strip sits above the game at ${viewport.width}×${viewport.height}, on the menu and in play`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const frame = await runInHall(page, 'robots');
+    await waitForGame(page, READY);
+    await expect(frame.getByTestId('rr-menu')).toBeVisible();
+    await expectStripAboveFrame(page);
+    await inGame(page, "window.__rr.start('exhibition')");
+    await expect(frame.locator('.rr-stats')).toBeVisible();
+    await expectStripAboveFrame(page);
+  });
+}
+
+test.describe('the Hall’s sound, motion and pause', () => {
+  interface SoundState {
+    on: boolean;
+    context: AudioContextState | null;
+    gain: number | null;
+  }
+
+  /** The game's own sound engine (src/audio/sfx.ts), read through its test hook. */
+  const soundState = (page: Page) =>
+    inGame<SoundState>(
+      page,
+      `(() => {
+        const sfx = window.__rr.sfx;
+        return { on: sfx.on, context: sfx.ctx ? sfx.ctx.state : null, gain: sfx.ctx ? sfx.master.gain.value : null };
+      })()`,
+    );
+  const gain = (page: Page) => async () => (await soundState(page)).gain ?? 0;
+  const contextState = (page: Page) => async () => (await soundState(page)).context;
+
+  async function waitForHello(page: Page) {
+    await expect
+      .poll(async () => (await bridgeLog(page)).some((message) => message.type === 'hello'))
+      .toBe(true);
+  }
+
+  test('a muted Hall starts the stadium silent, and the strip’s Mute switches it live', async ({
+    page,
+  }) => {
+    await recordBridgeMessages(page);
+    const frame = await runInHall(page, 'robots', { muted: true });
+    await waitForGame(page, READY);
+    await waitForHello(page);
+    await inGame(page, "window.__rr.start('exhibition')");
+    const soundSwitch = frame.getByTitle('Sound (m)');
+    await expect(soundSwitch).toHaveText('♪ off');
+    // Muted from the start, the game never even opens an audio context.
+    expect(await soundState(page)).toEqual({ on: false, context: null, gain: null });
+
+    const mute = page.getByTestId('pl-strip-mute');
+    await expect(mute).toHaveAttribute('aria-pressed', 'true');
+    await mute.click();
+    await expect(soundSwitch).toHaveText('♪ on');
+    await expect.poll(contextState(page)).toBe('running');
+    // The Hall's default volume leaves the stadium at its own designed level.
+    await expect.poll(gain(page)).toBeCloseTo(0.85, 2);
+
+    await mute.click();
+    await expect(soundSwitch).toHaveText('♪ off');
+    await expect.poll(gain(page)).toBeLessThan(0.005);
+    expect((await soundState(page)).on).toBe(false);
+  });
+
+  test('the Hall’s volume scales the stadium, and M still switches it during the visit', async ({
+    page,
+  }) => {
+    const frame = await runInHall(page, 'robots', { volume: 0.175 });
+    await waitForGame(page, READY);
+    await inGame(page, "window.__rr.start('exhibition')");
+    const soundSwitch = frame.getByTitle('Sound (m)');
+    await expect(soundSwitch).toHaveText('♪ on');
+    // Half the Hall's default volume: half the designed level.
+    await expect.poll(gain(page)).toBeCloseTo(0.425, 2);
+
+    await page.keyboard.press('m');
+    await expect(soundSwitch).toHaveText('♪ off');
+    await expect.poll(gain(page)).toBeLessThan(0.005);
+    await page.keyboard.press('m');
+    await expect(soundSwitch).toHaveText('♪ on');
+    await expect.poll(gain(page)).toBeCloseTo(0.425, 2);
+
+    // Switched off in the game, the next change in the Hall applies the Hall's sound again.
+    await page.keyboard.press('m');
+    await expect(soundSwitch).toHaveText('♪ off');
+    const mute = page.getByTestId('pl-strip-mute');
+    await mute.click();
+    await mute.click();
+    await expect(soundSwitch).toHaveText('♪ on');
+    await expect.poll(gain(page)).toBeCloseTo(0.425, 2);
+  });
+
+  test('the Hall’s reduced motion reaches the game’s own switch and its stylesheet', async ({
+    page,
+  }) => {
+    const frame = await runInHall(page, 'robots', { motion: 'reduce' });
+    await waitForGame(page, READY);
+    await expect.poll(() => inGame(page, 'window.__rr.quality.reducedMotion')).toBe(true);
+    expect(await inGame(page, "document.documentElement.hasAttribute('data-reduced-motion')")).toBe(
+      true,
+    );
+    await expect(frame.getByTestId('rr-mode-tour')).toHaveCSS('transition-property', 'none');
+  });
+
+  test('with the system’s motion setting, a change there reaches the game live', async ({
+    page,
+  }) => {
+    await recordBridgeMessages(page);
+    const frame = await runInHall(page, 'robots', { motion: 'system' });
+    await waitForGame(page, READY);
+    await waitForHello(page);
+    const reduced = () => inGame<boolean>(page, 'window.__rr.quality.reducedMotion');
+    const tour = frame.getByTestId('rr-mode-tour');
+    expect(await reduced()).toBe(false);
+    await expect(tour).not.toHaveCSS('transition-property', 'none');
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect.poll(reduced).toBe(true);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect.poll(reduced).toBe(false);
+    expect(await inGame(page, "document.documentElement.hasAttribute('data-reduced-motion')")).toBe(
+      false,
+    );
+    await expect(tour).not.toHaveCSS('transition-property', 'none');
+  });
+
+  test('a hidden tab stops the Blitz clock and silences the stadium; back in view both return', async ({
+    page,
+  }) => {
+    await runInHall(page, 'robots');
+    await waitForGame(page, READY);
+    await inGame(page, "window.__rr.start('blitz', 1)");
+    // One robot far down the row: the one-second clock walks it towards the player.
+    await stageBoard(page, 2, { x: 30, y: 12 }, [{ x: 5, y: 12 }]);
+    const robotX = () => inGame<number>(page, 'window.__rr.getState().robots[0].x');
+    await expect.poll(contextState(page)).toBe('running');
+    await expect.poll(robotX, { timeout: 10_000 }).toBeGreaterThan(5);
+
+    await setTabHidden(page, true);
+    await expect.poll(contextState(page)).toBe('suspended');
+    // A step already under way may still land; after that the clock holds.
+    await page.waitForTimeout(300);
+    const held = await robotX();
+    await page.waitForTimeout(2500);
+    expect(await robotX()).toBe(held);
+
+    await setTabHidden(page, false);
+    await expect.poll(contextState(page)).toBe('running');
+    await expect.poll(robotX, { timeout: 10_000 }).toBeGreaterThan(held);
+  });
+});
+
+test('keyboard alone: start a match, step out to the strip and back, and leave for the Hall', async ({
+  page,
+}) => {
+  const frame = await runInHall(page, 'robots');
+  await waitForGame(page, READY);
+  const inStrip = () =>
+    page.evaluate(() =>
+      Boolean(document.querySelector('[data-testid="pl-strip"]')?.contains(document.activeElement)),
+    );
+  const inFrame = () =>
+    page.evaluate(() => document.activeElement?.getAttribute('data-testid') === 'pl-frame');
+  const hallLink = page.locator('.pl-strip__hall');
+
+  await expect(frame.getByTestId('rr-mode-exhibition')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(frame.getByTestId('rr-start')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(frame.locator('.rr-stats')).toContainText('WAVE');
+  // Staying put for a turn ('.') lets every robot take a step.
+  const robots = () => inGame<string>(page, 'JSON.stringify(window.__rr.getState().robots)');
+  const before = await robots();
+  await page.keyboard.press('.');
+  await expect.poll(robots).not.toBe(before);
+
+  // Shift+Tab walks out of the game to the strip above it; Tab walks back in.
+  for (let i = 0; i < 12 && !(await inStrip()); i++) await page.keyboard.press('Shift+Tab');
+  expect(await inStrip()).toBe(true);
+  for (let i = 0; i < 12 && !(await inFrame()); i++) await page.keyboard.press('Tab');
+  expect(await inFrame()).toBe(true);
+  expect(await inGame(page, "document.activeElement?.tagName === 'BUTTON'")).toBe(true);
+
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Shift+Tab');
+    if (await hallLink.evaluate((link) => link === document.activeElement)) break;
+  }
+  await expect(hallLink).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expectBackInHall(page);
 });
 
 describeWaysOut({ id: 'robots', ready: READY, titleScreen: true });

@@ -80,9 +80,14 @@ export const EVENT_SOUNDS = {
   sleep: 'breath', stolen: 'rustle', disarmed: 'clang',
 };
 
+/** The master gain while sound is on, as the mix was designed. */
+export const MASTER_LEVEL = 0.8;
+
 export class Soundscape {
   constructor() {
     this.muted = true;
+    // Inside /usr/games Reborn the Hall's volume slider scales this (src/hall.js).
+    this.masterLevel = MASTER_LEVEL;
     this.ctx = null;
     this.bed = null;
     this.spec = null;
@@ -163,9 +168,17 @@ export class Soundscape {
     if (!m && this.ctx.state === 'suspended') this.ctx.resume();
     const t = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(t);
-    this.master.gain.setTargetAtTime(m ? 0 : 0.8, t, 0.25);
+    this.master.gain.setTargetAtTime(m ? 0 : this.masterLevel, t, 0.25);
     if (m) this._stopSparse();
     else if (this.spec) { const s = this.spec; this.spec = null; this.setScene(s); }
+  }
+
+  setMasterLevel(level) {
+    this.masterLevel = level;
+    if (!this.ctx || this.muted) return;
+    const t = this.ctx.currentTime;
+    this.master.gain.cancelScheduledValues(t);
+    this.master.gain.setTargetAtTime(level, t, 0.25);
   }
 
   setScene(spec) {
