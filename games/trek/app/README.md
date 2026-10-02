@@ -68,7 +68,7 @@ the cruiser to come about before it acts.
 | **V** | Tactical ↔ Galaxy Chart (only when the command line is empty) |
 | **?** | Tutorial |
 | **\\** | Command reference panel |
-| **`** | Dynamic cheat panel (what to type next) |
+| **Ctrl+Alt+C** | Dynamic cheat panel (what to type next); a testing aid with no button |
 | **!** | Captain's Override panel |
 | **Enter / Backspace / Esc** | Run · delete · clear |
 
@@ -76,7 +76,7 @@ the cruiser to come about before it acts.
 
 Two layers, both marked in the game:
 
-1. **Dynamic cheat** (**`** key) — the fancy-web hint panel, unchanged:
+1. **Dynamic cheat** (**Ctrl+Alt+C**, or `?cheat=1`; /usr/games Reborn hid it as a testing aid) — the fancy-web hint panel, unchanged:
    priority-sorted suggestions (shields, phaser amount, torpedo bearing,
    route to the nearest Klingon or starbase…). An autoplay test follows
    it blindly and wins 90 % of Novice games.

@@ -193,7 +193,6 @@ button (remembered in `localStorage`).
 |---|---|
 | `trek-procweb-help-seen` | tutorial shown once |
 | `trek-procweb-ref-visible` | reference panel |
-| `trek-procweb-cheat-visible` | dynamic cheat panel |
 | `trek-procweb-sound` | last sound choice (sound still starts muted) |
 | `trek-procweb-quality` | pinned quality profile |
 

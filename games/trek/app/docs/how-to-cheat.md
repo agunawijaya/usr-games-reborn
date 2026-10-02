@@ -8,8 +8,10 @@ did.
 
 ## Layer 1 — Dynamic cheat (advice)
 
-**Key:** <kbd>`</kbd> (backtick) or the `▶ cheat` bezel button.
-**Default:** off. **Effect on rules:** none.
+**Key:** <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>, or `?cheat=1` in the address. /usr/games Reborn
+removed the backtick key and the `▶ cheat` bezel button on 2026-10-02: the panel stays as a
+testing aid, out of sight for players.
+**Default:** off, and not remembered between visits. **Effect on rules:** none.
 
 A panel lists up to five suggestions, most urgent first, recomputed
 after every command. Each one is a command you can type as shown. This

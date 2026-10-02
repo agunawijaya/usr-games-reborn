@@ -16,7 +16,7 @@ const ROWS: Row[] = [
   // A second interpretation of trek: a native reborn with a career, calls and a nightly watch.
   ['lightkeeper', 'strategy', 10, 25, true],
   ['sail', 'strategy', 15, 40, false],
-  ['trek', 'strategy', 15, 40, false],
+  ['trek', 'strategy', 15, 40, true],
   ['hunt', 'arcade', 5, 15, false],
   ['robots', 'arcade', 3, 10, true],
   // A second interpretation of robots: a native reborn with rooms, rivals and a daily mess.

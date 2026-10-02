@@ -144,7 +144,7 @@ into the command line instead.
 
 ## P-09 — Dynamic cheat parity
 
-1. Press <kbd>`</kbd>.
+1. Press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>.
 
 **Expected:** the same hints fancy-web shows in the same state.
 `node --test tests/autoplay.test.js` → Novice ≥ 70 % (baseline 90 %).

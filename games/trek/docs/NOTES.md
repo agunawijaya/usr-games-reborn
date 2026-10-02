@@ -114,15 +114,44 @@ quirks, recorded upstream and confirmed by reading `app/src/engine.js`, were kep
 
 The in-Hall suite records every request during a visit; none leaves the Hall’s origin.
 
+## Deep Space Command (2026-10-02)
+
+The owner asked for the adopted trek to be gamified like the reborn games: a campaign, a daily and
+more, with the hint panel hidden but kept for testing (Ctrl+Alt+C), and the Captain’s Override left
+as it was. Everything new lives in `app/src/career/`; `main.js`, `index.html` and `hall.js` changed
+to host it; `galaxy.js`, `parser.js` and `hints.js` stayed byte-identical (the baseline regression
+still passes), and `engine.js` was not touched.
+
+- **Sortie seeds** (`app/scripts/tour-search.mjs`): the autopilot’s win rate per setup drew the
+  difficulty curve. Over the first 300 seeds the advice alone wins Shakedown Cruise 209 times,
+  Picket Duty and Torpedo School 175, The Long Haul 197, No Harbour 148, Phaser Drill 100, Close
+  Quarters 60, The Siege 14, Race the Clock 5 and Deep Space none (its seed, 711, came from a
+  search of 1,000). The first drafts of the last three sorties (25 ships in 26 stardates) were won
+  on no seed at all, so Race the Clock became 12 ships in 24 stardates, The Siege 16 ships with four
+  starbases in 34, and Deep Space 20 ships in 34. Each sortie’s seed is the escape-free win with the
+  most room to spare.
+- **Commendations on those seeds.** The advice alone earns every star except Torpedo School’s
+  three torpedo kills and No Harbour’s hull of 50%, so all but two of the thirty stars are proven
+  reachable; those two ask for a different line than the advice takes.
+- **Daily seeds.** Every one of 365 days from 2026-09-01 has an escape-free winning seed within the
+  first few tries; the search takes about a millisecond a try.
+- **Orders, not commands.** Scans, `computer`, `damages` and `help` are free so that looking around
+  never costs a commendation.
+- **Score** stays the ships disabled in every mode; the patrol rating lives in the game and its
+  share line, so the Hall’s best score means the same thing for every mission.
+
 ## XP and packages
 
-Twelve packages in the tier mix of the progression model (six core, four extra, two rare), so the
+Seventeen packages: the twelve from the adoption (six core, four extra, two rare) and five for Deep
+Space Command (three core, one extra, one rare). XP events: 2 XP per ship disabled, at most 25,
+and 3 XP per commendation; the Hall caps a session’s extras at 30. With the Daily Patrol, trek is
+now `daily: true` in the manifest and in the kit’s collection model.
+
+The adoption’s notes: twelve packages in the tier mix of the progression model, so the
 balance simulations stay representative. Prompt 01 asked for “survive, win, win on the hardest
 level”; the packages cover winning at each level, winning low on hull or without docking, and the
 milestones of a mission. XP events stay small: 2 XP per ship disabled, at most 25, inside the Hall’s
-cap of 30. The catalog placeholder already said `daily: false`, which is true: every mission draws
-a new galaxy, so nothing in the progression model changed for trek. A mission played with the
-override panel reports its outcome only.
+cap of 30. A mission played with the override panel reports its outcome only.
 
 ## Balance
 
@@ -142,40 +171,41 @@ about 80–180 ms under the warp tunnel. The page loads about 2.1 MB of vendored
 
 ## Decisions log
 
-| Date       | Decision                                                                      | Why                                                                                                    |
-| ---------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 2026-10-01 | Title “Trek — Deep Space”, from the game’s own title screen                   | Prompt 01 §7                                                                                           |
-| 2026-10-01 | The title screen is reported from its `shown` class with a `MutationObserver` | Keeps the changes to `main.js` to four calls                                                           |
-| 2026-10-01 | Score = hostile ships disabled; the original’s rating is not reproduced       | The game keeps no score of its own; the count is honest at every level                                 |
-| 2026-10-01 | The typed `quit` reports `quit`                                               | An aborted mission earns no XP                                                                         |
-| 2026-10-01 | Missions with an override report no score, ships, XP events or packages       | Progress must be honest; the game already marks those missions itself                                  |
-| 2026-10-01 | Poster: the tactical view six seconds into the first mission                  | Prompt 01 §7 names the tactical view as trek’s key art                                                 |
-| 2026-10-01 | `galaxy.js`, `parser.js` and `hints.js` untouched                             | They are pinned by SHA-256 in the upstream tests                                                       |
-| 2026-10-01 | Google Fonts replaced by self-hosted files                                    | No runtime network requests (hard rule 4, ADR 0011)                                                    |
-| 2026-10-01 | Trademark words kept in `app/` for now                                        | Copy is not edited on adoption; listed in `docs/KNOWN-ISSUES.md` for the trek modification prompt (§8) |
+| Date       | Decision                                                                       | Why                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| 2026-10-01 | Title “Trek — Deep Space”, from the game’s own title screen                    | Prompt 01 §7                                                                                           |
+| 2026-10-01 | The title screen is reported from its `shown` class with a `MutationObserver`  | Keeps the changes to `main.js` to four calls                                                           |
+| 2026-10-01 | Score = hostile ships disabled; the original’s rating is not reproduced        | The game keeps no score of its own; the count is honest at every level                                 |
+| 2026-10-01 | The typed `quit` reports `quit`                                                | An aborted mission earns no XP                                                                         |
+| 2026-10-01 | Missions with an override report no score, ships, XP events or packages        | Progress must be honest; the game already marks those missions itself                                  |
+| 2026-10-01 | Poster: the tactical view six seconds into the first mission                   | Prompt 01 §7 names the tactical view as trek’s key art                                                 |
+| 2026-10-01 | `galaxy.js`, `parser.js` and `hints.js` untouched                              | They are pinned by SHA-256 in the upstream tests                                                       |
+| 2026-10-01 | Google Fonts replaced by self-hosted files                                     | No runtime network requests (hard rule 4, ADR 0011)                                                    |
+| 2026-10-01 | Trademark words kept in `app/` for now                                         | Copy is not edited on adoption; listed in `docs/KNOWN-ISSUES.md` for the trek modification prompt (§8) |
+| 2026-10-02 | Deep Space Command: Frontier Tour, Daily Patrol, free missions, service record | The owner asked for a campaign and a daily like the reborn games                                       |
+| 2026-10-02 | Sorties are presets added to `DIFFICULTY` plus a fixed seed                    | `galaxy.js` must stay byte-identical; no rule changes                                                  |
+| 2026-10-02 | Sorties and patrols are proven winnable by following the hints alone           | The owner tests winnability with the hint panel; typing its first suggestion replays the proof         |
+| 2026-10-02 | The hint panel loses its button and backtick key; Ctrl+Alt+C or `?cheat=1`     | Owner: keep the feature for testing, out of sight for players                                          |
+| 2026-10-02 | `quit` asks first and the report says ABANDONED                                | Navigation standard: confirm before losing progress                                                    |
+| 2026-10-02 | The report follows the results order: the way on, R, M, H                      | Navigation standard; KNOWN-ISSUES #24                                                                  |
+| 2026-10-02 | The series’ names stay in this adopted port                                    | Owner: “the original game uses those names, leave them”; new copy does not use them                    |
 
 ## Open questions
 
-Listed in `docs/KNOWN-ISSUES.md` for the trek modification prompt or the owner:
+Listed in `docs/KNOWN-ISSUES.md` for the owner:
 
-- The temporary trademark exception: the game’s UI, engine and upstream docs use the series’ names
-  for the enemy, the player’s ship and the government.
+- The series’ names for the enemy, the player’s ship and the government stay in the game’s UI,
+  engine and upstream docs, by the owner’s decision (2026-10-02).
 - One dark look only; no light appearance.
 - The Hall’s reduced-motion setting does not reach the game, which reads the system setting (or
   `?reduced=1`) when it starts.
-- No `:focus-visible` styles or ARIA roles in the game.
-- Difficulty buttons reached with Tab start the mission before the choice applies (the page’s own
-  Enter handler runs first).
-- `quit` has no confirmation and shows the defeat screen.
-- The GPU’s name appears on the title screen.
-
-Seen while writing these docs, from reading the code (not yet checked in a browser):
-
+- `:focus-visible` styles cover the game menu, the report and the bezel buttons; the HUD panels
+  and the tutorial still have no ARIA roles.
 - Without WebGL the game draws on its 2D canvas, but the poster is still taken from the hidden
   WebGL canvas, so the Hall would receive a blank poster on such machines.
-- `quadrantsCharted` is still reported for override missions, so they can count towards the
-  charting goal.
-- The end screen offers only “Enter / Space · New mission”, which returns to the title screen; the
-  results order of the navigation standard (Play again, Game menu, Back to the Hall) is left to the
-  Hall’s strip.
 - The Hall’s volume and mute settings do not reach the game, which has its own sound switch.
+- At 1280 px the top bar’s readout and buttons wrap onto two lines once a mission is under way.
+
+Resolved on 2026-10-02 by Deep Space Command: Tab-focused difficulty buttons now only choose a
+level, `quit` asks first, the GPU’s name left the title screen, the report follows the results
+order, and override missions report no charted quadrants.

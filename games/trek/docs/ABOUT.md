@@ -35,7 +35,11 @@ the game began.
   target; the torpedo tube waits until the bow is on its bearing; hits ring the shield with hexagons.
 - A holographic galaxy chart with fog of war, and a warp tunnel between quadrants.
 - A command line that explains itself: each line is described before you press Enter, a reference
-  panel sits beside it, and an optional hint panel suggests what to type next.
+  panel sits beside it, and `computer` suggests what to type next.
+- Deep Space Command, the game menu: the ten sorties of the Frontier Tour, each with a briefing and
+  three commendations that earn stars and rank; a Daily Patrol that every player flies the same
+  day, with a standing order for each weekday and a share line; free missions; and a service
+  record.
 - Three difficulty levels instead of length × skill, synthesised sound (off until you turn it on),
   and lighter looks for machines without a graphics card.
 
@@ -46,7 +50,7 @@ the game began.
 | Directory       | `/usr/games/strategy` |
 | Players         | 1                     |
 | Session         | 15–40 minutes         |
-| Daily challenge | no                    |
+| Daily challenge | yes, the Daily Patrol |
 | Inspired by     | `trek` (1980)         |
 
 ## More

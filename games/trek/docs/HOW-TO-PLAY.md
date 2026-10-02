@@ -8,29 +8,32 @@ you lose if time runs out, your hull is destroyed, life support fails or your en
 
 ## Controls
 
-Trek is played by typing commands at the `Command >` line. The mouse works the buttons along the
-top and switches views. Keys are the game’s own and cannot be remapped from the Hall.
+Trek is played by typing commands at the `Command >` line. The game menu, its pages and the mission
+report work with the keyboard or the mouse; the buttons along the top switch views and panels. Keys
+are the game’s own and cannot be remapped from the Hall.
 
-| Action                                    | Keyboard                                 | Mouse                                       |
-| ----------------------------------------- | ---------------------------------------- | ------------------------------------------- |
-| Start a mission (title screen)            | Enter or Space                           | ▶ BEGIN MISSION ◀                           |
-| Choose a difficulty (title screen)        | — (see the tips)                         | Novice, Standard or Expert                  |
-| Type a command                            | Letters, digits, space, `.` and `-`      | —                                           |
-| Run the command                           | Enter                                    | —                                           |
-| Delete the last character                 | Backspace                                | —                                           |
-| Clear the command line                    | Esc                                      | —                                           |
-| Tactical view or galaxy chart             | V (only while the command line is empty) | Tactical, Galaxy Chart                      |
-| Tutorial                                  | ?                                        | ? help                                      |
-| Close the tutorial                        | Esc or ?                                 | ✕ close                                     |
-| Command reference panel                   | `\`                                      | ≡ ref                                       |
-| Hint panel (what to type next)            | `` ` `` (backtick)                       | ▶ cheat                                     |
-| Override panel (see Settings)             | ! (or type `override`)                   | ⚠ override                                  |
-| Rendering quality                         | —                                        | ◐ high, ◑ low or ○ lite                     |
-| Sound on or off (off at the start)        | —                                        | ♪ sound                                     |
-| Back to the title screen, after a mission | Enter or Space                           | —                                           |
-| Leave for the Hall from the title screen  | Esc                                      | Move to the top edge; ← Back to the Hall    |
-| Leave for the Hall during a mission       | Tab to the Hall’s strip                  | Move to the top edge; ← Back to the Hall    |
-| Start afresh                              | Tab to the Hall’s strip                  | Move to the top edge; Game menu, then Leave |
+| Action                                      | Keyboard                                                 | Mouse                                       |
+| ------------------------------------------- | -------------------------------------------------------- | ------------------------------------------- |
+| Open a page of the game menu                | T tour, D daily patrol, F free mission, S service record | The four cards                              |
+| Move between buttons on the menu and pages  | Arrow keys (Tab works too), then Enter                   | —                                           |
+| Back to the game menu from one of its pages | Esc                                                      | ← Game menu                                 |
+| Launch the sortie, patrol or mission shown  | Enter on ▶ LAUNCH                                        | ▶ LAUNCH SORTIE, LAUNCH PATROL, BEGIN       |
+| Type a command                              | Letters, digits, space, `.` and `-`                      | —                                           |
+| Run the command                             | Enter                                                    | —                                           |
+| Delete the last character                   | Backspace                                                | —                                           |
+| Clear the command line                      | Esc                                                      | —                                           |
+| Tactical view or galaxy chart               | V (only while the command line is empty)                 | Tactical, Galaxy Chart                      |
+| Tutorial                                    | ?                                                        | ? help                                      |
+| Close the tutorial                          | Esc or ?                                                 | ✕ close                                     |
+| Command reference panel                     | `\`                                                      | ≡ ref                                       |
+| Override panel (see Settings)               | ! (or type `override`)                                   | ⚠ override                                  |
+| Rendering quality                           | —                                                        | ◐ high, ◑ low or ○ lite                     |
+| Sound on or off (off at the start)          | —                                                        | ♪ sound                                     |
+| On the mission report                       | N next sortie, R fly again, M (or Esc) game menu, H Hall | The report’s buttons                        |
+| Copy a daily patrol’s share line            | S on its report                                          | Copy share line                             |
+| Leave for the Hall from the game menu       | Esc                                                      | ← Back to the Hall                          |
+| Leave for the Hall during a mission         | Tab to the Hall’s strip                                  | Move to the top edge; ← Back to the Hall    |
+| Start afresh                                | Tab to the Hall’s strip                                  | Move to the top edge; Game menu, then Leave |
 
 ### Commands
 
@@ -52,7 +55,7 @@ the prompt says what the command will do, or what is wrong with it.
 | `computer`                   | `c`          | Up to three suggested commands, in the line above the prompt                                               | Nothing                                           |
 | `dock`                       | —            | Docks at a starbase in a neighbouring sector, diagonals included                                           | 0.5 stardate                                      |
 | `help`, `help torpedo`       | `h`          | The command list, or one command, in the line above the prompt                                             | Nothing                                           |
-| `quit`                       | `q`          | Ends the mission at once                                                                                   | The mission                                       |
+| `quit`                       | `q`          | Asks first; typed again, it abandons the mission                                                           | The mission                                       |
 
 Bearings and courses are read like a clock face laid on its side: **0 (or 12) is east, 3 is north,
 6 is west and 9 is south**, and fractions point in between (1.5 is north-east). The reference panel
@@ -108,13 +111,76 @@ that holds them.
 Their shots also weaken with distance, by 8% a sector.
 
 **Defeat** comes four ways: the stardates run out, the hull reaches zero, life support fails, or
-your energy is exhausted (checked when hostile ships fire). Typing `quit` ends the mission too; the
-end screen then reads “Mission aborted”.
+your energy is exhausted (checked when hostile ships fire). Typing `quit` twice abandons the
+mission; the report then reads ABANDONED.
 
 ## Modes
 
-Three difficulty levels, chosen on the title screen. Each mission is a new galaxy. Trek has no
-daily challenge.
+The title screen is the game menu, Deep Space Command. It shows your rank and stars and offers four
+cards.
+
+```mermaid
+flowchart LR
+  menu["Game menu<br/>rank and stars"] --> tour["Frontier Tour<br/>ten sorties"]
+  menu --> patrol["Daily Patrol #N"]
+  menu --> free["Free Mission<br/>Novice, Standard, Expert"]
+  menu --> record["Service Record"]
+  tour --> briefing["A sortie’s briefing<br/>and its commendations"] --> mission["The mission"]
+  patrol --> mission
+  free --> mission
+  mission --> report["Mission report"]
+  report -->|"N next sortie, R again"| mission
+  report -->|"M or Esc"| menu
+```
+
+### Frontier Tour
+
+![The Frontier Tour page: ten sorties on the left, the first open with its stars, and the briefing of Shakedown Cruise with its three commendations on the right](media/tour-1280.webp)
+
+Ten sorties, each a fixed galaxy with its own briefing and three commendations to earn. The first
+is always open; winning a sortie opens the next. Every sortie can be won, and any of them can be
+flown again for the stars still missing.
+
+| #   | Sortie           | Hostile ships | Starbases | Stars | Stardates | Commendations besides the win               |
+| --- | ---------------- | ------------- | --------- | ----- | --------- | ------------------------------------------- |
+| 1   | Shakedown Cruise | 4             | 3         | 15    | 30        | Hull at 75% or better; fewer than 30 orders |
+| 2   | Picket Duty      | 6             | 3         | 20    | 30        | Never dock; 10 stardates to spare           |
+| 3   | Torpedo School   | 6             | 2         | 20    | 30        | 3 ships disabled by torpedo; hull 60%+      |
+| 4   | The Long Haul    | 9             | 2         | 25    | 34        | Chart 30 quadrants; never dock              |
+| 5   | No Harbour       | 7             | 0         | 20    | 30        | 3,000 energy in reserve; hull 50%+          |
+| 6   | Phaser Drill     | 10            | 3         | 25    | 30        | Phasers only; fewer than 60 orders          |
+| 7   | Close Quarters   | 12            | 3         | 34    | 30        | Hull 50%+; 6 stardates to spare             |
+| 8   | Race the Clock   | 12            | 3         | 25    | 24        | 5 stardates to spare; never dock            |
+| 9   | The Siege        | 16            | 4         | 25    | 34        | Hull 40%+; fewer than 90 orders             |
+| 10  | Deep Space       | 20            | 3         | 30    | 34        | Hull 50%+; 3 stardates to spare             |
+
+An **order** is a command that acts: a phaser volley, a torpedo, a move, docking or a shield
+command. Scans, reports, `computer` and `help` are free. While you fly, a strip at the top of the
+screen lists the mission’s commendations: ◇ still open, ◆ met, ✕ lost for good.
+
+### Daily Patrol
+
+One galaxy a day, the same for every player, numbered like the Hall’s daily challenges (#1 was
+1 September 2026). Twelve hostile ships, three starbases, 25 stars and 30 stardates. Its three
+commendations are the win, the day’s standing order (a different one each weekday) and a hull at
+50% or better.
+
+| Day       | Standing order              |
+| --------- | --------------------------- |
+| Monday    | Never dock                  |
+| Tuesday   | Win in fewer than 45 orders |
+| Wednesday | Fire 4 torpedoes or fewer   |
+| Thursday  | Hull at 60% or better       |
+| Friday    | 8 stardates to spare        |
+| Saturday  | Chart 32 quadrants          |
+| Sunday    | Phasers only                |
+
+The first patrol you fly each day, won, lost or abandoned, is the one on record; fly it again as often as you like.
+
+### Free Mission
+
+A new galaxy every time, at one of three levels. Free missions earn no stars but count in the
+service record.
 
 | Level    | Hostile ships | Starbases | Stars | Stardates |
 | -------- | ------------- | --------- | ----- | --------- |
@@ -133,14 +199,14 @@ All of them live in the bar along the top.
 | Sound           | On or off                                                | Off; turning it on always takes a click  |
 | Quality         | High, Low or Lite; a flat 2D view where WebGL is missing | Chosen for your machine, lowered if slow |
 | Reference panel | Shown or hidden                                          | Shown                                    |
-| Hint panel      | Shown or hidden                                          | Hidden                                   |
 | Override panel  | Switches that bend the rules (see below)                 | Every switch off                         |
 
 The panels and the quality you pick are remembered on this device. The **override panel** has
 switches for a revealed map, endless energy or torpedoes, shields nothing gets through, a frozen
 clock, one-shot phasers, instant warp and a full refit anywhere. Using any of them marks the
-mission for good: the game stamps it on the end screen, and the Hall records no score, ships, XP
-events or packages for it. The hint panel and `computer` only give advice and do not mark a mission.
+mission for good: the game stamps it on the report, saves no stars, patrol or record for it, and
+the Hall records no score, ships, XP events or packages for it. `computer` only gives advice and
+does not mark a mission.
 
 Trek follows your system’s reduced-motion setting: no camera drift, bobbing or shake, and a fade
 instead of the warp tunnel. It has a single dark look; the Hall’s strip follows the Hall’s light or
@@ -148,9 +214,34 @@ dark appearance.
 
 ## Scoring
 
-The game keeps no score of its own. Its end screen says VICTORY or DEFEAT, why, and how the ship
-stood: ships disabled, hull, energy and stardate. The Hall takes the number of hostile ships you
-disabled as the mission’s score and keeps your best.
+![The report of a won first sortie: three commendations earned, each tagged new, the next sortie opened and a promotion to Lieutenant, with the ways on below](media/report-1280.webp)
+
+Every mission ends on a report: VICTORY, DEFEAT or ABANDONED, why, how the ship stood (ships
+disabled, hull, energy, orders, stardate) and each commendation, earned ★ or missed ☆, with a “new”
+tag on a star earned for the first time.
+
+**Stars and rank.** Each commendation earned on the Frontier Tour is a star, thirty in all. Stars
+are kept for good, and so is the rank they bring:
+
+| Rank                 | Stars |
+| -------------------- | ----- |
+| Ensign               | 0     |
+| Lieutenant           | 3     |
+| Lieutenant Commander | 7     |
+| Commander            | 12    |
+| Captain              | 18    |
+| Commodore            | 24    |
+| Admiral              | 30    |
+
+**Patrol rating.** A won patrol scores 1,000, plus 25 for each stardate to spare, 4 for each point
+of hull, 15 for each torpedo left, 300 for the standing order and 150 for the sound hull, minus 3
+for each order given. A patrol not cleared scores 40 for each ship disabled. The report gives a
+share line such as `Trek — Deep Space · Daily Patrol #32 · ★★☆ · 1,830`, with no link.
+
+**Service record.** Missions flown, victories, hostile ships disabled, orders given, daily patrols
+and the best patrol rating, on this device.
+
+The Hall takes the number of hostile ships you disabled as the mission’s score and keeps your best.
 
 ## Achievements (packages)
 
@@ -168,16 +259,23 @@ disabled as the mission’s score and keeps your best.
 | `full-survey`          | Chart all 64 quadrants in one mission.                                 |
 | `hardest-level`        | Win at the expert level.                                               |
 | `flagship-down`        | Disable a ship of the super class, the toughest hull there is.         |
+| `first-sortie`         | Win the first sortie of the Frontier Tour.                             |
+| `on-patrol`            | Clear the sector on a Daily Patrol.                                    |
+| `promoted`             | Earn enough commendations to make Lieutenant.                          |
+| `full-marks`           | Earn all three commendations on one sortie or patrol.                  |
+| `tour-complete`        | Win all ten sorties of the Frontier Tour.                              |
 
 Missions in which the override panel was used earn no packages.
 
 ## XP
 
 Each mission reports to the Hall when it ends. A win counts as a win and a defeat as a loss; a
-mission you `quit` counts as quit and earns no XP. On top of the session’s XP, a mission earns 2 XP
-for every hostile ship disabled (up to 25); the Hall caps a session’s extras at 30. Weekly goals can
-ask you to disable a number of hostile ships (10–30) or chart a number of quadrants (20–60). A
-quadrant counts as charted the first time it appears on your chart in that mission.
+mission you abandon counts as quit and earns no XP. On top of the session’s XP, a mission earns 2
+XP for every hostile ship disabled (up to 25) and 3 XP for every commendation earned; the Hall caps
+a session’s extras at 30. A daily patrol counts as the day’s daily challenge in the Hall. Weekly
+goals can ask you to disable a number of hostile ships (10–30), chart a number of quadrants
+(20–60) or earn a number of commendations (3–9). A quadrant counts as charted the first time it
+appears on your chart in that mission.
 
 ## Tips
 
@@ -190,7 +288,7 @@ quadrant counts as charted the first time it appears on your chart in that missi
 - Warp is cheap in energy for short hops (warp 1 costs 10) but each one costs a whole stardate; on
   Expert, plan the route on the chart before you go.
 - Dock when the hull or the systems are hurting: one `dock` repairs everything.
-- The hint panel (`` ` ``) and `computer` always have a suggestion, including the exact bearing for
-  a torpedo or the course to the nearest starbase.
-- To pick a difficulty with the keyboard, the buttons do not help yet: Tab-focused buttons start
-  the mission before the choice applies. Click the level instead.
+- `computer` always has a suggestion, including the exact bearing for a torpedo or the course to
+  the nearest starbase.
+- Read the briefing before you launch: a commendation such as “never dock” or “phasers only”
+  changes how you should fly the whole sortie.

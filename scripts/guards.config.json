@@ -107,7 +107,7 @@
     "trademarkAllow": [
       {
         "path": "games/trek/app/**",
-        "reason": "Temporary trademark exception for the adopted trek game, listed in docs/KNOWN-ISSUES.md (prompt 01 §8); the trek modification prompt replaces these words."
+        "reason": "Trademark exception for the adopted trek game, listed in docs/KNOWN-ISSUES.md (prompt 01 §8); kept by the owner’s decision of 2026-10-02: the adopted port keeps the names the original game used."
       },
       {
         "path": "games/sail/app/**",

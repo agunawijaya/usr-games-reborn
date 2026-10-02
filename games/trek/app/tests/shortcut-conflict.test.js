@@ -2,7 +2,7 @@
 // collisions.
 //
 // The main.js key handler intercepts a small set of shortcut keys
-// (`?`, `\`, backtick, and `v`/`V`). If any of those characters were
+// (`?`, `\`, `!`, and `v`/`V`). If any of those characters were
 // ALSO part of a legitimate command word, the shortcut would eat the
 // keypress before it could reach the command buffer — that's the bug
 // that broke the "move" command (its 'v' switched to Galaxy Chart).
@@ -43,7 +43,7 @@ const COMMAND_TOKENS = [
 ];
 
 // procedural-web adds OVERRIDE_KEY ('!') for the Captain's Override panel.
-const GLOBAL_SHORTCUTS = ['?', '\\', '`', OVERRIDE_KEY];  // Fire regardless of buffer state
+const GLOBAL_SHORTCUTS = ['?', '\\', OVERRIDE_KEY];  // Fire regardless of buffer state
 const BUFFER_GATED_SHORTCUTS = ['v', 'V'];  // Fire only when buffer empty
 
 test('global shortcuts do not collide with any command character', () => {
@@ -107,7 +107,15 @@ test('main.js wires every global shortcut and keeps the V gate', () => {
   const main = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
   assert.match(main, /e\.key === '\?'/);
   assert.match(main, /e\.key === '\\\\'/);  // source text: e.key === '\\'
-  assert.match(main, /e\.key === '`'/);
   assert.match(main, /e\.key === OVERRIDE_KEY/);
   assert.match(main, /\(e\.key === 'v' \|\| e\.key === 'V'\) && cmdText === ''/);
+});
+
+// /usr/games Reborn: the hint panel left the bezel and its backtick key. It opens only with
+// Ctrl+Alt+C, which needs both modifiers, so no typed command can ever reach it.
+test('main.js keeps the hint panel behind Ctrl+Alt+C and nothing else', () => {
+  const main = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.match(main, /e\.ctrlKey && e\.altKey && e\.code === 'KeyC'/);
+  assert.doesNotMatch(main, /e\.key === '`'/);
+  assert.doesNotMatch(main, /cheat-btn/);
 });
