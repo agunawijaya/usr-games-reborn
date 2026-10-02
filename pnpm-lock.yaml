@@ -308,6 +308,12 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
 
+  games/worm:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/worms/app:
     devDependencies:
       playwright:

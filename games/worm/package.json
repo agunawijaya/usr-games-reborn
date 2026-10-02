@@ -1,0 +1,15 @@
+{
+  "name": "@usr-games/game-worm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Noodle Nine: eat the numbers, chain the bites, fill the box. Inspired by worm by Michael Toy (BSD games).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5275 --strictPort",
+    "hero": "playwright test -c . --grep @hero"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

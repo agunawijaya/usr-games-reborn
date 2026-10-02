@@ -15,7 +15,7 @@
     { "id": "atc-classic", "source": "game" },
     { "id": "wump", "source": "game" },
     { "id": "wump-classic", "source": "game" },
-    { "id": "worm", "source": "placeholder" },
+    { "id": "worm", "source": "game" },
     { "id": "snake", "source": "placeholder" },
     { "id": "blocks", "source": "placeholder" },
     { "id": "gomoku", "source": "placeholder" },

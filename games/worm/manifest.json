@@ -1,0 +1,127 @@
+{
+  "id": "worm",
+  "title": "Noodle Nine",
+  "tagline": "Eat the numbers. Chain the bites. Fill the box.",
+  "teaser": "A squishy, glowing noodle that only moves as fast as you dare. Gobble digits 1 to 9 to grow, bite again before you finish digesting to chain huge scores, and see if you can do what almost nobody did on a Berkeley terminal: fill the whole box.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 10],
+  "status": "shipped",
+  "accent": "#d8336f",
+  "emblem": "M14 36c-6-5-7-14-3-21s13-10 20-7c6 3 9 10 7 17-2 6-8 10-14 9M33 37a3.5 3.5 0 1 0 .01 0M24 15a5 5 0 1 0 .01 0M29 15v6c0 4-3 6-6 6",
+  "inspiredBy": {
+    "program": "worm",
+    "originalTitle": "worm",
+    "uiTitle": "the Berkeley growing-worm game",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "noodle nine — steer a growing noodle to the numbers; every bite while still digesting chains a bigger score.",
+    "description": "Michael Toy wrote worm at UC Santa Cruz; its source carries the Regents’ copyright of 1980. You steer with the keys, the worm creeps on by itself between them, and its score quietly adds up all the growth still to come at every bite. Noodle Nine keeps those rules and makes the accident the game: chains, a tempo you set yourself, hand-made gardens and fill-the-box puzzles.",
+    "seeAlso": ["snake", "robots"]
+  },
+  "howToPlay": [
+    "Steer with the arrow keys, W A S D or H J K L; left alone, the noodle creeps on by itself.",
+    "Eat a number to grow by it; bite again while still digesting to chain: each bite scores all the growth to come.",
+    "Mind the edge of the bed, the rocks and your own tail; Shift dashes; fill a whole box to win outright."
+  ],
+  "cronGoals": [
+    {
+      "id": "bites",
+      "stat": "bites",
+      "label": "Eat {n} numbers",
+      "min": 40,
+      "max": 160
+    },
+    {
+      "id": "grown",
+      "stat": "grown",
+      "label": "Grow {n} gardens",
+      "min": 2,
+      "max": 6
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-bite",
+      "title": "First bite",
+      "description": "Eat your first number.",
+      "tier": "core"
+    },
+    {
+      "id": "chain-3",
+      "title": "Chain of three",
+      "description": "Bite three times without ever finishing your digestion.",
+      "tier": "core"
+    },
+    {
+      "id": "fill-the-box",
+      "title": "Fill the box",
+      "description": "Fill every cell of a fill puzzle with noodle.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Play seven Daily Gardens.",
+      "tier": "core"
+    },
+    {
+      "id": "dash-dancer",
+      "title": "Dash dancer",
+      "description": "Eat a number at the end of a dash.",
+      "tier": "extra"
+    },
+    {
+      "id": "count-up",
+      "title": "Count-up",
+      "description": "Eat one to nine in order.",
+      "tier": "extra"
+    },
+    {
+      "id": "night-noodle",
+      "title": "Night noodle",
+      "description": "Grow the garden that has no light.",
+      "tier": "extra"
+    },
+    {
+      "id": "zoomer",
+      "title": "Zoomer",
+      "description": "Grow a garden with a bite at zoom tempo.",
+      "tier": "extra"
+    },
+    {
+      "id": "slowpoke",
+      "title": "Slowpoke",
+      "description": "Earn all three stars in a garden without ever leaving creep.",
+      "tier": "extra"
+    },
+    {
+      "id": "chain-7",
+      "title": "Chain of seven",
+      "description": "Bite seven times in one chain.",
+      "tier": "rare"
+    },
+    {
+      "id": "box-master",
+      "title": "Box master",
+      "description": "Fill all fifteen fill puzzles.",
+      "tier": "rare"
+    },
+    {
+      "id": "ninety-nine",
+      "title": "Ninety-nine",
+      "description": "Grow a noodle ninety-nine cells long.",
+      "tier": "rare"
+    }
+  ]
+}
