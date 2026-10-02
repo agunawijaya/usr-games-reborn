@@ -59,7 +59,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Hush the Wumpus     | `/usr/games/strategy` | the 1973 cave-hunting classic (1973)              | shipped     | native |
 | The Rune Gates      | `/usr/games/strategy` | wump (1989)                                       | shipped     | hosted |
 | Noodle Nine         | `/usr/games/arcade`   | the Berkeley growing-worm game (1980)             | shipped     | native |
-| Snake escape        | `/usr/games/arcade`   | snake (1980)                                      | coming soon | native |
+| Full Pockets        | `/usr/games/arcade`   | the Berkeley snake-and-treasure game (1980)       | shipped     | native |
 | Falling blocks      | `/usr/games/arcade`   | the BSD falling-blocks program (1989)             | coming soon | native |
 | Five in a row       | `/usr/games/board`    | gomoku (1994)                                     | coming soon | native |
 | Dots and boxes      | `/usr/games/board`    | dab (2003)                                        | coming soon | native |

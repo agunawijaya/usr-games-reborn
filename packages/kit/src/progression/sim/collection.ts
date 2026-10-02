@@ -29,7 +29,7 @@ const ROWS: Row[] = [
   // A second interpretation of wump: the earlier rune-gate port, with a career and a Daily Delve.
   ['wump-classic', 'strategy', 3, 10, true],
   ['worm', 'arcade', 2, 10, true],
-  ['snake', 'arcade', 2, 6, false],
+  ['snake', 'arcade', 3, 10, true],
   ['blocks', 'arcade', 3, 12, true],
   ['gomoku', 'board', 5, 15, true],
   ['dab', 'board', 3, 10, true],

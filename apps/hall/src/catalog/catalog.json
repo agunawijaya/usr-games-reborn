@@ -16,7 +16,7 @@
     { "id": "wump", "source": "game" },
     { "id": "wump-classic", "source": "game" },
     { "id": "worm", "source": "game" },
-    { "id": "snake", "source": "placeholder" },
+    { "id": "snake", "source": "game" },
     { "id": "blocks", "source": "placeholder" },
     { "id": "gomoku", "source": "placeholder" },
     { "id": "dab", "source": "placeholder" },

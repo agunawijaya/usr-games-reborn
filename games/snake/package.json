@@ -1,0 +1,14 @@
+{
+  "name": "@usr-games/game-snake",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Full Pockets: a treasure garden, a door, and one very interested snake. Inspired by snake (BSD games, 1980).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5276 --strictPort"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

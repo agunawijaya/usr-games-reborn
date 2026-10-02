@@ -1,0 +1,190 @@
+{
+  "id": "snake",
+  "title": "Full Pockets",
+  "tagline": "Grab the glints. Mind the snake. Know when to leave.",
+  "teaser": "A treasure garden, a door, and one very interested snake. Every coin you pocket makes it bolder; every step you take, it takes one too. Bank your haul at the door, or stay for one more shiny thing. Turn-based nerve, straight from a Berkeley terminal.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 10],
+  "status": "shipped",
+  "accent": "#2fbf71",
+  "emblem": "M26 9.2A15 15 0 1 0 36 19.5Q35 12 41 9Q44 8 44.5 11Q44 17 36 19.5M40.5 12.5h.01M44.6 11.2l2.6-1.2M44.6 11.2l2.2 2M18 23l3.5-4.5h5L30 23l-6 8zM18 23h12",
+  "inspiredBy": {
+    "program": "snake",
+    "originalTitle": "snake",
+    "uiTitle": "the Berkeley snake-and-treasure game",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "snake — step for step with a snake, pick up the glints, and leave by the door before it catches you.",
+    "description": "A reborn snake, the turn-based treasure chase from the 1980 Berkeley games. The snake grows bolder the richer you are, its odds are shown on the board, every door asks whether to bank or go deeper, and the original rules wait in Classic, quirks and all.",
+    "seeAlso": ["robots", "zoomies", "worm"]
+  },
+  "howToPlay": [
+    "Every step you take, the snake takes one: pick up glints and keep clear of its six squares.",
+    "The fuller your pockets, the bolder it gets; the strike preview shows where it may land next.",
+    "Every door asks: bank your haul and end the run, or go deeper for richer glints."
+  ],
+  "controls": [
+    {
+      "action": "north",
+      "label": "Step north",
+      "keys": ["ArrowUp", "Numpad8", "KeyW", "KeyK"]
+    },
+    {
+      "action": "north-east",
+      "label": "Step north-east",
+      "keys": ["Numpad9", "KeyE", "KeyU"]
+    },
+    {
+      "action": "east",
+      "label": "Step east",
+      "keys": ["ArrowRight", "Numpad6", "KeyD", "KeyL"]
+    },
+    {
+      "action": "south-east",
+      "label": "Step south-east",
+      "keys": ["Numpad3", "KeyC", "KeyN"]
+    },
+    {
+      "action": "south",
+      "label": "Step south",
+      "keys": ["ArrowDown", "Numpad2", "KeyX", "KeyJ"]
+    },
+    {
+      "action": "south-west",
+      "label": "Step south-west",
+      "keys": ["Numpad1", "KeyZ", "KeyB"]
+    },
+    {
+      "action": "west",
+      "label": "Step west",
+      "keys": ["ArrowLeft", "Numpad4", "KeyA", "KeyH"]
+    },
+    {
+      "action": "north-west",
+      "label": "Step north-west",
+      "keys": ["Numpad7", "KeyQ", "KeyY"]
+    },
+    {
+      "action": "warp",
+      "label": "Warp (costs a tenth of your haul)",
+      "keys": ["KeyT"]
+    },
+    {
+      "action": "peek",
+      "label": "Peek toward a glint",
+      "keys": ["KeyP"]
+    },
+    {
+      "action": "strikes",
+      "label": "Strike preview on or off",
+      "keys": ["KeyS"]
+    },
+    {
+      "action": "repeat",
+      "label": "Repeat the last move",
+      "keys": ["Period"]
+    }
+  ],
+  "cronGoals": [
+    {
+      "id": "glints",
+      "stat": "glintsPicked",
+      "label": "Pick up {n} glints in Full Pockets",
+      "min": 30,
+      "max": 120
+    },
+    {
+      "id": "banks",
+      "stat": "banked",
+      "label": "Bank {n} hauls in Full Pockets",
+      "min": 2,
+      "max": 6
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-glint",
+      "title": "First glint",
+      "description": "Pick up your first glint.",
+      "tier": "core"
+    },
+    {
+      "id": "banked",
+      "title": "Banked",
+      "description": "Bank a haul at a door.",
+      "tier": "core"
+    },
+    {
+      "id": "peek-a-boo",
+      "title": "Peek-a-boo",
+      "description": "Peek twenty times.",
+      "tier": "core"
+    },
+    {
+      "id": "no-warp-run",
+      "title": "Feet on the stones",
+      "description": "Bank a run without warping once.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Finish seven Daily Runs.",
+      "tier": "core"
+    },
+    {
+      "id": "root-denied",
+      "title": "Root denied",
+      "description": "Introduce yourself to the snake as root, the one player the original never let keep a score.",
+      "tier": "core",
+      "hidden": true
+    },
+    {
+      "id": "lucky-break",
+      "title": "Lucky break",
+      "description": "Scramble free when the dial lands on your digit.",
+      "tier": "extra"
+    },
+    {
+      "id": "winked-at",
+      "title": "Winked at",
+      "description": "Get caught carrying more than your best haul, and see the wink.",
+      "tier": "extra"
+    },
+    {
+      "id": "in-the-red",
+      "title": "In the red",
+      "description": "End a Classic game owing glints.",
+      "tier": "extra"
+    },
+    {
+      "id": "snake-charmer",
+      "title": "Snake charmer",
+      "description": "Leave a chamber where the snake never came within two squares of you.",
+      "tier": "extra"
+    },
+    {
+      "id": "greedy-guts",
+      "title": "Greedy guts",
+      "description": "Pick up fifteen glints in one chamber.",
+      "tier": "rare"
+    },
+    {
+      "id": "deep-pockets",
+      "title": "Deep pockets",
+      "description": "Bank a haul at the door of the tenth chamber.",
+      "tier": "rare"
+    }
+  ]
+}

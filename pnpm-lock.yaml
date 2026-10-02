@@ -302,6 +302,12 @@ importers:
         specifier: 0.186.0
         version: 0.186.0
 
+  games/snake:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/trek/app:
     devDependencies:
       playwright:
