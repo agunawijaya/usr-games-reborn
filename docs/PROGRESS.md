@@ -24,7 +24,7 @@ Status values: `coming-soon`, `adopting`, `in progress`, `hero frames` (waiting 
 | battlestar | Pajamas to Paradise | hosted | shipped | 01 | adopted as built; adult upstream text shipped by owner decision (KNOWN-ISSUES #16) |
 | atc | Skyloom | native | shipped | 02 | hero frames approved 2026-10-01; engine matches the 1986 program in 15 golden runs; tutorial, 12 shifts with stars, Endless over 25 skies, Daily Sky, 9 puzzles with solver-proven pars, logbook tapestries, Terminal mode; Canvas 2D, no three.js (ADR 0001); light and dark designed |
 | atc-classic | Control Room 1986 | hosted | shipped | 02 (owner addendum) | adopted as built; second interpretation of atc; airline names and an airport code are temporary trademark exceptions, upstream loss wording listed (KNOWN-ISSUES); voice limited to on-device voices; light look missing |
-| wump | Cave hunt | native | coming-soon | brief pending | — |
+| wump | Hush the Wumpus | native | shipped | 03 | hero frames approved 2026-10-02 (explorer redrawn as a caver, tunnel mouths never overlap); engine faithful to `wump.c` with a test per rule; Standard and Classic rule sets (ADR 0002); Scout bot over 1 000 seeds (first cave 95.5 %, deep cave 42 %, hard cave 27 % against a 45–65 % target: kept faithful, see NOTES); tutorial, 12 expeditions with stars, Daily Cave with share line, Custom Cave with the original's limits, notebook and Scout assist, first-person dart ride in one WebGL 2 shader (ADR 0001), 60 fps at 1920×1080 in the 120-room cave; Scrap Paper and Lantern Dark designed |
 | worm | Growing worm | native | coming-soon | brief pending | — |
 | snake | Snake escape | native | coming-soon | brief pending | — |
 | blocks | Falling blocks | native | coming-soon | brief pending | — |

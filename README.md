@@ -56,7 +56,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Pajamas to Paradise | `/usr/games/stories`  | battlestar (1979)                                 | shipped     | hosted |
 | Skyloom             | `/usr/games/arcade`   | the 1986 Berkeley air traffic control game (1986) | shipped     | native |
 | Control Room 1986   | `/usr/games/arcade`   | atc (1986)                                        | shipped     | hosted |
-| Cave hunt           | `/usr/games/strategy` | wump (1989)                                       | coming soon | native |
+| Hush the Wumpus     | `/usr/games/strategy` | the 1973 cave-hunting classic (1973)              | shipped     | native |
 | Growing worm        | `/usr/games/arcade`   | worm (1989)                                       | coming soon | native |
 | Snake escape        | `/usr/games/arcade`   | snake (1980)                                      | coming soon | native |
 | Falling blocks      | `/usr/games/arcade`   | the BSD falling-blocks program (1989)             | coming soon | native |

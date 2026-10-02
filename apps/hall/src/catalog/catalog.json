@@ -13,7 +13,7 @@
     { "id": "battlestar", "source": "game" },
     { "id": "atc", "source": "game" },
     { "id": "atc-classic", "source": "game" },
-    { "id": "wump", "source": "placeholder" },
+    { "id": "wump", "source": "game" },
     { "id": "worm", "source": "placeholder" },
     { "id": "snake", "source": "placeholder" },
     { "id": "blocks", "source": "placeholder" },

@@ -1,0 +1,18 @@
+{
+  "name": "@usr-games/game-wump",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hush the Wumpus: map the cave by draft, rustle and whiff, then steer a sleep dart to hush the wumpus. Inspired by wump (BSD games) and Gregory Yob's Hunt the Wumpus (1973).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5274 --strictPort",
+    "e2e": "playwright test -c .",
+    "hero": "playwright test -c . --grep @hero",
+    "shots": "playwright test -c . --grep @shots",
+    "sim": "tsx scripts/sim.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

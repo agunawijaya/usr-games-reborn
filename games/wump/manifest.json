@@ -1,0 +1,127 @@
+{
+  "id": "wump",
+  "title": "Hush the Wumpus",
+  "tagline": "Follow the stink. Steer the dart. Let it sleep.",
+  "teaser": "Somewhere in the dark, a huge, grumpy, very smelly wumpus is snoring. Map the cave by draft, flutter and whiff, dodge the pits and the bats, then thread a sleep dart through up to five tunnels and send it off to sleep. The 1973 cave hunt that started it all, redrawn by lantern light.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 8],
+  "status": "shipped",
+  "accent": "#6a9a2f",
+  "emblem": "M9 33c-3-7-1-15 4-20 3-3 7-5 11-5s8 2 11 5c5 5 7 13 4 20-3 5-9 8-15 8s-12-3-15-8zM14 12l-2-3M20 9l-1-3M28 9l1-3M34 12l2-3M17 24q2.5 2 5 0M26 24q2.5 2 5 0M22 30q2 1.6 4 0M15 41h5M28 41h5",
+  "inspiredBy": {
+    "program": "wump",
+    "originalTitle": "Hunt the Wumpus",
+    "uiTitle": "the 1973 cave-hunting classic",
+    "year": 1973
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "hush — map a cave by draft, flutter and whiff, then steer a sleep dart to put the wumpus to sleep.",
+    "description": "Gregory Yob wrote Hunt the Wumpus in 1973 for People’s Computer Company; Dave Taylor’s BSD wump dug crooked caves whose tunnels sometimes run one way. Hush the Wumpus keeps every rule, from the smell two rooms off to the crooked darts, and adds a map that draws itself, a notebook for your deductions, a dart you ride through the tunnels, and the magic tunnels the old code never dug.",
+    "seeAlso": ["adventure", "hack"]
+  },
+  "howToPlay": [
+    "Walk from room to room; drafts, flutters and whiffs tell you what lies one or two tunnels away.",
+    "Mark rooms in your notebook and keep clear of pits and bats.",
+    "Aim a sleep dart through up to five rooms; only the room where it lands counts."
+  ],
+  "cronGoals": [
+    {
+      "id": "hushes",
+      "stat": "hushed",
+      "label": "Hush {n} wumpuses",
+      "min": 2,
+      "max": 6
+    },
+    {
+      "id": "rooms",
+      "stat": "roomsSeen",
+      "label": "Explore {n} cave rooms",
+      "min": 30,
+      "max": 120
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-hush",
+      "title": "First hush",
+      "description": "Send your first wumpus to sleep.",
+      "tier": "core"
+    },
+    {
+      "id": "bat-taxi",
+      "title": "Bat taxi",
+      "description": "Ride with the bats three times in one expedition and live to tell it.",
+      "tier": "core"
+    },
+    {
+      "id": "shimmer",
+      "title": "Shimmer",
+      "description": "Step through a magic tunnel.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Explore seven Daily Caves.",
+      "tier": "core"
+    },
+    {
+      "id": "one-dart-wonder",
+      "title": "One-dart wonder",
+      "description": "Hush the wumpus with your very first dart.",
+      "tier": "extra"
+    },
+    {
+      "id": "scrap-paper",
+      "title": "Scrap paper",
+      "description": "Hush a wumpus with the Scout assist turned off.",
+      "tier": "extra"
+    },
+    {
+      "id": "ledge-grabber",
+      "title": "Ledge grabber",
+      "description": "Catch the ledge over a pit.",
+      "tier": "extra"
+    },
+    {
+      "id": "classic-chaos",
+      "title": "Classic chaos",
+      "description": "Hush a wumpus under Classic rules, crooked temper and all.",
+      "tier": "extra"
+    },
+    {
+      "id": "yobs-wish",
+      "title": "Yob’s wish",
+      "description": "Hush the wumpus in the cave named for Gregory Yob.",
+      "tier": "extra"
+    },
+    {
+      "id": "five-room-thread",
+      "title": "Five-room thread",
+      "description": "Hush the wumpus with a dart that flies all five rooms.",
+      "tier": "rare"
+    },
+    {
+      "id": "lights-out",
+      "title": "Lights out",
+      "description": "Hush the wumpus in the cave with no map.",
+      "tier": "rare"
+    },
+    {
+      "id": "deep-diver",
+      "title": "Deep diver",
+      "description": "Hush the wumpus at the bottom of the deep cave.",
+      "tier": "rare"
+    }
+  ]
+}
