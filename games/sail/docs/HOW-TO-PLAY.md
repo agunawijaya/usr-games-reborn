@@ -32,7 +32,7 @@ above it: both edit the same orders. Keys are the game’s own and cannot be rem
 | Report on the nearest ship, or all ships    | `i` (or `i b0`), `I`; `F f?` finds a French ship                             | Click a ship, its label or its line in The Fleet         |
 | Earlier commands                            | ↑ / ↓ on the command line                                                    | —                                                        |
 | Make it so (play the turn)                  | Enter on an empty command line, or `.`                                       | Make it so ⏎                                             |
-| Skip the turn’s playback                    | Space, Esc or Enter                                                          | —                                                        |
+| Skip the turn’s playback (or a last wreck)  | Space, Esc or Enter                                                          | —                                                        |
 | Chart view on or off                        | T (anywhere but the command line)                                            | Chart                                                    |
 | Rendering quality, High or Low              | Q (anywhere but the command line)                                            | High / Low                                               |
 | Sound on or off                             | M (anywhere but the command line)                                            | Sound                                                    |
@@ -142,7 +142,8 @@ work bring back up to two points, and a lost mast can only be jury-rigged back t
 | Hurricane | The wind rises to a hurricane: the storm turn plays, then every ship goes down |
 | Given up  | You type `Q`: you hand over your command                                       |
 
-The battle report shows the result, your points, the battle’s commendations earned ★ or missed ☆
+When a ship is lost in the deciding turn, the camera stays on the wreck, her boats pulling clear,
+until she is gone; then the battle report shows the result, your points, the battle’s commendations earned ★ or missed ☆
 (a “new” tag marks a star earned for the first time), what opened or changed in your career, and
 the top ten. It offers the way on first (the next action of the Sea Service, or the daily
 engagement’s share line), then Fight it again (the same plan: the same scenario, ship and seed),

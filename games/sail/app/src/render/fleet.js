@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { ShipVisual, poseToWorld } from './ship.js';
 import { lowerPortsClosed } from '../engine/index.js';
 import { CELL } from './world.js';
+import { Wreckage } from './wreckage.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
@@ -23,12 +24,24 @@ export class Fleet {
     this.playing = false;
     this.onBeat = null; // (beat) => camera director hook
     this.onDone = null;
+    this.shipOptions = {}; // set by main.js: the crew on deck, reduced motion
+    this.wreckage = new Wreckage(world);
+    this.ghosts = []; // churned water where a ship went down, fading
+    this.burstClock = 0;
+  }
+
+  /** Reduced motion switched while a battle runs (the Hall's setting). */
+  setReducedMotion(on) {
+    this.shipOptions.reduced = on;
+    for (const v of this.visuals) v.setReducedMotion(on);
   }
 
   load(st) {
     for (const v of this.visuals) this.world.scene.remove(v.root);
+    this.wreckage.clear();
+    this.ghosts = [];
     this.visuals = st.ships.map((sp) => {
-      const v = new ShipVisual(sp, st);
+      const v = new ShipVisual(sp, st, this.shipOptions);
       this.world.scene.add(v.root);
       return v;
     });
@@ -44,7 +57,18 @@ export class Fleet {
       const sp = st.ships[i];
       this.fx.setFire(i, () => v.firePoint(), sp.explode === 1 && sp.dir !== 0 ? 1 : 0);
       this.smolder(i);
+      this.abandonIfLost(i);
     });
+  }
+
+  // A ship that is sinking or on fire is abandoned: her crew take to the boats.
+  abandonIfLost(i) {
+    const v = this.visuals[i];
+    const sp = this.display.ships[i];
+    if (v.abandoned || v.v.hidden || sp.dir === 0 || (sp.sink !== 1 && sp.explode !== 1)) return;
+    v.abandoned = true;
+    this.wreckage.launchBoats(v);
+    v.sync(sp, this.display);
   }
 
   // A hull below two-thirds of its strength smokes from its shot holes, thicker as it fails.
@@ -61,6 +85,7 @@ export class Fleet {
 
   // Build the timeline for one turn. Returns total duration (s).
   play(events, finalState, { reduced = false, speed = 1 } = {}) {
+    this.lostThisTurn = null; // the last ship to sink or blow up in this turn, for the closing shot
     const disp = this.display;
     const q = [];
     let t = 0.25;
@@ -78,19 +103,28 @@ export class Fleet {
       const v = this.visuals[e.ship];
       this.at(t, () => {
         if (e.t === 'sink') {
+          if (!v.abandoned) {
+            v.abandoned = true;
+            this.wreckage.launchBoats(v);
+          }
           v.startPlunge();
+          this.lostThisTurn = v;
           this.fx.founder(v.root.position);
           this.audio?.founder(v.root.position);
         } else {
           const p = v.worldAnchor(4);
           this.fx.explosion(p, v.L / 50);
           this.audio?.explosion(p);
+          this.wreckage.scatter(v.root.position, v.L, { burnt: true });
+          this.ghosts.push(this.ghostOf(v));
+          this.lostThisTurn = v;
           v.explodeNow();
         }
         disp.ships[e.ship].dir = 0;
         this.fx.setFire(e.ship, null, 0);
       }, { kind: e.t, ship: e.ship });
-      t += e.t === 'sink' ? 4.5 * k : 3.2 * k;
+      // a foundering ship gets the camera until she is nearly gone
+      t += e.t === 'sink' ? 6.5 * k : 3.2 * k;
     }
     for (const e of events.filter((x) => x.t === 'blast')) {
       this.at(t - 2.5 * k, () => this.applyDamage(e.to, e.damage, null));
@@ -190,6 +224,7 @@ export class Fleet {
 
   fireRipple(e, dur) {
     const v = this.visuals[e.from];
+    v.crewFired(e.side);
     const muzzles = v.muzzles(e.side);
     // guns fire from bow to stern along each deck in a rolling broadside
     muzzles.sort((a, b) => b.u - a.u || a.deck - b.deck);
@@ -275,6 +310,7 @@ export class Fleet {
     v.sync(sp, disp);
     this.fx.setFire(index, () => v.firePoint(), sp.explode === 1 ? 1 : 0);
     this.smolder(index);
+    this.abandonIfLost(index);
   }
 
   // Skip the rest of the cinematic: run every pending action now.
@@ -319,8 +355,12 @@ export class Fleet {
       }
     }
     const wakes = [];
+    this.burstClock += dt;
+    const burst = this.burstClock > 0.35;
+    if (burst) this.burstClock = 0;
     for (const v of this.visuals) {
       v.update(dt, time, this.world, windVec, windSpeed, stormGlow);
+      this.followPlunge(v, burst);
       if (!v.v.hidden) {
         wakes.push({
           x: v.root.position.x, z: v.root.position.z, heading: -v.root.rotation.y, speed: v.v.speed,
@@ -328,7 +368,42 @@ export class Fleet {
         });
       }
     }
+    // where a ship went down the sea stays churned white for a while, fading
+    for (let i = this.ghosts.length - 1; i >= 0; i--) {
+      const g = this.ghosts[i];
+      g.age += dt;
+      if (g.age > 24) this.ghosts.splice(i, 1);
+      else wakes.push({ ...g, speed: 0, fire: 0, sinking: 1.4 * (1 - g.age / 24) });
+    }
     this.world.ocean.setWakes(wakes);
+    this.wreckage.update(dt, time, windVec);
+  }
+
+  ghostOf(v) {
+    return { x: v.root.position.x, z: v.root.position.z, heading: -v.root.rotation.y, halfLength: v.L * 0.5, halfBeam: v.B * 0.7, age: 0 };
+  }
+
+  // While a ship goes down: air bursting up along her length, then her wreckage on the water,
+  // then the churned patch where she was.
+  followPlunge(v, burst) {
+    const p = v.v.plunge;
+    if (p < 0) return;
+    if (!v.v.hidden && burst && p > 0.1) {
+      const at = v.worldAnchor(0);
+      const along = (Math.random() - 0.5) * v.L * 0.8;
+      at.x += Math.sin(v.root.rotation.y) * along;
+      at.z += Math.cos(v.root.rotation.y) * along;
+      at.y = 0;
+      this.fx.splash(at, 0.45 + Math.random() * 0.4);
+    }
+    if (p > 0.72 && !v.wreckScattered) {
+      v.wreckScattered = true;
+      this.wreckage.scatter(v.root.position, v.L);
+    }
+    if (v.v.hidden && !v.ghosted) {
+      v.ghosted = true;
+      this.ghosts.push(this.ghostOf(v));
+    }
   }
 
   // Centre of all active ships (for establishing shots).

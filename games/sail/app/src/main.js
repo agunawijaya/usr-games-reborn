@@ -59,6 +59,8 @@ try {
 const fx = createFx(world.scene, { quality, reducedMotion: reduced });
 const audio = createAudio();
 const fleet = new Fleet(world, fx, audio);
+// People on deck: a full crew on High, half on Low, none with ?crew=0 (for measuring the cost).
+fleet.shipOptions = { crewShare: params.get('crew') === '0' ? 0 : quality === 'high' ? 1 : 0.5, reduced };
 const director = new Director(1);
 director.reduced = reduced;
 const tactical = createTactical(world.scene);
@@ -69,6 +71,7 @@ let st = null; // engine state (authoritative)
 let cfg = null; // { scenarioId, playerShip, captain, initialLoad, seed, plan }
 let log = null; // the player's logbook for this battle (career/logbook.js)
 let report = null; // { buttons, share, shownAt } while the battle report is up
+let closing = null; // { timer, show } between the deciding turn and the report; show() skips the wait
 let orders = {};
 let me = -1;
 let hint = null;
@@ -138,6 +141,8 @@ function launch(plan, extra = {}) {
 }
 
 function startBattle(c, saved = null, savedLog = null) {
+  clearTimeout(closing?.timer);
+  closing = null;
   cfg = { seed: (Math.random() * 2 ** 31) >>> 0, ...c };
   cfg.plan ??= planFree(cfg.scenarioId, cfg.playerShip ?? 0, cfg.seed);
   st = saved || E.createGame(cfg);
@@ -360,7 +365,24 @@ function endBattle() {
     fleet.visuals.forEach((v, i) => setTimeout(() => { v.startPlunge(); fx.founder(v.root.position); }, 600 + i * 500));
   }
   try { sessionStorage.removeItem('broadside.battle'); } catch { /* ignore */ }
-  setTimeout(() => showReport(plan, summary), r.reason === 'hurricane' ? 4200 : 1400);
+  // A ship lost in the deciding turn is watched to the end, with her boats and wreckage, before the
+  // report covers the sea.
+  const lost = r.reason === 'hurricane' ? null : fleet.lostThisTurn;
+  const watch = lost ? lost.plungeLeft() + 3.5 : 0;
+  if (lost) {
+    director.mode = 'cinematic';
+    director.play({ ...director.impactShot(lost, watch), cut: true });
+    document.body.classList.add('cinematic');
+    $('cine').classList.add('on');
+    $('caption').textContent = `The ${lost.name} is gone. Her boats pull clear.`;
+  }
+  const wait = r.reason === 'hurricane' ? 4200 : lost ? watch * 1000 : 1400;
+  const show = () => {
+    clearTimeout(closing?.timer);
+    closing = null;
+    showReport(plan, summary);
+  };
+  closing = { timer: setTimeout(show, wait), show: lost ? show : null };
 }
 
 // ---------------------------------------------------------------------------
@@ -371,6 +393,11 @@ function endBattle() {
 const REPORT_SETTLE_MS = 700;
 
 function showReport(plan, summary) {
+  // back to the free camera and the panels, for Look around
+  director.mode = view === 'tactical' ? 'tactical' : 'orbit';
+  document.body.classList.remove('cinematic');
+  $('cine').classList.remove('on');
+  $('caption').textContent = '';
   const ms = st.ships[me];
   const { board, rank } = Menu.recordInTopTen(st, ms);
   const buttons = reportButtons(plan, st, summary, hostedInHall);
@@ -517,7 +544,7 @@ function onBeat(b) {
       break;
     }
     case 'sink':
-      director.play({ ...director.impactShot(V[b.ship], 4), cut: true });
+      director.play({ ...director.impactShot(V[b.ship], 6.5), cut: true });
       cap(`${st.ships[b.ship].name} founders and goes down.`);
       break;
     case 'explode':
@@ -650,12 +677,19 @@ followHall({
     reduced = on || params.get('reduced') === '1';
     director.reduced = reduced;
     fx.reduced = reduced;
+    fleet.setReducedMotion(reduced);
   },
 });
 $('btnHelp').onclick = () => Menu.showHelp();
 
 window.addEventListener('keydown', (e) => {
   if (document.querySelector('.overlay.open')) return;
+  // the closing shot of a lost ship can be skipped like any other cinematic
+  if (closing?.show && (e.key === ' ' || e.key === 'Escape' || e.key === 'Enter')) {
+    e.preventDefault();
+    closing.show();
+    return;
+  }
   if (fleet.playing && (e.key === ' ' || e.key === 'Escape' || e.key === 'Enter')) {
     e.preventDefault();
     fleet.finish();

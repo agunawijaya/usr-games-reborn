@@ -154,6 +154,9 @@ the allowance, not by time.
 | Rain                                                            | `app/src/render/weather.js`                                            |
 | Hulls: loft, paint per nation, gun ports, shot holes, fire      | `app/src/render/hull.js` (`CLASS_DIM`, `PAINT`)                        |
 | Wales, catheads and anchors, head rails, figurehead, deadeyes   | `app/src/render/fittings.js`                                           |
+| The stern's carved work: taffrail, window frames, name board    | `app/src/render/stern.js` (painted on a canvas, also the bump map)     |
+| The people on deck: gun crews, hands, officers                  | `app/src/render/crew.js` (one instanced mesh a ship, shader-animated)  |
+| Boats pulling away, floating wreckage                           | `app/src/render/wreckage.js` (world space, cleared with each battle)   |
 | Masts, yards, sails, rigging                                    | `app/src/render/rig.js` ([ADR 005](adr/005-ship-rigging-and-masts.md)) |
 | Ensigns                                                         | `app/src/render/flags.js` (`PAINTERS`)                                 |
 | A ship kept in step with its engine state                       | `app/src/render/ship.js`                                               |
@@ -174,7 +177,21 @@ proportion to the hull points lost (holes seen being made count towards them), t
 holes below two-thirds of the hull, the hull settling and listing as it takes water, empty ports
 with their lids gone for every gun lost on that side, round shot holes and rents in the sails as the
 rigging counter falls, the topgallant mast gone at a third and a yard hanging sprung below
-three-fifths. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read at
+three-fifths. The people on deck follow the crew counters: fewer of them as the crew falls (never
+shown falling), nobody running once the ship has struck, and the gun crews of a side leaning back
+from their guns as it fires. They are one instanced mesh per ship, animated in the vertex shader,
+with no shadow; Low puts half as many on deck, reduced motion stands them still, and `?crew=0`
+leaves the decks empty for measuring.
+
+A ship that is sinking or on fire is abandoned at once: her crew leave the deck and her boats
+(one to three by size, each with four or five rowers) pull away from both sides; nobody is shown in
+the water. When the engine sends her down she goes under in eight seconds, rolling onto her low side
+with her masts going over one by one and air bursting up along her length; her wreckage (planks, a
+spar, casks, gratings) spreads, drifts downwind and sinks after about two minutes, and the sea where
+she was stays churned white for 24 seconds (a fading wake in the ocean shader). A ship that blows up
+leaves charred wreckage the same way. The cinematic holds on a foundering ship for 6.5 s, and when a
+ship is lost in the deciding turn the camera stays on the wreck, letterboxed and captioned, until
+she is gone plus 3.5 s before the report opens; Space, Esc or Enter skips it. Broadside has one look and does not read the Hall’s tokens. Reduced motion is read at
 start from the system (`prefers-reduced-motion`, or `?reduced=1`) and, in the Hall, follows the
 Hall’s setting live (`?reduced=1` still wins); it skips the opening sweep, speeds the playback,
 blends instead of cutting and turns off camera shake. The Low quality tier

@@ -132,6 +132,19 @@ it; the engine was not touched.
   tears, falling masts): holes now follow the hull points lost, so a battle resumed or staged shows
   them too, with splintered rims that read on a black hull; the other effects are listed in
   `ARCHITECTURE.md`. The stern windows had faced inboard and were never seen from astern; fixed.
+- **Carved stern and crew** (the owner asked whether they would be heavy): the stern's carving is
+  one canvas a ship, painted once, also used as its bump map; nothing is added per frame. The crew
+  is one instanced mesh a ship (at most 48 figures of 72 triangles, no shadow), so a ten-ship
+  battle adds ten draw calls and about 30,000 triangles. Measured in Algeciras on the development
+  machine's GPU with the frame cap lifted, medians with and without the crew were within the run's
+  own noise at 1280×720 and 1920×1080 on High and Low (for example 258 against 242 fps close up at
+  1280×720, 107 against 83 at 1920×1080); under software rendering on Low, 68 and 67 fps with the
+  crew against 82 and 63 without. No cost stood out of the noise.
+- **Going down** (asked for by the owner after a look at how sinking works): over 440 computer
+  battles a ship took a median of 9 broadsides that hit before striking (3 to 18 for the middle
+  80%), and a third of the struck ships began to sink, the original's rule. Only 182 of the 307
+  that began to sink went down before their battle ended, so the closing shot now holds on any ship
+  lost in the deciding turn. Her crew leave in the boats, never shown in the water (all-ages).
 
 ## XP and packages
 

@@ -4,6 +4,7 @@
 // waterline at y = 0.
 
 import * as THREE from 'three';
+import { paintStern, sternMaterial } from './stern.js';
 
 const smooth = (x) => { const t = Math.min(1, Math.max(0, x)); return t * t * (3 - 2 * t); };
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -336,7 +337,7 @@ diffuseColor.a = 1.0;
 }
 
 // Build the hull meshes. Returns { group, form, ports, deckY(u), railX(u) }.
-export function buildHull(spec, nation) {
+export function buildHull(spec, nation, name = '') {
   const dim = shipDimensions(spec);
   const form = hullForm(dim);
   const ports = portLayout(dim, spec, form);
@@ -493,45 +494,53 @@ export function buildHull(spec, nation) {
   }
 
   // --- transom with stern windows -----------------------------------------------
+  // The windows' rows come first: the carved work is painted round them.
+  const rows = [];
+  const sternX = form.section(0, 0.9).x;
+  for (let r = 0; r < Math.max(1, dim.decks); r++) {
+    const y = form.top(0) - 1.5 - r * 2.2;
+    if (y < 1.2) break;
+    const nW = Math.max(4, Math.round(sternX * 2 / 1.6));
+    const xs = Array.from({ length: nW }, (_, w) => lerp(-sternX * 0.8, sternX * 0.8, nW === 1 ? 0.5 : w / (nW - 1)));
+    rows.push({ y, xs });
+  }
+  let spanX = 0;
+  for (let j = 0; j <= NT; j++) spanX = Math.max(spanX, form.section(0, j / NT).x);
+  const carving = paintStern({ sternX: spanX, bottom: form.bottom(0), top: form.top(0), rows, name, paint: P });
   const tp = [];
+  const tuv = [];
   const ti = [];
   const center = form.section(0, 0.55);
-  tp.push(0, center.y, center.z);
+  const pushStern = (x, y, z) => {
+    tp.push(x, y, z);
+    tuv.push(...carving.uvOf(x, y));
+  };
+  pushStern(0, center.y, center.z);
   for (let j = 0; j <= NT; j++) {
     const p = form.section(0, j / NT);
-    tp.push(p.x, p.y, p.z);
+    pushStern(p.x, p.y, p.z);
   }
   for (let j = NT; j >= 0; j--) {
     const p = form.section(0, j / NT);
-    tp.push(-p.x, p.y, p.z);
+    pushStern(-p.x, p.y, p.z);
   }
   const n = (tp.length / 3) - 1;
   for (let k = 1; k < n; k++) ti.push(0, k + 1, k);
   const trGeo = new THREE.BufferGeometry();
   trGeo.setAttribute('position', new THREE.Float32BufferAttribute(tp, 3));
+  trGeo.setAttribute('uv', new THREE.Float32BufferAttribute(tuv, 2));
   trGeo.setIndex(ti);
   trGeo.computeVertexNormals();
-  const transom = new THREE.Mesh(trGeo, hullMaterial(null, { color: P.wale }));
+  const transom = new THREE.Mesh(trGeo, sternMaterial(carving.texture));
   group.add(transom);
-  // stern gallery windows: warm lamplight, one row per gun deck + the cabin
+  // stern gallery windows: warm lamplight in the painted frames, one row per gun deck + the cabin
   const winMat = new THREE.MeshStandardMaterial({ color: '#2a1d10', emissive: '#ffb45c', emissiveIntensity: 0.6, roughness: 0.3 });
-  const trimMat = new THREE.MeshStandardMaterial({ color: P.trim, roughness: 0.6 });
-  const rows = Math.max(1, dim.decks);
-  const sternX = form.section(0, 0.9).x;
-  for (let r = 0; r < rows; r++) {
-    const y = form.top(0) - 1.5 - r * 2.2;
-    if (y < 1.2) break;
-    const nW = Math.max(4, Math.round(sternX * 2 / 1.6));
-    // the transom rakes aft: follow it
-    const tz = form.section(0, (y - form.bottom(0)) / (form.top(0) - form.bottom(0))).z;
-    const band = new THREE.Mesh(new THREE.BoxGeometry(sternX * 1.9, 1.5, 0.3), trimMat);
-    band.position.set(0, y, tz + 0.35);
-    group.add(band);
-    for (let w = 0; w < nW; w++) {
-      const x = lerp(-sternX * 0.8, sternX * 0.8, nW === 1 ? 0.5 : w / (nW - 1));
+  for (const row of rows) {
+    // the transom rakes aft: follow it, the panes just proud of the planking and facing astern
+    const tz = form.section(0, (row.y - form.bottom(0)) / (form.top(0) - form.bottom(0))).z;
+    for (const x of row.xs) {
       const win = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.0), winMat);
-      // the stern faces +z (aft): the panes look outward, to be seen from astern
-      win.position.set(x, y, tz + 0.52);
+      win.position.set(x, row.y, tz + 0.06);
       group.add(win);
     }
   }

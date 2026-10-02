@@ -32,7 +32,13 @@ thirty-two scenarios.
   away, a topgallant goes and then the mast, guns knocked off their carriages leave empty ports, a
   battered hull settles and lists, and a ship that strikes hauls down her flag.
 - Hulls fitted out as period warships: raised wales along the sheer, red-lined gun-port lids,
-  anchors catted at the bow, head rails and a gilded figurehead, stern windows lit at dusk.
+  anchors catted at the bow, head rails and a gilded figurehead, and a carved and gilded stern with
+  the ship's name under its lit windows.
+- A crew on deck: gun crews at the guns who lean back as they fire, hands running the gangways,
+  officers on the quarterdeck, thinning as the crew is cut down.
+- Ships that founder go down for good: the crew pull away in the boats, the masts go over as she
+  rolls, and her wreckage floats where she was. A ship lost in the deciding turn is watched to the
+  end before the report.
 - A career: the Sea Service’s ten actions take you from midshipman to admiral, each with a briefing
   and three commendations to earn; a Daily Engagement that every captain fights the same day, with a
   weekday standing order and a share line; and a service record.

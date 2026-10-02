@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { buildHull, setPorts, MAX_HITS, mulberry } from './hull.js';
 import { addFittings } from './fittings.js';
+import { buildCrew } from './crew.js';
 import { buildRig, trimSails } from './rig.js';
 import { flagMaterial } from './flags.js';
 import { CELL, dirYaw } from './world.js';
@@ -17,6 +18,8 @@ import { CELL, dirYaw } from './world.js';
 const DR = [0, 1, 1, 0, -1, -1, -1, 0, 1];
 const DC = [0, 0, -1, -1, -1, 0, 1, 1, 1];
 const ease = (t) => t * t * (3 - 2 * t);
+/** How long a ship takes to go under once she founders. */
+export const PLUNGE_SECONDS = 8;
 
 // Bow position of an engine pose, in world metres.
 export function bowWorld(row, col) {
@@ -30,7 +33,8 @@ export function poseToWorld(row, col, dir) {
 }
 
 export class ShipVisual {
-  constructor(ship, st) {
+  /** opts: { crewShare: how much of a full crew to put on deck (0 for none), reduced: motion } */
+  constructor(ship, st, opts = {}) {
     this.index = ship.index;
     this.name = ship.name;
     this.nation = ship.nationality;
@@ -38,11 +42,16 @@ export class ShipVisual {
     this.root = new THREE.Group(); // grid position + heading
     this.body = new THREE.Group(); // heave, pitch, roll, list
     this.root.add(this.body);
-    this.hull = buildHull(ship.max, ship.nationality);
+    this.hull = buildHull(ship.max, ship.nationality, ship.name);
     this.body.add(this.hull.group);
     this.rig = buildRig(this.hull);
     this.hull.mastUs = this.rig.masts.map((m) => m.u);
     addFittings(this.hull);
+    if (opts.crewShare > 0) {
+      this.crew = buildCrew(this.hull, { share: opts.crewShare, seed: ship.index + 1, reduced: opts.reduced, cls: ship.max.class });
+      this.hull.group.add(this.crew.mesh);
+    }
+    this.lastTime = 0;
     for (const m of this.rig.masts) this.body.add(m.pivot);
     this.body.add(this.rig.bow, this.rig.head, this.rig.stays, ...this.rig.jibs);
     this.dim = this.hull.dim;
@@ -126,6 +135,14 @@ export class ShipVisual {
     v.soot = Math.max(v.soot, (1 - hullFrac) * 0.8);
     this.showHullDamage(hullFrac);
     this.showGunDamage(ship);
+    if (this.crew) {
+      const crew = ship.specs.crew1 + ship.specs.crew2 + ship.specs.crew3;
+      // once she is abandoned only a few hands are left aboard, lowering the last boat
+      const aboard = this.abandoned ? 0.12 : 1;
+      this.crew.setStrength((aboard * crew) / Math.max(1, ship.max.crew1 + ship.max.crew2 + ship.max.crew3));
+      // a ship that has struck stands still: nobody runs to the guns any more
+      this.crew.setCalm(!!ship.struck || this.abandoned);
+    }
     v.fullTarget = ship.FS && !ship.struck ? 1 : 0;
     if (instant) v.full = v.fullTarget;
     // list: battered hulls take water; a foundering hulk lists hard
@@ -333,6 +350,8 @@ export class ShipVisual {
   update(dt, time, world, windVec, windSpeed, stormGlow) {
     const v = this.v;
     if (v.hidden) return;
+    this.lastTime = time;
+    this.crew?.tick(time);
     // --- movement along the path ----------------------------------------------
     let moving = 0;
     if (this.path) {
@@ -447,11 +466,19 @@ export class ShipVisual {
     // a battered hull takes water and settles a little lower
     let sinkY = -v.sink * 2.2 - (1 - this.hullFrac) * 0.9;
     let plungePitch = 0;
+    let plungeRoll = 0;
     if (v.plunge >= 0) {
-      v.plunge += dt / 9;
+      v.plunge += dt / PLUNGE_SECONDS;
       const p = Math.min(1, v.plunge);
       sinkY -= p * p * (this.dim.F + this.dim.D + 25);
       plungePitch = p * 0.45 * (this.index % 2 ? 1 : -1);
+      // she rolls onto her low side as she goes, and her masts go over that way, one by one
+      const low = this.index % 2 ? 1 : -1;
+      plungeRoll = p * 0.55 * low;
+      this.rig.masts.forEach((m, i) => {
+        if (!m.fallen && p > 0.12 + i * 0.1) this.fell(m, false, low);
+      });
+      if (this.crew && p > 0.05) this.crew.setStrength(0);
       if (v.plunge >= 1) {
         v.hidden = true;
         this.root.visible = false;
@@ -459,7 +486,7 @@ export class ShipVisual {
     }
     this.body.position.y = v.heave + sinkY;
     // +x rotation lifts the bow (-z); +z rotation lifts the starboard side
-    this.body.rotation.set(v.pitch + plungePitch, 0, -v.roll + v.heel + v.list * (this.index % 2 ? 1 : -1), 'YXZ');
+    this.body.rotation.set(v.pitch + plungePitch, 0, -v.roll + v.heel + v.list * (this.index % 2 ? 1 : -1) + plungeRoll, 'YXZ');
 
     // --- hull wear and fire ----------------------------------------------------------------
     v.burn += (v.burnTarget - v.burn) * Math.min(1, dt * 0.5);
@@ -475,6 +502,20 @@ export class ShipVisual {
     this.lowerClosed = closed;
     // two- and three-deckers shut the lowest tier in heavy seas
     this.applyPorts();
+  }
+
+  setReducedMotion(on) {
+    this.crew?.setReduced(on);
+  }
+
+  /** A broadside fired from this side: its gun crews recoil from the guns. */
+  crewFired(side) {
+    this.crew?.fired(side, this.lastTime);
+  }
+
+  /** Seconds until she is gone, while she is going down; 0 otherwise. */
+  plungeLeft() {
+    return this.v.plunge < 0 || this.v.hidden ? 0 : Math.max(0, (1 - this.v.plunge) * PLUNGE_SECONDS);
   }
 
   startPlunge() { if (this.v.plunge < 0) this.v.plunge = 0; }
