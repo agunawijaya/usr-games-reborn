@@ -7,10 +7,16 @@
 import * as K from '../engine/constants.js';
 import * as H from '../engine/hunt.js';
 import { scoreboard } from '../engine/match.js';
-import { ACTIONS, MODERN_DEFAULT, CLASSIC } from '../keymap.js';
+import { ACTIONS, AIM, EASY, MODERN_DEFAULT, CLASSIC } from '../keymap.js';
 
 const $ = (id) => document.getElementById(id);
 const FACE_ARROW = { [K.LEFTS]: '&larr;', [K.RIGHT]: '&rarr;', [K.ABOVE]: '&uarr;', [K.BELOW]: '&darr;', [K.FLYER]: '&amp;' };
+
+// Under the Aim scheme the arrows walk, and with Shift or Alt they fire.
+const AIM_LABEL = {
+  moveLeft: '← A', moveRight: '→ D', moveUp: '↑ W', moveDown: '↓ S', shot: 'Shift+Arrow', grenade: 'Alt+Arrow',
+};
+const codeLabel = (code) => code.replace('Key', '').replace('Digit', '').replace('Space', 'Spc').replace('Period', '.');
 
 const WEAPONS = [
   ['shot', 'Shot', 1], ['grenade', 'Grenade', 9], ['satchel', 'Satchel', 25], ['bomb7', 'Bomb', 49],
@@ -28,26 +34,40 @@ export class Hud {
   }
 
   keyLabel(action, scheme, modern = MODERN_DEFAULT) {
-    if (scheme === 'classic') {
-      return ACTIONS[action];
-    }
-    const code = Object.keys(modern).find((c) => modern[c] === action);
-    if (!code) return '';
-    return code.replace('Key', '').replace('Digit', '').replace('Space', 'Spc');
+    if (scheme === 'classic') return action === 'wait' ? '.' : ACTIONS[action];
+    if (scheme === 'aim' && AIM_LABEL[action]) return AIM_LABEL[action];
+    const map = scheme === 'easy' ? EASY : scheme === 'aim' ? AIM : modern;
+    const code = Object.keys(map).find((c) => map[c] === action);
+    return code ? codeLabel(code) : '';
   }
 
   buildWeapons(scheme, modern) {
+    // the Aim scheme's labels are long; its mouse buttons are in the help
+    const mouse = { modern: 'shot <kbd>RMB</kbd>grenade', easy: 'shot <kbd>RMB</kbd>grenade' }[scheme];
     $('weapons').innerHTML = WEAPONS.map(([a, name, cost]) => `<span class="w" data-a="${a}" data-c="${cost}"><kbd>${this.keyLabel(a, scheme, modern)}</kbd>${name}<span class="c">${cost}</span></span>`).join('')
-      + (scheme === 'modern' ? '<span class="w"><kbd>LMB</kbd>shot <kbd>RMB</kbd>grenade</span>' : '');
+      + (mouse ? `<span class="w"><kbd>LMB</kbd>${mouse}</span>` : '');
   }
 
   helpKeys(scheme, modern) {
-    const rows = [
+    const rows = {
+      easy: [['goLeft', 'goRight'], ['goUp', 'goDown'], ['shot', 'grenade'], ['satchel', 'bomb7'], ['slime', 'slime2'], ['scan', 'cloak'], ['wait']],
+      aim: [['moveLeft', 'moveRight'], ['moveUp', 'moveDown'], ['shot', 'grenade'], ['satchel', 'bomb7'], ['slime', 'slime2'], ['scan', 'cloak'], ['wait']],
+    }[scheme] ?? [
       ['moveLeft', 'moveRight'], ['moveUp', 'moveDown'], ['faceLeft', 'faceRight'], ['faceUp', 'faceDown'],
-      ['shot', 'grenade'], ['satchel', 'bomb7'], ['slime', 'slime2'], ['scan', 'cloak'],
+      ['shot', 'grenade'], ['satchel', 'bomb7'], ['slime', 'slime2'], ['scan', 'cloak'], ['wait'],
     ];
-    const label = { moveLeft: 'move left', moveRight: 'move right', moveUp: 'move up', moveDown: 'move down', faceLeft: 'face left', faceRight: 'face right', faceUp: 'face up', faceDown: 'face down', shot: 'shot · 1 ammo', grenade: 'grenade 3×3 · 9', satchel: 'satchel 5×5 · 25', bomb7: 'bomb 7×7 · 49 (5–0 bigger)', slime: 'slime · 5', slime2: 'more slime · 10', scan: 'scan · 1', cloak: 'cloak · 1' };
-    return rows.map(([a, b]) => `<kbd>${this.keyLabel(a, scheme, modern)}</kbd><span>${label[a]}</span><kbd>${this.keyLabel(b, scheme, modern)}</kbd><span>${label[b]}</span>`).join('');
+    const label = {
+      moveLeft: 'move left', moveRight: 'move right', moveUp: 'move up', moveDown: 'move down',
+      goLeft: 'walk left (turns you)', goRight: 'walk right (turns you)', goUp: 'walk up (turns you)', goDown: 'walk down (turns you)',
+      faceLeft: 'face left', faceRight: 'face right', faceUp: 'face up', faceDown: 'face down',
+      shot: scheme === 'aim' ? 'shot that way (Space: again) · 1' : 'shot · 1 ammo',
+      grenade: scheme === 'aim' ? 'grenade that way · 9' : 'grenade 3×3 · 9',
+      satchel: 'satchel 5×5 · 25',
+      bomb7: 'bomb 7×7 · 49 (5–0 bigger)', slime: 'slime · 5', slime2: 'more slime · 10', scan: 'scan · 1', cloak: 'cloak · 1',
+      wait: 'wait a step (Turn by turn)',
+    };
+    const cell = (a) => (a ? `<kbd>${this.keyLabel(a, scheme, modern)}</kbd><span>${label[a]}</span>` : '<span></span><span></span>');
+    return rows.map(([a, b]) => cell(a) + cell(b)).join('');
   }
 
   onEvents(g, me, events, colorOf) {
@@ -107,8 +127,9 @@ export class Hud {
       for (let i = 0; i < 3; i++) pips[i].classList.toggle('on', p.ncshot > i);
       $('c-boots').classList.toggle('on', p.nboots > 0);
       $('c-boots').textContent = p.nboots === 2 ? 'BOOTS ×2' : p.nboots === 1 ? 'BOOT ×1' : 'NO BOOTS';
-      $('c-face').innerHTML = `FACING ${FACE_ARROW[p.face] ?? '?'}`;
+      $('c-face').innerHTML = `${ctx.scheme === 'aim' ? 'AIM' : 'FACING'} ${FACE_ARROW[p.face] ?? '?'}`;
     }
+    this.updateGoal(g, humanName, ctx.goal);
     // weapons affordability
     for (const w of document.querySelectorAll('#weapons .w[data-c]')) w.classList.toggle('no', !p || p.ammo < +w.dataset.c);
     // scoreboard
@@ -116,7 +137,7 @@ export class Hud {
     $('s-table').innerHTML = rows.map((r) => {
       const pp = r.id != null ? H.playerById(g, r.id) : null;
       const col = pp ? colorOf(pp).css : '#6b7488';
-      const kind = r.bot ? { otto: 'OTTO', novice: 'NOVICE', sharp: 'SHARP' }[r.kind] : 'YOU';
+      const kind = r.bot ? { otto: 'OTTO', novice: 'NOVICE', sharp: 'SHARP' }[r.kind] : r.name === humanName ? 'YOU' : 'TARGET';
       const stat = r.stat.trim() ? ` ${r.stat}` : '';
       return `<tr class="${r.name === humanName ? 'me' : ''} ${r.alive ? '' : 'dead'}"><td><span class="sw" style="background:${col}"></span>${r.name}${r.team ? `<span class="kind">[${r.team}]</span>` : ''}<span class="kind">${kind}${stat}</span>${r.name === humanName && cheated ? '<span class="cheat">CHEATED</span>' : ''}</td>`
         + `<td class="s">${r.score.toFixed(2)}</td><td class="n">${r.kills}/${r.deaths}</td></tr>`;
@@ -127,8 +148,18 @@ export class Hud {
     $('msg').textContent = now - this.msgT < 4500 ? this.lastMsg : '';
   }
 
-  // Radar: gunshots and blasts near you, as rings that fade.
-  drawRadar(me, face) {
+  // A match with a goal: tags so far and times hit out, against its limits.
+  updateGoal(g, humanName, goal) {
+    $('c-goal').hidden = !goal;
+    if (!goal) return;
+    const mine = g.scores.find((row) => row.name === humanName);
+    $('c-tags').textContent = `${mine?.gkills ?? 0} / ${goal.tags}`;
+    $('c-lives').textContent = `${mine?.deaths ?? 0} / ${goal.lives}`;
+  }
+
+  // Radar: gunshots and blasts near you, as rings that fade. `round`: the
+  // Aim scheme's player has no facing to show, so it is a dot.
+  drawRadar(me, face, round = false) {
     const c = this.rctx;
     const S = this.radar.width;
     c.clearRect(0, 0, S, S);
@@ -160,10 +191,14 @@ export class Hud {
         c.beginPath(); c.arc(ex, ey, 3, 0, Math.PI * 2); c.fill();
       }
       // you: a chevron pointing where you face
-      const ang = { [K.RIGHT]: 0, [K.BELOW]: Math.PI / 2, [K.LEFTS]: Math.PI, [K.ABOVE]: -Math.PI / 2 }[face] ?? 0;
-      c.rotate(ang);
       c.fillStyle = '#5cffc8';
-      c.beginPath(); c.moveTo(11, 0); c.lineTo(-7, 7); c.lineTo(-3, 0); c.lineTo(-7, -7); c.closePath(); c.fill();
+      if (round) {
+        c.beginPath(); c.arc(0, 0, 7, 0, Math.PI * 2); c.fill();
+      } else {
+        const ang = { [K.RIGHT]: 0, [K.BELOW]: Math.PI / 2, [K.LEFTS]: Math.PI, [K.ABOVE]: -Math.PI / 2 }[face] ?? 0;
+        c.rotate(ang);
+        c.beginPath(); c.moveTo(11, 0); c.lineTo(-7, 7); c.lineTo(-3, 0); c.lineTo(-7, -7); c.closePath(); c.fill();
+      }
     }
     c.restore();
     c.fillStyle = 'rgba(127,140,163,0.8)';

@@ -4,7 +4,7 @@
 // drawstatus() (draw.c:73-123); row 23 is the message line.
 
 import * as K from './engine/constants.js';
-import { ident } from './engine/hunt.js';
+import { ident, playerSym } from './engine/hunt.js';
 
 const W = K.SCREEN_WIDTH;
 const Hh = K.SCREEN_HEIGHT;
@@ -12,13 +12,32 @@ const Hh = K.SCREEN_HEIGHT;
 const pad = (s, n) => (s.length >= n ? s.slice(0, n) : s + ' '.repeat(n - s.length));
 const num = (v, n) => pad(String(v).padStart(n), n);
 
+// The maze as it is, for the Fog: Off setting, translated the way check()
+// writes a screen (your own glyph, teammates as their digit) and with the
+// explosions every screen shows (showexpl) on top.
+function wholeScreen(g, me) {
+  const scr = new Uint8Array(K.WIDTH * K.HEIGHT);
+  for (let y = 0; y < K.HEIGHT; y++) {
+    for (let x = 0; x < K.WIDTH; x++) {
+      const i = y * K.WIDTH + x;
+      const ch = g.maze[i];
+      if (me && x === me.x && y === me.y) scr[i] = K.translate(ch);
+      else if (me && K.isPlayer(ch)) scr[i] = playerSym(g, me, y, x) ?? ch;
+      else scr[i] = ch;
+    }
+  }
+  for (const list of g.expl) for (const [y, x, ch] of list) scr[y * K.WIDTH + x] = ch;
+  return scr;
+}
+
 export function classicLines(g, me, state) {
   const rows = [];
   for (let y = 0; y < Hh; y++) rows.push(new Array(W).fill(' '));
   const put = (y, x, s) => { for (let i = 0; i < s.length && x + i < W; i++) rows[y][x + i] = s[i]; };
 
-  // Maze: the player's screen; while dead, the last screen they had.
-  const scr = me ? me.scr : state.lastScr;
+  // Maze: the player's screen; while dead, the last screen they had; with the
+  // fog lifted, the whole maze.
+  const scr = state.wholeMaze ? wholeScreen(g, me) : me ? me.scr : state.lastScr;
   if (scr) {
     for (let y = 0; y < K.HEIGHT; y++) {
       for (let x = 0; x < K.WIDTH; x++) rows[y][x] = String.fromCharCode(scr[y * K.WIDTH + x] || 32);

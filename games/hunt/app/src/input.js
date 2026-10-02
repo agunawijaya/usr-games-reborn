@@ -1,8 +1,9 @@
 // Keyboard and mouse -> hunt keystrokes (port ADR 004). Everything the
 // player does becomes one of the original command characters in their
-// typeahead queue; the engine executes one per step.
+// typeahead queue; the engine executes one per step. Under the Easy and Aim
+// schemes one action may become two of them: a turn, then the step or shot.
 
-import { ACTIONS, MOVES, UI_KEYS, UI_CODES, MOUSE, actionFor, facingToward, MODERN_DEFAULT } from './keymap.js';
+import { UI_KEYS, UI_CODES, MOUSE, WAIT, actionFor, facingAfter, facingToward, isStep, keysFor, MODERN_DEFAULT } from './keymap.js';
 import * as K from './engine/constants.js';
 
 export const QUEUE_MAX = 3;
@@ -12,9 +13,10 @@ const RESERVED = new Set(['Escape', 'Slash', 'Backquote', 'Backslash', 'Tab', 'F
 const FACE_ACTION = { [K.LEFTS]: 'faceLeft', [K.RIGHT]: 'faceRight', [K.ABOVE]: 'faceUp', [K.BELOW]: 'faceDown' };
 
 export class Input {
-  constructor({ canvas, onUi, onKey, getMe, getScreenPos, getScheme }) {
+  constructor({ canvas, onUi, onKeys, onWait, getMe, getScreenPos, getScheme }) {
     this.onUi = onUi;
-    this.onKey = onKey;          // (huntChar) -> boolean (queued?)
+    this.onKeys = onKeys;        // (huntChars) -> boolean (queued?)
+    this.onWait = onWait;        // the Wait key, for the Turn by turn pace
     this.getMe = getMe;
     this.getScreenPos = getScreenPos;
     this.getScheme = getScheme;
@@ -56,19 +58,35 @@ export class Input {
     const act = actionFor(e, this.getScheme(), this.modern);
     if (!act) return;
     e.preventDefault();
-    if (MOVES.has(act)) {
+    if (act === WAIT) {
+      if (!e.repeat) this.onWait();
+      return;
+    }
+    if (isStep(act)) {
       this.held = this.held.filter((a) => a !== act);
       this.held.push(act);
       if (e.repeat) return; // held keys repeat once per step, see stepRepeat()
     }
-    if (e.repeat && !MOVES.has(act) && act !== 'shot') return;
+    if (e.repeat && !isStep(act) && !act.startsWith('shot')) return;
     if (act.startsWith('face')) this.mouseFace = null; // keyboard takes over facing
-    this.onKey(ACTIONS[act]);
+    this.send(act);
+  }
+
+  // Queue the hunt keys for an action, turning first when it needs a facing
+  // the player will not have once the keys already queued have run.
+  send(act) {
+    const me = this.getMe();
+    const facing = me ? facingAfter(FACE_ACTION[me.face], me.q) : null;
+    const keys = keysFor(act, facing);
+    if (keys.length) this.onKeys(keys);
   }
 
   keyup(e) {
-    const act = actionFor(e, this.getScheme(), this.modern) || (this.getScheme() === 'classic' ? actionFor({ key: e.key.toLowerCase() }, 'classic') : null);
-    if (act && MOVES.has(act)) this.held = this.held.filter((a) => a !== act);
+    // a key let go is let go whatever modifiers are down by then: a walk held on
+    // an arrow stops even if Shift went down meanwhile to fire
+    const bare = { code: e.code, key: e.key };
+    const act = actionFor(bare, this.getScheme(), this.modern) || (this.getScheme() === 'classic' ? actionFor({ key: e.key.toLowerCase() }, 'classic') : null);
+    if (act && isStep(act)) this.held = this.held.filter((a) => a !== act);
     if (this.getScheme() === 'classic') {
       // releasing 'h' after pressing 'H' etc.: drop by letter either case
       const lower = e.key && e.key.length === 1 ? e.key.toLowerCase() : '';
@@ -80,7 +98,7 @@ export class Input {
   // Called once per engine step before it runs: auto-repeat a held move.
   stepRepeat(queueLen) {
     if (!this.enabled || !this.held.length || queueLen > 0) return;
-    this.onKey(ACTIONS[this.held[this.held.length - 1]]);
+    this.send(this.held[this.held.length - 1]);
   }
 
   pointer(e) {
@@ -98,17 +116,33 @@ export class Input {
     this.mouseOn = true;
     if (want !== current || (want && FACE_ACTION[me.face] !== want && this.mouseFace !== want)) {
       this.mouseFace = want;
-      if (FACE_ACTION[me.face] !== want) this.onKey(ACTIONS[want]);
+      if (FACE_ACTION[me.face] !== want) this.send(want);
     }
   }
 
+  // Modern: the pointer has turned you, the button fires. Easy: the button
+  // fires where you walked. Aim: it fires toward the pointer.
   click(e) {
-    if (!this.enabled || this.getScheme() !== 'modern') return;
+    const scheme = this.getScheme();
+    if (!this.enabled || scheme === 'classic') return;
     const act = MOUSE[e.button];
     if (!act) return;
     e.preventDefault();
-    this.pointer(e);
-    this.onKey(ACTIONS[act]);
+    if (scheme === 'modern') this.pointer(e);
+    if (scheme === 'aim') {
+      const toward = this.facingTowardPointer(e);
+      if (toward) this.send(`${act}${toward.slice('face'.length)}`);
+      return;
+    }
+    this.send(act);
+  }
+
+  facingTowardPointer(e) {
+    const me = this.getMe();
+    const pos = me && this.getScreenPos(me.x, me.y);
+    if (!pos) return null;
+    const r = e.currentTarget.getBoundingClientRect();
+    return facingToward(e.clientX - r.left - pos[0], e.clientY - r.top - pos[1], null);
   }
 
   resetBindings() {

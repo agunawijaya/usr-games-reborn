@@ -7,6 +7,7 @@
   <meta name="description" content="hunt(6), the 1985 BSD maze deathmatch, as a zero-raster neon arena: line-of-sight light, mirror ricochets, slime and Otto bots — engine golden-tested against the original daemon.">
   <!-- /usr/games Reborn: fonts are served from the game's own folder. -->
   <link href="./src/fonts/fonts.css" rel="stylesheet">
+  <link href="./src/desk/desk.css" rel="stylesheet">
   <script type="importmap">{ "imports": { "three": "./src/vendor/three.module.js" } }</script>
   <style>
     :root {
@@ -78,6 +79,8 @@
     .pips span.on { background: #ffb34a; box-shadow: 0 0 6px #ffb34a; }
     .chip { padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); color: var(--ink); font-size: 10px; letter-spacing: .1em; }
     .chip.on { border-color: rgba(92,255,200,.5); color: var(--mint); }
+    #c-goal[hidden] { display: none; }
+    #c-goal b { font: 400 12px var(--mono); color: var(--ink); letter-spacing: 0; margin-right: 6px; }
 
     #scores { right: 16px; top: 14px; width: 262px; padding: 9px 10px; font-size: 12px; }
     #scores h3, #feed h3 { margin: 0 0 5px; font-size: 10px; letter-spacing: .24em; color: var(--dim); font-weight: 600; }
@@ -109,6 +112,11 @@
     #b-override { background: rgba(255, 50, 70, .15); border: 1px solid rgba(255, 77, 94, .7); color: var(--red); box-shadow: 0 0 18px rgba(255,77,94,.35); }
     #b-coach { background: rgba(92, 255, 200, .08); border: 1px solid rgba(92,255,200,.45); color: var(--mint); }
     #b-slow { background: rgba(111,140,255,.1); border: 1px solid rgba(111,140,255,.5); color: var(--ultra); }
+    #b-fog { background: rgba(255,200,58,.08); border: 1px solid rgba(255,200,58,.45); color: var(--gold); }
+    #b-turns { background: rgba(92,255,200,.08); border: 1px solid rgba(92,255,200,.45); color: var(--mint); }
+    /* the desk's screens lie over the arena; settings, help and the key panel over them */
+    .overlay.desk { z-index: 3; }
+    #settings, #keys, #help { z-index: 4; }
 
     #flashred { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 40, 60, .45)); opacity: 0; transition: opacity .25s; }
 
@@ -139,6 +147,9 @@
     .keys-grid button.wait { color: #fff; border-color: var(--gold); }
     #help .keys { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 4px 12px; font-size: 13px; }
     #help kbd { font: 700 12px var(--mono); color: var(--mint); }
+    .pause-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .pause-list .btn { text-align: left; font-size: 14px; padding: 9px 14px; }
+    .pause-list kbd { font: 700 11px var(--mono); color: #eafff7; margin-left: 6px; }
     #help p { color: var(--dim); font-size: 13px; line-height: 1.5; }
 
     #respawn { background: radial-gradient(ellipse at center, rgba(40,4,10,.35), rgba(2,3,7,.55)); }
@@ -184,13 +195,14 @@
       <div class="meter"><div class="lab"><span>AMMO</span><b id="c-ammo">15</b></div><div class="bar" id="ammobar"><i></i></div></div>
       <div class="meter" id="m-cloak"><div class="lab"><span id="c-cloaklab">CLOAK</span><b id="c-cloak">20 moves</b></div><div class="bar" id="cloakbar"><i></i></div></div>
       <div class="row"><span>GUN</span><span class="pips" id="c-gun"><span></span><span></span><span></span></span><span class="chip" id="c-boots">BOOTS</span><span class="chip" id="c-face">FACING &rarr;</span></div>
+      <div class="row" id="c-goal" hidden><span>TAGS</span><b id="c-tags">0 / 3</b><span>HIT OUT</span><b id="c-lives">0 / 3</b></div>
     </div>
 
     <div id="scores" class="hud panel hud-right"><h3>SCOREBOARD · KILLS ÷ ENTRIES</h3><table id="s-table"></table></div>
     <div id="feed" class="hud panel"><h3>KILL FEED</h3><div id="f-list"></div><div id="msg"></div></div>
     <canvas id="radar" class="hud panel hud-right" width="340" height="340" aria-label="Gunshot radar"></canvas>
     <div id="weapons" class="hud panel"></div>
-    <div id="badges" class="hud"><div class="badge" id="b-override">OVERRIDE ACTIVE</div><div class="badge" id="b-coach">COACH</div><div class="badge" id="b-slow">SLOW MOTION</div></div>
+    <div id="badges" class="hud"><div class="badge" id="b-override">OVERRIDE ACTIVE</div><div class="badge" id="b-coach">COACH</div><div class="badge" id="b-slow">SLOW MOTION</div><div class="badge" id="b-fog">FOG OFF</div><div class="badge" id="b-turns">TURN BY TURN</div></div>
     <button id="sound" class="btn hud" style="visibility:visible" aria-pressed="false">SOUND: OFF</button>
     <div id="fps" class="hud"></div>
     <div id="nogl">WebGL is not available here — playing in the classic terminal view.</div>
@@ -198,34 +210,50 @@
     <div id="coachp" class="side panel" aria-live="polite"><h3>COACH · RICOCHET PREVIEW</h3><div id="coach-body"></div><div class="note">Backtick toggles. Shows where your next shot goes, every mirror flip included.</div></div>
     <div id="overp" class="side panel"><h3>OVERRIDE</h3><div id="over-body"></div><div class="note">Backslash toggles. Any flag marks your score as cheated for this match.</div></div>
 
-    <div id="respawn" class="overlay"><div class="box panel"><div class="cause" id="r-cause"></div><div class="cd" id="r-cd"></div>
+    <div id="respawn" class="overlay"><div class="box panel"><div class="cause" id="r-cause"></div><div class="cd" id="r-lives"></div><div class="cd" id="r-cd"></div>
       <div class="seg" style="justify-content:center"><button data-enter="c">Enter cloaked <kbd>C</kbd></button><button data-enter="s">Scanning <kbd>S</kbd></button><button data-enter="f">Flying <kbd>F</kbd></button></div></div></div>
 
-    <div id="setup" class="overlay on"><div class="sheet panel">
-      <h1 class="title">HUNT <span>—</span> RICOCHET</h1>
-      <p class="sub">hunt(6), the maze deathmatch of 4.3BSD (Conrad Huang, Greg Couch, Ken Arnold — UCSF, 1985), in a neon arena built only from code.</p>
+    <div id="setup" class="overlay"><div class="sheet panel">
+      <h2 class="title" style="font-size:34px">FREE MATCH</h2>
+      <p class="sub">Your own arena, rivals and goal. Fog, bot speed, pace and controls are in Settings.</p>
       <div class="grid">
-        <div class="field"><label>NAME</label><input id="o-name" type="text" maxlength="10" value="you" spellcheck="false"></div>
         <div class="field"><label>MODE</label><div class="seg" data-opt="mode"><button data-v="ffa">Free for all</button><button data-v="teams">Two teams</button></div><div class="note" data-note="mode"></div></div>
+        <div class="field"><label>GOAL</label><div class="seg" data-opt="goal"><button data-v="none">No limit</button><button data-v="3">3 tags</button><button data-v="5">5 tags</button><button data-v="10">10 tags</button></div><div class="note" data-note="goal"></div></div>
         <div class="field"><label>BOTS</label><div class="seg" data-opt="bots"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button><button data-v="8">8</button></div></div>
         <div class="field"><label>DIFFICULTY</label><div class="seg" data-opt="difficulty"><button data-v="novice">Novice</button><button data-v="otto">Classic Otto</button><button data-v="sharp">Sharpshooter</button><button data-v="mixed">Mixed</button></div><div class="note" data-note="difficulty"></div></div>
         <div class="field"><label>ARENA</label><div class="seg" data-opt="arena"><button data-v="classic">Classic</button><button data-v="veteran">Veteran</button><button data-v="ricochet">Ricochet</button></div><div class="note" data-note="arena"></div></div>
         <div class="field"><label>MAP SEED</label><div style="display:flex;gap:6px"><input id="o-seed" type="number" value="1985"><button class="btn" id="o-rand" title="Random seed">Random</button></div></div>
-        <div class="field"><label>SPEED</label><div class="seg" data-opt="speed"><button data-v="relaxed">Relaxed</button><button data-v="standard">Standard</button><button data-v="frantic">Frantic</button></div><div class="note" data-note="speed"></div></div>
-        <div class="field"><label>ENTER AS</label><div class="seg" data-opt="enter"><button data-v="c">Cloaked</button><button data-v="s">Scanning</button><button data-v="f">Flying</button></div></div>
-        <div class="field"><label>CONTROLS</label><div class="seg" data-opt="scheme"><button data-v="modern">Modern · WASD + mouse</button><button data-v="classic">Classic · hjkl</button></div></div>
-        <div class="field"><label>VIEW · QUALITY</label><div class="seg" data-opt="view"><button data-v="modern">3D</button><button data-v="split">Split</button><button data-v="classic">Terminal</button></div><div class="seg" data-opt="quality" style="margin-top:4px"><button data-v="auto">Auto</button><button data-v="high">High</button><button data-v="low">Low</button></div></div>
       </div>
-      <div class="actions"><button class="btn primary" id="o-start">ENTER THE MAZE</button><button class="btn" id="o-help">How to play</button><button class="btn" id="o-keys">Controls</button></div>
-      <div class="credit">Engine: a function-by-function port of huntd and otto.c, golden-tested against the original. Original source: <a href="https://github.com/vattam/BSDGames/tree/master/hunt" target="_blank" rel="noopener">vattam/BSDGames</a>. BSDGames Reborn · MIT.</div>
+      <div class="actions"><button class="btn primary" id="o-start">ENTER THE MAZE</button><button class="btn" id="o-settings">Settings</button><button class="btn" id="o-help">How to play</button><button class="btn" id="o-back">&larr; Game menu</button></div>
     </div></div>
 
-    <div id="pause" class="overlay"><div class="sheet panel" style="width:min(520px,94vw)">
+    <div id="settings" class="overlay"><div class="sheet panel">
+      <h2 class="title" style="font-size:30px">SETTINGS</h2>
+      <p class="sub">Every choice is remembered on this device, and the pause menu reaches this page in the middle of a match.</p>
+      <div class="grid">
+        <div class="field"><label>FOG</label><div class="seg" data-opt="fog"><button data-v="on">On · line of sight</button><button data-v="off">Off · whole maze</button></div><div class="note" data-note="fog"></div></div>
+        <div class="field"><label>BOT SPEED</label><div class="seg" data-opt="botSpeed"><button data-v="slow">Slow</button><button data-v="medium">Medium</button><button data-v="fast">Fast</button></div><div class="note" data-note="botSpeed"></div></div>
+        <div class="field"><label>PACE</label><div class="seg" data-opt="pace"><button data-v="real">Real time</button><button data-v="turns">Turn by turn</button></div><div class="note" data-note="pace"></div></div>
+        <div class="field"><label>SPEED</label><div class="seg" data-opt="speed"><button data-v="relaxed">Relaxed</button><button data-v="standard">Standard</button><button data-v="frantic">Frantic</button></div><div class="note" data-note="speed"></div></div>
+        <div class="field"><label>CONTROLS</label><div class="seg" data-opt="scheme"><button data-v="easy">Easy</button><button data-v="aim">Aim</button><button data-v="modern">Modern</button><button data-v="classic">Classic · hjkl</button></div><div class="note" data-note="scheme"></div></div>
+        <div class="field"><label>ENTER AS</label><div class="seg" data-opt="enter"><button data-v="c">Cloaked</button><button data-v="s">Scanning</button><button data-v="f">Flying</button></div></div>
+        <div class="field"><label>VIEW · CAMERA</label><div class="seg" data-opt="view"><button data-v="modern">3D</button><button data-v="split">Split</button><button data-v="classic">Terminal</button></div><div class="seg" data-opt="camera" style="margin-top:4px"><button data-v="overview">Overview</button><button data-v="follow">Follow</button></div></div>
+        <div class="field"><label>QUALITY · NAME</label><div class="seg" data-opt="quality"><button data-v="auto">Auto</button><button data-v="high">High</button><button data-v="low">Low</button></div><input id="o-name" type="text" maxlength="10" value="you" spellcheck="false" aria-label="Your name" style="margin-top:6px"></div>
+      </div>
+      <div class="actions"><button class="btn primary" id="s-done">Done</button><button class="btn" id="o-keys">Remap Modern keys</button></div>
+    </div></div>
+
+    <div id="pause" class="overlay"><div class="sheet panel" style="width:min(460px,94vw)">
       <h2 class="title" style="font-size:30px">PAUSED</h2>
-      <div class="field" style="margin-top:12px"><label>VIEW</label><div class="seg" data-opt="view"><button data-v="modern">3D</button><button data-v="split">Split</button><button data-v="classic">Terminal</button></div></div>
-      <div class="field" style="margin-top:10px"><label>CAMERA</label><div class="seg" data-opt="camera"><button data-v="overview">Overview</button><button data-v="follow">Follow</button></div></div>
-      <div class="field" style="margin-top:10px"><label>QUALITY</label><div class="seg" data-opt="quality"><button data-v="auto">Auto</button><button data-v="high">High</button><button data-v="low">Low</button></div></div>
-      <div class="actions"><button class="btn primary" id="p-resume">Resume</button><button class="btn" id="p-restart">Restart seed</button><button class="btn" id="p-new">New match</button><button class="btn" id="p-help">Help</button><button class="btn" id="p-keys">Controls</button></div>
+      <p class="sub" id="p-what"></p>
+      <div class="pause-list">
+        <button class="btn primary" id="p-resume">Resume <kbd>Esc</kbd></button>
+        <button class="btn" id="p-restart">Restart match</button>
+        <button class="btn" id="p-help">How to play</button>
+        <button class="btn" id="p-settings">Settings</button>
+        <button class="btn" id="p-menu">Game menu</button>
+        <button class="btn" id="p-hall">Back to the Hall</button>
+      </div>
     </div></div>
 
     <div id="keys" class="overlay"><div class="sheet panel" style="width:min(640px,94vw)">
@@ -237,7 +265,8 @@
 
     <div id="help" class="overlay"><div class="sheet panel">
       <h2 class="title" style="font-size:28px">HOW TO PLAY</h2>
-      <p>Kill the others before they kill you. Your score is kills per entry. You <b>move without turning</b> — facing is separate, and you only fire the way you face. You only see ahead and to your sides, never behind; what you saw stays on your map as a ghost. Firing shows every player where you are. Shots move five cells per step, bounce 90° off mirrors — and every hit <b>flips the mirror</b>. Any blast destroys interior walls; they grow back, sometimes as mirrors or doors. Doors scatter shots.</p>
+      <p>Kill the others before they kill you. Your score is kills per entry. You <b>move without turning</b> — facing is separate, and you only fire the way you face. You only see ahead and to your sides, never behind; what you saw stays on your map as a ghost. (Set <b>Fog</b> to Off on the setup or the pause menu and the whole maze is lit; the match still counts.) Firing shows every player where you are. Shots move five cells per step, bounce 90° off mirrors — and every hit <b>flips the mirror</b>. Any blast destroys interior walls; they grow back, sometimes as mirrors or doors. Doors scatter shots.</p>
+      <p>In the career, and in a free match with a goal, you win by tagging the goal's number of rivals before you are hit out three times. Settings can make it gentler: <b>Fog</b> Off lights the whole maze, <b>Bot speed</b> slows the bots, <b>Turn by turn</b> lets the world move only when you press a key (<kbd>.</kbd> waits a step), and the <b>Easy</b> and <b>Aim</b> controls drop the separate facing keys (under Aim, Shift with an arrow fires that way and Alt with an arrow throws a grenade).</p>
       <div class="keys" id="help-keys"></div>
       <p>Esc pause · <kbd>?</kbd> help · <kbd>`</kbd> Coach (ricochet preview) · <kbd>\</kbd> Override (cheats) · <kbd>Tab</kbd> scores · <kbd>F2</kbd> view · <kbd>F3</kbd> camera</p>
       <div class="actions"><button class="btn primary" id="h-close">Got it</button></div>

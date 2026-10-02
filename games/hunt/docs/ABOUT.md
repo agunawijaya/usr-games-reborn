@@ -36,6 +36,10 @@ and unfair.
 - Modern controls (WASD to move, the arrows or the mouse to face) beside the original keys, and a
   Coach that previews where your next shot will bounce.
 - Three views: the 3D arena, the original 80×24 terminal screen, or both side by side.
+- A ten-match career from one rookie to a final against sharpshooters, with stars and ranks, a
+  four-lesson tutorial, and free matches with a goal or none.
+- Help when you want it: lift the fog, slow the bots, play turn by turn, or pick controls where
+  walking turns you (Easy) or Shift with an arrow fires that way (Aim).
 
 ## At a glance
 

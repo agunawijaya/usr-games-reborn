@@ -10,6 +10,11 @@ rules engine is a function-by-function port of the `huntd` daemon, pure and DOM-
 golden-tested against step-by-step traces of the C original. The upstream design notes are in
 [`../app/docs/architecture.md`](../app/docs/architecture.md) and its decisions in [`adr/`](adr/).
 
+On 2026-10-02, at the owner’s request, the collection added a desk around the port (`app/src/desk/`:
+the game menu, a ten-match career, briefings, results, a tutorial) and assists in a Settings page:
+Fog, Bot speed, the Turn by turn pace and the Easy and Aim controls. The rules engine (`hunt.js`)
+is untouched; bot speed lives in `match.js`, every other addition in the host.
+
 ## Module map
 
 ```mermaid
@@ -29,23 +34,28 @@ flowchart LR
   render --> audio["src/audio.js<br/>Web Audio synthesis"]
   main --> hall["src/hall.js<br/>results, packages, poster"]
   hall --> bridge["UsrGamesBridge<br/>../../bridge/bridge.js"]
+  main --> desk["src/desk/desk.js<br/>menu, career, briefing, results"]
+  desk --> career["src/desk/career.js<br/>matches, stars, ranks"]
+  main --> goal["src/desk/goal.js<br/>won, lost or going on"]
+  main --> tutorial["src/desk/tutorial.js<br/>training hall, lessons"]
 ```
 
-| Path                         | Responsibility                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------ |
-| `app/src/engine/`            | Rules: maze, players, shots, blasts, slime, walls and regrowth, scoring, the Override flags      |
-| `app/src/bots/`              | The three bot kinds and the map explorer the two new ones share                                  |
-| `app/src/main.js`            | The host: settings, match setup, the fixed-step loop, pause, views, the Coach, the test hooks    |
-| `app/src/input.js`           | Keyboard and mouse to hunt keystrokes, typeahead, remapping                                      |
-| `app/src/keymap.js`          | Every binding: the hunt keystroke per action, Classic and Modern keys, UI keys                   |
-| `app/src/view.js`            | Per-cell light, memory and ghosts for the renderer                                               |
-| `app/src/render/`            | The 3D arena, effects, post-processing, quality profiles                                         |
-| `app/src/classic.js`         | The original 80×24 terminal screen, drawn from the same state                                    |
-| `app/src/ui/hud.js`          | HUD card, scoreboard, feed, message line, weapon bar, gunshot radar                              |
-| `app/src/audio.js`           | Procedural sound                                                                                 |
-| `app/src/fonts/`             | Self-hosted Chakra Petch and JetBrains Mono (added on adoption)                                  |
-| `app/src/hall.js`            | The bridge glue (added on adoption)                                                              |
-| `app/scripts/`, `app/tests/` | The workbench: dev server, screenshot and timing scripts, the C oracle, unit tests (not shipped) |
+| Path                         | Responsibility                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `app/src/engine/`            | Rules: maze, players, shots, blasts, slime, walls and regrowth, scoring, the Override flags               |
+| `app/src/bots/`              | The three bot kinds and the map explorer the two new ones share                                           |
+| `app/src/main.js`            | The host: settings, match setup, the fixed-step loop, pause, views, the Coach, the test hooks             |
+| `app/src/input.js`           | Keyboard and mouse to hunt keystrokes, typeahead, remapping                                               |
+| `app/src/keymap.js`          | Every binding: the hunt keystroke per action, Classic and Modern keys, UI keys                            |
+| `app/src/view.js`            | Per-cell light, memory and ghosts for the renderer                                                        |
+| `app/src/render/`            | The 3D arena, effects, post-processing, quality profiles                                                  |
+| `app/src/classic.js`         | The original 80×24 terminal screen, drawn from the same state                                             |
+| `app/src/ui/hud.js`          | HUD card, scoreboard, feed, message line, weapon bar, gunshot radar                                       |
+| `app/src/audio.js`           | Procedural sound                                                                                          |
+| `app/src/fonts/`             | Self-hosted Chakra Petch and JetBrains Mono (added on adoption)                                           |
+| `app/src/hall.js`            | The bridge glue (added on adoption)                                                                       |
+| `app/src/desk/`              | The collection’s desk: `desk.js` (screens), `career.js`, `goal.js`, `tutorial.js`, `store.js`, `desk.css` |
+| `app/scripts/`, `app/tests/` | The workbench: dev server, screenshot and timing scripts, the C oracle, unit tests (not shipped)          |
 
 The engine imports nothing from the host; `app/tests/` runs it in Node.
 
@@ -53,22 +63,50 @@ The engine imports nothing from the host; `app/tests/` runs it in Node.
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Setup
-  Setup --> Playing: ENTER THE MAZE
-  Setup --> [*]: Esc, back to the Hall
+  [*] --> Menu
+  Menu --> [*]: Esc or Back to the Hall
+  Menu --> Career
+  Career --> Briefing: a match
+  Menu --> Briefing: Start or Continue the career
+  Briefing --> Playing: Begin
+  Menu --> FreeSetup: Free match
+  FreeSetup --> Playing: ENTER THE MAZE
+  Menu --> Tutorial
   Playing --> Paused: Esc
   Paused --> Playing: Resume or Esc
+  Paused --> Confirm: Restart, Game menu or Hall, goal not reached
+  Confirm --> Playing: Keep playing
+  Confirm --> Menu: Leave (reports a quit)
+  Paused --> Menu: Game menu, no goal (reports the match)
   Playing --> HitOut: damage over capacity
-  HitOut --> Playing: re-enter after 20 steps, cloaked, scanning or flying
-  Paused --> Result: New match or Restart seed
-  Result --> Playing: Restart seed
-  Result --> Setup: New match
+  HitOut --> Playing: re-enter after 20 steps
+  Playing --> Results: the goal's tags, or the third hit-out
+  Results --> Playing: Play again (R)
+  Results --> Briefing: Next match (N)
+  Results --> Menu: Game menu (Esc)
+  Tutorial --> Results: four lessons done
 ```
 
-`Result` is not a screen: `reportMatchEnded` sends the result to the Hall and the game goes
-straight on to a fresh match or back to the setup. While hit out, the match keeps running and you
-watch the whole arena. The Hall’s strip can leave from any state (Back to the Hall) or reload the
-frame onto the setup (Game menu); neither sends a result.
+Behind every menu runs a match of bots alone (`startDemo`), watched whole from above, silent; the
+key art for the Hall is taken from it. While hit out, a match keeps running and you watch the whole
+arena. The Hall’s strip can leave from any state (Back to the Hall) or reload the frame onto the
+game menu (Game menu); neither sends a result.
+
+## The desk and the assists
+
+| Piece        | Where                                              | How it works                                                                                                                                                                                                                                                                     |
+| ------------ | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Career       | `desk/career.js`                                   | Ten matches (arena, seed, roster of bot kinds, goal); stars by hit-outs; ranks by wins; saved as `usr-games:hunt:career`                                                                                                                                                         |
+| Goal         | `desk/goal.js`                                     | `goalOutcome`: won at the goal’s tags (`gkills`), lost at its hit-outs (`deaths`); rivals’ tags never end a match                                                                                                                                                                |
+| Tutorial     | `desk/tutorial.js`                                 | A hand-made training hall (`loadMaze`); a target that never types, worn down so one shot tags it; lesson checks from events                                                                                                                                                      |
+| Bot speed    | `engine/match.js` `tick`, `BOT_SPEEDS`             | On a step the bots sit out, their typed keys wait in their queues and they type nothing new; humans never sit out                                                                                                                                                                |
+| Turn by turn | `main.js` `worldMayMove`                           | The clock steps only while a key waits, a step key is held, Wait was pressed, or the player is hit out or flying                                                                                                                                                                 |
+| Easy, Aim    | `keymap.js` `EASY`, `AIM`, `keysFor`               | An action becomes a turn key (when the facing after the queue differs) and then the step or the weapon. Under Aim the arrows walk like W A S D, and with Shift or Alt they fire that way; a key let go always ends a held walk, whatever modifiers are down (`input.js` `keyup`) |
+| Aim’s orb    | `render/actors.js` (`round`), `renderer.js`        | The player’s actor is a sphere with a ring and no thruster; with the fog off no beam shows a facing                                                                                                                                                                              |
+| Settings     | `index.html` `#settings`, `main.js` `applySetting` | Each option takes effect at once, mid-match too; saved with the port’s settings (`hunt.settings`)                                                                                                                                                                                |
+
+Bot speed was measured with `app/scripts/career-sim.mjs`: the player’s seat driven by a bot brain
+(see [NOTES](NOTES.md#the-career-simulated)).
 
 ## Engine
 
@@ -176,11 +214,16 @@ step already returns, through `noteEvents` in `main.js`’s `syncFrame`.
 the player ends it from the pause menu. `score` is the player’s tags (`gkills`: rivals only).
 `stats` carries `tags`, `entries`, `bankShots` (shots of yours that bounced at least once) and
 `defused`; `tags` and `bankShots` feed the manifest’s weekly goals. `xpEvents`: `tags`, 3 XP per
-tag, at most 25. Once any Override flag has been turned on (`g.cheated`), the result has no score,
-`tags` is 0, there are no XP events, and no further packages are sent. Packages are sent once per
-page load. Hunt ignores the Hall’s appearance messages (it has one look) and, for now, its pause:
-a match keeps running while the Hall pauses or the tab is hidden (an open issue; Esc is the game’s
-own pause). Since bridge 1.1 it follows the Hall’s sound and reduced motion:
+tag, at most 25, plus `won` (10) for a won match with a goal, `stars` (2 each) and `promotion` (6)
+from the career. A match with a goal reports `win` or `loss` when it is decided and `quit` when it
+is left early; a match without one reports `complete` when ended from the pause menu. Once any
+Override flag has been turned on (`g.cheated`), the result has no score,
+`tags` is 0, there are no XP events, and no further packages are sent. Fog: Off is a setting, not
+an Override flag: it leaves `g.cheated` alone, so such a match reports like any other. Packages
+are sent once per page load. Hunt ignores the Hall’s appearance messages (it has one look) and,
+for now, its pause: a match keeps running while the Hall pauses or the tab is hidden (an open
+issue; Esc is the game’s own pause). Since bridge 1.1 it follows the Hall’s sound and reduced
+motion:
 
 | In `hall.js`                          | What it does                                                                                                                                                                                                                                          |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -202,14 +245,38 @@ Prompt C1 added `followHall` once the renderer is built, the hurt flash reading 
 one line in `input.js` that leaves Tab to the browser outside live play, so it moves focus on the
 setup and pause menus and out of the frame to the Hall’s strip.
 
+## The Fog setting
+
+Added on 2026-10-02 at the owner’s request: with the fog off the whole maze is lit, for players
+who find the line of sight too hard. It is the setting `fog` (`on` or `off`) in `main.js`,
+remembered with the others and switched on the setup or in the pause menu.
+
+```mermaid
+flowchart LR
+  setting["settings.fog = off<br/>(main.js, fogLiftedFor)"] --> view["updateView … fogLifted<br/>known and terrain: the whole maze<br/>lit: still the line of sight"]
+  view --> renderer["Renderer.onStep … seeAll, fogLifted<br/>every rival, mine and boot shown;<br/>the beam kept, clipped by lit"]
+  setting --> terminal["classicLines … wholeMaze<br/>the maze as it is"]
+```
+
+| File                         | Change                                                                                                                                                         |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/src/main.js`            | The `fog` setting; `fogLiftedFor(me)` (never while hit out or under Override’s See whole maze); `syncFrame` passes it on; the Coach shows the rivals it lights |
+| `app/src/view.js`            | `updateView(…, { fogLifted })`: every cell known as it is, `lit` left as the player’s line of sight; `items(…, fogLifted)` counts every mine and boot as seen  |
+| `app/src/render/renderer.js` | `fogLifted`: the beam and its shaft stay on (clipped by the line of sight, so they stop at the first wall); rivals lit as if seen                              |
+| `app/src/classic.js`         | `wholeScreen`: the terminal draws the maze as it is, translated as `check()` writes a screen, explosions on top                                                |
+| `app/index.html`             | The Fog switch under Bots on the setup and in the pause menu, the FOG OFF badge, a line in the help                                                            |
+
+The engine is untouched, so the golden traces and the Override baseline still hold; the bots
+still see only their own screens.
+
 ## Tests
 
-| Test                                 | Command                                           | What it proves                                                                                                                              |
-| ------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Upstream unit tests (90 in 12 files) | `pnpm run test:hosted` (or `pnpm test` in `app/`) | Golden traces, mirrors and the Coach’s paths, weapons, world, sight, scoring, view, bots, stress, Override, zero raster, shortcut conflicts |
-| Golden traces (7, part of the above) | the same; `app/tests/golden.test.js`              | The engine matches the C daemon field by field, step by step, over about 6,000 steps                                                        |
-| In the Hall (6)                      | `pnpm exec playwright test -c games/hunt`         | Opens on the setup with no outside requests, a match ended from the pause menu counts, every way out                                        |
-| Screenshots                          | `SHOTS=1 pnpm exec playwright test -c games/hunt` | `docs/media/`, on the machine’s GPU                                                                                                         |
+| Test                                 | Command                                           | What it proves                                                                                                                                                                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit tests (102 in 14 files)         | `pnpm run test:hosted` (or `pnpm test` in `app/`) | Upstream: golden traces, mirrors and the Coach’s paths, weapons, world, sight, scoring, view, bots, stress, Override, zero raster, shortcut conflicts; ours: the Fog setting (`fog.test.js`); the career, goals, bot speed, the Easy and Aim keys and the training hall (`desk.test.js`)          |
+| Golden traces (7, part of the above) | the same; `app/tests/golden.test.js`              | The engine matches the C daemon field by field, step by step, over about 6,000 steps                                                                                                                                                                                                              |
+| In the Hall (25)                     | `pnpm exec playwright test -c games/hunt`         | Opens on the game menu with no outside requests; a free match ended from the pause menu counts; a career match won (stars, next match), lost, and left early (confirm, quit); Fog off; Slow bots and Turn by turn; the Aim keys and the orb; the tutorial; sound, motion, keyboard, every way out |
+| Screenshots                          | `SHOTS=1 pnpm exec playwright test -c games/hunt` | `docs/media/`, on the machine’s GPU                                                                                                                                                                                                                                                               |
 
 The golden traces in `app/tests/golden/*.jsonl.gz` were recorded by `scripts/oracle/capture.mjs`,
 which compiles the original daemon and Otto from a local copy of the BSD source (never committed)

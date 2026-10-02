@@ -4,6 +4,8 @@
 // team 2, so teams differ by shape as well as by colour). Under-glow on the
 // floor, a thruster at the back, damage shown by flicker and sparks, cloak
 // by a refraction shimmer (render/post.js), memory ghosts as holograms.
+// Under the Aim scheme the player's own drone is a round orb with a ring on
+// top instead: that scheme has no facing to show.
 
 import * as THREE from 'three';
 import * as K from '../engine/constants.js';
@@ -40,7 +42,16 @@ function geos() {
   markHollowGeo.rotateX(-Math.PI / 2);
 }
 
-function hullMaterial(lightUniforms, color) {
+let orbGeo = null;
+let ringGeo = null;
+function orbGeos() {
+  if (orbGeo) return;
+  orbGeo = new THREE.SphereGeometry(0.3, 28, 18);
+  ringGeo = new THREE.RingGeometry(0.2, 0.3, 40);
+  ringGeo.rotateX(-Math.PI / 2);
+}
+
+function hullMaterial(lightUniforms, color, round) {
   return new THREE.ShaderMaterial({
     transparent: true,
     uniforms: {
@@ -54,6 +65,7 @@ function hullMaterial(lightUniforms, color) {
       uBeamOn: { value: 1 },
       uLit: { value: 1 },
       uAmb: { value: 0 },
+      uRound: { value: round ? 1 : 0 },
       ...lightUniforms,
     },
     vertexShader: /* glsl */ `
@@ -70,7 +82,7 @@ function hullMaterial(lightUniforms, color) {
     fragmentShader: /* glsl */ `
       precision highp float;
       uniform vec3 uCol;
-      uniform float uTime, uHurt, uCloak, uAlpha, uLit;
+      uniform float uTime, uHurt, uCloak, uAlpha, uLit, uRound;
       varying vec3 vW;
       varying vec3 vN;
       varying vec3 vL;
@@ -86,7 +98,7 @@ function hullMaterial(lightUniforms, color) {
         vec3 spec = vec3(1.0) * pow(max(dot(reflect(-normalize(vec3(0.3, 1.0, 0.2)), n), v), 0.0), 30.0) * 0.4;
         vec3 col = body * light + spec;
         // trim: emissive lines along the bevel and the spine
-        float spine = smoothstep(0.03, 0.0, abs(vL.z)) * step(0.15, vL.y);
+        float spine = smoothstep(0.03, 0.0, abs(vL.z)) * step(0.15, vL.y) * (1.0 - uRound);
         float bevel = smoothstep(0.62, 0.95, abs(n.y)) < 0.5 ? 1.0 : 0.0;
         col += uCol * (fres * 1.4 + spine * 0.9 + (1.0 - abs(n.y)) * 0.35);
         // damage: flicker and hot sparks on the hull
@@ -137,20 +149,23 @@ function markMaterial(color) {
 }
 
 export class Actor {
-  constructor(lightUniforms, color, hollow) {
+  constructor(lightUniforms, color, hollow, round = false) {
     geos();
+    orbGeos();
     this.group = new THREE.Group();
-    this.hull = new THREE.Mesh(hullGeo, hullMaterial(lightUniforms, color));
-    this.hull.position.y = 0.34;
-    this.mark = new THREE.Mesh(hollow ? markHollowGeo : markGeo, markMaterial(color));
-    this.mark.position.y = 0.62;
-    this.mark.scale.setScalar(1.25);
+    this.round = round;
+    this.hull = new THREE.Mesh(round ? orbGeo : hullGeo, hullMaterial(lightUniforms, color, round));
+    this.hull.position.y = round ? 0.4 : 0.34;
+    this.mark = new THREE.Mesh(round ? ringGeo : hollow ? markHollowGeo : markGeo, markMaterial(color));
+    this.mark.position.y = round ? 0.76 : 0.62;
+    this.mark.scale.setScalar(round ? 1 : 1.25);
     const disc = new THREE.PlaneGeometry(2.4, 2.4);
     disc.rotateX(-Math.PI / 2);
     this.glow = new THREE.Mesh(disc, glowMaterial(color, 0.55));
     this.glow.position.y = 0.02;
     this.thrust = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5).rotateX(-Math.PI / 2), glowMaterial(color, 1.6));
     this.thrust.position.set(-0.38, 0.36, 0);
+    this.thrust.visible = !round; // a thruster would show which way is back
     this.spin = new THREE.Group();
     this.spin.add(this.hull, this.mark, this.thrust);
     this.group.add(this.glow, this.spin);

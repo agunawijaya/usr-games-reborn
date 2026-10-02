@@ -2,10 +2,11 @@
 // loaded by index.html from ../../bridge/bridge.js. Opened on its own the bridge script is
 // missing or reports `hosted: false`, and every call below does nothing.
 //
-// A match never ends by itself (players drop in and out, as on the original's server), so a
-// match counts as a session when the player ends it from the pause menu: New match or Restart.
-// Everything else is read from the events each engine step already returns. Overridden
-// (cheated) matches earn no packages, no XP events and no score.
+// A match with a goal (the career's, or a free match's) ends by itself, won or lost; leaving it
+// before then from the pause menu counts as a quit. A match without a goal never ends by itself
+// (players drop in and out, as on the original's server), so it counts as a session when the
+// player ends it from the pause menu. Everything else is read from the events each engine step
+// already returns. Overridden (cheated) matches earn no packages, no XP events and no score.
 //
 // In the Hall the game's sound and motion follow the Hall's settings (followHall).
 
@@ -25,6 +26,9 @@ const hall =
 const installed = new Set();
 const WALL_BREAKER_CHARGE = 49; // a 7×7 charge
 const XP_PER_TAG = 3;
+const XP_WON = 10;
+const XP_PER_STAR = 2;
+const XP_PROMOTION = 6;
 const TOP_OF_BOARD = { tags: 5, players: 5 };
 
 function install(id) {
@@ -33,17 +37,14 @@ function install(id) {
   hall.achievement(id);
 }
 
-// The match setup is the game menu: Escape there (with nothing open over it) leads back to the
-// Hall. Hunt's own key handling consumes Escape, so main.js asks for the trip itself.
-const setup = document.getElementById('setup');
-if (hall?.hosted && setup) {
-  const report = () => hall.setTitleScreen(setup.classList.contains('on'));
-  new MutationObserver(report).observe(setup, { attributes: true, attributeFilter: ['class'] });
-  report();
+// The game menu is the title screen: Escape there leads back to the Hall. Hunt's own key
+// handling consumes Escape, so main.js asks for the trip itself (goToHall).
+export function setTitleScreen(onTitle) {
+  if (hall?.hosted) hall.setTitleScreen(onTitle);
 }
 
-/** Escape on the match setup. Returns whether the Hall took over. */
-export function leaveFromSetup() {
+/** Back to the Hall. Returns whether the Hall took over (false when the page runs on its own). */
+export function goToHall() {
   if (!hall?.hosted) return false;
   hall.navigate('hall');
   return true;
@@ -109,35 +110,51 @@ export function noteEvents(g, me, events, name) {
   }
 }
 
-/** The player ended the match (New match or Restart). */
-export function reportMatchEnded(g, name) {
+/**
+ * A match ended. ending: { outcome: 'win' | 'loss' | 'complete' | 'quit', stars?, promotion? };
+ * stars and a promotion come from a career match.
+ */
+export function reportMatchEnded(g, name, ending) {
   if (!hall || !match || !g) return;
   const mine = scoreOf(g, name);
   const clean = !g.cheated;
-  const tags = clean ? (mine?.gkills ?? 0) : 0;
+  const counted = clean && ending.outcome !== 'quit';
+  const tags = counted ? (mine?.gkills ?? 0) : 0;
+  const stars = counted ? (ending.stars ?? 0) : 0;
+  const xpEvents = [];
+  if (tags > 0) xpEvents.push({ id: 'tags', xp: Math.min(25, tags * XP_PER_TAG) });
+  if (counted && ending.outcome === 'win') {
+    xpEvents.push({ id: 'won', xp: XP_WON });
+    install('first-win');
+  }
+  if (stars > 0) xpEvents.push({ id: 'stars', xp: stars * XP_PER_STAR });
+  if (counted && ending.promotion) xpEvents.push({ id: 'promotion', xp: XP_PROMOTION });
+  if (counted && stars === 3) install('flawless');
+  if (counted && ending.promotion?.wins === 10) install('champion');
   hall.result({
-    outcome: 'complete',
-    ...(clean ? { score: tags } : {}),
+    outcome: ending.outcome,
+    ...(counted ? { score: tags } : {}),
     stats: {
       tags,
       entries: mine?.entries ?? 0,
-      bankShots: clean ? match.bankShots : 0,
-      defused: clean ? match.defused : 0,
+      bankShots: counted ? match.bankShots : 0,
+      defused: counted ? match.defused : 0,
+      stars,
     },
-    xpEvents: tags > 0 ? [{ id: 'tags', xp: Math.min(25, tags * XP_PER_TAG) }] : [],
+    xpEvents,
     durationSeconds: Math.round((performance.now() - match.startedAt) / 1000),
   });
   match = null;
 }
 
-// Key art for the Hall: the arena some seconds into the first match, after the entry flight.
+// Key art for the Hall: the arena behind the game menu, lit whole, some seconds after the page
+// opens, once its bots have spread out and a shot or two is in the air.
 const POSTER_AFTER_MS = 8000;
+const pageOpened = performance.now();
 let posterSent = false;
 
 export function posterWanted() {
-  return (
-    !!hall?.hosted && !posterSent && !!match && performance.now() - match.startedAt > POSTER_AFTER_MS
-  );
+  return !!hall?.hosted && !posterSent && performance.now() - pageOpened > POSTER_AFTER_MS;
 }
 
 /** Call right after drawing the canvas, in the same task (see the bridge's posterFromCanvas). */

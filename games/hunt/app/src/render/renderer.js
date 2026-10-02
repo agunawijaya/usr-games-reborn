@@ -93,6 +93,7 @@ export class Renderer {
     this.camTarget = new THREE.Vector3();
     this.followTarget = new THREE.Vector3();
     this.seeAll = false;
+    this.fogLifted = false;
     this.setQuality(profile || (high ? 'high' : 'low'));
     this.stepDur = 0.1;
     this.lastStepT = 0;
@@ -197,6 +198,11 @@ export class Renderer {
     this.g = g;
     this.me = me;
     this.seeAll = !!ctx.seeAll;
+    // Fog off: everything is seen, yet the beam keeps to the player's own line of sight
+    this.fogLifted = !!ctx.fogLifted;
+    // Aim scheme: the player is an orb, and with the fog off no beam shows a facing either
+    this.roundMe = !!ctx.roundMe;
+    this.hideBeam = !!ctx.hideBeam;
     this.revealMines = !!ctx.revealMines;
     this.colorOf = ctx.colorOf;
     this.fields.setView(vs, ctx.instant);
@@ -228,16 +234,19 @@ export class Renderer {
     for (const [id, s] of now) {
       let a = this.actors.get(id);
       const col = this.colorOf(s.slot);
+      const round = this.roundMe && this.isMe(id);
       if (!a) {
-        const actor = new Actor(this.lights.uniforms, col.hex, H.ident(g, s.slot).team === 50);
-        actor.bindShared(this.shared.uEye, this.shared.uFace, this.shared.uBeamOn, this.shared.uAmb);
-        this.scene.add(actor.group);
+        const actor = this.makeActor(s, col, round);
         const dist = makeDistortion();
         this.distGroup.add(dist);
         a = { actor, from: { ...s }, to: { ...s }, dist, slimed: 0, born: t0 };
-        actor.angle = faceAngle(s.face === K.FLYER ? K.RIGHT : s.face);
         this.actors.set(id, a);
       } else {
+        if (a.actor.round !== round) {
+          // the scheme changed mid-match: same place, new body
+          this.scene.remove(a.actor.group);
+          a.actor = this.makeActor(s, col, round);
+        }
         a.from = { ...a.to };
         a.to = { ...s };
       }
@@ -245,11 +254,19 @@ export class Renderer {
     }
     // memory ghosts and items
     this.ghostList = me && !this.seeAll ? viewGhosts(g, me, vs) : [];
-    this.itemList = viewItems(g, me, vs, this.revealMines || this.seeAll);
+    this.itemList = viewItems(g, me, vs, this.revealMines || (this.seeAll && !this.fogLifted), this.fogLifted);
     this.vs = vs;
     // flying boots
     this.bootFlights = events.filter((e) => e.t === 'bootFly');
     this.direct(events, t0);
+  }
+
+  makeActor(s, col, round) {
+    const actor = new Actor(this.lights.uniforms, col.hex, H.ident(this.g, s.slot).team === 50, round);
+    actor.bindShared(this.shared.uEye, this.shared.uFace, this.shared.uBeamOn, this.shared.uAmb);
+    actor.angle = faceAngle(s.face === K.FLYER ? K.RIGHT : s.face);
+    this.scene.add(actor.group);
+    return actor;
   }
 
   // Map events to effects, timed inside the step.
@@ -583,7 +600,7 @@ export class Renderer {
       const born = Math.min(1, (time - (a.born ?? -10)) / 0.6);
       const angle = t.face === K.FLYER ? a.actor.angle + dt * 14 : faceAngle(t.face);
       const moving = jump > 0 && k < 1;
-      a.actor.pose(x, z, h, angle, time, t.hurt > 0.55 && !this.reduced ? (t.hurt - 0.55) / 0.45 : 0, cloak * (me ? 0.6 : 1), Math.min(visible, born), me ? 1 : litHere, moving);
+      a.actor.pose(x, z, h, angle, time, t.hurt > 0.55 && !this.reduced ? (t.hurt - 0.55) / 0.45 : 0, cloak * (me ? 0.6 : 1), Math.min(visible, born), me || this.seeAll ? 1 : litHere, moving);
       a.actor.group.visible = visible > 0.02;
       a.dist.position.set(x, 0.4 + h, z);
       a.dist.visible = cloak > 0 && visible > 0.02 && this.high;
@@ -619,7 +636,7 @@ export class Renderer {
     this.items.sync(this.itemList || [], flying);
     // viewer light
     const sh = this.shared;
-    if (meWorld && !this.seeAll) {
+    if (meWorld && (!this.seeAll || this.fogLifted) && !this.hideBeam) {
       sh.uEye.value.set(meWorld.x, 0.5, meWorld.z);
       sh.uFace.value.set(Math.cos(meWorld.angle), -Math.sin(meWorld.angle));
       sh.uBeamOn.value = 1;

@@ -66,7 +66,10 @@ function blastCells(g) {
 
 // Update the view of player `pp` (or of the whole maze when `all`).
 // Returns the view state: lit[i] 0/1, known[i] 0/1, terrain[i] T_*.
-export function updateView(g, pp, vs, { all = false } = {}) {
+// `fogLifted` (the Fog: Off setting): the whole maze is known as it truly
+// is, while `lit` stays the player's own line of sight, so their beam still
+// stops at the first wall.
+export function updateView(g, pp, vs, { all = false, fogLifted = false } = {}) {
   const truth = trueTerrain(g);
   if (all || !pp) {
     vs.lit.fill(1);
@@ -101,6 +104,10 @@ export function updateView(g, pp, vs, { all = false } = {}) {
       vs.known[i] = t !== T_FLOOR || vs.seen[i] ? 1 : 0;
     }
   }
+  if (fogLifted) {
+    vs.known.fill(1);
+    vs.terrain.set(truth);
+  }
   return vs;
 }
 
@@ -123,7 +130,8 @@ export function ghosts(g, pp, vs) {
 }
 
 // Mines and boots the viewer can see or remembers (or all, with the flag).
-export function items(g, pp, vs, reveal = false) {
+// With the fog lifted every one counts as seen.
+export function items(g, pp, vs, reveal = false, fogLifted = false) {
   const out = [];
   const under = new Map();
   for (const b of g.bullets) under.set(b.y * WIDTH + b.x, b.over);
@@ -132,7 +140,7 @@ export function items(g, pp, vs, reveal = false) {
     let c = null;
     let state = 0;
     if (reveal && (truth === K.MINE || truth === K.GMINE || truth === K.BOOT || truth === K.BOOT_PAIR)) { c = truth; state = vs.lit[i] ? 2 : 3; }
-    else if (vs.lit[i]) { c = truth; state = 2; }
+    else if (vs.lit[i] || fogLifted) { c = truth; state = 2; }
     else if (pp) { c = pp.mem[i]; state = 1; }
     if (c === K.MINE || c === K.GMINE || c === K.BOOT || c === K.BOOT_PAIR) {
       const y = Math.floor(i / WIDTH);

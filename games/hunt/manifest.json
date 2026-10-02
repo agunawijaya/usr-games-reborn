@@ -2,7 +2,7 @@
   "id": "hunt",
   "title": "Hunt — Ricochet",
   "tagline": "A maze, a few rivals and nowhere to hide.",
-  "teaser": "The 1980s maze free-for-all, as a neon arena lit by line of sight. Bank shots off mirrors, roll slime down the corridors, grab boots and charges, and outplay the bots — the rules come straight from the original game server.",
+  "teaser": "The 1980s maze free-for-all, as a neon arena lit by line of sight. Bank shots off mirrors, roll slime down the corridors and climb a ten-match career against the bots. Lift the fog, slow the bots or play turn by turn: the rules come straight from the original game server.",
   "category": "arcade",
   "directory": "/usr/games/arcade",
   "players": {
@@ -32,9 +32,9 @@
     "seeAlso": ["robots", "worm"]
   },
   "howToPlay": [
-    "Move with WASD, turn with the arrows or the mouse; Space fires.",
-    "Bank shots off mirrors and use charges to break walls.",
-    "End the match from the pause menu (Esc) to have it count."
+    "Tag the match's number of rivals before you are hit out three times.",
+    "Easy: arrows walk and turn you, Space fires. Aim: arrows walk, Shift + arrow fires that way.",
+    "Too hard? In Settings, lift the Fog, slow the bots or play Turn by turn."
   ],
   "cronGoals": [
     {
@@ -123,6 +123,24 @@
       "id": "lift-off",
       "title": "Lift-off",
       "description": "Get thrown when a wall grows back under your feet.",
+      "tier": "rare"
+    },
+    {
+      "id": "first-win",
+      "title": "First win",
+      "description": "Win a match with a goal: its tags before three hit-outs.",
+      "tier": "core"
+    },
+    {
+      "id": "flawless",
+      "title": "Flawless",
+      "description": "Win a career match without being hit out.",
+      "tier": "extra"
+    },
+    {
+      "id": "champion",
+      "title": "Champion of the Maze",
+      "description": "Win all ten matches of the career.",
       "tier": "rare"
     }
   ]

@@ -23,11 +23,12 @@ const BOT_NAMES = {
 
 // config: { seed, arena, mode: 'ffa'|'teams', bots: n, difficulty:
 //   'otto'|'novice'|'sharp'|'mixed', human: name|null, enter: 'c'|'s'|'f',
-//   rejoinDelay: steps }
+//   rejoinDelay: steps, roster: [kind, …] (overrides bots and difficulty),
+//   botSpeed: 'fast'|'medium'|'slow' }
 export function createMatch(config = {}) {
   const cfg = {
     seed: 1, arena: 'classic', mode: 'ffa', bots: 4, difficulty: 'otto',
-    human: 'you', enter: 'c', rejoinDelay: 20, ...config,
+    human: 'you', enter: 'c', rejoinDelay: 20, botSpeed: 'fast', ...config,
   };
   const g = H.newGame({ seed: cfg.seed, arena: cfg.arena });
   H.initArena(g);
@@ -35,6 +36,7 @@ export function createMatch(config = {}) {
   g.rejoinDelay = cfg.rejoinDelay;
   g.mode = cfg.mode;
   g.config = cfg;
+  g.botSpeed = cfg.botSpeed;
   const status = { c: K.Q_CLOAK, s: K.Q_SCAN, f: K.Q_FLY }[cfg.enter] ?? K.Q_CLOAK;
   // Team mode: hunt teams are single digits (hunt.c:150-156).
   const teamOf = (i) => (cfg.mode === 'teams' ? (i % 2 === 0 ? '1' : '2') : ' ');
@@ -46,8 +48,9 @@ export function createMatch(config = {}) {
   }
   const kinds = ['otto', 'novice', 'sharp'];
   const used = { otto: 0, novice: 0, sharp: 0 };
-  for (let i = 0; i < cfg.bots; i++) {
-    const kind = cfg.difficulty === 'mixed' ? kinds[i % 3] : cfg.difficulty;
+  const roster = cfg.roster ?? Array.from({ length: cfg.bots }, (_, i) => (cfg.difficulty === 'mixed' ? kinds[i % 3] : cfg.difficulty));
+  for (let i = 0; i < roster.length; i++) {
+    const kind = roster[i];
     const name = BOT_NAMES[kind][used[kind]++];
     H.connect(g, name, teamOf(slot++), K.Q_CLOAK);
     // otto.c never seeds random(); give each bot its own stream from the match seed
@@ -56,9 +59,37 @@ export function createMatch(config = {}) {
   return g;
 }
 
+// Bot speed, an addition of this collection: Fast is huntd as it was, every
+// bot acting on every step; Medium lets them act on two steps in three and
+// Slow on one in three. The world (shots, slime, blasts) and the human keep
+// the full pace.
+export const BOT_SPEEDS = {
+  fast: [true],
+  medium: [true, true, false],
+  slow: [true, false, false],
+};
+
 // One step of the match: humans' queued keys, the world, bots' next keys.
 export function tick(g) {
-  return H.step(g, runBots);
+  const pattern = BOT_SPEEDS[g.botSpeed] ?? BOT_SPEEDS.fast;
+  if (pattern[g.step % pattern.length]) return H.step(g, runBots);
+  return stepWhileBotsRest(g);
+}
+
+// A step the bots sit out: the keys they already typed wait in their queues,
+// and they type nothing new.
+function stepWhileBotsRest(g) {
+  const resting = [];
+  for (let n = 0; n < g.np; n++) {
+    const pp = g.slots[n];
+    const name = H.nameOf(g, pp);
+    if (!g.bots[name] || g.humans.includes(name)) continue;
+    resting.push([pp, pp.q]);
+    pp.q = [];
+  }
+  const events = H.step(g);
+  for (const [pp, queue] of resting) pp.q = queue.concat(pp.q);
+  return events;
 }
 
 // Scoreboard rows as the status panel lists them (draw.c drawstatus).
