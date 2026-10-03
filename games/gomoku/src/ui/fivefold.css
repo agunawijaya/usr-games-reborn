@@ -1,0 +1,1410 @@
+/* Fivefold: the screens around the board. Colours per look; the canvas takes its own from
+   src/render/look.ts. Zen Sand is a stone garden in the morning, Lantern Lake a still lake at night. */
+
+.ff-root[data-look='sand'] {
+  --ff-ink: #2e2820;
+  --ff-ink-2: #5f5443;
+  --ff-paper: rgba(251, 247, 238, 0.93);
+  --ff-paper-solid: #fbf7ee;
+  --ff-paper-edge: rgba(120, 96, 60, 0.2);
+  --ff-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 12px 30px rgba(84, 62, 30, 0.16);
+  --ff-accent: #ad3d17;
+  --ff-accent-ink: #ffffff;
+  --ff-accent-soft: rgba(173, 61, 23, 0.1);
+  --ff-chip: #efe6d3;
+  --ff-chip-ink: #4c4235;
+  --ff-focus: #1d5fb0;
+  --ff-star: #b7860b;
+  --ff-star-off: #d9ccb2;
+  --ff-pip: #3c444d;
+  --ff-pip-off: #d9ccb2;
+  --ff-mine: #1d5fb0;
+  --ff-theirs: #c2410c;
+  --ff-scrim: rgba(60, 46, 26, 0.32);
+  --ff-switch-off: #d6cab3;
+}
+
+.ff-root[data-look='lake'] {
+  --ff-ink: #e9effc;
+  --ff-ink-2: #a8b8da;
+  --ff-paper: rgba(8, 15, 34, 0.84);
+  --ff-paper-solid: #0a1328;
+  --ff-paper-edge: rgba(150, 190, 255, 0.2);
+  --ff-shadow: 0 1px 0 rgba(160, 200, 255, 0.08) inset, 0 18px 40px rgba(0, 0, 0, 0.45);
+  --ff-accent: #ffb547;
+  --ff-accent-ink: #1d1203;
+  --ff-accent-soft: rgba(255, 181, 71, 0.14);
+  --ff-chip: rgba(30, 46, 86, 0.75);
+  --ff-chip-ink: #d6e2fb;
+  --ff-focus: #8edcff;
+  --ff-star: #ffd36b;
+  --ff-star-off: #2b3c66;
+  --ff-pip: #ffb547;
+  --ff-pip-off: #2b3c66;
+  --ff-mine: #ffc35a;
+  --ff-theirs: #8edcff;
+  --ff-scrim: rgba(1, 4, 14, 0.55);
+  --ff-switch-off: #2b3c66;
+}
+
+.ff-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--ff-ink);
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.ff-root > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ff-root :focus-visible {
+  outline: 3px solid var(--ff-focus);
+  outline-offset: 3px;
+}
+
+/* The bar across the top: Game menu, the title, Pause. */
+
+.ff-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--ff-bar, 72px);
+  padding: 0 var(--ff-gutter, 28px);
+}
+
+.ff-root.is-in-hall .ff-bar {
+  padding-right: 224px;
+}
+
+.ff-bar__end {
+  justify-self: end;
+}
+
+.ff-title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.ff-wordmark {
+  font:
+    800 30px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+  letter-spacing: -0.01em;
+}
+
+.ff-root[data-look='lake'] .ff-wordmark {
+  text-shadow: 0 0 18px rgba(255, 200, 120, 0.35);
+}
+
+.ff-context {
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ff-button {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1.5px solid var(--ff-paper-edge);
+  border-radius: 999px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+  color: var(--ff-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ff-button:hover {
+  border-color: var(--ff-accent);
+}
+
+.ff-button--primary {
+  border-color: transparent;
+  background: var(--ff-accent);
+  color: var(--ff-accent-ink);
+}
+
+.ff-root kbd {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--ff-chip);
+  color: var(--ff-chip-ink);
+  font:
+    600 12px/1.4 'IBM Plex Mono',
+    monospace;
+}
+
+.ff-button--primary kbd {
+  background: rgba(255, 255, 255, 0.22);
+  color: inherit;
+}
+
+/* The two seats beside the board. */
+
+.ff-side {
+  position: absolute;
+  top: var(--ff-slot-top);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: var(--ff-side);
+}
+
+.ff-side--you {
+  left: var(--ff-gutter);
+}
+
+.ff-side--them {
+  right: var(--ff-gutter);
+}
+
+.ff-card {
+  padding: 20px 22px;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 18px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.ff-kicker {
+  margin: 0;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ff-seat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 16px;
+}
+
+.ff-seat__name {
+  margin: 0;
+  font:
+    700 28px/1.05 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-seat__side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ff-seat__turn {
+  grid-column: 1 / -1;
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--ff-chip);
+  color: var(--ff-chip-ink);
+  font-weight: 600;
+}
+
+.ff-seat__turn.is-urgent {
+  background: var(--ff-accent-soft);
+  color: var(--ff-ink);
+  box-shadow: inset 3px 0 0 var(--ff-accent);
+}
+
+.ff-seat__turn b {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.ff-swatch {
+  flex: none;
+}
+
+.ff-portrait {
+  display: block;
+}
+
+.ff-foe__head .ff-portrait {
+  width: clamp(76px, 6.2vw, 118px);
+  height: auto;
+}
+
+.ff-rung .ff-portrait {
+  width: clamp(84px, 12.6vh, 136px);
+  height: auto;
+}
+
+.ff-foe__head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 18px;
+}
+
+.ff-foe__name {
+  margin: 2px 0 4px;
+  font:
+    800 38px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-speech {
+  position: relative;
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--ff-chip);
+  color: var(--ff-chip-ink);
+  font:
+    italic 500 18px/1.35 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-speech::before {
+  position: absolute;
+  top: -8px;
+  left: 44px;
+  border: 8px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--ff-chip);
+  content: '';
+}
+
+.ff-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ff-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ff-pip {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ff-pip);
+  border-radius: 50%;
+}
+
+.ff-pip.is-on {
+  background: var(--ff-pip);
+}
+
+.ff-star {
+  color: var(--ff-star-off);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.ff-star.is-on {
+  color: var(--ff-star);
+}
+
+.ff-thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+}
+
+/* Read the board: the switch and its key. */
+
+.ff-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ff-switch input {
+  position: absolute;
+  opacity: 0;
+}
+
+.ff-switch__track {
+  position: relative;
+  flex: none;
+  width: 50px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--ff-switch-off);
+  transition: background 0.2s;
+}
+
+.ff-switch__track::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ff-paper-solid);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  content: '';
+  transition: transform 0.2s;
+}
+
+.ff-switch input:checked + .ff-switch__track {
+  background: var(--ff-accent);
+}
+
+.ff-switch input:checked + .ff-switch__track::after {
+  transform: translateX(22px);
+}
+
+.ff-switch input:focus-visible + .ff-switch__track {
+  outline: 3px solid var(--ff-focus);
+  outline-offset: 3px;
+}
+
+.ff-legend {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ff-ink-2);
+  font-size: 15px;
+}
+
+.ff-legend li {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.ff-legend svg {
+  display: block;
+}
+
+.ff-legend strong {
+  color: var(--ff-ink);
+}
+
+.ff-tally {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.ff-tally div {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ff-chip);
+  color: var(--ff-chip-ink);
+  font-size: 14px;
+}
+
+.ff-tally strong {
+  display: block;
+  color: var(--ff-ink);
+  font-size: 15px;
+}
+
+.ff-tally .is-mine {
+  box-shadow: inset 3px 0 0 var(--ff-mine);
+}
+
+.ff-tally .is-theirs {
+  box-shadow: inset 3px 0 0 var(--ff-theirs);
+}
+
+.ff-moves {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ff-moves b {
+  color: var(--ff-ink);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.ff-seat__moment {
+  grid-column: 1 / -1;
+  margin: 14px 0 0;
+  color: var(--ff-accent);
+  font:
+    800 italic 34px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-root[data-look='lake'] .ff-seat__moment {
+  text-shadow: 0 0 22px rgba(255, 190, 90, 0.55);
+}
+
+/* The ladder. */
+
+.ff-page {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 26px var(--ff-gutter, 40px) 32px;
+  overflow: auto;
+}
+
+.ff-page__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+}
+
+.ff-root.is-in-hall .ff-page__head {
+  padding-right: 224px;
+}
+
+.ff-page__titles {
+  text-align: center;
+}
+
+.ff-page__title {
+  margin: 4px 0 6px;
+  font:
+    800 54px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+  letter-spacing: -0.015em;
+}
+
+.ff-root[data-look='lake'] .ff-page__title {
+  text-shadow: 0 0 30px rgba(255, 200, 120, 0.3);
+}
+
+.ff-page__lead {
+  margin: 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.ff-rungs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.08fr);
+  align-items: end;
+  gap: 22px;
+  margin: auto 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ff-rung {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 18px 20px;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 22px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.ff-rung:nth-child(2) {
+  margin-bottom: calc(var(--ff-step, 40px) * 1);
+}
+
+.ff-rung:nth-child(3) {
+  margin-bottom: calc(var(--ff-step, 40px) * 2);
+}
+
+.ff-rung:nth-child(4) {
+  margin-bottom: calc(var(--ff-step, 40px) * 3);
+}
+
+.ff-rung:nth-child(5) {
+  margin-bottom: calc(var(--ff-step, 40px) * 4);
+}
+
+.ff-rung:nth-child(6) {
+  margin-bottom: calc(var(--ff-step, 40px) * 5);
+}
+
+.ff-rung__rung {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  color: var(--ff-ink-2);
+  font:
+    600 13px/1 'IBM Plex Mono',
+    monospace;
+}
+
+.ff-rung__name {
+  margin: 12px 0 2px;
+  font:
+    800 30px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-rung__temper {
+  margin: 0;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ff-rung__line {
+  flex: 1;
+  margin: 12px 0 14px;
+  color: var(--ff-ink);
+  font:
+    italic 500 16px/1.35 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-rung__record {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 24px;
+}
+
+.ff-rung__state {
+  margin: 12px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ff-rung.is-next {
+  border: 2px solid var(--ff-accent);
+  box-shadow:
+    0 0 0 6px var(--ff-accent-soft),
+    var(--ff-shadow);
+}
+
+.ff-rung.is-next .ff-rung__state {
+  color: var(--ff-accent);
+}
+
+.ff-rung.is-locked .ff-portrait {
+  opacity: 0.55;
+  filter: saturate(0.4);
+}
+
+.ff-rung.is-locked .ff-rung__line {
+  color: var(--ff-ink-2);
+}
+
+.ff-rung--referee {
+  border-style: dashed;
+}
+
+.ff-ladder__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 18px 28px;
+  margin: 26px 0 0;
+}
+
+.ff-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ff-segmented {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 999px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+}
+
+.ff-segmented button {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ff-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ff-segmented button[aria-pressed='true'] {
+  background: var(--ff-ink);
+  color: var(--ff-paper-solid);
+}
+
+.ff-button--big {
+  min-height: 54px;
+  padding: 0 28px;
+  font-size: 19px;
+}
+
+/* The app and the board's own hit area. */
+
+.ff-app {
+  position: absolute;
+  inset: 0;
+}
+
+.ff-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ff-board-hit {
+  position: absolute;
+  z-index: 1;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.ff-board-hit:focus {
+  outline: none;
+}
+
+.ff-board-hit:focus-visible {
+  outline: 3px solid var(--ff-focus);
+  outline-offset: 4px;
+}
+
+.ff-seat.is-to-move {
+  box-shadow:
+    inset 0 0 0 2px var(--ff-accent),
+    var(--ff-shadow);
+}
+
+.ff-info__line {
+  margin: 10px 0 0;
+  color: var(--ff-ink-2);
+  font-size: 15px;
+}
+
+.ff-info__line.is-urgent {
+  color: var(--ff-accent);
+  font-weight: 700;
+}
+
+.ff-coach__text {
+  margin: 10px 0 12px;
+  font:
+    500 19px/1.4 'Atkinson Hyperlegible Next',
+    sans-serif;
+}
+
+.ff-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+.ff-puzzle-pips {
+  margin: 12px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ff-switch--small {
+  margin: 14px 0;
+  font-size: 15px;
+}
+
+.ff-thinking__dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.ff-thinking__dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ff-accent);
+  animation: ff-thinking 1.2s ease-in-out infinite;
+}
+
+.ff-thinking__dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ff-thinking__dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes ff-thinking {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.ff-foe .ff-thinking {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--ff-chip);
+}
+
+/* Cards over the board. */
+
+.ff-overlays {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.ff-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--ff-scrim);
+  pointer-events: auto;
+}
+
+.ff-overlay__card {
+  width: min(600px, 100%);
+  max-height: 100%;
+  padding: 30px 34px;
+  overflow: auto;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 24px;
+  background: var(--ff-paper-solid);
+  box-shadow: var(--ff-shadow);
+  text-align: center;
+}
+
+.ff-overlay__title {
+  margin: 6px 0 10px;
+  font:
+    800 48px/1.02 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-results.is-won .ff-overlay__title {
+  color: var(--ff-accent);
+}
+
+.ff-overlay__title:focus {
+  outline: none;
+}
+
+.ff-overlay__story {
+  margin: 0 auto 16px;
+  max-width: 46ch;
+  color: var(--ff-ink-2);
+  font:
+    italic 500 18px/1.45 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-overlay__foot {
+  margin: 8px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ff-overlay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 22px 0 0;
+}
+
+.ff-overlay__actions--column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ff-results__record {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin: 4px 0 14px;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+}
+
+.ff-results__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 6px;
+}
+
+.ff-results__stats div {
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: var(--ff-chip);
+}
+
+.ff-results__stats dt {
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ff-results__stats dd {
+  margin: 4px 0 0;
+  font:
+    600 20px/1.1 'IBM Plex Mono',
+    monospace;
+}
+
+/* The game menu. */
+
+.ff-titlescreen__column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: clamp(24px, 6vw, 120px);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(600px, 48vw);
+  padding: 32px 0;
+}
+
+.ff-titlescreen.is-in-hall .ff-titlescreen__column {
+  padding-top: 84px;
+}
+
+.ff-titlescreen__mark {
+  margin: 6px 0 4px;
+  font:
+    900 clamp(64px, 8.5vw, 124px) / 0.92 'Fraunces Variable',
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+}
+
+.ff-root[data-look='lake'] .ff-titlescreen__mark {
+  color: #fff4d6;
+  text-shadow: 0 0 34px rgba(255, 190, 90, 0.45);
+}
+
+.ff-titlescreen__tagline {
+  margin: 0 0 26px;
+  color: var(--ff-ink-2);
+  font:
+    italic 500 clamp(18px, 1.6vw, 22px) / 1.35 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-menu {
+  display: grid;
+  gap: 8px;
+}
+
+.ff-menu__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  padding: 10px 18px;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 14px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+  color: var(--ff-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.ff-menu__item:hover {
+  border-color: var(--ff-accent);
+}
+
+.ff-menu__item.is-primary {
+  border-color: transparent;
+  background: var(--ff-accent);
+  color: var(--ff-accent-ink);
+}
+
+.ff-menu__label {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.ff-menu__meta {
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ff-menu__item.is-primary .ff-menu__meta {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.ff-titlescreen__hall {
+  align-self: flex-start;
+  margin: 18px 0 0;
+}
+
+/* Pages. */
+
+.ff-page__lede {
+  margin: 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.ff-page__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin: 26px 0 0;
+}
+
+.ff-bands {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.ff-band {
+  padding: 20px 22px;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 20px;
+  background: var(--ff-paper);
+  box-shadow: var(--ff-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.ff-band__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  margin: 0 0 14px;
+}
+
+.ff-band__head h2 {
+  margin: 0;
+  font:
+    800 30px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-band__head p {
+  grid-column: 1;
+  margin: 4px 0 0;
+  color: var(--ff-ink-2);
+  font-weight: 600;
+}
+
+.ff-band__count {
+  grid-row: 1;
+  grid-column: 2 !important;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.ff-puzzles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ff-puzzle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--ff-paper-edge);
+  border-radius: 14px;
+  background: var(--ff-chip);
+  color: var(--ff-chip-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ff-puzzle:hover {
+  border-color: var(--ff-accent);
+}
+
+.ff-puzzle__number {
+  font:
+    800 24px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-puzzle__moves {
+  margin-top: -14px;
+  color: var(--ff-ink-2);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.ff-puzzle.is-solved {
+  background: var(--ff-accent-soft);
+  border-color: var(--ff-accent);
+}
+
+.ff-puzzle__done {
+  position: absolute;
+  top: 4px;
+  right: 7px;
+  color: var(--ff-accent);
+  font-weight: 800;
+}
+
+.ff-daily,
+.ff-setup {
+  align-self: center;
+  padding: 28px 32px;
+}
+
+.ff-setup {
+  width: min(760px, 100%);
+}
+
+.ff-daily {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+  width: min(1040px, 100%);
+}
+
+.ff-preview {
+  display: block;
+  border-radius: 16px;
+  box-shadow: var(--ff-shadow);
+}
+
+.ff-setup--league {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ff-setup--league > :not(.ff-matchup) {
+  grid-column: 1;
+}
+
+.ff-matchup {
+  grid-row: 1 / span 4;
+  grid-column: 2;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-width: 300px;
+  padding: 10px 20px;
+  border-left: 1px solid var(--ff-paper-edge);
+  text-align: center;
+}
+
+.ff-matchup__player {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.ff-matchup__player strong {
+  font:
+    800 30px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-matchup__player span:last-child {
+  color: var(--ff-ink-2);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ff-matchup__vs {
+  margin: 6px 0;
+  color: var(--ff-ink-2);
+  font:
+    italic 600 20px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-matchup__note {
+  margin: 8px 0 0;
+  color: var(--ff-ink-2);
+  font-size: 14px;
+}
+
+.ff-daily__title {
+  margin: 6px 0 10px;
+  font:
+    800 54px/1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-daily__line,
+.ff-daily__foot {
+  margin: 10px 0 0;
+  color: var(--ff-ink-2);
+  font-size: 17px;
+}
+
+.ff-daily__done {
+  margin: 14px 0 0;
+  color: var(--ff-accent);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.ff-daily__actions,
+.ff-setup__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 22px 0 0;
+}
+
+.ff-setup {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+
+.ff-setup--league {
+  width: min(1100px, 100%);
+}
+
+.ff-picker__row {
+  display: grid;
+  gap: 10px;
+}
+
+.ff-picker__label {
+  margin: 0;
+  font:
+    700 20px/1.1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ff-picker__item {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 2px solid var(--ff-paper-edge);
+  border-radius: 16px;
+  background: var(--ff-chip);
+  color: var(--ff-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ff-picker__item[aria-checked='true'] {
+  border-color: var(--ff-accent);
+  background: var(--ff-accent-soft);
+}
+
+.ff-help {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.ff-help h2 {
+  margin: 18px 0 8px;
+  font:
+    800 26px/1.1 'Fraunces Variable',
+    Georgia,
+    serif;
+}
+
+.ff-help h2:first-child {
+  margin-top: 0;
+}
+
+.ff-help p {
+  margin: 0 0 10px;
+  color: var(--ff-ink-2);
+  font-size: 16px;
+}
+
+.ff-keys {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.ff-keys div {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ff-keys dd {
+  margin: 0;
+}
+
+@media (max-height: 800px), (max-width: 1400px) {
+  .ff-root {
+    --ff-step: 22px;
+  }
+
+  .ff-wordmark {
+    font-size: 24px;
+  }
+
+  .ff-page {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .ff-rungs {
+    gap: 14px;
+  }
+
+  .ff-rung {
+    padding: 16px 12px 14px;
+  }
+
+  .ff-rung__name {
+    margin-top: 8px;
+  }
+
+  .ff-rung__line {
+    margin: 8px 0 10px;
+  }
+
+  .ff-rung__state {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .ff-ladder__foot {
+    margin-top: 16px;
+  }
+
+  .ff-card {
+    padding: 14px 16px;
+  }
+
+  .ff-foe__name {
+    font-size: 30px;
+  }
+
+  .ff-speech {
+    font-size: 16px;
+  }
+
+  .ff-page__title {
+    font-size: 40px;
+  }
+
+  .ff-rung__name {
+    font-size: 24px;
+  }
+
+  .ff-rung__line {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-switch__track,
+  .ff-switch__track::after {
+    transition: none;
+  }
+
+  .ff-thinking__dots i {
+    animation: none;
+    opacity: 0.8;
+  }
+}

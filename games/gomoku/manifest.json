@@ -1,0 +1,127 @@
+{
+  "id": "gomoku",
+  "title": "Fivefold",
+  "tagline": "Five in a row. Read the threats before they read you.",
+  "teaser": "The oldest race on a grid: get five stones in a line before your opponent does. Fivefold pits you against a 1994 Berkeley mind that hunts in hidden combinations — and lets you switch on its thoughts to learn how it plays.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 2
+  },
+  "sessionMinutes": [3, 15],
+  "status": "shipped",
+  "accent": "#ad3d17",
+  "emblem": "M8 40L40 8M8 40a4 4 0 1 0 .01 0M16 32a4 4 0 1 0 .01 0M24 24a4 4 0 1 0 .01 0M32 16a4 4 0 1 0 .01 0M40 8a4 4 0 1 0 .01 0",
+  "inspiredBy": {
+    "program": "gomoku",
+    "originalTitle": "gomoku",
+    "uiTitle": "the Berkeley five-in-a-row program",
+    "year": 1994
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "fivefold — place stones in turn; the first to make five in a row wins, against a 1994 mind that hunts combinations.",
+    "description": "Ralph Campbell's five-in-a-row program reached Berkeley's games in 1994. It thinks in frames, every run of five points on the board, and hunts for combinations of frames that force a win; it was made for robot tournaments, where a referee program pits one player against another. Fivefold keeps its mind, move for move, and lets you watch it think.",
+    "seeAlso": ["dab", "backgammon"]
+  },
+  "howToPlay": [
+    "Take turns placing pieces where the lines cross; five in an unbroken line — across, down or on a slant — wins.",
+    "Answer every four at once, and stop an open three before it becomes an open four.",
+    "Read the board (T) draws the fours and open threes for you in practice, puzzles and two-player games."
+  ],
+  "cronGoals": [
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} games",
+      "min": 3,
+      "max": 15
+    },
+    {
+      "id": "puzzles",
+      "stat": "puzzles",
+      "label": "Solve {n} puzzles",
+      "min": 5,
+      "max": 25
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-five",
+      "title": "First five",
+      "description": "Make five in a row against any opponent.",
+      "tier": "core"
+    },
+    {
+      "id": "white-win",
+      "title": "Second to move",
+      "description": "Win a game moving second.",
+      "tier": "core"
+    },
+    {
+      "id": "league-fan",
+      "title": "Ringside",
+      "description": "Watch a whole Bot League match to the end.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Solve seven Daily Puzzles.",
+      "tier": "core"
+    },
+    {
+      "id": "beat-each-opponent",
+      "title": "Every rung",
+      "description": "Beat Pebble, Reed, Heron, Koi and Campbell, each at least once.",
+      "tier": "extra"
+    },
+    {
+      "id": "beat-campbell",
+      "title": "The 1994 mind",
+      "description": "Beat Campbell, the full Berkeley search.",
+      "tier": "extra"
+    },
+    {
+      "id": "exactly-five-win",
+      "title": "Exactly five",
+      "description": "Win a game under Exactly five, where six in a row counts for nothing.",
+      "tier": "extra"
+    },
+    {
+      "id": "four-four",
+      "title": "Four-four",
+      "description": "Make two fours with a single stone.",
+      "tier": "extra"
+    },
+    {
+      "id": "fast-five",
+      "title": "Quick five",
+      "description": "Win in fewer than fifteen of your own moves.",
+      "tier": "extra"
+    },
+    {
+      "id": "referee-slayer",
+      "title": "Out-read the Referee",
+      "description": "Beat the Referee, who reads every threat.",
+      "tier": "rare"
+    },
+    {
+      "id": "puzzle-50",
+      "title": "Fifty solved",
+      "description": "Solve fifty of the puzzles.",
+      "tier": "rare"
+    },
+    {
+      "id": "no-overlay-win",
+      "title": "Bare eyes",
+      "description": "Beat Campbell with Read the board off the whole game.",
+      "tier": "rare"
+    }
+  ]
+}

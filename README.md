@@ -61,7 +61,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Noodle Nine         | `/usr/games/arcade`   | the Berkeley growing-worm game (1980)             | shipped     | native |
 | Full Pockets        | `/usr/games/arcade`   | the Berkeley snake-and-treasure game (1980)       | shipped     | native |
 | Falling blocks      | `/usr/games/arcade`   | the BSD falling-blocks program (1989)             | coming soon | native |
-| Five in a row       | `/usr/games/board`    | gomoku (1994)                                     | coming soon | native |
+| Fivefold            | `/usr/games/board`    | the Berkeley five-in-a-row program (1994)         | shipped     | native |
 | Dots and boxes      | `/usr/games/board`    | dab (2003)                                        | coming soon | native |
 | Backgammon          | `/usr/games/board`    | backgammon (1980)                                 | coming soon | native |
 | Property trading    | `/usr/games/board`    | monop (1980)                                      | coming soon | native |

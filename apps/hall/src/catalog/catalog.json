@@ -18,7 +18,7 @@
     { "id": "worm", "source": "game" },
     { "id": "snake", "source": "game" },
     { "id": "blocks", "source": "placeholder" },
-    { "id": "gomoku", "source": "placeholder" },
+    { "id": "gomoku", "source": "game" },
     { "id": "dab", "source": "placeholder" },
     { "id": "backgammon", "source": "placeholder" },
     { "id": "monop", "source": "placeholder" },
