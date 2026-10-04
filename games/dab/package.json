@@ -1,0 +1,14 @@
+{
+  "name": "@usr-games/game-dab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Double Cross: draw a line, close a box, learn when to give one away. Inspired by dab (NetBSD games, 2003).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5287 --strictPort"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

@@ -1,0 +1,1405 @@
+/* Double Cross — the interface around the board. Everything is scoped under .dx. */
+
+.dx {
+  --dx-display: 'Fredoka Variable', 'Fredoka', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --dx-body: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+  --dx-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--dx-body);
+  color: var(--dx-ink);
+  background: var(--dx-bg);
+  user-select: none;
+}
+
+.dx[data-look='chalk'] {
+  --dx-panel: rgba(250, 247, 240, 0.94);
+  --dx-panel-2: rgba(239, 233, 222, 0.96);
+  --dx-line: #cfc6b5;
+  --dx-line-strong: #8c8170;
+  --dx-ink: #2c261d;
+  --dx-ink-2: #5d5446;
+  --dx-bg: #e3ddd1;
+  --dx-p0: #c43c27;
+  --dx-p1: #1d63b4;
+  --dx-p0-soft: #fde3dc;
+  --dx-p1-soft: #dceafb;
+  --dx-lens: #f2c53d;
+  --dx-lens-ink: #4a3700;
+  --dx-accent: #2c261d;
+  --dx-accent-ink: #faf7f0;
+  --dx-focus: #1b5fd0;
+  --dx-shadow: 0 16px 36px -22px rgba(60, 48, 30, 0.6), 0 2px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.dx[data-look='neon'] {
+  --dx-panel: rgba(18, 16, 36, 0.88);
+  --dx-panel-2: rgba(28, 25, 54, 0.92);
+  --dx-line: #34305c;
+  --dx-line-strong: #7e78c0;
+  --dx-ink: #f1efff;
+  --dx-ink-2: #b9b4e6;
+  --dx-bg: #0d0b1c;
+  --dx-p0: #ff6fb1;
+  --dx-p1: #4fe4ff;
+  --dx-p0-soft: rgba(255, 79, 160, 0.16);
+  --dx-p1-soft: rgba(53, 224, 255, 0.14);
+  --dx-lens: #ffe156;
+  --dx-lens-ink: #2b2200;
+  --dx-accent: #ffe156;
+  --dx-accent-ink: #1b1600;
+  --dx-focus: #ffe156;
+  --dx-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.dx canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.dx-panel {
+  background: var(--dx-panel);
+  border: 1.5px solid var(--dx-line);
+  border-radius: 18px;
+  box-shadow: var(--dx-shadow);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.dx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--dx-line-strong);
+  background: var(--dx-panel);
+  color: var(--dx-ink);
+  font: 600 16px/1 var(--dx-body);
+  cursor: pointer;
+}
+
+.dx-btn-primary {
+  border-color: transparent;
+  background: var(--dx-accent);
+  color: var(--dx-accent-ink);
+}
+
+.dx-btn:focus-visible,
+.dx-toggle:focus-visible {
+  outline: 3px solid var(--dx-focus);
+  outline-offset: 3px;
+}
+
+.dx-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 7px;
+  border: 1.5px solid var(--dx-line-strong);
+  border-bottom-width: 3px;
+  font: 600 12.5px/1 var(--dx-mono);
+  color: var(--dx-ink-2);
+  box-sizing: border-box;
+}
+
+.dx-btn-primary .dx-key {
+  border-color: color-mix(in srgb, var(--dx-accent-ink) 50%, transparent);
+  color: var(--dx-accent-ink);
+}
+
+/* ------------------------------------------------------------------ top bar */
+
+.dx-top {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+}
+
+/* Centred over the board, but never over the Game menu button. */
+.dx-score {
+  position: absolute;
+  top: 0;
+  left: max(calc(var(--dx-centre, 50vw) - 24px), 360px);
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.dx-player {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 8px 18px;
+  min-width: 170px;
+  box-sizing: border-box;
+}
+
+.dx-player + .dx-player {
+  border-left: 1.5px solid var(--dx-line);
+}
+
+.dx-player svg {
+  grid-row: span 2;
+  width: 40px;
+  height: 40px;
+}
+
+.dx-player b {
+  font: 600 17px/1.1 var(--dx-display);
+}
+
+.dx-player .dx-points {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  font: 700 34px/1 var(--dx-display);
+  margin-left: 6px;
+}
+
+.dx-player small {
+  font-size: 13px;
+  color: var(--dx-ink-2);
+}
+
+.dx-player[data-turn='true'] {
+  box-shadow: 0 -4px 0 var(--dx-turn) inset;
+}
+
+.dx-player-0 {
+  --dx-turn: var(--dx-p0);
+  background: var(--dx-p0-soft);
+}
+
+.dx-player-1 {
+  --dx-turn: var(--dx-p1);
+  background: var(--dx-p1-soft);
+}
+
+.dx-player-0 svg {
+  color: var(--dx-p0);
+}
+
+.dx-player-1 svg {
+  color: var(--dx-p1);
+}
+
+/* ------------------------------------------------------------------ side panel */
+
+/* The top right 220 × 64 px belongs to the Hall's Pause pill; the panel starts below it. */
+.dx-side {
+  position: absolute;
+  right: 24px;
+  top: 96px;
+  max-height: calc(100% - 120px);
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.dx-match {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--dx-line);
+}
+
+.dx-match b {
+  font: 600 19px/1.15 var(--dx-display);
+}
+
+.dx-match span {
+  font-size: 14px;
+  color: var(--dx-ink-2);
+}
+
+.dx-side h2 {
+  margin: 0;
+  font: 700 12.5px/1.2 var(--dx-body);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dx-ink-2);
+}
+
+.dx-rival {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 4px 14px;
+  align-items: center;
+}
+
+.dx-rival svg {
+  grid-row: span 2;
+  width: 64px;
+  height: 64px;
+  padding: 8px;
+  border-radius: 18px;
+  background: var(--dx-p1-soft);
+  color: var(--dx-p1);
+  box-sizing: border-box;
+}
+
+.dx-rival b {
+  font: 600 21px/1.15 var(--dx-display);
+}
+
+.dx-rival p,
+.dx-quote {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: var(--dx-ink-2);
+}
+
+.dx-quote {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--dx-panel-2);
+  font-style: italic;
+}
+
+.dx-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  color: var(--dx-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dx-toggle svg {
+  grid-row: span 2;
+  width: 26px;
+  height: 26px;
+}
+
+.dx-toggle b {
+  font-size: 16px;
+}
+
+.dx-toggle small {
+  grid-column: 2;
+  font-size: 13px;
+  color: var(--dx-ink-2);
+}
+
+.dx-toggle .dx-key {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+
+.dx-toggle[aria-pressed='true'] {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 1.5px var(--dx-lens) inset;
+}
+
+.dx-control {
+  display: grid;
+  gap: 8px;
+}
+
+.dx-control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.dx-control-row b {
+  font: 600 18px/1 var(--dx-display);
+}
+
+.dx-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font: 700 13px/1.2 var(--dx-body);
+}
+
+.dx-badge-0 {
+  background: var(--dx-p0);
+  color: #fff;
+}
+
+.dx-badge-1 {
+  background: var(--dx-p1);
+  color: #fff;
+}
+
+.dx[data-look='neon'] .dx-badge-1,
+.dx[data-look='neon'] .dx-badge-0 {
+  color: #10081c;
+}
+
+.dx-note {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--dx-ink-2);
+}
+
+.dx-keys {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1.5px solid var(--dx-line);
+}
+
+.dx-keyrow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--dx-ink-2);
+}
+
+.dx-keyrow > span {
+  display: flex;
+  gap: 3px;
+}
+
+/* ------------------------------------------------------------------ cards and the coach */
+
+.dx-card {
+  position: absolute;
+  display: grid;
+  gap: 12px;
+  padding: 24px 28px;
+  border-radius: 22px;
+}
+
+.dx-eyebrow {
+  font: 700 13px/1 var(--dx-body);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dx-ink-2);
+}
+
+.dx-card h1 {
+  margin: 0;
+  font: 600 38px/1.05 var(--dx-display);
+}
+
+.dx-card p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.dx-steps {
+  display: flex;
+  gap: 6px;
+}
+
+.dx-steps i {
+  width: 34px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--dx-line);
+}
+
+.dx-steps i.done {
+  background: var(--dx-line-strong);
+}
+
+.dx-steps i.here {
+  background: var(--dx-lens);
+}
+
+.dx-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dx-option {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+}
+
+.dx-option b {
+  font: 600 18px/1.15 var(--dx-display);
+}
+
+.dx-option span {
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: var(--dx-ink-2);
+}
+
+.dx-option em {
+  font: 700 22px/1 var(--dx-display);
+  font-style: normal;
+}
+
+.dx-option-good {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 1.5px var(--dx-lens) inset;
+}
+
+.dx-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dx-cut-banner {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 14px 24px;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.dx-cut-banner b {
+  font: 700 30px/1 var(--dx-display);
+  letter-spacing: 0.02em;
+}
+
+.dx-cut-banner span {
+  font-size: 15px;
+  color: var(--dx-ink-2);
+}
+
+/* ------------------------------------------------------------------ shared */
+
+.dx :focus-visible {
+  outline: 3px solid var(--dx-focus);
+  outline-offset: 3px;
+}
+
+.dx :focus:not(:focus-visible) {
+  outline: none;
+}
+
+.dx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.dx-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.dx-btn-small {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 10px;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.dx-link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dx-ink);
+  font: 600 14px/1.4 var(--dx-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ the play screen */
+
+.dx-play,
+.dx-hud,
+.dx-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.dx-hud,
+.dx-layer {
+  pointer-events: none;
+}
+
+.dx-hud > *,
+.dx-layer > * {
+  pointer-events: auto;
+}
+
+.dx-play canvas {
+  transition: transform 0.4s ease-out;
+}
+
+.dx-cut-banner {
+  top: 96px;
+  z-index: 3;
+  animation: dx-banner-in 0.35s ease-out;
+}
+
+@keyframes dx-banner-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.dx-run {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.dx-run svg {
+  width: 20px;
+  height: 20px;
+}
+
+.dx-run .dx-key {
+  margin-left: auto;
+}
+
+.dx-goal {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--dx-panel-2);
+  border: 1.5px solid var(--dx-lens);
+}
+
+.dx-goal p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.dx-toast {
+  position: absolute;
+  left: var(--dx-centre, 50%);
+  bottom: 28px;
+  margin: 0;
+  padding: 12px 18px;
+  transform: translateX(-50%);
+  font-weight: 600;
+}
+
+/* The coach card sits to the right of the tutorial's board. */
+.dx-play .dx-coach {
+  top: 50%;
+  right: 40px;
+  width: min(560px, 38vw);
+  transform: translateY(-46%);
+  box-sizing: border-box;
+}
+
+.dx-outcome {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--dx-panel-2);
+  border: 1.5px solid var(--dx-line-strong);
+}
+
+.dx-outcome-done {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 1.5px var(--dx-lens) inset;
+}
+
+.dx-outcome p {
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ cards over the board */
+
+.dx-intro,
+.dx-confirm {
+  width: min(520px, calc(100vw - 32px));
+  box-sizing: border-box;
+  z-index: 4;
+}
+
+.dx-results {
+  width: min(620px, calc(100vw - 32px));
+  box-sizing: border-box;
+  z-index: 4;
+}
+
+.dx-rival-big {
+  grid-template-columns: 72px 1fr;
+}
+
+.dx-rival-big svg {
+  width: 72px;
+  height: 72px;
+}
+
+.dx-facts {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.dx-eyebrow-calm {
+  color: var(--dx-ink-2);
+}
+
+.dx-final {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dx-final span {
+  display: grid;
+  justify-items: center;
+  font-size: 14px;
+  color: var(--dx-ink-2);
+}
+
+.dx-final b {
+  font: 700 56px/1 var(--dx-display);
+}
+
+.dx-final-0 b {
+  color: var(--dx-p0);
+}
+
+.dx-final-1 b {
+  color: var(--dx-p1);
+}
+
+.dx-final i {
+  font: 600 36px/1 var(--dx-display);
+  font-style: normal;
+  color: var(--dx-ink-2);
+}
+
+.dx-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 14.5px;
+  color: var(--dx-ink-2);
+}
+
+.dx-tally b {
+  color: var(--dx-ink);
+  font: 700 18px/1 var(--dx-display);
+}
+
+.dx-results .dx-quote {
+  font-size: 15px;
+}
+
+/* ------------------------------------------------------------------ the game menu */
+
+.dx-title {
+  position: absolute;
+  inset: 0;
+}
+
+.dx-menu {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  max-height: calc(100% - 48px);
+  width: min(560px, calc(100% - 48px));
+  max-width: 42%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 28px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.dx-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.dx-logo svg {
+  width: 52px;
+  height: 52px;
+  color: var(--dx-p0);
+}
+
+.dx-logo h1 {
+  margin: 0;
+  font: 600 46px/1 var(--dx-display);
+  letter-spacing: 0.01em;
+}
+
+.dx-tag {
+  margin: 0;
+  font-size: 17px;
+  color: var(--dx-ink-2);
+}
+
+.dx-options {
+  display: grid;
+  gap: 8px;
+}
+
+.dx-option-btn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  color: var(--dx-ink);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.dx-option-btn b {
+  font: 600 19px/1.2 var(--dx-display);
+}
+
+.dx-option-btn span {
+  grid-column: 1;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--dx-ink-2);
+}
+
+.dx-option-btn:hover {
+  border-color: var(--dx-line-strong);
+}
+
+.dx-option-primary {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 1.5px var(--dx-lens) inset;
+}
+
+.dx-badge-new {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--dx-lens);
+  color: var(--dx-lens-ink);
+  font: 700 12.5px/1.2 var(--dx-body);
+  font-style: normal;
+}
+
+.dx-glance {
+  display: flex;
+  gap: 18px;
+  font-size: 13.5px;
+  color: var(--dx-ink-2);
+}
+
+.dx-glance span {
+  display: grid;
+}
+
+.dx-glance b {
+  font: 600 22px/1.1 var(--dx-display);
+  color: var(--dx-ink);
+}
+
+.dx-tip {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--dx-ink-2);
+}
+
+.dx-tip b {
+  color: var(--dx-ink);
+}
+
+.dx-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ------------------------------------------------------------------ pages */
+
+.dx-page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  /* A field of dots, waiting for lines. */
+  background:
+    radial-gradient(circle, var(--dx-line) 1.8px, transparent 2px) 0 0 / 36px 36px,
+    var(--dx-bg);
+}
+
+.dx-page-body {
+  max-width: 1040px;
+  /* Clear of the Hall's Pause button at the top right. */
+  margin: 80px auto 24px;
+  padding: 24px 28px 28px;
+  display: grid;
+  gap: 18px;
+  box-sizing: border-box;
+  width: calc(100% - 48px);
+}
+
+.dx-page-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  /* Leave the Hall's pause and "back" corner alone. */
+  padding-right: 200px;
+}
+
+.dx-page-head h1 {
+  margin: 0;
+  font: 600 34px/1.1 var(--dx-display);
+}
+
+.dx-lead {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 16.5px;
+  line-height: 1.5;
+  color: var(--dx-ink-2);
+}
+
+.dx-rungs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dx-rung {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 16px 14px 14px;
+  border-radius: 16px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  color: var(--dx-ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dx-rung:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.dx-rung svg {
+  width: 40px;
+  height: 40px;
+  color: var(--dx-p1);
+}
+
+.dx-rung b {
+  font: 600 17px/1.15 var(--dx-display);
+}
+
+.dx-rung span {
+  font-size: 13px;
+  color: var(--dx-ink-2);
+}
+
+.dx-rung em {
+  margin-top: 6px;
+  font: 700 13px/1 var(--dx-body);
+  font-style: normal;
+}
+
+.dx-rung-number {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font: 600 24px/1 var(--dx-display) !important;
+  color: var(--dx-ink-2);
+}
+
+.dx-rung-won {
+  border-color: var(--dx-line-strong);
+}
+
+.dx-rung-won em::before {
+  content: '✓ ';
+}
+
+.dx-rung-next {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 1.5px var(--dx-lens) inset;
+}
+
+.dx-puzzle-group h2,
+.dx-record h2,
+.dx-help-part h2 {
+  margin: 0 0 8px;
+  font: 700 13px/1.2 var(--dx-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dx-ink-2);
+}
+
+.dx-puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.dx-thumb {
+  width: 64px;
+  height: auto;
+  margin-bottom: 6px;
+  color: var(--dx-ink-2);
+}
+
+.dx-thumb-dot {
+  fill: var(--dx-ink);
+  stroke: none;
+}
+
+.dx-thumb-0 {
+  fill: var(--dx-p0-soft);
+  stroke: var(--dx-p0);
+  stroke-width: 0.8;
+}
+
+.dx-thumb-1 {
+  fill: var(--dx-p1-soft);
+  stroke: var(--dx-p1);
+  stroke-width: 0.8;
+}
+
+.dx-puzzle {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  color: var(--dx-ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dx-puzzle b {
+  font: 600 24px/1 var(--dx-display);
+}
+
+.dx-puzzle span {
+  font-size: 12.5px;
+  color: var(--dx-ink-2);
+}
+
+.dx-puzzle em {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--dx-p0);
+}
+
+.dx-puzzle-solved {
+  border-color: var(--dx-line-strong);
+}
+
+.dx-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: flex-start;
+}
+
+.dx-form-stack {
+  flex-direction: column;
+}
+
+.dx-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dx-stepper > span {
+  font-weight: 700;
+  min-width: 70px;
+}
+
+.dx-stepper output {
+  min-width: 2ch;
+  text-align: center;
+  font: 600 24px/1 var(--dx-display);
+}
+
+.dx-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.dx-field input {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--dx-line-strong);
+  background: var(--dx-panel-2);
+  color: var(--dx-ink);
+  font: 16px var(--dx-body);
+}
+
+.dx fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dx legend {
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.dx-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dx-marks legend {
+  width: 100%;
+}
+
+.dx-mark-choice {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  cursor: pointer;
+}
+
+.dx-mark-choice svg {
+  width: 34px;
+  height: 34px;
+  color: var(--dx-p0);
+}
+
+.dx-marks-1 .dx-mark-choice svg {
+  color: var(--dx-p1);
+}
+
+.dx-mark-choice input,
+.dx-rival-choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.dx-mark-choice:has(input:checked),
+.dx-rival-choice:has(input:checked) {
+  border-color: var(--dx-lens);
+  box-shadow: 0 0 0 2px var(--dx-lens) inset;
+}
+
+.dx-mark-choice:has(input:focus-visible),
+.dx-rival-choice:has(input:focus-visible) {
+  outline: 3px solid var(--dx-focus);
+  outline-offset: 3px;
+}
+
+.dx-rival-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.dx-rival-picker legend {
+  grid-column: 1 / -1;
+}
+
+.dx-rival-choice {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--dx-line);
+  background: var(--dx-panel-2);
+  cursor: pointer;
+}
+
+.dx-rival-choice svg {
+  width: 38px;
+  height: 38px;
+  color: var(--dx-p1);
+}
+
+.dx-rival-choice b {
+  font: 600 17px/1.15 var(--dx-display);
+}
+
+.dx-rival-choice span {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--dx-ink-2);
+}
+
+.dx-first {
+  display: grid;
+  gap: 6px;
+}
+
+.dx-first label,
+.dx-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.dx-first input,
+.dx-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--dx-p0);
+}
+
+.dx-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.dx-record {
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--dx-panel-2);
+  border: 1.5px solid var(--dx-line);
+}
+
+.dx-record p,
+.dx-record ol {
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+
+.dx-big {
+  font: 600 36px/1.1 var(--dx-display);
+}
+
+.dx-help {
+  display: grid;
+  gap: 22px;
+  max-width: 820px;
+}
+
+.dx-help-text {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.dx-help-text:has(.dx-thumb) {
+  grid-template-columns: 1fr 140px;
+}
+
+.dx-help-text .dx-thumb {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  width: 140px;
+  margin: 0;
+}
+
+.dx-help-part p {
+  grid-column: 1;
+  margin: 0 0 8px;
+  line-height: 1.55;
+}
+
+.dx-help-keys {
+  grid-column: 1 / -1;
+}
+
+.dx-help-keys table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.dx-help-keys th,
+.dx-help-keys td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--dx-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.dx-help-keys th {
+  width: 30%;
+  font: 600 14px var(--dx-mono);
+}
+
+/* ------------------------------------------------------------------ small screens */
+
+@media (max-width: 899px) {
+  .dx-side {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 40%;
+    padding: 14px;
+  }
+
+  .dx-keys {
+    display: none;
+  }
+
+  .dx-score {
+    left: 50%;
+  }
+
+  .dx-player {
+    min-width: 0;
+    padding: 6px 10px;
+  }
+
+  .dx-menu {
+    max-width: none;
+  }
+
+  .dx-play .dx-coach {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    transform: none;
+    max-height: 48%;
+    overflow-y: auto;
+  }
+
+  .dx-rungs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dx-page-head {
+    padding-right: 0;
+    padding-top: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dx *,
+  .dx *::before,
+  .dx *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.dx[data-motion='reduce'] *,
+.dx[data-motion='reduce'] *::before,
+.dx[data-motion='reduce'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Short screens (720 px and less): the game menu tightens up so everything fits. */
+@media (max-height: 820px) {
+  .dx-menu {
+    gap: 10px;
+    padding: 20px 24px;
+  }
+
+  .dx-logo {
+    margin-top: 30px;
+  }
+
+  .dx-logo h1 {
+    font-size: 38px;
+  }
+
+  .dx-logo svg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .dx-tag {
+    font-size: 15px;
+  }
+
+  .dx-options {
+    gap: 6px;
+  }
+
+  .dx-option-btn {
+    padding: 7px 14px;
+  }
+
+  .dx-option-btn b {
+    font-size: 17px;
+  }
+
+  .dx-option-btn span {
+    font-size: 13px;
+  }
+
+  .dx-glance b {
+    font-size: 18px;
+  }
+
+  .dx-tip {
+    font-size: 13px;
+  }
+
+  /* The keys are in How to play; the side panel keeps what changes during a game. */
+  .dx-side .dx-keys {
+    display: none;
+  }
+}

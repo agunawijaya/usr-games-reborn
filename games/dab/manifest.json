@@ -1,0 +1,204 @@
+{
+  "id": "dab",
+  "title": "Double Cross",
+  "tagline": "Draw a line. Close a box. Learn when to give one away.",
+  "teaser": "The pencil-and-paper classic, lit up: take turns drawing lines, close a box to claim it and move again. Simple, until you learn why the best players hand over boxes on purpose. The computer that shipped with NetBSD never figured that out. You will.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 2
+  },
+  "sessionMinutes": [3, 10],
+  "status": "shipped",
+  "accent": "#e0457b",
+  "emblem": "M10 10h.01M24 10h.01M38 10h.01M10 24h.01M24 24h.01M38 24h.01M10 38h.01M24 38h.01M38 38h.01M10 10h14v14H10zM24 38h14V24M28.5 28.5l5 5M33.5 28.5l-5 5",
+  "inspiredBy": {
+    "program": "dab",
+    "originalTitle": "dab",
+    "uiTitle": "the NetBSD dots-and-boxes game",
+    "year": 2003
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "dab — draw a line; close a box to claim it and draw again; learn when to give boxes away.",
+    "description": "A reborn dab, Christos Zoulas’s dots and boxes from NetBSD, its manual by Thomas Klausner. Its computer took every box it could see and never learned the double cross; here a ladder of five opponents climbs from that greedy mind to a solver, a tutorial and forty endgame puzzles teach chains and control, and a Daily Board starts everyone from the same opening.",
+    "seeAlso": ["gomoku", "backgammon"]
+  },
+  "howToPlay": [
+    "Take turns drawing a line between two dots; close the fourth side of a box to claim it and draw again.",
+    "Boxes link into chains: whoever has to open a long chain usually hands over the rest.",
+    "Take all but the last two of a chain and hand those back, the double cross, to keep control."
+  ],
+  "controls": [
+    {
+      "action": "aim-up",
+      "label": "Aim up, or walk up",
+      "keys": ["ArrowUp", "KeyW"]
+    },
+    {
+      "action": "aim-down",
+      "label": "Aim down, or walk down",
+      "keys": ["ArrowDown", "KeyS"]
+    },
+    {
+      "action": "aim-left",
+      "label": "Aim left, or walk left",
+      "keys": ["ArrowLeft", "KeyA"]
+    },
+    {
+      "action": "aim-right",
+      "label": "Aim right, or walk right",
+      "keys": ["ArrowRight", "KeyD"]
+    },
+    {
+      "action": "draw",
+      "label": "Draw the line",
+      "keys": ["Enter", "Space", "NumpadEnter"]
+    },
+    {
+      "action": "jump-left",
+      "label": "Original: parallel line to the left",
+      "keys": ["KeyH"]
+    },
+    {
+      "action": "jump-down",
+      "label": "Original: parallel line below",
+      "keys": ["KeyJ"]
+    },
+    {
+      "action": "jump-up",
+      "label": "Original: parallel line above",
+      "keys": ["KeyK"]
+    },
+    {
+      "action": "jump-right",
+      "label": "Original: parallel line to the right",
+      "keys": ["KeyL"]
+    },
+    {
+      "action": "hop-up-left",
+      "label": "Original: hop up and left",
+      "keys": ["KeyY"]
+    },
+    {
+      "action": "hop-up-right",
+      "label": "Original: hop up and right",
+      "keys": ["KeyU"]
+    },
+    {
+      "action": "hop-down-left",
+      "label": "Original: hop down and left",
+      "keys": ["KeyB"]
+    },
+    {
+      "action": "hop-down-right",
+      "label": "Original: hop down and right",
+      "keys": ["KeyN"]
+    },
+    {
+      "action": "take-run",
+      "label": "Take the run of boxes",
+      "keys": ["KeyT"]
+    },
+    {
+      "action": "lens",
+      "label": "Chain lens on or off",
+      "keys": ["KeyC"]
+    }
+  ],
+  "cronGoals": [
+    {
+      "id": "boxes",
+      "stat": "boxesClosed",
+      "label": "Close {n} boxes in Double Cross",
+      "min": 40,
+      "max": 160
+    },
+    {
+      "id": "crosses",
+      "stat": "doubleCrosses",
+      "label": "Play {n} double crosses in Double Cross",
+      "min": 2,
+      "max": 8
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-box",
+      "title": "First box",
+      "description": "Close your first box.",
+      "tier": "core"
+    },
+    {
+      "id": "first-double-cross",
+      "title": "Double cross",
+      "description": "Hand back the last two boxes of a chain on purpose, and keep control.",
+      "tier": "core"
+    },
+    {
+      "id": "beat-greedy-gus",
+      "title": "Greed is not enough",
+      "description": "Beat Greedy Gus, the computer from the 2003 original.",
+      "tier": "core"
+    },
+    {
+      "id": "shut-out",
+      "title": "Shut-out",
+      "description": "Win a game in which your rival closes no box at all.",
+      "tier": "core"
+    },
+    {
+      "id": "loop-de-loop",
+      "title": "Loop-de-loop",
+      "description": "Win a game whose last piece is a loop.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Finish seven Daily Boards.",
+      "tier": "core"
+    },
+    {
+      "id": "beat-the-pupil",
+      "title": "Top of the class",
+      "description": "Beat Berlekamp’s Pupil.",
+      "tier": "extra"
+    },
+    {
+      "id": "control-freak",
+      "title": "Control freak",
+      "description": "Win a game in which your rival had to open every long chain and loop.",
+      "tier": "extra"
+    },
+    {
+      "id": "big-board",
+      "title": "Big board",
+      "description": "Win on a board of 7 × 7 or larger.",
+      "tier": "extra"
+    },
+    {
+      "id": "sharing-is-winning",
+      "title": "Sharing is winning",
+      "description": "Give away four or more boxes with a single line, and still win the game.",
+      "tier": "extra"
+    },
+    {
+      "id": "beat-master-4x4",
+      "title": "Master class",
+      "description": "Beat Master on a board of 4 × 4 or larger.",
+      "tier": "rare"
+    },
+    {
+      "id": "puzzle-30",
+      "title": "Thirty endgames",
+      "description": "Solve thirty endgame puzzles.",
+      "tier": "rare"
+    }
+  ]
+}
