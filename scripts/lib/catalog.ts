@@ -7,7 +7,7 @@ import { REPO_ROOT } from './paths.ts';
 /**
  * The thirty games registered by the foundation prompt (§10), plus the owner's additions (atc-classic,
  * a second interpretation of atc, and zoomies, a second interpretation of robots, both decided on
- * 2026-10-01); ids are final.
+ * 2026-10-01; blocks-classic, a second interpretation of blocks, decided 2026-10-04); ids are final.
  */
 export const PLANNED_IDS = [
   'pom',
@@ -15,6 +15,8 @@ export const PLANNED_IDS = [
   'rain',
   'lightkeeper',
   'sail',
+  // A second interpretation of sail, built at the owner's request on 2026-10-04.
+  'figurehead',
   'trek',
   'hunt',
   'robots',
@@ -25,8 +27,11 @@ export const PLANNED_IDS = [
   'wump',
   'wump-classic',
   'worm',
+  'worm-classic',
   'snake',
+  'snake-classic',
   'blocks',
+  'blocks-classic',
   'gomoku',
   'dab',
   'backgammon',

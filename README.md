@@ -49,6 +49,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Rain on Still Water | `/usr/games/toys`     | rain (1989)                                       | shipped     | hosted |
 | Lightkeeper         | `/usr/games/strategy` | trek (1976)                                       | shipped     | native |
 | Broadside           | `/usr/games/strategy` | sail (1980)                                       | shipped     | hosted |
+| Figurehead          | `/usr/games/strategy` | sail (1980)                                       | shipped     | native |
 | Trek — Deep Space   | `/usr/games/strategy` | trek (1980)                                       | shipped     | hosted |
 | Hunt — Ricochet     | `/usr/games/arcade`   | hunt (1983)                                       | shipped     | hosted |
 | Robots              | `/usr/games/arcade`   | robots (1991)                                     | shipped     | hosted |
@@ -59,10 +60,13 @@ the days you play, and two quiet days a week are covered automatically.
 | Hush the Wumpus     | `/usr/games/strategy` | the 1973 cave-hunting classic (1973)              | shipped     | native |
 | The Rune Gates      | `/usr/games/strategy` | wump (1989)                                       | shipped     | hosted |
 | Noodle Nine         | `/usr/games/arcade`   | the Berkeley growing-worm game (1980)             | shipped     | native |
+| Orchard Crawl       | `/usr/games/arcade`   | the Berkeley growing-worm game (1980)             | shipped     | hosted |
 | Full Pockets        | `/usr/games/arcade`   | the Berkeley snake-and-treasure game (1980)       | shipped     | native |
-| Falling blocks      | `/usr/games/arcade`   | the BSD falling-blocks program (1989)             | coming soon | native |
+| Talon's Shadow      | `/usr/games/arcade`   | the Berkeley snake-and-treasure game (1980)       | shipped     | hosted |
+| Sinkers             | `/usr/games/arcade`   | the 1992 Berkeley falling-blocks game (1992)      | shipped     | native |
+| Broken Well         | `/usr/games/arcade`   | the 1992 Berkeley falling-blocks game (1992)      | shipped     | hosted |
 | Fivefold            | `/usr/games/board`    | the Berkeley five-in-a-row program (1994)         | shipped     | native |
-| Dots and boxes      | `/usr/games/board`    | dab (2003)                                        | coming soon | native |
+| Double Cross        | `/usr/games/board`    | the NetBSD dots-and-boxes game (2003)             | shipped     | native |
 | Backgammon          | `/usr/games/board`    | backgammon (1980)                                 | coming soon | native |
 | Property trading    | `/usr/games/board`    | monop (1980)                                      | coming soon | native |
 | Cribbage            | `/usr/games/cards`    | cribbage (1980)                                   | coming soon | native |

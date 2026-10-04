@@ -11,11 +11,13 @@ type Row = [id: string, category: Category, shortest: number, longest: number, d
 
 const ROWS: Row[] = [
   ['pom', 'toys', 1, 5, false],
-  ['worms', 'toys', 1, 10, false],
+  ['worms', 'toys', 1, 10, true],
   ['rain', 'toys', 1, 10, false],
   // A second interpretation of trek: a native reborn with a career, calls and a nightly watch.
   ['lightkeeper', 'strategy', 10, 25, true],
   ['sail', 'strategy', 15, 40, true],
+  // A second interpretation of sail: a native reborn, one ship's life in twelve chapters.
+  ['figurehead', 'strategy', 10, 25, true],
   ['trek', 'strategy', 15, 40, true],
   ['hunt', 'arcade', 5, 15, false],
   ['robots', 'arcade', 3, 10, true],
@@ -29,8 +31,14 @@ const ROWS: Row[] = [
   // A second interpretation of wump: the earlier rune-gate port, with a career and a Daily Delve.
   ['wump-classic', 'strategy', 3, 10, true],
   ['worm', 'arcade', 2, 10, true],
+  // A second interpretation of worm: the earlier fancy-web port, with a season and a Daily Orchard.
+  ['worm-classic', 'arcade', 2, 12, true],
   ['snake', 'arcade', 3, 10, true],
+  // A second interpretation of snake: the earlier fancy-web port, with an expedition and a Daily Flight.
+  ['snake-classic', 'arcade', 2, 10, true],
   ['blocks', 'arcade', 3, 12, true],
+  // A second interpretation of blocks: the earlier reshaped-well port, with a career and a Daily Shift.
+  ['blocks-classic', 'arcade', 3, 15, true],
   ['gomoku', 'board', 5, 15, true],
   ['dab', 'board', 3, 10, true],
   ['backgammon', 'board', 10, 25, false],

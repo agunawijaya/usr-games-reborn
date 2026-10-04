@@ -3,8 +3,9 @@ import { type PlayerIconName, playerIcon } from './icons';
 import type { Announcement, AnnouncementKind } from './receipt';
 
 /**
- * XP toasts: one small card per result or achievement, stacked in the bottom-right corner and
- * announced politely to screen readers. They fade on their own and never block play.
+ * XP toasts: one small card per result or achievement, stacked in a bottom corner (bottom-left
+ * over a native game, in its safe zone; bottom-right over a hosted one) and announced politely
+ * to screen readers. They fade on their own and never block play.
  */
 
 const TOAST_MS = 5_500;

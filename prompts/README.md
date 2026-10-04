@@ -24,7 +24,11 @@ sets of frames, then let them continue. Only the atc session may change `package
   frames): [P1-C Control Room 1986](p1-c-control-room.md) (port 5283, on-ramp order buttons that type
   for you) · [P1-L Lightkeeper](p1-l-lightkeeper.md) (port 5281) · [P1-Z Zoomies + Hall pause pill
   fix](p1-z-zoomies.md) (port 5282, only P1-Z may touch `apps/hall/`).
-- Wave 2 briefs (to design): blocks, gomoku, dab, backgammon, and the card games.
+- **Wave 2** (four parallel sessions, may run alongside P1; rules in [wave2-shared.md](wave2-shared.md);
+  nobody owns kit/bridge; `apps/hall/` belongs to P1-Z): [06 Sinkers — blocks](06-blocks.md) (5285) ·
+  [07 Fivefold — gomoku](07-gomoku.md) (5286) · [08 Double Cross — dab](08-dab.md) (5287) ·
+  [09 Homeward — backgammon](09-backgammon.md) (5288). Each stops at its hero frames.
+- Wave 3 (cards and dice): cribbage, canfield, fish, mille, pig, monop.
 - Modification prompts for the adopted battlestar, trek and robots (owner will describe the changes).
 - Consolidation + QA once most games exist.
 

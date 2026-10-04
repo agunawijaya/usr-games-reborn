@@ -181,6 +181,12 @@ shared synth), `save(...)` (versioned saves scoped to your game), `daily` (numbe
 `navigate('game-menu' | 'hall')`. The demo must be silent, pause when `setVisible(false)` is called
 and draw in the appearance it is given. Full reference: `packages/kit/README.md`.
 
+Call `setOnTitleScreen(true)` on your game menu and `false` everywhere else: on the game menu the
+Hall shows only "← Back to the Hall", and its Pause pill appears only once you leave it. Keep your
+own status out of the player's **safe zones**: the top-right 220 × 64 px, where the Pause pill sits
+during play, and the bottom-left corner, where toasts stack 64 px up (above any bottom bar you
+draw), up to 400 px wide. See "The player's safe zones" in `docs/ARCHITECTURE.md`.
+
 ## 11. Progression integration
 
 - Call `context.reportResult(result)` once per finished session, where `result` holds `outcome`,

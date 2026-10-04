@@ -220,8 +220,39 @@ flowchart TB
 
 - A game that cannot run yet (coming soon, or not built) gets a still page with its poster and the
   ways back (`not-launchable.ts`); `isLaunchable(entry)` tells a style whether to offer Play.
+
+### The player's safe zones
+
+Over a native game the player draws only two things, and each keeps to a zone the game leaves free
+(prompt P1-Z). They are custom properties on `.pl-page--native` in `player.css`.
+
+```mermaid
+flowchart TB
+  subgraph screen["A native game's screen"]
+    direction TB
+    pill["top right, 220 × 64 px: the Pause pill, during play only<br/>(on the game menu: ← Back to the Hall, top left)"]
+    game["the game: its own status anywhere outside the two zones"]
+    toasts["bottom left, 64 px up, at most 400 px wide: toasts, stacking upwards"]
+    pill --- game --- toasts
+  end
+```
+
+| Zone       | Size and place                                                       | Properties                                      |
+| ---------- | -------------------------------------------------------------------- | ----------------------------------------------- |
+| Pause pill | Inside the top-right 220 × 64 px; the pill sits 10 px down, 16 px in | `--pl-safe-pill-width`, `--pl-safe-pill-height` |
+| Toasts     | Bottom left, from 64 px above the bottom edge, at most 400 px wide   | `--pl-toast-lift`, `--pl-toast-width`           |
+
+- The pill shows only during play: on the game's own menu, which the game signals with
+  `setOnTitleScreen(true)`, only "← Back to the Hall" shows.
+- The 64 px lift keeps toasts above a bottom bar such as a key strip. A game should keep the rest
+  of its status (counters, side panels, captions) out of both zones.
+- `apps/hall/e2e/safe-zones.spec.ts` checks every native game, in every style, by day and by
+  night: nothing of the game under the pill or a stack of three toasts. Known exceptions are listed
+  in that spec with their KNOWN-ISSUES row.
+- Hosted games are unchanged: their strip is part of the layout, and their toasts stay bottom-right.
 - Receipts become toasts: XP, achievements (packages) and a rank change; the rank-up moment itself
-  plays in the style when the player returns to the Hall.
+  plays in the style when the player returns to the Hall. Over a native game they stack in its
+  bottom-left safe zone (above); over a hosted game, bottom right.
 
 ## Bridge handshake (protocol v1, revision 1.1)
 

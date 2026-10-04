@@ -135,11 +135,6 @@
         "path": "games/battlestar/app/**",
         "match": "Klingon",
         "reason": "Temporary exception: a rank title in the adopted starship adventure’s upstream text (docs/KNOWN-ISSUES.md); shipped by the owner’s decision until its modification prompt (docs/KNOWN-ISSUES.md #16)."
-      },
-      {
-        "path": "games/atc-classic/app/docs/diff-log.md",
-        "match": "monopoly",
-        "reason": "The adopted Control Room 1986’s upstream change log uses “monopoly” as a plain noun (“the terminal-appearance monopoly”), not the board game’s name; workbench prose, never shipped (ADR 0011)."
       }
     ],
     "contentAllow": [

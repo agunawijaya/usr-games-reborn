@@ -336,6 +336,38 @@ test.describe('native games', () => {
     await expectHall(page);
   });
 
+  test('the Pause pill shows only during play, inside its top-right safe zone', async ({
+    page,
+  }) => {
+    await openPlayer(page, 'fixture-native');
+    await expect(page.locator('.pl-corner')).toBeVisible();
+    await expect(page.getByTestId('pl-pause-button')).toBeHidden();
+    await page.getByTestId('fx-start').click();
+    await expect(page.getByTestId('pl-pause-button')).toBeVisible();
+    await expect(page.locator('.pl-corner')).toBeHidden();
+    const pill = (await page.getByTestId('pl-pause-button').boundingBox())!;
+    expect(pill.x).toBeGreaterThanOrEqual(page.viewportSize()!.width - 220);
+    expect(pill.y + pill.height).toBeLessThanOrEqual(64);
+    // Back on the game's own menu, the pill goes again.
+    await page.keyboard.press('Escape');
+    await page.getByTestId('pl-pause').getByRole('button', { name: 'Game menu' }).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Leave' }).click();
+    await expect(page.getByTestId('fx-start')).toBeVisible();
+    await expect(page.getByTestId('pl-pause-button')).toBeHidden();
+  });
+
+  test('toasts stack in the bottom-left safe zone, clear of a side panel', async ({ page }) => {
+    await openPlayer(page, 'fixture-native');
+    await page.getByTestId('fx-start').click();
+    await page.keyboard.press('KeyW');
+    const toasts = page.getByTestId('pl-toasts');
+    await expect(toasts).toContainText('Achievement unlocked: First win');
+    const box = (await toasts.boundingBox())!;
+    expect(box.x).toBeLessThanOrEqual(30);
+    expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height - 64 + 1);
+    expect(box.width).toBeLessThanOrEqual(400);
+  });
+
   test('on the title screen Escape and the corner link go straight back', async ({ page }) => {
     await openPlayer(page, 'fixture-native');
     await expect(page.getByTestId('fx-start')).toBeFocused();

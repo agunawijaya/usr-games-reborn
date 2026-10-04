@@ -208,6 +208,26 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
 
+  games/blocks:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
+  games/blocks-classic/app: {}
+
+  games/dab:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
+  games/figurehead:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/gomoku:
     dependencies:
       '@usr-games/kit':
@@ -314,6 +334,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/snake-classic/app: {}
+
   games/trek/app:
     devDependencies:
       playwright:
@@ -325,6 +347,8 @@ importers:
       '@usr-games/kit':
         specifier: workspace:*
         version: link:../../packages/kit
+
+  games/worm-classic/app: {}
 
   games/worms/app:
     devDependencies:

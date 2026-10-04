@@ -148,6 +148,20 @@
 
 /* ---- Native chrome: the corner way out and the pause button --------------------------- */
 
+/*
+ * The safe zones of a native game (docs/ARCHITECTURE.md, "The player's safe zones"). The game
+ * keeps its own status out of the top-right 220 × 64 px, where the Pause pill sits during play,
+ * and out of the bottom-left corner, where toasts stack 64 px up (above any bottom bar the game
+ * draws), at most 400 px wide.
+ */
+.pl-page--native {
+  --pl-safe-pill-width: 220px;
+  --pl-safe-pill-height: 64px;
+  --pl-safe-inset: 10px;
+  --pl-toast-lift: 64px;
+  --pl-toast-width: 400px;
+}
+
 .pl-chrome {
   position: absolute;
   top: var(--pl-gutter);
@@ -164,8 +178,15 @@
   pointer-events: auto;
 }
 
+.pl-page--native .pl-chrome {
+  top: var(--pl-safe-inset);
+  right: calc(var(--pl-safe-inset) + 6px);
+  left: calc(var(--pl-safe-inset) + 6px);
+}
+
 .pl-pause {
   margin-left: auto;
+  max-width: calc(var(--pl-safe-pill-width) - var(--pl-safe-inset) - 6px);
   padding-inline: 0.8em 0.7em;
   background: color-mix(in srgb, var(--ug-surface) 88%, transparent);
   box-shadow: 0 10px 30px -18px var(--ug-shadow);
@@ -595,6 +616,22 @@
 }
 
 /* ---- Toasts --------------------------------------------------------------------------- */
+
+/* Over a native game the toasts stack in its bottom-left safe zone, clear of side panels. */
+.pl-page--native .pl-toasts {
+  right: auto;
+  bottom: var(--pl-toast-lift);
+  left: var(--pl-gutter);
+  justify-items: start;
+}
+
+.pl-page--native .pl-toast {
+  max-width: min(var(--pl-toast-width), calc(100vw - 2 * var(--pl-gutter)));
+}
+
+.pl-page--native .pl-toast.is-leaving {
+  animation-name: pl-toast-out-left;
+}
 
 .pl-toasts {
   position: fixed;
@@ -1080,6 +1117,13 @@
   to {
     opacity: 0;
     transform: translateX(24px);
+  }
+}
+
+@keyframes pl-toast-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
   }
 }
 

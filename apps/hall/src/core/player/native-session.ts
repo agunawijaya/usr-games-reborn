@@ -18,7 +18,9 @@ import { LABELS, type Wording } from './wording';
 /**
  * Runs a native game: mounts its module on a full-page stage with a GameContext, and wraps it
  * in the Hall's pause menu, results screen and XP toasts. Escape pauses; on the game's own
- * title screen it goes back to the Hall instead.
+ * title screen it goes back to the Hall instead, and only "← Back to the Hall" shows there: the
+ * Pause pill belongs to play. The pill and the toasts keep to the safe zones a native game
+ * leaves free (see `player.css` and docs/ARCHITECTURE.md).
  */
 
 export interface SessionOptions {
@@ -95,7 +97,8 @@ export function startNativeSession(options: SessionOptions): Session {
     element.classList.toggle('is-on-title', onTitle);
     element.classList.toggle('has-overlay', overlayOpen);
     corner.hidden = !onTitle;
-    pauseHint.hidden = onTitle;
+    // A game's own menu has nothing to pause: there the way out is the only chrome.
+    pauseButton.hidden = onTitle;
     // Behind a dialog the game and its buttons are out of reach, for pointers and focus alike.
     stage.inert = overlayOpen;
     chrome.inert = overlayOpen;
