@@ -127,6 +127,31 @@ export function noteCommandLine() {
   install('command-line');
 }
 
+/** The logbook's moments (log/logbook.js): sightings, the journal, the Daily Dive. */
+export function noteSighting(kindsSeen) {
+  install('first-sighting');
+  if (kindsSeen >= 4) install('every-sighting');
+}
+
+export function noteJournal(speciesMet) {
+  if (speciesMet >= 8) install('naturalist');
+}
+
+/**
+ * The day's dive finished, for the first time today: a daily challenge done, by watching. It is
+ * reported once, as the toy's visit is, and only because the player found what it asked.
+ */
+export function noteDiveFinished(sightingsFound) {
+  install('daily-diver');
+  if (!hall) return;
+  hall.result({
+    outcome: 'complete',
+    stats: { diveSightings: sightingsFound, divesFinished: 1 },
+    daily: true,
+    durationSeconds: Math.round((performance.now() - openedAt) / 1000),
+  });
+}
+
 /** Called after every engine step while the letter field is on. */
 export function noteLettersEaten(count) {
   if (!hall || count === 0) return;

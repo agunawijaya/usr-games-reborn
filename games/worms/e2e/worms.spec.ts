@@ -230,4 +230,82 @@ test('the keyboard alone reaches the abyss, crosses to the strip and back, and l
   await expectBackInHall(page);
 });
 
+test.describe('the logbook', () => {
+  /** Waits for the abyss to mark a sighting on the floor. */
+  const sightingOnShow = (page: Page) =>
+    expect
+      .poll(
+        () => inGame<string | null>(page, 'window.__abyss.logbook.watch.active?.kind ?? null'),
+        {
+          timeout: 60_000,
+        },
+      )
+      .not.toBeNull();
+
+  test('a ring on the floor is logged with L, and the first sighting is a package', async ({
+    page,
+  }) => {
+    const frame = await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await sightingOnShow(page);
+    await page.keyboard.press('l');
+    await expect(frame.locator('#log-toast')).toContainText('logged');
+    await expect(toasts(page)).toContainText('Achievement unlocked: First sighting');
+    await page.keyboard.press('b');
+    await expect(frame.locator('#logbook')).toContainText('Logged 1×');
+  });
+
+  test('J meets a worm and puts its species in the journal', async ({ page }) => {
+    const frame = await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await page.keyboard.press('j');
+    await expect(frame.locator('#log-toast')).toContainText('new in the journal');
+    await page.keyboard.press('b');
+    await frame.locator('[data-page="journal"]').click();
+    await expect(frame.locator('#logbook')).toContainText('1 of 8 species');
+  });
+
+  test('the Daily Dive digs the day’s abyss and, finished, counts as the daily challenge', async ({
+    page,
+  }) => {
+    const frame = await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await page.keyboard.press('b');
+    await frame.locator('[data-page="dive"]').click();
+    await frame.getByTestId('dive-start').click();
+    const dive = await inGame<{ seed: number; seek: string[] }>(
+      page,
+      'window.__abyss.logbook.dive',
+    );
+    expect(await inGame<number>(page, 'window.__abyss.S.seed')).toBe(dive.seed);
+    // The three sightings it asks for, each marked on the floor in turn and logged.
+    for (const kind of dive.seek) {
+      await inGame(
+        page,
+        `window.__abyss.logbook.watch.active = { kind: '${kind}', x: 5, y: 5, worm: 0, born: 0, until: 1e9 }`,
+      );
+      await page.keyboard.press('l');
+    }
+    await expect(frame.locator('#log-toast')).toContainText('finished');
+    await expect(toasts(page)).toContainText('Achievement unlocked: Daily diver');
+    await expect(frame.getByTestId('dive-share')).toBeVisible();
+  });
+
+  test('a postcard keeps the scene and opens it again', async ({ page }) => {
+    const frame = await runInHall(page, game.id);
+    await waitForGame(page, game.ready);
+    await page.keyboard.press('b');
+    await frame.locator('[data-page="postcards"]').click();
+    await frame.getByTestId('postcard-keep').click();
+    const seed = await inGame<number>(page, 'window.__abyss.S.seed');
+    await page.keyboard.press('Escape');
+    await frame.locator('#btn-settings').click();
+    await frame.locator('#btn-seed').click();
+    expect(await inGame<number>(page, 'window.__abyss.S.seed')).not.toBe(seed);
+    await page.keyboard.press('b');
+    await frame.locator('#logbook').getByRole('button', { name: 'Open' }).click();
+    expect(await inGame<number>(page, 'window.__abyss.S.seed')).toBe(seed);
+  });
+});
+
 describeWaysOut(game);

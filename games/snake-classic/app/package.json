@@ -1,0 +1,11 @@
+{
+  "name": "@usr-games/snake-classic-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Talon's Shadow: the owner's earlier fancy-web port of snake (a slithering snake, fruit to gather and a bird of prey's shadow), with an expedition through eight regions, contracts, a field book and a Daily Flight.",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\""
+  },
+  "author": "Agun Wijaya",
+  "license": "MIT"
+}

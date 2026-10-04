@@ -5,10 +5,10 @@ import { GPU_LAUNCH_ARGS } from '../../packages/bridge/testing/shots';
 /**
  * Full Pockets' browser runs, in two projects. `workbench` plays the game on its own workbench
  * (port 5276); `--grep @hero` renders the hero frames. `hall` opens it inside a Hall dev server on
- * port 5287 (or `HALL_PORT`), never shared with another session; `SHOTS=1` takes the documentation
+ * port 5297 (or `HALL_PORT`), never shared with another session; `SHOTS=1` takes the documentation
  * screenshots there. One worker: other sessions often share the machine.
  */
-process.env.HALL_PORT ??= '5287';
+process.env.HALL_PORT ??= '5297';
 const hall = hostedSuiteConfig();
 const shots = Boolean(process.env.SHOTS);
 

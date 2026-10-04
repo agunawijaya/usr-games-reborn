@@ -10,7 +10,9 @@ Far below the last of the daylight, worms glow as they crawl. Each one lights th
 flares where it crosses another, and with trails on leaves a wake of light that cools and fades.
 You never steer them; nobody ever did. Every turn they take is the one a 1980 terminal program
 chose, cell for cell, and you can open that terminal beside them and watch it happen. Add worms,
-stretch them, scatter the floor with letters for them to eat, or just sit back and watch.
+stretch them, scatter the floor with letters for them to eat, or just sit back and watch. Now and
+then the abyss does something worth noting, and a ring of light marks it on the floor: catch it
+for your logbook, meet the eight species one by one, and take the day’s Daily Dive.
 
 ## Where it comes from
 
@@ -34,6 +36,13 @@ trail, and whether the screen started full of the word WORM for them to chew thr
   both showing the very same worms.
 - Every original option works live from a settings panel, and you can type a command line the way
   the old program took it.
+- **A logbook.** Sightings marked on the floor by a ring of light (two paths crossing, a worm
+  crossing its own body, a worm in a far corner, a bloom of light round one worm), logged with a
+  click or `L` while they last; a journal of the eight species, met by clicking a worm (or `J`);
+  postcards that keep a scene you like and open it again.
+- **The Daily Dive.** The same abyss for everyone each day, and three kinds of sighting to find in
+  it, with a share line and no link. Nothing is ever rewarded for leaving the abyss running on its
+  own: every entry needs you to be watching.
 
 ## At a glance
 
@@ -42,7 +51,7 @@ trail, and whether the screen started full of the word WORM for them to chew thr
 | Directory       | `/usr/games/toys`          |
 | Players         | 1                          |
 | Session         | 1–10 minutes               |
-| Daily challenge | no                         |
+| Daily challenge | yes (the Daily Dive)       |
 | Inspired by     | `worms` (1989 manual page) |
 
 ## More

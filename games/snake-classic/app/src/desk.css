@@ -1,0 +1,504 @@
+/* Talon's Shadow — the expedition desk, in the port's own gallery style: warm paper, white cards,
+   dark ink. The scene keeps playing behind it. */
+
+[hidden] {
+  display: none !important;
+}
+
+.desk-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: rgba(247, 244, 238, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+/* The card the page opens on, until the desk has arrived: opaque, so nothing underneath shows. */
+.desk-loading {
+  background: var(--page-bg);
+  backdrop-filter: none;
+}
+
+.desk-loader {
+  width: min(560px, 100%);
+  margin-top: 12vh;
+}
+
+.desk-meter {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--card-border);
+  overflow: hidden;
+}
+
+.desk-meter span {
+  display: block;
+  height: 100%;
+  width: 8%;
+  border-radius: inherit;
+  background: var(--ink);
+  transition: width 0.15s ease-out;
+}
+
+.desk-page {
+  width: min(980px, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 24px 28px 28px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.3);
+}
+
+.desk-title {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.desk-tag,
+.desk-lead {
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.desk-page h2 {
+  font-family: 'JetBrains Mono', 'Fira Code', SF Mono, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.desk-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.desk-head h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.desk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font: 600 14px/1 inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.desk-btn:hover {
+  border-color: var(--ink-soft);
+}
+
+.desk-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.desk-btn kbd,
+.desk-row kbd {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  opacity: 0.8;
+}
+
+.desk-menu :focus-visible,
+.desk-report :focus-visible {
+  outline: 3px solid #1b5fd0;
+  outline-offset: 3px;
+}
+
+.desk-daily {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--page-bg-2);
+  border: 1.5px solid var(--card-border);
+}
+
+.desk-daily div {
+  display: grid;
+  gap: 3px;
+}
+
+.desk-daily span {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+
+.desk-regions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.desk-region {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-region:hover:not(:disabled) {
+  border-color: var(--ink-soft);
+  transform: translateY(-1px);
+}
+
+.desk-region:disabled {
+  cursor: default;
+  background: var(--page-bg-2);
+}
+
+.desk-region:disabled b,
+.desk-region:disabled > span:not(.desk-swatch) {
+  color: var(--ink-soft);
+}
+
+.desk-region-last {
+  border-color: var(--accent);
+}
+
+.desk-region b {
+  font-size: 15px;
+}
+
+.desk-region > span {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.desk-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.desk-region-locked .desk-swatch {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.desk-small {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.desk-stamps,
+.desk-stamp {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.desk-links,
+.desk-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.desk-links .desk-small {
+  margin-right: auto;
+}
+
+.desk-contracts {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.desk-contracts li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 14.5px;
+}
+
+.desk-contracts .desk-done {
+  color: var(--ink-soft);
+}
+
+.desk-contracts .desk-fresh em {
+  font-style: normal;
+  font-weight: 700;
+  color: #0a7a3e;
+}
+
+.desk-progress {
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+}
+
+.desk-book {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.desk-entry {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--card-border);
+}
+
+.desk-entry p {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.desk-entry-unseen p,
+.desk-entry-unseen b {
+  color: var(--ink-soft);
+}
+
+.desk-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.desk-records ol {
+  padding-left: 22px;
+  display: grid;
+  gap: 3px;
+  font-size: 14px;
+}
+
+.desk-records p,
+.desk-help p {
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+
+.desk-help {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+}
+
+/* ------------------------------------------------------------------ during a flight */
+
+.desk-run {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 900px;
+}
+
+.desk-contracts-run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.desk-contracts-run li {
+  font-size: 13px;
+}
+
+/* The goal and the harvest, above the contracts. */
+.desk-status {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.desk-status b {
+  color: var(--ink);
+}
+
+.desk-status .desk-enough {
+  color: #0a7a3e;
+}
+
+/* A line over the field for the moments that change a flight. */
+.desk-banner {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  z-index: 4;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ the report */
+
+.desk-report {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 10, 14, 0.35);
+  border-radius: 10px;
+}
+
+.desk-card {
+  width: min(460px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  display: grid;
+  gap: 8px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.5);
+  animation: desk-in 0.3s ease-out;
+}
+
+.desk-card h2 {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.desk-escaped h2 {
+  color: #0a7a3e;
+}
+
+.desk-caught h2 {
+  color: #b3261e;
+}
+
+.desk-haul {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.desk-news {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.desk-cleared-news {
+  color: #0a7a3e;
+  font-size: 16px;
+}
+
+/* ------------------------------------------------------------------ goals and the ending */
+
+.desk-goal {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.desk-cleared {
+  color: #0a7a3e;
+}
+
+.desk-region-cleared {
+  border-color: #8cc9a4;
+}
+
+.desk-page h2 .desk-btn-ending {
+  margin-left: 12px;
+  min-height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: middle;
+}
+
+.desk-rules {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
+.desk-stars {
+  color: #b8860b;
+  letter-spacing: 0.08em;
+}
+
+.desk-stars-big {
+  font-size: 26px;
+}
+
+.desk-challenges .desk-region > span:not(.desk-swatch):not(.desk-small) {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.desk-ending {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+  line-height: 1.6;
+}
+
+@keyframes desk-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 760px) {
+  .desk-regions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk-card {
+    animation: none;
+  }
+
+  .desk-region:hover:not(:disabled) {
+    transform: none;
+  }
+}

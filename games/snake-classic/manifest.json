@@ -1,0 +1,129 @@
+{
+  "id": "snake-classic",
+  "title": "Talon's Shadow",
+  "tagline": "Gather the fruit. Watch the shadow. Slip away over any edge.",
+  "teaser": "A snake, a field of fruit, a bird of prey overhead and a hunter of the place on foot. Every fruit you carry slows you; rival snakes share the harvest, and running into one ends you. Clear eight regions to end the expedition, or take on five challenges, from filling the field to King Drift.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 10],
+  "status": "shipped",
+  "accent": "#d99a1e",
+  "emblem": "M9 13q8 1 15 8q7-7 15-8M24 21v3M6 38c5-6 9 4 14 0s9-6 14-1 5 3 8 1M41 37h.01",
+  "inspiredBy": {
+    "program": "snake",
+    "originalTitle": "snake",
+    "uiTitle": "the Berkeley snake-and-treasure game",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/snake-classic/app",
+    "output": "play/snake-classic/"
+  },
+  "manPage": {
+    "synopsis": "snake — gather fruit under a circling bird of prey and slip away over any edge before its dive finds you.",
+    "description": "The owner's earlier fancy-web port of snake: you are the snake now, slithering after fruit while an eagle (an owl by night) circles, locks on and dives, its shadow the only warning. Around it, an expedition through eight regions with their own birds, harvests, rival snakes and letter-shaped fences; every fruit carried makes you slower and the bird hungrier, a bare field makes it ravenous, and clearing Midnight ends the expedition. Three contracts a region with a stamp each, a field book, records and a Daily Flight. A hunter of each region stalks on foot and pecks, rival snakes that run into you are cut off (and you, if you run into them), and Space sheds the tail as a decoy. Five challenges stand apart: Fill the Field, King Drift, Coil, Survival and Courier. A second interpretation beside the collection's own snake.",
+    "seeAlso": ["snake", "robots"]
+  },
+  "howToPlay": [
+    "Steer with W A S D or the arrow keys and gather fruit; once the last fruit is gone, leave over any edge.",
+    "Keep clear of the bird's red ring and the hunter's peck, and never run into a rival's body.",
+    "Every fruit slows you; bring home a region's goal to clear it. Space sheds your tail as a decoy."
+  ],
+  "cronGoals": [
+    {
+      "id": "fruit",
+      "stat": "fruitSecured",
+      "label": "Bring home {n} fruit in Talon's Shadow",
+      "min": 20,
+      "max": 80
+    },
+    {
+      "id": "dodges",
+      "stat": "divesDodged",
+      "label": "Dodge {n} dives in Talon's Shadow",
+      "min": 8,
+      "max": 30
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-escape",
+      "title": "Away with it",
+      "description": "Escape with at least one fruit.",
+      "tier": "core"
+    },
+    {
+      "id": "empty-handed",
+      "title": "Empty-handed",
+      "description": "Escape carrying nothing at all. The 1980 game counted that as an escape too.",
+      "tier": "core"
+    },
+    {
+      "id": "dodger",
+      "title": "Not today",
+      "description": "Dodge five dives in a single flight.",
+      "tier": "core"
+    },
+    {
+      "id": "first-stamp",
+      "title": "First stamp",
+      "description": "Meet a contract and earn its stamp.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-flier",
+      "title": "Daily flier",
+      "description": "Finish seven Daily Flights.",
+      "tier": "core"
+    },
+    {
+      "id": "into-the-night",
+      "title": "Into the night",
+      "description": "Open the last region of the expedition, where the owl hunts.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-basket",
+      "title": "Full basket",
+      "description": "Escape with fifteen fruit or more.",
+      "tier": "extra"
+    },
+    {
+      "id": "field-guide",
+      "title": "Field guide",
+      "description": "Fill every page of the field book: eight birds and eight fruits.",
+      "tier": "extra"
+    },
+    {
+      "id": "stamp-collector",
+      "title": "Stamp collector",
+      "description": "Earn all twenty-four contract stamps.",
+      "tier": "rare"
+    },
+    {
+      "id": "owl-light",
+      "title": "Owl light",
+      "description": "Clear Midnight, the last region, and end the expedition.",
+      "tier": "rare"
+    },
+    {
+      "id": "challenger",
+      "title": "Challenger",
+      "description": "Earn at least one star in every challenge.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-field",
+      "title": "Full field",
+      "description": "Fill the field to the last corner in Fill the Field.",
+      "tier": "rare"
+    }
+  ]
+}

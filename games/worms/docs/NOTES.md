@@ -79,9 +79,12 @@ visit; none leaves the Hall’s origin.
 Abyssal Worms is a toy (`/usr/games/toys`), so the progression engine gives it a flat 6 XP once a
 day whatever it reports, and ignores XP events. The visit counts (`outcome: complete`) on the first
 key press or click; moving the pointer does not count, so opening the worms and leaving them
-running earns nothing. Its six packages are 15 XP each, matching the progression model for toys
-(`packages/kit/src/progression/sim/collection.ts`: six small packages worth 15 XP), so the balance
-simulations stay representative.
+running earns nothing. Its packages are 15 XP each, as the progression model has it for toys
+(`packages/kit/src/progression/sim/collection.ts`: six small packages worth 15 XP). Since the
+logbook (2026-10-03) it has ten: the four new ones (first-sighting, every-sighting, naturalist,
+daily-diver) add 60 XP over a lifetime, beyond what the simulation models for a toy. A finished
+Daily Dive reports the day’s challenge (`daily: true`), and the simulation row now says the game
+has a daily.
 
 ## Performance
 
@@ -94,14 +97,15 @@ falls back to SwiftShader and Low quality.
 
 ## Decisions log
 
-| Date       | Decision                                                           | Why                                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-10-01 | Title “Abyssal Worms”, as the game shows itself                    | Prompt 01 §7: the final title is the one the game already shows                                                                                           |
-| 2026-10-01 | No title-screen signal                                             | Abyssal Worms has no title screen; the Hall’s strip carries the ways out                                                                                  |
-| 2026-10-01 | A visit counts once, on the first key press or click               | Toys must never reward being left open; pointer movement only wakes the toolbar                                                                           |
-| 2026-10-01 | Packages only for moments the controller already knows about       | Changes to the game stay single calls into `hall.js` (ADR 0011)                                                                                           |
-| 2026-10-01 | The poster is taken from `#abyss` 5 s after opening                | By then the worms have left the corner and spread across the floor                                                                                        |
-| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1) | ADR 0012; the ambience plays at the Hall’s level, reduced motion applies live, and a pause or hidden tab freezes the abyss, which then carries on exactly |
+| Date       | Decision                                                                                        | Why                                                                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-01 | Title “Abyssal Worms”, as the game shows itself                                                 | Prompt 01 §7: the final title is the one the game already shows                                                                                                 |
+| 2026-10-01 | No title-screen signal                                                                          | Abyssal Worms has no title screen; the Hall’s strip carries the ways out                                                                                        |
+| 2026-10-01 | A visit counts once, on the first key press or click                                            | Toys must never reward being left open; pointer movement only wakes the toolbar                                                                                 |
+| 2026-10-01 | Packages only for moments the controller already knows about                                    | Changes to the game stay single calls into `hall.js` (ADR 0011)                                                                                                 |
+| 2026-10-01 | The poster is taken from `#abyss` 5 s after opening                                             | By then the worms have left the corner and spread across the floor                                                                                              |
+| 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)                              | ADR 0012; the ambience plays at the Hall’s level, reduced motion applies live, and a pause or hidden tab freezes the abyss, which then carries on exactly       |
+| 2026-10-03 | A logbook around the toy, at the owner’s request: sightings, a journal, a Daily Dive, postcards | The owner chose all four ideas; every entry needs a click or a key, so nothing rewards leaving the abyss running; the engine is untouched (`tests/log.test.js`) |
 
 ## Open questions
 

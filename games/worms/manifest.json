@@ -2,7 +2,7 @@
   "id": "worms",
   "title": "Abyssal Worms",
   "tagline": "Glowing worms crawling the floor of a deep, dark sea.",
-  "teaser": "The worms of a 1980 terminal reborn as bioluminescent creatures of the deep, eight species of them, crawling exactly where the original program sent them. Change how many and how fast, let them leave glowing trails, or split the screen to watch the old terminal beside them.",
+  "teaser": "The worms of a 1980 terminal reborn as bioluminescent creatures of the deep, crawling exactly where the original sent them. Watch for sightings, meet all eight species in the journal, take the Daily Dive, keep postcards of the scenes you like, or split the screen to see the old terminal.",
   "category": "toys",
   "directory": "/usr/games/toys",
   "players": {
@@ -19,7 +19,7 @@
     "uiTitle": "worms",
     "year": 1989
   },
-  "daily": false,
+  "daily": true,
   "kind": "hosted",
   "build": {
     "kind": "hosted-static",
@@ -28,13 +28,13 @@
   },
   "manPage": {
     "synopsis": "worms — watch worms wander; change how many and how fast.",
-    "description": "Eric P. Scott’s worms animated little worms crawling around a display terminal. It returns as a smooth, colourful screensaver.",
+    "description": "Eric P. Scott’s worms animated little worms crawling around a display terminal. It returns as a smooth, colourful screensaver. A logbook keeps the sightings you catch, a journal the species you meet, and a Daily Dive digs the same abyss for everyone; postcards keep the scenes you like.",
     "seeAlso": ["rain", "worm"]
   },
   "howToPlay": [
-    "Let the worms crawl; S opens the settings.",
-    "Change how many there are, how long and how fast.",
-    "C shows the 1980 terminal; V splits the screen."
+    "Let the worms crawl; S opens the settings, C the 1980 terminal, V a split screen.",
+    "When a ring of light marks the floor, click it (or press L) to log the sighting.",
+    "Click a worm to meet its species; B opens the logbook and today's Daily Dive."
   ],
   "packages": [
     {
@@ -76,6 +76,34 @@
       "id": "command-line",
       "title": "From the command line",
       "description": "Start the worms with a command line of your own.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "first-sighting",
+      "title": "First sighting",
+      "description": "Log a sighting: click the ring of light while it lasts.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "every-sighting",
+      "title": "Seen it all",
+      "description": "Log all four kinds of sighting.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "naturalist",
+      "title": "Naturalist",
+      "description": "Meet all eight species and put them in the journal.",
+      "tier": "core",
+      "xp": 15
+    },
+    {
+      "id": "daily-diver",
+      "title": "Daily diver",
+      "description": "Find the three sightings of a Daily Dive.",
       "tier": "core",
       "xp": 15
     }

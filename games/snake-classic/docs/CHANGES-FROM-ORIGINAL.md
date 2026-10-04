@@ -1,0 +1,58 @@
+# Talon's Shadow — changes from the original
+
+Original: `snake` from the BSD games (copyright 1980, 1993 The Regents of the University of
+California; its manual page calls it a “display chase game”). This game is the owner’s earlier
+browser port of it, adopted as built (ADR 0011), then given an expedition around it and a handful
+of small fixes; the way the snake slithers and the bird glides and strikes is the port’s, while
+what carrying does, the harvest, the rivals and the fences are new (ADR 0002).
+
+## The soul we kept
+
+Go out into the open after the prize, keep an eye on the hunter, and leave while you still can:
+whatever you carry counts only if you get away with it.
+
+## Changes
+
+| Area          | Original (`snake.c`)                                                         | The port, as built                                                                                   | In the collection                                                                                                                                                                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Roles         | You are an `I`; a six-square snake (`s`, head `S`) hunts you                 | You are the snake (45 segments); a bird of prey hunts you                                            | Unchanged; rival snakes share the fruit, and a head that runs into another snake’s body ends that snake, yours or a rival’s                                                                                                                                                        |
+| The prize     | One `$` at a time; a new one appears when you take it                        | Six apples on the field, each replaced when taken, without end                                       | Fruit of the region, four or five on the field, from a set harvest (10 to 28); fruit no snake takes withers after 24 s; a bare field ends the flight soon                                                                                                                          |
+| Leaving       | Walk onto the exit `#`                                                       | Touch any edge of the field, at any time                                                             | Only once the field is bare: until then the edges are closed and the head slides along them; then every edge opens and glows, and the snake slithers off the field out of the bird’s reach before the flight ends; the edge is noted for the edge contracts                        |
+| The hunter    | Moves after each of your moves; “as you get richer, the snake gets hungrier” | Real time: glides, locks on, dives at where you were, strikes, climbs; no change with what you carry | Hunts the nearest snake, yours or a rival’s (a rival under the strike is carried off); hungrier with every fruit you carry (it waits less and warns for less); ravenous once the field is bare, fair for three dives, then quicker each time; eight birds, harder region by region |
+| On the ground | —                                                                            | —                                                                                                    | A hunter of each region on foot (a secretary bird, a heron, a jungle fowl, a courser, a circuit hen, a wild turkey, a paper hen, two night herons): it stalks the nearest snake, warns, and pecks; a peck on the body knocks a fruit loose, on the head it ends the flight         |
+| You           | One square, whatever you carry                                               | A snake of fixed length and pace (0.14 px/ms)                                                        | A sixth faster (0.165 px/ms); longer, slower and slower to turn with every fruit carried; Space sheds a third of the tail as a decoy                                                                                                                                               |
+| The warning   | None: you see the snake                                                      | The bird’s shadow and a ring at the strike spot                                                      | The ring follows your head while the bird takes aim; the dive takes a set time, so keeping straight on always clears it until the field is bare                                                                                                                                    |
+| The field     | The screen, with the exit on it                                              | Open ground                                                                                          | From the River on, a fence shaped like a letter (I, T, H, a plus, a walled yard, U, two H’s)                                                                                                                                                                                       |
+| Moving        | `hjkl`, arrows, `sefc`; jumps (`HJKL`, `SEFC`), edges (`ATPB`), warp `w`     | Steer with WASD or arrows; the snake never stops; the key straight back does nothing                 | The key straight back swings the snake round in a U                                                                                                                                                                                                                                |
+| Score         | Money, scaled by the screen size; a last-digit bonus “as in pinball”         | Apples carried out                                                                                   | Fruit carried out, against each region’s goal                                                                                                                                                                                                                                      |
+| Best          | A personal best, counted only if you leave by the exit                       | A best that also counted the fruit of a flight that was caught                                       | As in 1980: only an escape sets a best, kept for every region                                                                                                                                                                                                                      |
+| Looks         | A terminal                                                                   | Eight painted looks, chosen with pills above the field                                               | Each look is a region of the expedition, with its own fence and rivals; the pills are hidden                                                                                                                                                                                       |
+| Sound         | None                                                                         | None                                                                                                 | None                                                                                                                                                                                                                                                                               |
+| Progression   | `snscore`, the table of players’ bests                                       | Restart with any key                                                                                 | An expedition of eight regions with goals and an ending, three contracts and stamps each, a field book, records, a Daily Flight, and five challenges with stars                                                                                                                    |
+
+## Quirks and bugs in the port
+
+The port reimplemented the chase from a written specification; where it departs from its own
+design notes or from `snake.c`, this table says what the collection did.
+
+| Quirk                                                                                                                                         | In this game                                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| The lock-on ring was drawn at the previous strike’s spot (or round the bird on the first lock), not round the snake its design notes describe | Fixed: while the bird takes aim, the ring follows the head; the dive still goes where the head was when the lock ended                   |
+| The ring shrank over a fixed 900 ms whatever the bird’s lock time                                                                             | Fixed: it shrinks over the bird’s own lock time                                                                                          |
+| The bird’s patience was drawn afresh every frame (4.5 s plus up to 2.5 s), so it locked on almost as soon as 4.5 s had passed                 | Changed: drawn once per glide, each region with its own spread; Neon Grid’s bird, the port’s own, waits 4.5–4.75 s as it effectively did |
+| Being caught still raised the best score                                                                                                      | Fixed: being caught is worth nothing, as in 1980                                                                                         |
+| Strike sparks ignored reduced motion (the pickup and catch bursts already followed it)                                                        | Fixed: with reduced motion only the strike’s ring is drawn                                                                               |
+| Pressing the key straight back did nothing: the heading lerped through zero and was set back to full length                                   | Changed: the snake swings round to its left until it no longer heads the wrong way                                                       |
+| The dive flew at a set speed until within 22 px of its target or low enough, so a bird close by struck almost at once                         | Changed: a dive takes a set time from wherever it starts, falling faster as it goes                                                      |
+
+## Derived logic or data
+
+None from the C source: the port reimplemented the chase from a description of `snake(6)`, and
+the bird, the slithering body and the looks are its own. The original is credited in
+`CREDITS.md` with the notice in `LICENSES/BSD-3-Clause-UCB.txt`.
+
+## Names
+
+Our title is _Talon's Shadow_; the original is credited as `snake` only in the credits and the
+manifest’s `inspiredBy`. The port’s Aztec bird was described as a national emblem’s eagle; in the
+collection it is simply the golden eagle.

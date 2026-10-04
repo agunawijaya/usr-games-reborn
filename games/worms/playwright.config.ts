@@ -3,10 +3,12 @@ import { hostedSuiteConfig } from '../../packages/bridge/testing/hall';
 import { GPU_LAUNCH_ARGS } from '../../packages/bridge/testing/shots';
 
 /**
- * Abyssal Worms (worms) inside the Hall. Run with `pnpm exec playwright test -c games/worms`; set
- * `HALL_PORT` when the Hall's usual port is taken. One worker: its scene is drawn in WebGL, and
- * the machine running these suites is often busy with other work.
+ * Abyssal Worms (worms) inside the Hall. Run with `pnpm exec playwright test -c games/worms`. The
+ * suite starts its own Hall dev server on port 5311 (or `HALL_PORT`), so it never shares one with
+ * another session. One worker: its scene is drawn in WebGL, and the machine running these suites
+ * is often busy with other work.
  */
+process.env.HALL_PORT ??= '5311';
 const { baseURL, webServer } = hostedSuiteConfig();
 
 // `SHOTS=1` runs only the documentation screenshots.

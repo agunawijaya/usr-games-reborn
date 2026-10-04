@@ -8,6 +8,7 @@ import { parseArgs, splitArgs, formatArgs, DEFAULTS } from '../engine/args.js';
 import { WormRenderer } from '../render/renderer.js';
 import { ClassicView } from '../render/classic.js';
 import { Ambience } from '../audio/ambience.js';
+import { createLogbook } from '../log/logbook.js';
 import {
   followHall, isHeldStill,
   noteCommandLine, noteLettersEaten, noteOptions, noteSplitMoved, noteView, offerPoster, posterWanted,
@@ -67,6 +68,7 @@ export function startApp() {
 
   // ---- world -------------------------------------------------------------------
   let world = null;
+  let logbook = null;     // created once the controls exist, below
   let grid = null;
   let clock = 0;          // real seconds since start (trail ages)
   let anim = 0;           // animation seconds (frozen under reduced motion)
@@ -86,6 +88,7 @@ export function startApp() {
     grid = layoutGrid();
     world = createWorld({ cols: grid.cols, rows: grid.rows, ...S.opts, seed: S.seed });
     acc = 0;
+    logbook?.onRestart(clock);
     renderer?.setWorld(world, clock);
     classic.invalidate();
     syncUI();
@@ -99,6 +102,7 @@ export function startApp() {
 
   function doStep() {
     step(world);
+    logbook?.afterStep(world, clock);
     if (S.opts.field) noteLettersEaten(world.ate.length);
     renderer?.onStep(clock);
     // a head landing on an occupied cell: two worms (or one) crossing
@@ -201,6 +205,7 @@ export function startApp() {
   const togglePanel = (on = panel.hidden) => {
     panel.hidden = !on;
     $('btn-settings').setAttribute('aria-pressed', String(on));
+    if (on) logbook.toggle(false);
   };
   $('btn-settings').addEventListener('click', () => togglePanel());
 
@@ -243,11 +248,39 @@ export function startApp() {
     }
   });
 
+  // ---- the logbook: sightings, the journal, the Daily Dive, postcards (src/log/) ----
+  logbook = createLogbook({
+    world: () => world,
+    grid: () => grid,
+    cell: () => S.cell,
+    seed: () => S.seed,
+    reducedMotion: () => !S.motion,
+    scene: () => ({ seed: S.seed, opts: { ...S.opts }, cell: S.cell, view: S.view }),
+    openScene: (scene) => {
+      S.seed = scene.seed;
+      if (scene.cell) S.cell = scene.cell;
+      if (scene.view) setView(scene.view);
+      applyOpts({ ...S.opts, ...scene.opts }, { fresh: true });
+    },
+  });
+  $('btn-log').addEventListener('click', () => { if (logbook.open) togglePanel(false); });
+  window.addEventListener('pointerdown', (e) => {
+    if (e.target === canvas || e.target === classicCanvas) logbook.onPointer(e.clientX, e.clientY, clock);
+  });
+
   // keyboard
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLInputElement || e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key.toLowerCase();
-    if (k === 'escape') { togglePanel(false); return; }
+    if (k === 'escape') {
+      if (!panel.hidden || logbook.open) e.preventDefault();
+      togglePanel(false);
+      logbook.toggle(false);
+      return;
+    }
+    if (k === 'b') { togglePanel(false); logbook.toggle(); e.preventDefault(); return; }
+    if (k === 'l') { logbook.logActive(clock); e.preventDefault(); return; }
+    if (k === 'j') { logbook.meetNextWorm(clock); e.preventDefault(); return; }
     if (k === 'f') toggleFull();
     else if (k === 's') togglePanel();
     else if (k === 'm') toggleSound();
@@ -307,7 +340,7 @@ export function startApp() {
     }
     clock += dt;
     if (S.motion) anim += dt;
-    if (!panel.hidden || now - lastActivity < IDLE_MS) document.body.classList.remove('idle');
+    if (!panel.hidden || logbook.open || now - lastActivity < IDLE_MS) document.body.classList.remove('idle');
     else document.body.classList.add('idle');
 
     const iv = interval();
@@ -343,7 +376,8 @@ export function startApp() {
       }
     }
     audio.update(world, panOf);
-    window.__abyss = { ready: revealed, S, world, renderer, audio };
+    logbook.draw(clock);
+    window.__abyss = { ready: revealed, S, world, renderer, audio, logbook: logbook.forTests };
     requestAnimationFrame(frame);
   }
 

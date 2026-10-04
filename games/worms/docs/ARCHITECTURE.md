@@ -25,6 +25,12 @@ flowchart LR
   app --> classic["src/render/classic.js<br/>Canvas 2D terminal"]
   app --> audio["src/audio/ambience.js"]
   app --> hall["src/hall.js<br/>visit, packages, poster"]
+  app --> logbook["src/log/logbook.js<br/>rings on the floor, the panel"]
+  logbook --> sightings["src/log/sightings.js"]
+  logbook --> journal["src/log/journal.js"]
+  logbook --> dive["src/log/dive.js"]
+  logbook --> store["src/log/store.js"]
+  logbook --> hall
   hall --> bridge
 ```
 
@@ -40,6 +46,11 @@ flowchart LR
 | `app/src/ui/styles.css`     | Layout and the night look                                                          |
 | `app/src/ui/fonts/`         | Self-hosted Inter and JetBrains Mono (added on adoption)                           |
 | `app/src/hall.js`           | The bridge glue (added on adoption)                                                |
+| `app/src/log/sightings.js`  | Watches each step for the four sightings; its own seeded chance and timing         |
+| `app/src/log/journal.js`    | The eight species’ pages (our own notes); which worm is under a cell               |
+| `app/src/log/dive.js`       | The Daily Dive: number, seed, worms, length, the three sightings, share line       |
+| `app/src/log/store.js`      | The log under `usr-games:worms:log`: sightings, species, dives, postcards          |
+| `app/src/log/logbook.js`    | The rings on the `#marks` canvas, the logbook panel, its toast, the keys B, L, J   |
 
 ## State machine
 
@@ -55,6 +66,22 @@ stateDiagram-v2
 ```
 
 The view (Abyssal, Split or Classic) is independent of this: every view reads the same world.
+The logbook is independent too: it opens over any state, and a Daily Dive or a postcard is a
+relaunch with the dive’s or the postcard’s seed and options.
+
+## The logbook
+
+The logbook was added in the collection, around the engine and never inside it. After every
+step, `app.js` hands the world to `logbook.afterStep`; `SightingWatch` looks at it (two heads on
+one cell, a head on its own body, a head in a far corner, or, on its own timetable, a bloom) and
+may start a sighting. Its chances and quiet spells come from its own mulberry32 generator, seeded
+from the scene’s seed, so the worms move exactly as before and a Daily Dive’s blooms come at the
+same moments for everyone at the same window size. A sighting lasts 4.5 s; a bloom’s ring
+follows its worm, the others stay where they happened. The rings are drawn on a Canvas 2D layer
+(`#marks`) above the abyss, so they show in every view.
+
+Nothing is logged unless the player clicks a ring (or presses L) or a worm (or presses J): the
+toy never rewards the abyss for running unwatched.
 
 ## Engine
 
@@ -105,18 +132,22 @@ muted. The master level is the ambience’s `volume` (its designed 0.8, scaled i
 All of it lives in `app/src/hall.js`, plus one script tag in `index.html` and, in
 `app/src/ui/app.js`, one import, calls at six moments the controller already knew about, the
 hand-over of the ambience and two setters (`followHall`) and a hold check (`isHeldStill`) at the top
-of the frame loop.
+of the frame loop. The logbook (`src/log/`) calls `noteSighting`, `noteJournal` and
+`noteDiveFinished` in `hall.js`.
 
-| Abyssal Worms moment                                      | Bridge message                                                    |
-| --------------------------------------------------------- | ----------------------------------------------------------------- |
-| The first key press or click                              | `result { outcome: 'complete', durationSeconds }`, once per visit |
-| The classic view is chosen                                | `achievement back-to-the-terminal`                                |
-| The split divider is dragged or moved with the arrows     | `achievement side-by-side`                                        |
-| Trails are switched on                                    | `achievement luminous-trail`                                      |
-| 1,000 letters eaten while the field is on                 | `achievement plankton-feast`                                      |
-| Eight or more worms set in the settings or a command line | `achievement full-spectrum`                                       |
-| A command line is accepted                                | `achievement command-line`                                        |
-| The first abyss frame drawn 5 s after opening             | `poster`, from `#abyss` through `posterFromCanvas`                |
+| Abyssal Worms moment                                      | Bridge message                                                                                                    |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| The first key press or click                              | `result { outcome: 'complete', durationSeconds }`, once per visit                                                 |
+| The classic view is chosen                                | `achievement back-to-the-terminal`                                                                                |
+| The split divider is dragged or moved with the arrows     | `achievement side-by-side`                                                                                        |
+| Trails are switched on                                    | `achievement luminous-trail`                                                                                      |
+| 1,000 letters eaten while the field is on                 | `achievement plankton-feast`                                                                                      |
+| Eight or more worms set in the settings or a command line | `achievement full-spectrum`                                                                                       |
+| A command line is accepted                                | `achievement command-line`                                                                                        |
+| A sighting is logged; all four kinds logged               | `achievement first-sighting`; `achievement every-sighting`                                                        |
+| All eight species met                                     | `achievement naturalist`                                                                                          |
+| A Daily Dive finished (once a day)                        | `achievement daily-diver`; `result { outcome: 'complete', stats: { diveSightings, divesFinished }, daily: true }` |
+| The first abyss frame drawn 5 s after opening             | `poster`, from `#abyss` through `posterFromCanvas`                                                                |
 
 Abyssal Worms sends no title-screen signal: it has no title screen, and the Hall’s strip carries
 the ways out. It does not act on appearance messages (it has one look). Since bridge 1.1 it follows
@@ -134,15 +165,15 @@ as before.
 
 ## Tests
 
-| Test                     | Command                                                               | What it proves                                                                                                      |
-| ------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Upstream unit tests (33) | `pnpm run test:hosted` (or `node --test "tests/*.test.js"` in `app/`) | Screens and command-line errors match captures of the real binary; glibc `random()`; invariants; glide; zero raster |
-| In the Hall (5)          | `pnpm exec playwright test -c games/worms`                            | Opens with no outside requests; a key press is the visit and installs a package; every way out                      |
-| Screenshots              | `SHOTS=1 pnpm exec playwright test -c games/worms`                    | `docs/media/title-1280.webp`, `play-1280.webp`, `signature-1280.webp`, on the machine’s GPU                         |
+| Test             | Command                                                               | What it proves                                                                                                                                                                                                                                                             |
+| ---------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit tests (41)  | `pnpm run test:hosted` (or `node --test "tests/*.test.js"` in `app/`) | Upstream (33): screens and command-line errors match captures of the real binary; glibc `random()`; invariants; glide; zero raster. The logbook (8, `tests/log.test.js`): the engine untouched, rarity and spacing, determinism, logging, the journal, the dive, the store |
+| In the Hall (19) | `pnpm exec playwright test -c games/worms`                            | Opens with no outside requests; a key press is the visit; sound, motion and pause follow the Hall; the keyboard; a sighting logged, a species met, a Daily Dive finished, a postcard kept and opened; every way out                                                        |
+| Screenshots      | `SHOTS=1 pnpm exec playwright test -c games/worms`                    | `docs/media/title-1280.webp`, `play-1280.webp`, `signature-1280.webp`, `logbook-1280.webp`, on the machine’s GPU                                                                                                                                                           |
 
 The screenshots stage each scene with the game’s own `?args`, `?cell`, `?warm` (steps to run before
-the first frame) and `?view` parameters. Set `HALL_PORT` when the Hall’s usual port (5173) is
-taken. On its own, `pnpm --dir games/worms/app start` serves Abyssal Worms at
+the first frame) and `?view` parameters. The suite starts its own Hall on port 5311
+(`HALL_PORT` to move it). On its own, `pnpm --dir games/worms/app start` serves Abyssal Worms at
 `http://localhost:5203/`.
 
 ## Kit candidates

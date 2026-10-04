@@ -1,0 +1,3737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Talon's Shadow</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --page-bg: #f7f4ee;
+      --page-bg-2: #efeae0;
+      --ink: #2a2a2e;
+      --ink-soft: #6a6a72;
+      --ink-faint: #a8a7ac;
+      --card: #ffffff;
+      --card-border: #e0dcd2;
+      --accent: #2a2a2e;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 50% 0%, var(--page-bg) 0%, var(--page-bg-2) 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 24px;
+      gap: 18px;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .title {
+      font-family: 'JetBrains Mono', 'Fira Code', SF Mono, Monaco, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+    }
+    .subtitle {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .theme-picker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 900px;
+    }
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px 8px 8px;
+      background: var(--card);
+      border: 1.5px solid var(--card-border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--ink-soft);
+      transition: all 0.18s cubic-bezier(0.2, 0.6, 0.3, 1);
+      user-select: none;
+    }
+    .theme-btn:hover {
+      border-color: var(--ink-soft);
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+    .theme-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .theme-btn .swatch {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.4);
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .canvas-wrap {
+      position: relative;
+      display: block;
+    }
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 72vh;
+      box-shadow:
+        0 30px 60px -20px rgba(0,0,0,0.20),
+        0 12px 24px -8px rgba(0,0,0,0.10),
+        0 0 0 1px rgba(0,0,0,0.06);
+      border-radius: 10px;
+      background: #050a1a;
+    }
+    .game-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
+      border-radius: 10px;
+      color: white;
+      font-family: 'JetBrains Mono', 'Fira Code', SF Mono, monospace;
+    }
+    .game-overlay.visible {
+      opacity: 1;
+    }
+    .game-overlay .go-title {
+      font-size: 48px;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 30px rgba(255,255,255,0.4), 0 4px 20px rgba(0,0,0,0.6);
+    }
+    .game-overlay .go-title.win  { color: #a0f0d0; }
+    .game-overlay .go-title.dead { color: #ffa0a0; }
+    .game-overlay .go-sub {
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      opacity: 0.85;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .game-overlay .go-instr {
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      opacity: 0.65;
+      margin-top: 26px;
+      text-transform: uppercase;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.35; } }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      padding: 0 4px;
+      font-family: 'JetBrains Mono', 'Fira Code', SF Mono, monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      gap: 12px;
+    }
+    .meta-row .keys kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 10px;
+      color: var(--ink);
+      margin: 0 1px;
+    }
+    .meta-row .score {
+      display: flex; gap: 6px; align-items: baseline;
+    }
+    .meta-row .score .label { color: var(--ink-faint); }
+    .meta-row .score .value {
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      min-width: 22px;
+      display: inline-block;
+    }
+    .meta-row .score .sep { color: var(--ink-faint); margin: 0 4px; }
+    .meta-row .state {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .meta-row .state .label { color: var(--ink-faint); }
+    .meta-row .state .value {
+      color: var(--ink);
+      font-weight: 700;
+      min-width: 68px; text-align: left;
+    }
+    .footer {
+      font-size: 10.5px;
+      color: var(--ink-faint);
+      letter-spacing: 0.05em;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+    }
+  </style>
+  <link rel="stylesheet" href="src/desk.css">
+  <!-- The desk's modules, fetched side by side rather than one import after another; the
+       loading card counts them in (tests/page.test.mjs checks that none is missing). -->
+  <link rel="modulepreload" href="src/book.mjs">
+  <link rel="modulepreload" href="src/carry.mjs">
+  <link rel="modulepreload" href="src/challenges.mjs">
+  <link rel="modulepreload" href="src/contracts.mjs">
+  <link rel="modulepreload" href="src/daily.mjs">
+  <link rel="modulepreload" href="src/desk.mjs">
+  <link rel="modulepreload" href="src/fences.mjs">
+  <link rel="modulepreload" href="src/hall.mjs">
+  <link rel="modulepreload" href="src/paths.mjs">
+  <link rel="modulepreload" href="src/progress.mjs">
+  <link rel="modulepreload" href="src/regions.mjs">
+  <link rel="modulepreload" href="src/rivals.mjs">
+  <link rel="modulepreload" href="src/rules.mjs">
+  <link rel="modulepreload" href="src/store.mjs">
+  <link rel="modulepreload" href="src/hens.mjs">
+  <script>
+    // Counted from here, before any of them can have arrived: the card's bar reads this.
+    window.__deskLoading = { total: 0, done: 0 };
+    for (const link of document.querySelectorAll('link[rel="modulepreload"]')) {
+      window.__deskLoading.total++;
+      const arrived = () => { window.__deskLoading.done++; };
+      link.addEventListener('load', arrived, { once: true });
+      link.addEventListener('error', arrived, { once: true });
+    }
+  </script>
+</head>
+<body>
+  <div class="header">
+    <div class="title">talon's shadow</div>
+    <div class="subtitle" id="deskSubtitle">An expedition under the eagle's wing</div>
+  </div>
+
+  <div class="theme-picker" id="themePicker" hidden></div>
+
+  <div class="stage">
+    <div class="canvas-wrap">
+      <canvas id="c" width="900" height="600"></canvas>
+      <div class="game-overlay" id="gameOverlay"></div>
+      <div class="desk-report" id="deskReport" hidden></div>
+    </div>
+    <div class="meta-row">
+      <div class="keys">steer &nbsp; <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &nbsp; · &nbsp; <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div>
+      <div class="score">
+        <span class="label">apples</span><span class="value" id="scoreLabel">0</span>
+        <span class="sep">·</span>
+        <span class="label">best</span><span class="value" id="bestLabel">0</span>
+      </div>
+      <div class="state"><span class="label">eagle</span><span class="value" id="stateLabel">GLIDE</span></div>
+    </div>
+  </div>
+
+  <div class="desk-run" id="deskRun" hidden></div>
+
+  <div class="footer">gather the fruit · the edges open once it is all gone · mind the bird, the hunter and the rivals</div>
+
+  <!-- The desk opens on a card of its own straight away: no glimpse of the page underneath, no
+       blank screen. The bar fills as the desk's modules arrive; the desk then takes its place. -->
+  <div class="desk-menu desk-loading" id="deskMenu">
+    <section class="desk-page desk-loader" aria-labelledby="desk-loader-title">
+      <h1 id="desk-loader-title" class="desk-title">Talon’s Shadow</h1>
+      <p class="desk-tag">Gather the fruit. Watch the shadow. Slip away over any edge.</p>
+      <div class="desk-meter" role="progressbar" aria-label="Opening the expedition" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="deskMeterFill"></span></div>
+    </section>
+  </div>
+  <script>
+    (() => {
+      const fill = document.getElementById('deskMeterFill');
+      const meter = fill.parentElement;
+      const follow = () => {
+        if (!meter.isConnected) return;
+        const { total, done } = window.__deskLoading;
+        const percent = total ? Math.round((100 * done) / total) : 100;
+        fill.style.width = `${Math.max(8, percent)}%`;
+        meter.setAttribute('aria-valuenow', String(percent));
+        requestAnimationFrame(follow);
+      };
+      follow();
+    })();
+  </script>
+
+  <!-- The Hall's bridge (absent when the page is opened on its own) -->
+  <script src="../../bridge/bridge.js"></script>
+
+  <script>
+  (() => {
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const stateLabel = document.getElementById('stateLabel');
+    const scoreLabel = document.getElementById('scoreLabel');
+    const bestLabel = document.getElementById('bestLabel');
+    const gameOverlay = document.getElementById('gameOverlay');
+    const themePicker = document.getElementById('themePicker');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // ================= GAME STATE =================
+    // Kept under the collection's prefix, so the Hall's "Forget everything" clears it too.
+    const BEST_KEY = 'usr-games:snake-classic:best';
+    const game = {
+      // 'menu' (the expedition desk is open, the bird circles) | 'playing' | 'dead' | 'won'
+      state: 'menu',
+      score: 0,
+      bestScore: parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0,
+      overOffTime: 0,        // ms since game ended
+      canRestart: false,
+      // The harvest (added in the collection): fruit still to come once the field's is taken,
+      // what the rivals ate, and whether the field is bare.
+      harvestLeft: Infinity,
+      rivalsAte: 0,
+      rivalsTaken: 0,
+      rivalsCutOff: 0,
+      withered: 0,
+      pecks: 0,
+      huntersAte: 0,
+      // Shedding the tail: segments given up this flight, and when it can be done again.
+      shedSegments: 0,
+      shedReadyAt: 0,
+      // What a challenge's mode may change: a bird that does not hunt yet, a hungrier bird,
+      // where fruit may grow; and whether the head met a fence or an edge this step.
+      birdAsleep: false,
+      birdHunger: 1,
+      diveQuickening: 1,
+      fruitSpot: null,
+      touchedWall: false,
+      bare: false,
+      divesSinceBare: 0,
+      // Once the snake is on its way out over an open edge: which edge, and which way out.
+      leaving: null,
+      // When the head last met a closed edge (to say so now and then, not every frame).
+      closedEdgeSaidAt: -Infinity,
+      clock: 0,
+    };
+
+    // ================= THE DESK'S HOOKS =================
+    // The expedition desk (src/desk.mjs) starts each flight with a region's temperament and,
+    // for the Daily Flight, a seeded random draw; it listens to what happens. Opened without the
+    // desk, the game behaves as it always did.
+    let rand = Math.random;
+    let paused = false;
+    let reducedMotion = false;
+    const listeners = [];
+    const emit = (event) => { for (const listen of listeners) listen(event); };
+    const controlled = () => listeners.length > 0;
+    // The bird's temperament. The defaults are the port's own numbers; regions change them.
+    const ORIGINAL_TUNE = {
+      patience: 4500, patienceSpread: 250, lockMs: 900, diveMs: 245,
+      strikeRadius: 26, appleCount: 6, glideSpeed: 105, firstDelay: 2000,
+    };
+    let tune = { ...ORIGINAL_TUNE };
+    // The rules of a flight (src/rules.mjs): fences, the harvest, rivals, and what carrying
+    // fruit does. Without the desk they are the port's: open ground, fruit without end, no
+    // rivals, and carrying changes nothing.
+    const PORT_RULES = {
+      fences: [],
+      start: { x: W / 2, y: H / 2 },
+      harvest: Infinity,
+      fruitLifeMs: Infinity,
+      // The port let the snake out over any edge at any time, at its own pace, and nothing else
+      // on the field could run into it.
+      exitsOnlyWhenBare: false,
+      snakeSpeed: 0.14,
+      contactKills: false,
+      hunters: 0,
+      hunterKind: null,
+      makeHunter: () => null,
+      stepHunter: () => null,
+      canShed: false,
+      rivals: 0,
+      carry: () => ({ speed: 1, turn: 1, grow: 0, patience: 1, lock: 1, dive: 1 }),
+      ravenous: () => ({ patienceMs: 500, lock: 0.6, dive: 1 }),
+      pushOut: () => false,
+      isClear: () => true,
+      makeRival: () => null,
+      stepRival: () => -1,
+    };
+    let rules = PORT_RULES;
+
+    // ================= THEMES =================
+    const THEMES = {
+      'neon-grid': {
+        name: 'Neon Grid',
+        swatch: 'linear-gradient(135deg,#00ffff 0%,#ff00ff 100%)',
+        bg: '#050a1a',
+        bgGradient: null,
+        vignette: 'rgba(20,30,80,0.4)',
+        gridLine: 'rgba(30,80,180,0.35)',
+        gridDot: 'rgba(255,0,255,0.55)',
+        gridDotGlow: 4,
+        snakeHead: '#00ffff',
+        snakeTail: '#ff00ff',
+        snakeGlow: '#00ffff',
+        snakeGlowRadius: 22,
+        snakePulseColor: 'rgba(255,255,255,0.14)',
+        snakeEyeWhite: '#ffffff',
+        snakeEyeColor: '#08f018',
+        snakeTongue: '#ff2266',
+        apple: '#ff2266',
+        appleGlow: '#ff4488',
+        appleLeaf: '#22ff88',
+        appleLeafGlow: '#22ff88',
+        appleStem: '#664422',
+        appleHighlight: 'rgba(255,255,255,0.55)',
+        enemy: '#ff00ff',
+        enemyTip: '#00ffff',
+        enemyGlow: '#ff00ff',
+        beak: '#ffcc00',
+        driftColors: ['rgba(0,255,255,ALPHA)', 'rgba(255,0,255,ALPHA)'],
+        composite: 'lighter',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+      },
+      'savanna': {
+        name: 'Savanna',
+        swatch: 'linear-gradient(135deg,#a8d8f0 0%,#d0b448 50%,#5a7828 100%)',
+        bg: '#c8b048',
+        bgGradient: [
+          { pos: 0,    color: '#a8d8f0' },   // sky
+          { pos: 0.35, color: '#e5d478' },   // dry grass yellow
+          { pos: 0.65, color: '#a8ac48' },   // yellow-green grass
+          { pos: 1,    color: '#5a6828' },   // shaded ground
+        ],
+        vignette: 'rgba(90,60,20,0.20)',
+        gridLine: 'rgba(80,90,30,0.25)',
+        gridDot: 'rgba(80,60,20,0.4)',
+        gridDotGlow: 0,
+        snakeHead: '#7bb038',           // grass snake bright green
+        snakeTail: '#3a6a1a',
+        snakeGlow: 'rgba(60,120,30,0.45)',
+        snakeGlowRadius: 8,
+        snakePulseColor: 'rgba(220,255,180,0.20)',
+        snakeEyeWhite: '#fff8dc',
+        snakeEyeColor: '#000000',
+        snakeTongue: '#c92a3a',
+        apple: '#ff8a1a',               // mango
+        appleGlow: 'rgba(255,140,40,0.55)',
+        appleLeaf: '#4aab5a',
+        appleLeafGlow: '#4aab5a',
+        appleStem: '#5a3a20',
+        appleHighlight: 'rgba(255,240,180,0.7)',
+        enemy: '#4a3020',               // African fish eagle brown
+        enemyTip: '#f5f0e0',            // white head/tail
+        enemyGlow: 'rgba(60,40,20,0.4)',
+        beak: '#ffcc22',
+        driftColors: ['rgba(240,220,140,ALPHA)', 'rgba(180,200,80,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+      },
+      'jungle': {
+        name: 'Jungle',
+        swatch: 'linear-gradient(135deg,#2a5028 0%,#68b048 100%)',
+        bg: '#1e3d1a',
+        bgGradient: [
+          { pos: 0,   color: '#0f2a0e' },   // deep canopy shadow
+          { pos: 0.5, color: '#2a5028' },   // mid canopy
+          { pos: 1,   color: '#5a8a3a' },   // forest floor
+        ],
+        vignette: 'rgba(10,30,10,0.5)',
+        gridLine: 'rgba(150,220,120,0.10)',
+        gridDot: 'rgba(180,240,140,0.45)',
+        gridDotGlow: 2,
+        snakeHead: '#48c268',           // emerald bright
+        snakeTail: '#0a3010',           // dark forest
+        snakeGlow: 'rgba(80,220,80,0.5)',
+        snakeGlowRadius: 12,
+        snakePulseColor: 'rgba(220,255,200,0.20)',
+        snakeEyeWhite: '#fffee8',
+        snakeEyeColor: '#c8a020',       // amber snake iris
+        snakeTongue: '#e8409a',
+        apple: '#f8b028',               // tropical mango yellow-orange
+        appleGlow: 'rgba(255,180,40,0.6)',
+        appleLeaf: '#68d868',
+        appleLeafGlow: '#68d868',
+        appleStem: '#5a2a10',
+        appleHighlight: 'rgba(255,240,180,0.6)',
+        enemy: '#4a4a45',               // harpy eagle dark upper
+        enemyTip: '#f0ead0',            // pale belly / wingtip
+        enemyGlow: 'rgba(60,60,55,0.5)',
+        beak: '#f8d8a0',
+        driftColors: ['rgba(140,220,80,ALPHA)', 'rgba(80,180,120,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+      },
+      'desert': {
+        name: 'Desert',
+        swatch: 'linear-gradient(135deg,#f5d798 0%,#e8a848 60%,#8a5020 100%)',
+        bg: '#d59845',
+        bgGradient: [
+          { pos: 0,    color: '#f5d798' },   // pale sky
+          { pos: 0.5,  color: '#e8a848' },   // warm sand
+          { pos: 1,    color: '#8a5020' },   // dune shadow
+        ],
+        vignette: 'rgba(100,50,10,0.30)',
+        gridLine: 'rgba(120,70,20,0.20)',
+        gridDot: 'rgba(100,50,10,0.4)',
+        gridDotGlow: 0,
+        snakeHead: '#e5b268',           // sidewinder tan
+        snakeTail: '#8a5820',
+        snakeGlow: 'rgba(160,100,30,0.4)',
+        snakeGlowRadius: 6,
+        snakePulseColor: 'rgba(255,230,180,0.20)',
+        snakeEyeWhite: '#fff8dc',
+        snakeEyeColor: '#000000',
+        snakeTongue: '#c92a3a',
+        apple: '#e64570',               // prickly pear fruit
+        appleGlow: 'rgba(230,70,110,0.55)',
+        appleLeaf: '#6a9a3a',           // sage green
+        appleLeafGlow: '#6a9a3a',
+        appleStem: '#4a2a10',
+        appleHighlight: 'rgba(255,240,220,0.7)',
+        enemy: '#5a3820',               // dark hawk brown
+        enemyTip: '#f0d090',            // pale gold wingtip
+        enemyGlow: 'rgba(140,90,40,0.4)',
+        beak: '#ffcc22',
+        driftColors: ['rgba(255,220,140,ALPHA)', 'rgba(230,180,100,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+        sandBlow: true,
+      },
+      'river': {
+        name: 'River',
+        swatch: 'linear-gradient(135deg,#c0e0e8 0%,#3a8ab8 50%,#164560 100%)',
+        bg: '#3a8ab8',
+        bgGradient: [
+          { pos: 0,   color: '#c0e0e8' },   // sky reflection
+          { pos: 0.3, color: '#7ac0d8' },   // shallow water
+          { pos: 0.7, color: '#2a7098' },   // mid water
+          { pos: 1,   color: '#0f3a58' },   // deep water
+        ],
+        vignette: 'rgba(30,80,120,0.35)',
+        gridLine: 'rgba(255,255,255,0.10)',
+        gridDot: 'rgba(200,240,255,0.55)',
+        gridDotGlow: 3,
+        snakeHead: '#8ec8a8',           // water snake pale green-blue
+        snakeTail: '#2a5850',
+        snakeGlow: 'rgba(120,200,180,0.5)',
+        snakeGlowRadius: 10,
+        snakePulseColor: 'rgba(220,255,240,0.20)',
+        snakeEyeWhite: '#f0f8ff',
+        snakeEyeColor: '#c8a020',
+        snakeTongue: '#e8408a',
+        apple: '#ff7050',               // fallen fruit — coral orange
+        appleGlow: 'rgba(255,120,80,0.55)',
+        appleLeaf: '#5aa88a',
+        appleLeafGlow: '#5aa88a',
+        appleStem: '#5a3a20',
+        appleHighlight: 'rgba(255,240,220,0.7)',
+        enemy: '#3a2818',               // osprey brown wings
+        enemyTip: '#f5f0e8',            // osprey white body
+        enemyGlow: 'rgba(50,30,15,0.4)',
+        beak: '#f5c848',
+        driftColors: ['rgba(200,240,255,ALPHA)', 'rgba(150,220,240,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+        risingParticles: true,          // bubbles rise
+      },
+      'aztec': {
+        name: 'Aztec',
+        swatch: 'linear-gradient(135deg,#c8724a 0%,#e8b028 50%,#3cc0c8 100%)',
+        bg: '#3a2010',
+        bgGradient: [
+          { pos: 0,    color: '#5a2a10' },   // dark umber top
+          { pos: 0.55, color: '#c8724a' },   // terracotta mid
+          { pos: 1,    color: '#4a1e08' },   // dark umber bottom
+        ],
+        vignette: 'rgba(50,20,5,0.4)',
+        gridLine: 'rgba(232,176,40,0.28)',
+        gridDot: 'rgba(232,176,40,0.75)',
+        gridDotGlow: 4,
+        snakeHead: '#3cc0c8',           // Quetzalcoatl turquoise
+        snakeTail: '#e8b028',           // golden feathers
+        snakeGlow: 'rgba(60,192,200,0.55)',
+        snakeGlowRadius: 12,
+        snakePulseColor: 'rgba(255,255,200,0.25)',
+        snakeEyeWhite: '#fff0c0',
+        snakeEyeColor: '#c02020',       // ruby red
+        snakeTongue: '#ff6060',
+        apple: '#c02036',               // pomegranate
+        appleGlow: 'rgba(255,60,90,0.55)',
+        appleLeaf: '#4a7028',
+        appleLeafGlow: '#4a7028',
+        appleStem: '#3a1a08',
+        appleHighlight: 'rgba(255,220,180,0.7)',
+        enemy: '#e8b028',               // golden eagle
+        enemyTip: '#3cc0c8',            // turquoise wing/tail accents
+        enemyGlow: 'rgba(232,176,40,0.55)',
+        beak: '#f8e880',
+        driftColors: ['rgba(232,176,40,ALPHA)', 'rgba(60,192,200,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: false,
+      },
+      'origami': {
+        name: 'Origami',
+        swatch: 'linear-gradient(135deg,#ff8a95 0%,#74a8d1 100%)',
+        bg: '#faf7f2',
+        bgGradient: [
+          { pos: 0,   color: '#ffffff' },
+          { pos: 1,   color: '#f2ece0' },
+        ],
+        vignette: 'rgba(180,170,160,0.18)',
+        gridLine: 'rgba(180,170,160,0.45)',
+        gridDot: 'rgba(150,140,130,0.55)',
+        gridDotGlow: 0,
+        snakeHead: '#ff8a95',
+        snakeTail: '#b74250',
+        snakeGlow: 'rgba(255,138,149,0.15)',
+        snakeGlowRadius: 6,
+        snakePulseColor: 'rgba(255,255,255,0.30)',
+        snakeEyeWhite: '#ffffff',
+        snakeEyeColor: '#000000',
+        snakeTongue: '#c02030',
+        apple: '#e8515e',
+        appleGlow: 'rgba(232,81,94,0.2)',
+        appleLeaf: '#7ec585',
+        appleLeafGlow: '#7ec585',
+        appleStem: '#8b5a2b',
+        appleHighlight: 'rgba(255,255,255,0.75)',
+        enemy: '#e0dcd0',           // cream paper
+        enemyTip: '#a08c78',
+        enemyGlow: 'rgba(160,140,120,0.15)',
+        beak: '#e8a230',
+        driftColors: ['rgba(255,180,190,ALPHA)', 'rgba(180,210,230,ALPHA)'],
+        composite: 'source-over',
+        enemyShape: 'eagle',
+        stars: false,
+        paperFold: true,
+      },
+      'midnight': {
+        name: 'Midnight',
+        swatch: 'linear-gradient(135deg,#2a1a4a 0%,#d4d4f0 100%)',
+        bg: '#1a0d33',
+        bgGradient: [
+          { pos: 0,   color: '#2a1a4a' },
+          { pos: 0.6, color: '#160830' },
+          { pos: 1,   color: '#0a0418' },
+        ],
+        vignette: 'rgba(80,50,120,0.35)',
+        gridLine: 'rgba(140,100,200,0.14)',
+        gridDot: 'rgba(200,180,255,0.5)',
+        gridDotGlow: 3,
+        snakeHead: '#e0d8ff',
+        snakeTail: '#5b2c8a',
+        snakeGlow: 'rgba(180,150,240,0.55)',
+        snakeGlowRadius: 18,
+        snakePulseColor: 'rgba(255,255,255,0.18)',
+        snakeEyeWhite: '#ffdd44',
+        snakeEyeColor: '#1a0a2a',
+        snakeTongue: '#a02060',
+        apple: '#c02040',
+        appleGlow: 'rgba(255,60,100,0.7)',
+        appleLeaf: '#5a3a5a',
+        appleLeafGlow: '#a080c0',
+        appleStem: '#3a2a1a',
+        appleHighlight: 'rgba(255,200,220,0.6)',
+        enemy: '#d0c8e8',           // owl body pale
+        enemyTip: '#ffdd44',        // owl eyes yellow
+        enemyGlow: 'rgba(255,220,80,0.45)',
+        beak: '#ff8800',
+        driftColors: ['rgba(200,180,255,ALPHA)', 'rgba(255,220,120,ALPHA)'],
+        composite: 'lighter',
+        enemyShape: 'owl',
+        stars: true,
+        paperFold: false,
+      },
+    };
+
+    // How a region's fence and its rival snakes look, by theme (added in the collection).
+    const FENCE_LOOK = {
+      'savanna':   { kind: 'thorn',  body: '#8a6a3a', light: '#c8a868', dark: '#4a3418' },
+      'river':     { kind: 'reeds',  body: '#5a7a48', light: '#a8c888', dark: '#2a4020' },
+      'jungle':    { kind: 'bamboo', body: '#8aa840', light: '#d0e488', dark: '#3a5018' },
+      'desert':    { kind: 'stone',  body: '#b8865a', light: '#ecc89a', dark: '#6a4424' },
+      'neon-grid': { kind: 'neon',   body: '#ffb800', light: '#fff4b0', dark: '#a05000' },
+      'aztec':     { kind: 'stone',  body: '#9a5430', light: '#e8b028', dark: '#3a1a08' },
+      'origami':   { kind: 'paper',  body: '#e6dfcf', light: '#ffffff', dark: '#a89a84' },
+      'midnight':  { kind: 'hedge',  body: '#3c3c6c', light: '#9a98d8', dark: '#18183c' },
+    };
+    const RIVAL_LOOK = {
+      'savanna':   { head: '#c8a040', tail: '#6a5018' },
+      'river':     { head: '#b0b0a4', tail: '#4a4a48' },
+      'jungle':    { head: '#dccc3c', tail: '#5a5010' },
+      'desert':    { head: '#cc6c48', tail: '#5a2818' },
+      'neon-grid': { head: '#ffaa00', tail: '#ff4400' },
+      'aztec':     { head: '#2e9060', tail: '#0a2a1a' },
+      'origami':   { head: '#74a8d1', tail: '#2a5a80' },
+      'midnight':  { head: '#88d0c8', tail: '#1a4a50' },
+    };
+
+    // Open in the look of the region flown last, so the scene behind the desk is the right one
+    // from the first frame (the port opened on Neon Grid).
+    let currentTheme = 'neon-grid';
+    try {
+      const saved = JSON.parse(localStorage.getItem('usr-games:snake-classic:progress') || 'null');
+      if (THEMES[saved?.data?.lastRegion]) currentTheme = saved.data.lastRegion;
+    } catch (e) {}
+    let T = THEMES[currentTheme];
+
+    // ---- Build theme picker ----
+    Object.entries(THEMES).forEach(([key, theme]) => {
+      const btn = document.createElement('button');
+      btn.className = 'theme-btn' + (key === currentTheme ? ' active' : '');
+      btn.dataset.theme = key;
+      btn.innerHTML = `<span class="swatch" style="background:${theme.swatch}"></span><span>${theme.name}</span>`;
+      btn.onclick = () => setTheme(key);
+      themePicker.appendChild(btn);
+    });
+
+    function setTheme(name) {
+      currentTheme = name;
+      T = THEMES[name];
+      themePicker.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === name);
+      });
+      invalidateStaticLayer();
+    }
+
+    // ---- OFFSCREEN STATIC LAYER (bg + grid + moon) ----
+    // The static parts of the scene don't change per frame — only per theme.
+    // Rendering them into an offscreen canvas ONCE per theme and blitting each
+    // frame eliminates ~370 shadow-blur operations per frame on high-glow themes.
+    let staticLayer = null;
+    let staticLayerTheme = null;
+
+    function invalidateStaticLayer() {
+      staticLayer = null;
+      staticLayerTheme = null;
+    }
+
+    function ensureStaticLayer() {
+      if (staticLayer && staticLayerTheme === currentTheme) return;
+      staticLayer = document.createElement('canvas');
+      staticLayer.width = W;
+      staticLayer.height = H;
+      const sctx = staticLayer.getContext('2d');
+      renderStaticLayer(sctx);
+      staticLayerTheme = currentTheme;
+    }
+
+    function renderStaticLayer(sctx) {
+      // Base bg fill
+      if (T.bgGradient) {
+        const g = sctx.createLinearGradient(0, 0, 0, H);
+        for (const stop of T.bgGradient) g.addColorStop(stop.pos, stop.color);
+        sctx.fillStyle = g;
+      } else {
+        sctx.fillStyle = T.bg;
+      }
+      sctx.fillRect(0, 0, W, H);
+
+      // Vignette
+      const vg = sctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, W*0.7);
+      vg.addColorStop(0, T.vignette);
+      vg.addColorStop(1, 'rgba(0,0,0,0)');
+      sctx.fillStyle = vg;
+      sctx.fillRect(0, 0, W, H);
+
+      // Grid lines
+      sctx.strokeStyle = T.gridLine;
+      sctx.lineWidth = 1;
+      sctx.beginPath();
+      for (let x = 40; x < W; x += 40) {
+        sctx.moveTo(x + 0.5, 0);
+        sctx.lineTo(x + 0.5, H);
+      }
+      for (let y = 40; y < H; y += 40) {
+        sctx.moveTo(0, y + 0.5);
+        sctx.lineTo(W, y + 0.5);
+      }
+      sctx.stroke();
+
+      // Grid intersection dots (with per-theme glow — cached, not per frame!)
+      sctx.save();
+      if (T.composite === 'lighter') sctx.globalCompositeOperation = 'lighter';
+      sctx.fillStyle = T.gridDot;
+      if (T.gridDotGlow > 0) {
+        sctx.shadowBlur = T.gridDotGlow;
+        sctx.shadowColor = T.gridDot;
+      }
+      for (let x = 40; x < W; x += 40) {
+        for (let y = 40; y < H; y += 40) {
+          sctx.beginPath();
+          sctx.arc(x, y, 1.2, 0, Math.PI * 2);
+          sctx.fill();
+        }
+      }
+      sctx.restore();
+
+      // Moon crescent (Midnight theme only — static geometry, cached)
+      if (T.stars) {
+        const moonX = W - 80, moonY = 80;
+        const moonR = 24;
+        const coverX = moonX + 10, coverY = moonY - 4;
+        const coverR = 22;
+        sctx.save();
+        sctx.beginPath();
+        sctx.rect(0, 0, W, H);
+        sctx.arc(coverX, coverY, coverR, 0, Math.PI * 2, true);
+        sctx.clip('evenodd');
+        sctx.shadowBlur = 30;
+        sctx.shadowColor = 'rgba(240,235,220,0.7)';
+        sctx.fillStyle = 'rgba(240,235,220,0.95)';
+        sctx.beginPath();
+        sctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+        sctx.fill();
+        sctx.restore();
+      }
+    }
+
+    // ================= INPUT =================
+    const input = { dx: 1, dy: 0 };
+    document.addEventListener('keydown', (e) => {
+      if (paused) return;
+      // With the desk, its report card handles what comes next.
+      if (game.state !== 'playing' && controlled()) return;
+      // Restart on any key when game is over (after brief lockout)
+      if (game.state !== 'playing') {
+        if (game.canRestart) {
+          restartGame();
+          e.preventDefault();
+        }
+        return;
+      }
+      const k = e.key.toLowerCase();
+      if (k === 'arrowright' || k === 'd') { input.dx = 1;  input.dy = 0;  e.preventDefault(); }
+      else if (k === 'arrowleft'  || k === 'a') { input.dx = -1; input.dy = 0;  e.preventDefault(); }
+      else if (k === 'arrowup'    || k === 'w') { input.dx = 0;  input.dy = -1; e.preventDefault(); }
+      else if (k === 'arrowdown'  || k === 's') { input.dx = 0;  input.dy = 1;  e.preventDefault(); }
+    });
+
+    // ================= SNAKE =================
+    const snake = {
+      segments: [],
+      dx: 1, dy: 0,
+      speed: 0.14,
+      segLen: 8,
+      count: 45,
+    };
+    for (let i = 0; i < snake.count; i++) {
+      snake.segments.push({ x: W/2 - i * snake.segLen, y: H/2 });
+    }
+
+    function updateSnake(dt) {
+      if (game.state !== 'playing') return;
+
+      // Every fruit carried makes the snake slower and slower to turn (src/carry.mjs).
+      const carry = rules.carry(game.score);
+      const s = Math.min(1, 0.010 * dt * carry.turn);
+      // Pressing straight back turns the snake round in a U (the port did nothing): it swings
+      // to its left until it is no longer heading the wrong way.
+      let wantX = input.dx;
+      let wantY = input.dy;
+      if (wantX * snake.dx + wantY * snake.dy < -0.9) {
+        wantX = snake.dy;
+        wantY = -snake.dx;
+      }
+      snake.dx += (wantX - snake.dx) * s;
+      snake.dy += (wantY - snake.dy) * s;
+      // On its way out the snake no longer answers the keys: it slithers straight off the field.
+      if (game.leaving) {
+        snake.dx = game.leaving.dx;
+        snake.dy = game.leaving.dy;
+      }
+      const len = Math.hypot(snake.dx, snake.dy) || 1;
+      snake.dx /= len; snake.dy /= len;
+      game.clock += dt;
+
+      const head = snake.segments[0];
+      head.x += snake.dx * rules.snakeSpeed * carry.speed * dt;
+      head.y += snake.dy * rules.snakeSpeed * carry.speed * dt;
+
+      // Edge = escape (win with current score). Even 0 apples counts as an escape
+      // — but the win screen will note if empty-handed.
+      // In the collection the edges stay closed while any fruit is left: the head slides along
+      // them. Once the field is bare an edge lets the snake out, and the flight goes on until
+      // all of it has slithered off the field.
+      const escapeM = 4;
+      const atEdge = head.x < escapeM || head.x > W - escapeM || head.y < escapeM || head.y > H - escapeM;
+      if (atEdge && !game.leaving) {
+        const edge = head.y < escapeM ? 'north' : head.y > H - escapeM ? 'south'
+          : head.x < escapeM ? 'west' : 'east';
+        if (!rules.exitsOnlyWhenBare) {
+          // Clamp head to edge for visual only
+          head.x = Math.max(escapeM, Math.min(W - escapeM, head.x));
+          head.y = Math.max(escapeM, Math.min(H - escapeM, head.y));
+          triggerWin(edge);
+          return;
+        }
+        if (!game.bare) {
+          head.x = Math.max(escapeM, Math.min(W - escapeM, head.x));
+          head.y = Math.max(escapeM, Math.min(H - escapeM, head.y));
+          if (game.clock - game.closedEdgeSaidAt > 4000) {
+            game.closedEdgeSaidAt = game.clock;
+            emit({ type: 'edge-closed', left: fruitLeft() });
+          }
+        } else {
+          const out = { north: [0, -1], south: [0, 1], west: [-1, 0], east: [1, 0] }[edge];
+          game.leaving = { edge, dx: out[0], dy: out[1] };
+          emit({ type: 'leaving', edge });
+        }
+      }
+      if (game.leaving && snake.segments.every((segment) =>
+        segment.x < -14 || segment.x > W + 14 || segment.y < -14 || segment.y > H + 14)) {
+        triggerWin(game.leaving.edge);
+        return;
+      }
+
+      // A fence stops the head, which slides along it; and the snake grows with what it carries.
+      game.touchedWall = rules.pushOut(head, 8) || (atEdge && !game.leaving);
+      while (snake.segments.length < Math.max(20, snake.count + carry.grow - game.shedSegments)) {
+        const tail = snake.segments[snake.segments.length - 1];
+        snake.segments.push({ x: tail.x, y: tail.y });
+      }
+
+      // Body chain constraint
+      for (let i = 1; i < snake.segments.length; i++) {
+        const prev = snake.segments[i-1];
+        const curr = snake.segments[i];
+        const dx = curr.x - prev.x;
+        const dy = curr.y - prev.y;
+        const d = Math.hypot(dx, dy) || 1;
+        if (d > snake.segLen) {
+          const t = snake.segLen / d;
+          curr.x = prev.x + dx * t;
+          curr.y = prev.y + dy * t;
+        }
+      }
+
+      // Collision checks
+      checkAppleCollection();
+      checkEagleStrikeHit();
+    }
+
+    // ================= COLLISION / GAME EVENTS =================
+    function checkAppleCollection() {
+      const head = snake.segments[0];
+      for (let i = 0; i < apples.length; i++) {
+        const a = apples[i];
+        const d = Math.hypot(head.x - a.x, head.y - a.y);
+        if (d < APPLE_PICKUP_RADIUS) {
+          spawnPickupBurst(a.x, a.y);
+          game.score++;
+          updateScoreDisplay();
+          takeFruit(i);
+          emit({ type: 'pickup', score: game.score, left: fruitLeft() });
+          checkBare();
+          break;   // one pickup per frame is fine
+        }
+      }
+    }
+
+    function checkEagleStrikeHit() {
+      // Death window: while eagle is in 'strike' state, first ~120ms.
+      // The strike lands at the LOCKED target — player can dodge. Any head under it is taken:
+      // a rival's is carried off, the player's ends the flight.
+      if (eagle.state !== 'strike' || eagle.stateTime > 120) return;
+      const sx = eagle.targetX || eagle.x;
+      const sy = eagle.targetY || eagle.y;
+      for (let i = rivals.length - 1; i >= 0; i--) {
+        const rivalHead = rivals[i].segments[0];
+        if (Math.hypot(rivalHead.x - sx, rivalHead.y - sy) < tune.strikeRadius) takeRival(i);
+      }
+      for (let i = decoys.length - 1; i >= 0; i--) {
+        if (decoys[i].segments.some((s) => Math.hypot(s.x - sx, s.y - sy) < tune.strikeRadius)) takeDecoy(i);
+      }
+      if (game.leaving) return;
+      const head = snake.segments[0];
+      const d = Math.hypot(head.x - sx, head.y - sy);
+      if (d < tune.strikeRadius) triggerDeath();
+    }
+
+    function spawnPickupBurst(x, y) {
+      if (reducedMotion) return;
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 50 + Math.random() * 90;
+        particles.push({
+          x, y,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 550, maxLife: 550,
+          color: i % 2 === 0 ? T.apple : (T.appleLeaf.startsWith('#') ? T.appleLeaf : T.apple),
+          size: 1.5 + Math.random() * 1,
+        });
+      }
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 380, maxLife: 380,
+        ring: true, radius: 4,
+        color: T.apple,
+      });
+    }
+
+    function spawnDeathBurst(x, y) {
+      if (reducedMotion) return;
+      for (let i = 0; i < 30; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = 90 + Math.random() * 180;
+        particles.push({
+          x, y,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 900, maxLife: 900,
+          color: i % 3 === 0 ? '#ffffff' : (i % 3 === 1 ? T.snakeHead : T.snakeTail),
+          size: 2 + Math.random() * 2,
+        });
+      }
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 700, maxLife: 700,
+        ring: true, radius: 6,
+        color: '#ffffff',
+      });
+    }
+
+    /** @param {'bird' | 'rival' | 'peck' | 'self'} [cause] what ended the flight */
+    function triggerDeath(cause = 'bird') {
+      if (game.state !== 'playing') return;
+      game.state = 'dead';
+      game.overOffTime = 0;
+      game.canRestart = false;
+      const head = snake.segments[0];
+      spawnDeathBurst(head.x, head.y);
+      // As in snake(6), being caught is worth nothing: only an escape can set a best.
+      emit({ type: 'caught', score: game.score, cause });
+      if (controlled()) return;
+      showOverlay('dead',
+        'CAUGHT',
+        game.score === 0 ? 'no apples secured' : `lost ${game.score} apple${game.score === 1 ? '' : 's'}`,
+        'press any key');
+    }
+
+    function triggerWin(edge) {
+      if (game.state !== 'playing') return;
+      game.state = 'won';
+      game.overOffTime = 0;
+      game.canRestart = false;
+      if (game.score > game.bestScore) {
+        game.bestScore = game.score;
+        try { localStorage.setItem(BEST_KEY, String(game.bestScore)); } catch(e) {}
+        updateScoreDisplay();
+      }
+      emit({ type: 'escape', score: game.score, edge });
+      if (controlled()) return;
+      const msg = game.score === 0
+        ? 'escaped empty-handed'
+        : `${game.score} apple${game.score === 1 ? '' : 's'} secured`;
+      showOverlay('win', 'ESCAPED', msg, 'press any key');
+    }
+
+    function showOverlay(cls, title, sub, instr) {
+      gameOverlay.innerHTML = `
+        <div class="go-title ${cls}">${title}</div>
+        <div class="go-sub">${sub}</div>
+        <div class="go-instr">${instr}</div>
+      `;
+      // Delay the "visible" class so the fade in feels intentional,
+      // AND delay canRestart briefly so player can't skip the end screen instantly
+      setTimeout(() => gameOverlay.classList.add('visible'), 40);
+      setTimeout(() => { game.canRestart = true; }, 550);
+    }
+
+    function hideOverlay() {
+      gameOverlay.classList.remove('visible');
+      gameOverlay.innerHTML = '';
+    }
+
+    function updateScoreDisplay() {
+      scoreLabel.textContent = game.score;
+      bestLabel.textContent = game.bestScore;
+    }
+    updateScoreDisplay();
+
+    function restartGame() {
+      game.state = 'playing';
+      game.score = 0;
+      updateScoreDisplay();
+      hideOverlay();
+
+      game.rivalsAte = 0;
+      game.rivalsTaken = 0;
+      game.rivalsCutOff = 0;
+      game.withered = 0;
+      game.pecks = 0;
+      game.huntersAte = 0;
+      game.shedSegments = 0;
+      game.shedReadyAt = 0;
+      decoys.length = 0;
+      game.bare = false;
+      game.divesSinceBare = 0;
+      game.leaving = null;
+      game.closedEdgeSaidAt = -Infinity;
+      game.clock = 0;
+
+      // Reset snake (at the region's start: below its fence, if it has one)
+      snake.segments.length = 0;
+      for (let i = 0; i < snake.count; i++) {
+        snake.segments.push({ x: rules.start.x - i * snake.segLen, y: rules.start.y });
+      }
+      snake.dx = 1; snake.dy = 0;
+      input.dx = 1; input.dy = 0;
+
+      // Reset apples, and the rivals come in from their corners
+      initApples();
+      rivals.length = 0;
+      for (let i = 0; i < rules.rivals; i++) {
+        const rival = rules.makeRival(i);
+        if (rival) rivals.push(rival);
+      }
+      hunters.length = 0;
+      for (let i = 0; i < rules.hunters; i++) {
+        const hunter = rules.makeHunter(i);
+        if (hunter) hunters.push(hunter);
+      }
+
+      // Reset eagle to non-threatening state, far from player
+      eagle.x = 120; eagle.y = 100;
+      eagle.vx = 100; eagle.vy = 30;
+      eagle.altitude = 0.8;
+      eagle.state = 'glide';
+      eagle.stateTime = -tune.firstDelay;   // negative so first lock is delayed further
+      eagle.patience = drawPatience();
+      eagle.wingPhase = 0;
+      eagle.targetX = 0;
+      eagle.targetY = 0;
+      eagle.quarry = null;
+      eagle.lookAgainIn = 0;
+      stateLabel.textContent = 'GLIDE';
+
+      // Clear particles
+      particles.length = 0;
+    }
+
+    function renderSnake(time) {
+      renderSerpent(snake.segments, snake.dx, snake.dy, {
+        head: T.snakeHead, tail: T.snakeTail, glow: T.snakeGlow, glowRadius: T.snakeGlowRadius,
+        pulse: T.snakePulseColor, eyeWhite: T.snakeEyeWhite, eyeColor: T.snakeEyeColor,
+        tongue: T.snakeTongue, additive: T.composite === 'lighter', flat: Boolean(rules.flatBody),
+      }, time, 1);
+    }
+
+    /** Draws a snake: the player's, or a rival's (smaller, in its own colours). */
+    function renderSerpent(segments, headDx, headDy, look, time, scale) {
+      const N = segments.length;
+      const positions = [];
+      for (let i = 0; i < N; i++) {
+        const seg = segments[i];
+        let px, py;
+        if (i === 0) { px = -headDy; py = headDx; }
+        else {
+          const prev = segments[i-1];
+          const dx = prev.x - seg.x;
+          const dy = prev.y - seg.y;
+          const d = Math.hypot(dx, dy) || 1;
+          px = -dy / d; py = dx / d;
+        }
+        const wave = 3.2 * scale * Math.sin(time * 0.006 + i * 0.35) * (1 - (i / N) * 0.35);
+        positions.push({
+          x: seg.x + px * wave,
+          y: seg.y + py * wave,
+          r: look.flat ? 9 * scale : Math.max(1.5, (11 - i * 0.16) * scale),
+          t: i / (N - 1),
+          nx: -px, ny: -py,        // tangent (approx)
+        });
+      }
+
+      // ---- SINGLE-PASS BODY GLOW ----
+      // Draw the whole body as one stroke path with shadow — canvas performs
+      // one blur op instead of one per segment (45 blurs → 1 blur). Same
+      // visual halo, dramatically cheaper on high-glow themes (Neon Grid,
+      // Midnight, Aztec, Jungle, River).
+      ctx.save();
+      if (look.additive) ctx.globalCompositeOperation = 'lighter';
+      ctx.shadowBlur = look.glowRadius;
+      ctx.shadowColor = look.glow;
+      ctx.strokeStyle = look.head;
+      ctx.lineWidth = 20 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const p = positions[i];
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // ---- SEGMENT FILLS (no shadow — cheap, provides taper + gradient detail) ----
+      ctx.save();
+      if (look.additive) ctx.globalCompositeOperation = 'lighter';
+      for (let i = N - 1; i >= 0; i--) {
+        const p = positions[i];
+        ctx.fillStyle = lerpColor(look.head, look.tail, p.t);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Origami paper fold shading (subtle darker line down center)
+      if (T.paperFold) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(80,50,60,0.35)';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        for (let i = 0; i < N; i++) {
+          const p = positions[i];
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Muscle-pulse highlight
+      ctx.save();
+      if (look.additive) ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < N; i++) {
+        const p = positions[i];
+        const pulse = 0.5 + 0.5 * Math.sin(time * 0.006 + i * 0.45);
+        ctx.fillStyle = look.pulse.replace(/[\d.]+\)$/, (m) => (parseFloat(m) * pulse).toFixed(2) + ')');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Head detail (a shed tail has none)
+      if (look.headless) return;
+      const head = positions[0];
+      ctx.save();
+      ctx.translate(head.x, head.y);
+      ctx.rotate(Math.atan2(headDy, headDx));
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = look.eyeWhite;
+      ctx.beginPath();
+      ctx.arc(2, -4, 2.6, 0, Math.PI * 2);
+      ctx.arc(2,  4, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = look.eyeColor;
+      ctx.beginPath();
+      ctx.arc(3.4, -4, 1.4, 0, Math.PI * 2);
+      ctx.arc(3.4,  4, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Vertical slit pupil (only when eyes have color contrast to black)
+      if (look.eyeColor !== '#000000') {
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(3.4, -5.2); ctx.lineTo(3.4, -2.8);
+        ctx.moveTo(3.4,  2.8); ctx.lineTo(3.4,  5.2);
+        ctx.stroke();
+      }
+
+      // Tongue flick
+      const flick = Math.sin(time * 0.0032);
+      if (flick > 0.7) {
+        const extend = (flick - 0.7) / 0.3;
+        ctx.strokeStyle = look.tongue;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(9, 0);
+        ctx.lineTo(11 + extend * 6, -1.5);
+        ctx.moveTo(9, 0);
+        ctx.lineTo(11 + extend * 6,  1.5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // ================= APPLES (multiple) =================
+    // The number of apples on the ground comes from the region's temperament (tune).
+    const APPLE_PICKUP_RADIUS = 16;
+    const apples = [];
+    // Smaller snakes after the same harvest (see RIVALS below); declared here, before the first
+    // fruit is placed, since fruit is placed away from their heads too.
+    const rivals = [];
+    /** Rivals are drawn (and touch) at this scale of the player's snake. */
+    const RIVAL_SCALE = 0.68;
+
+    function spawnApple() {
+      const margin = 60;
+      const spot = () => ({ x: margin + rand() * (W - margin * 2), y: margin + rand() * (H - margin * 2) });
+      // Try a few spots clear of the fence; keep the one farthest from every head, the player's
+      // and the rivals', so no snake finds new fruit waiting at its nose, and from the other fruit.
+      const heads = [snake.segments[0], ...rivals.map((rival) => rival.segments[0]), ...apples];
+      let best = null;
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const { x, y } = spot();
+        if (!rules.isClear(x, y, 28) || (game.fruitSpot && !game.fruitSpot(x, y))) continue;
+        const d = Math.min(...heads.map((h) => Math.hypot(x - h.x, y - h.y)));
+        if (d > 90 && (!best || d > best.d)) {
+          best = { x, y, d };
+        }
+      }
+      let pos = best;
+      for (let attempt = 0; !pos && attempt < 40; attempt++) {
+        const candidate = spot();
+        if (rules.isClear(candidate.x, candidate.y, 28) && (!game.fruitSpot || game.fruitSpot(candidate.x, candidate.y))) pos = candidate;
+      }
+      pos = pos || spot();
+      return {
+        x: pos.x,
+        y: pos.y,
+        spin: Math.random() * Math.PI * 2,
+        bob: Math.random() * Math.PI * 2,
+        age: 0,
+      };
+    }
+
+    function initApples() {
+      apples.length = 0;
+      const onTheField = Math.min(rules.appleCount ?? tune.appleCount, rules.harvest);
+      for (let i = 0; i < onTheField; i++) apples.push(spawnApple());
+      game.harvestLeft = rules.harvest - onTheField;
+    }
+    initApples();
+
+    /** The fruit at index i is taken: the next of the harvest grows in its place, while any is left. */
+    function takeFruit(i) {
+      if (game.harvestLeft > 0) {
+        game.harvestLeft--;
+        apples[i] = spawnApple();
+      } else {
+        apples.splice(i, 1);
+      }
+    }
+
+    /** Fruit still to be had: on the field and still to come. */
+    function fruitLeft() {
+      return apples.length + game.harvestLeft;
+    }
+
+    /** The last fruit is gone: the bird turns ravenous and the rivals leave. */
+    function checkBare() {
+      if (game.bare || fruitLeft() > 0) return;
+      game.bare = true;
+      if (eagle.state === 'glide') {
+        eagle.patience = Math.min(eagle.patience, Math.max(0, eagle.stateTime) + 500);
+      }
+      emit({ type: 'bare' });
+    }
+
+    // ================= RIVALS (added in the collection) =================
+    // Smaller snakes after the same harvest: src/rivals.mjs moves them, the page counts what they
+    // eat and draws them. They never harm the player, and the bird hunts only the player.
+
+    // ================= CONTACT (added in the collection) =================
+    // A head that runs into another snake's body ends that snake: the player's flight, or a
+    // rival's run. The first segments behind a head are its neck, not body; nobody runs into
+    // its own body here (only the Grow challenge counts that).
+    const NECK = 3;
+
+    function bodyRadius(index, scale) {
+      return Math.max(1.5, (11 - index * 0.16) * scale) * 0.8;
+    }
+
+    /** True when a head of radius `reach` touches the body of a snake drawn at `scale`. */
+    function touchesBody(head, reach, segments, scale) {
+      for (let i = NECK; i < segments.length; i++) {
+        const s = segments[i];
+        const r = reach + bodyRadius(i, scale);
+        const dx = s.x - head.x;
+        const dy = s.y - head.y;
+        if (dx > -r && dx < r && dy > -r && dy < r && dx * dx + dy * dy < r * r) return true;
+      }
+      return false;
+    }
+
+    /** Every snake's body as points with a radius, for the rivals to steer round. */
+    function bodiesOnTheField() {
+      const points = [];
+      const add = (owner, segments, scale) => {
+        for (let i = NECK; i < segments.length; i += 2) {
+          points.push({ owner, x: segments[i].x, y: segments[i].y, r: bodyRadius(i, scale) });
+        }
+      };
+      if (!game.leaving) add(null, snake.segments, 1);
+      for (const rival of rivals) add(rival, rival.segments, RIVAL_SCALE);
+      for (const decoy of decoys) add(decoy, decoy.segments, 1);
+      return points;
+    }
+
+    function checkContacts() {
+      if (game.state !== 'playing' || !rules.contactKills) return;
+      for (let i = rivals.length - 1; i >= 0; i--) {
+        const head = rivals[i].segments[0];
+        const intoYou = (!game.leaving && touchesBody(head, 4, snake.segments, 1))
+          || decoys.some((decoy) => touchesBody(head, 4, decoy.segments, 1));
+        const intoRival = rivals.some((other, j) => j !== i && touchesBody(head, 4, other.segments, RIVAL_SCALE));
+        if (intoYou || intoRival) cutOffRival(i, intoYou);
+      }
+      if (game.leaving) return;
+      const head = snake.segments[0];
+      if (rivals.some((rival) => touchesBody(head, 6, rival.segments, RIVAL_SCALE))) triggerDeath('rival');
+      // Only Fill the Field counts running into yourself; well past the neck, so a U-turn is safe.
+      if (rules.selfCollision) {
+        for (let i = 16; i < snake.segments.length; i++) {
+          const s = snake.segments[i];
+          if (Math.hypot(s.x - head.x, s.y - head.y) < 11) {
+            triggerDeath('self');
+            return;
+          }
+        }
+      }
+    }
+
+    /** A rival ran into a body: it is out, and what it ate spills back (up to two fruit). */
+    function cutOffRival(index, byYou) {
+      const [rival] = rivals.splice(index, 1);
+      rival.gone = true;
+      if (byYou) game.rivalsCutOff++;
+      if (!game.bare) {
+        const spill = Math.min(2, rival.ate);
+        for (let k = 0; k < spill; k++) {
+          const at = rival.segments[Math.min(rival.segments.length - 1, 4 + k * 8)];
+          if (rules.isClear(at.x, at.y, 20) && at.x > 30 && at.x < W - 30 && at.y > 30 && at.y < H - 30) {
+            apples.push({ x: at.x, y: at.y, spin: Math.random() * Math.PI * 2, bob: Math.random() * Math.PI * 2, age: 0 });
+          }
+        }
+      }
+      const look = RIVAL_LOOK[currentTheme] ?? RIVAL_LOOK.savanna;
+      const head = rival.segments[0];
+      particles.push({ x: head.x, y: head.y, vx: 0, vy: 0, life: 450, maxLife: 450, ring: true, radius: 4, color: look.head });
+      emit({ type: 'rival-out', byYou, rivalsCutOff: game.rivalsCutOff, left: fruitLeft() });
+    }
+
+    function updateRivals(dt) {
+      if (game.state !== 'playing') return;
+      const bodies = rules.contactKills ? bodiesOnTheField() : [];
+      for (let i = rivals.length - 1; i >= 0; i--) {
+        const rival = rivals[i];
+        const hunted = eagle.quarry === rival && (eagle.state === 'lock' || eagle.state === 'dive');
+        const world = { apples, bare: game.bare, width: W, height: H, random: rand, hunted, bodies };
+        const eaten = rules.stepRival(rival, world, dt);
+        if (eaten >= 0) {
+          game.rivalsAte++;
+          takeFruit(eaten);
+          emit({ type: 'rival-ate', rivalsAte: game.rivalsAte, left: fruitLeft() });
+          checkBare();
+        }
+        if (rival.gone) rivals.splice(i, 1);
+      }
+    }
+
+    /** The strike found a rival: the bird carries it off. */
+    function takeRival(index) {
+      const [rival] = rivals.splice(index, 1);
+      rival.gone = true;
+      game.rivalsTaken++;
+      const look = RIVAL_LOOK[currentTheme] ?? RIVAL_LOOK.savanna;
+      const head = rival.segments[0];
+      if (!reducedMotion) {
+        for (let i = 0; i < 18; i++) {
+          const a = (i / 18) * Math.PI * 2;
+          const speed = 60 + Math.random() * 110;
+          particles.push({
+            x: head.x, y: head.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
+            life: 650, maxLife: 650, color: i % 2 ? look.head : look.tail, size: 1.6 + Math.random(),
+          });
+        }
+      }
+      particles.push({ x: head.x, y: head.y, vx: 0, vy: 0, life: 500, maxLife: 500, ring: true, radius: 5, color: look.head });
+      emit({ type: 'rival-taken', rivalsTaken: game.rivalsTaken });
+    }
+
+    function renderRivals(time) {
+      const look = RIVAL_LOOK[currentTheme] ?? RIVAL_LOOK.savanna;
+      for (const rival of rivals) {
+        renderSerpent(rival.segments, rival.dx, rival.dy, {
+          head: look.head, tail: look.tail, glow: 'rgba(0,0,0,0.25)', glowRadius: 4,
+          pulse: 'rgba(255,255,255,0.16)', eyeWhite: '#ffffff', eyeColor: '#000000',
+          tongue: T.snakeTongue, additive: false,
+        }, time + rival.index * 900, RIVAL_SCALE);
+      }
+    }
+
+    // ================= CHALLENGES (added in the collection) =================
+    // A challenge (src/challenges.mjs) plays on this handle every step and draws its own marks:
+    // it can read the field, take fruit, send in hunters and rivals, wake or rouse the bird, say
+    // things over the field, and end the game.
+    const modeApi = {
+      state: {},
+      get snake() { return snake.segments; },
+      get heading() { return { dx: snake.dx, dy: snake.dy }; },
+      get apples() { return apples; },
+      get rivals() { return rivals; },
+      get hunters() { return hunters; },
+      get carried() { return game.score; },
+      set carried(count) { game.score = count; updateScoreDisplay(); },
+      get clock() { return game.clock; },
+      get size() { return { width: W, height: H }; },
+      get reducedMotion() { return reducedMotion; },
+      get touchedWall() { return game.touchedWall; },
+      random: () => rand(),
+      say(text, ms = 2500) { emit({ type: 'mode-say', text, ms }); },
+      finish(reason) { finishChallenge(reason); },
+      setBirdAwake(awake) { game.birdAsleep = !awake; },
+      setBirdHunger(factor) { game.birdHunger = factor; },
+      quickenDives(factor) { game.diveQuickening = factor; },
+      setFruitSpot(test) { game.fruitSpot = test; },
+      addHunter() {
+        const hunter = rules.makeHunter(hunters.length);
+        if (!hunter) return;
+        hunter.state = 'stalk';
+        hunter.stateTime = 0;
+        hunters.push(hunter);
+      },
+      addRival() {
+        const rival = rules.makeRival(rivals.length % 3);
+        if (rival) rivals.push(rival);
+      },
+      spawnFruitAt(x, y) {
+        const fx = Math.min(W - 40, Math.max(40, x));
+        const fy = Math.min(H - 40, Math.max(40, y));
+        if (!rules.isClear(fx, fy, 24) || (game.fruitSpot && !game.fruitSpot(fx, fy))) return;
+        apples.push({ x: fx, y: fy, spin: Math.random() * Math.PI * 2, bob: Math.random() * Math.PI * 2, age: 0 });
+      },
+      collectFruit(index) {
+        const [fruit] = apples.splice(index, 1);
+        spawnPickupBurst(fruit.x, fruit.y);
+        game.score++;
+        updateScoreDisplay();
+        emit({ type: 'pickup', score: game.score, left: fruitLeft() });
+      },
+      removeRival(index) {
+        const [rival] = rivals.splice(index, 1);
+        rival.gone = true;
+        const head = rival.segments[0];
+        particles.push({ x: head.x, y: head.y, vx: 0, vy: 0, life: 450, maxLife: 450, ring: true, radius: 4, color: '#d8f070' });
+      },
+      /** True when the head is within `distance` of a fence, an edge, a rival's body or a hunter. */
+      closeCall(distance) {
+        const head = snake.segments[0];
+        if (head.x < distance || head.y < distance || head.x > W - distance || head.y > H - distance) return true;
+        if (!rules.isClear(head.x, head.y, distance)) return true;
+        if (hunters.some((h) => Math.hypot(h.x - head.x, h.y - head.y) < distance + 10)) return true;
+        return rivals.some((rival) => rival.segments.some((s) => Math.hypot(s.x - head.x, s.y - head.y) < distance));
+      },
+    };
+
+    /** A challenge has come to its end (time up, or the field full): over, and not a catch. */
+    function finishChallenge(reason) {
+      if (game.state !== 'playing') return;
+      game.state = 'won';
+      game.overOffTime = 0;
+      game.canRestart = false;
+      emit({ type: 'challenge-over', reason });
+    }
+
+    // ================= SHEDDING THE TAIL (added in the collection) =================
+    // Space sheds the last third of the snake, which wriggles where it fell for a few seconds:
+    // the hunters and the bird may go for it instead, and a rival running into it is cut off.
+    // It costs a third of the fruit carried (rounded up), and can be done again after a while.
+    const decoys = [];
+    const SHED_COOLDOWN_MS = 15000;
+    const DECOY_MS = 6000;
+
+    function shedTail() {
+      if (game.state !== 'playing' || game.leaving || !rules.canShed) return false;
+      if (game.clock < game.shedReadyAt) return false;
+      const length = snake.segments.length;
+      const keep = Math.max(24, Math.ceil((length * 2) / 3));
+      if (length - keep < 8) return false;
+      const tail = snake.segments.splice(keep);
+      game.shedSegments += tail.length;
+      const lost = Math.ceil(game.score / 3);
+      game.score -= lost;
+      updateScoreDisplay();
+      const away = { dx: tail[0].x - tail[1].x, dy: tail[0].y - tail[1].y };
+      const size = Math.hypot(away.dx, away.dy) || 1;
+      decoys.push({ decoy: true, gone: false, segments: tail, until: game.clock + DECOY_MS,
+        dx: away.dx / size, dy: away.dy / size });
+      game.shedReadyAt = game.clock + SHED_COOLDOWN_MS;
+      emit({ type: 'shed', lost, score: game.score });
+      return true;
+    }
+
+    function updateDecoys() {
+      for (let i = decoys.length - 1; i >= 0; i--) {
+        if (game.clock < decoys[i].until) continue;
+        decoys[i].gone = true;
+        decoys.splice(i, 1);
+      }
+    }
+
+    /** A shed tail taken by the bird or eaten by a hunter. */
+    function takeDecoy(index) {
+      const [decoy] = decoys.splice(index, 1);
+      decoy.gone = true;
+      const at = decoy.segments[0];
+      particles.push({ x: at.x, y: at.y, vx: 0, vy: 0, life: 450, maxLife: 450, ring: true, radius: 4, color: T.snakeTail });
+      emit({ type: 'decoy-taken' });
+    }
+
+    function renderDecoys(time) {
+      for (const decoy of decoys) {
+        const fading = Math.min(1, (decoy.until - game.clock) / 800);
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, fading);
+        renderSerpent(decoy.segments, decoy.dx, decoy.dy, {
+          head: T.snakeTail.startsWith('#') ? T.snakeTail : '#556b2f', tail: T.snakeTail.startsWith('#') ? T.snakeTail : '#556b2f',
+          glow: T.snakeGlow, glowRadius: T.snakeGlowRadius * 0.5, pulse: T.snakePulseColor,
+          eyeWhite: T.snakeEyeWhite, eyeColor: T.snakeEyeColor, tongue: T.snakeTongue,
+          additive: T.composite === 'lighter', headless: true,
+        }, time * (reducedMotion ? 0 : 2.2), 0.8);
+        ctx.restore();
+      }
+    }
+
+    // ================= GROUND HUNTERS (added in the collection) =================
+    // A bird of the region that hunts on foot (src/hens.mjs moves it): it walks after the
+    // nearest snake, warns with a bob of the head, and pecks. A peck on the player's head ends
+    // the flight; on the body it knocks a fruit loose. It freezes while the flying bird is low
+    // overhead, and pecks up fruit in its way.
+    const hunters = [];
+
+    /** The snakes a hunter may go for: heads and bodies, the player's unless it is on its way out. */
+    function snakesForHunters() {
+      const sample = (segments) => segments.filter((_, i) => i >= NECK && i % 2 === 0);
+      const list = [];
+      if (!game.leaving) list.push({ quarry: null, head: snake.segments[0], body: sample(snake.segments) });
+      for (const rival of rivals) list.push({ quarry: rival, head: rival.segments[0], body: sample(rival.segments) });
+      for (const decoy of decoys) list.push({ quarry: decoy, head: decoy.segments[0], body: sample(decoy.segments) });
+      return list;
+    }
+
+    function updateHunters(dt) {
+      if (game.state !== 'playing' || !hunters.length) return;
+      const world = {
+        snakes: snakesForHunters(),
+        apples,
+        width: W,
+        height: H,
+        // Low overhead, the flying bird's shadow sends a hunter stock-still.
+        shadow: eagle.altitude < 0.7 ? { x: eagle.x, y: eagle.y } : null,
+      };
+      for (const hunter of hunters) {
+        const outcome = rules.stepHunter(hunter, world, dt);
+        if (!outcome) continue;
+        if (outcome.peck) landPeck(outcome.peck, hunter);
+        if (outcome.graze !== undefined && apples[outcome.graze]) {
+          game.huntersAte++;
+          takeFruit(outcome.graze);
+          emit({ type: 'hunter-ate', left: fruitLeft() });
+          checkBare();
+        }
+        if (game.state !== 'playing') return;
+      }
+    }
+
+    /** A peck came down at `point`: whatever head or body is under the beak feels it. */
+    function landPeck(point, hunter) {
+      const BEAK = 9;
+      // A shed tail under the beak is eaten, and the peck goes no further.
+      const decoy = decoys.findIndex((d) => d.segments.some((s) => Math.hypot(s.x - point.x, s.y - point.y) < BEAK + 8));
+      if (decoy >= 0) {
+        takeDecoy(decoy);
+        return;
+      }
+      for (let i = rivals.length - 1; i >= 0; i--) {
+        const rival = rivals[i];
+        const head = rival.segments[0];
+        if (Math.hypot(head.x - point.x, head.y - point.y) < BEAK + 4) {
+          cutOffRival(i, false);
+        } else if (touchesBody(point, BEAK, rival.segments, RIVAL_SCALE)) {
+          rival.fullUntil = rival.clock + 1200;
+        }
+      }
+      if (game.leaving) return;
+      const head = snake.segments[0];
+      if (Math.hypot(head.x - point.x, head.y - point.y) < BEAK + 6) {
+        triggerDeath('peck');
+        return;
+      }
+      if (touchesBody(point, BEAK, snake.segments, 1)) {
+        game.pecks++;
+        if (game.score > 0) {
+          game.score--;
+          updateScoreDisplay();
+          // The hunter goes straight for the fruit it knocked loose: the snake's moment to go.
+          hunter.lure = dropFruitNear(point);
+        }
+        if (!reducedMotion) spawnPickupBurst(point.x, point.y);
+        emit({ type: 'pecked', score: game.score, left: fruitLeft(), pecks: game.pecks });
+      }
+    }
+
+    /** A fruit knocked loose withers sooner than one grown on the field, so the harvest still ends. */
+    const DROPPED_FRUIT_LIFE_MS = 12000;
+
+    /** A fruit knocked loose lands a short hop away, somewhere a snake can reach it; returns it. */
+    function dropFruitNear(point) {
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const angle = rand() * Math.PI * 2;
+        const hop = 40 + rand() * 40;
+        const x = Math.min(W - 40, Math.max(40, point.x + Math.cos(angle) * hop));
+        const y = Math.min(H - 40, Math.max(40, point.y + Math.sin(angle) * hop));
+        if (!rules.isClear(x, y, 22)) continue;
+        const fruit = { x, y, spin: Math.random() * Math.PI * 2, bob: Math.random() * Math.PI * 2, age: 0, life: DROPPED_FRUIT_LIFE_MS };
+        apples.push(fruit);
+        return fruit;
+      }
+      return null;
+    }
+
+    function renderPeckWarnings() {
+      for (const hunter of hunters) {
+        if (hunter.state !== 'windup' || !hunter.aim) continue;
+        const t = Math.min(1, hunter.stateTime / 460);
+        ctx.save();
+        ctx.strokeStyle = `rgba(255, 80, 80, ${0.35 + 0.45 * t})`;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(hunter.aim.x, hunter.aim.y, 15 - 5 * t, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // How each region's hunter looks: side on, facing right (the page turns it round). Lengths
+    // in pixels before `scale`.
+    const HUNTER_LOOK = {
+      savanna: {
+        body: '#cbc9bf', back: '#a9a79c', wing: '#2b2b2b', tail: '#2b2b2b', legs: '#2b2b2b',
+        thigh: '#1d1d1d', neck: '#cbc9bf', head: '#cbc9bf', face: '#e8762c', beak: '#6f6e66',
+        eye: '#2a1d10', crest: 'quills', crestColor: '#1d1d1d', tailShape: 'long',
+        legLen: 24, neckLen: 9, neckW: 4.5, bodyW: 19, bodyH: 12, headR: 4.4, beakLen: 5, scale: 1.1,
+      },
+      river: {
+        body: '#bcc3cb', back: '#8f98a4', wing: '#6c7582', tail: '#8f98a4', legs: '#b8984e',
+        neck: '#e9ecef', head: '#eef0f2', beak: '#e2b22e', eye: '#e8c020', crest: 'plume',
+        crestColor: '#1d2127', tailShape: 'short',
+        legLen: 22, neckLen: 18, neckW: 3.6, bodyW: 18, bodyH: 11, headR: 3.6, beakLen: 9, scale: 1.1,
+      },
+      jungle: {
+        body: '#c8561e', back: '#a52c16', wing: '#7e2a12', tail: '#1b3b2b', tailSheen: '#3c7a5a',
+        legs: '#80868c', neck: '#e0862a', head: '#d8682a', face: '#d43a2a', beak: '#e2c472',
+        eye: '#e8a020', crest: 'comb', crestColor: '#d42a2a', wattle: '#d42a2a', tailShape: 'sickle',
+        legLen: 11, neckLen: 6, neckW: 6, bodyW: 18, bodyH: 14, headR: 4.4, beakLen: 3.5, scale: 1,
+      },
+      desert: {
+        body: '#dbbd8d', back: '#c9a676', wing: '#8a6a44', tail: '#c9a676', legs: '#efe3c8',
+        neck: '#dbbd8d', head: '#dbbd8d', beak: '#3a2a1a', eye: '#1a1a1a', crest: 'stripe',
+        tailShape: 'short',
+        legLen: 18, neckLen: 6, neckW: 4.5, bodyW: 16, bodyH: 11, headR: 4, beakLen: 5, scale: 0.95,
+      },
+      'neon-grid': {
+        outline: true, line: '#29f3e0', glow: '#29f3e0', crestColor: '#ff2bd6', wattle: '#ff2bd6',
+        beak: '#ffd23f', eye: '#ffffff', legs: '#29f3e0', crest: 'comb', tailShape: 'sickle',
+        legLen: 11, neckLen: 6, neckW: 2, bodyW: 18, bodyH: 14, headR: 4.4, beakLen: 3.5, scale: 1,
+      },
+      aztec: {
+        body: '#5b3b22', back: '#3f2a18', wing: '#7b5a35', tail: '#6b4a2a', tailBars: '#d0a660',
+        legs: '#c8907e', neck: '#7aaed6', head: '#86b8de', beak: '#dccca6', eye: '#1a1a1a',
+        crest: 'snood', crestColor: '#cf2230', wattle: '#cf2230', tailShape: 'fan',
+        legLen: 12, neckLen: 8, neckW: 4, bodyW: 22, bodyH: 16, headR: 3.8, beakLen: 3.5, scale: 1.15,
+      },
+      origami: {
+        paper: true, body: '#f6f1e6', back: '#e3ddcf', wing: '#d8d0bf', tail: '#ece6d8', fold: '#b8ad98',
+        legs: '#e8986a', neck: '#f6f1e6', head: '#f6f1e6', beak: '#f0b050', eye: '#2a2a2a',
+        crest: 'comb', crestColor: '#ff7a7a', wattle: '#ff7a7a', tailShape: 'paper',
+        legLen: 10, neckLen: 5, neckW: 6, bodyW: 18, bodyH: 14, headR: 4.4, beakLen: 4, scale: 1,
+      },
+      midnight: {
+        body: '#d8dce6', back: '#2d3752', wing: '#3b4662', tail: '#2d3752', legs: '#d9c25e',
+        neck: '#d8dce6', head: '#1b2338', beak: '#151515', eye: '#e8203a', crest: 'plume-white',
+        crestColor: '#f2f4f8', tailShape: 'short',
+        legLen: 12, neckLen: 3, neckW: 7, bodyW: 19, bodyH: 13, headR: 4.8, beakLen: 6, scale: 1.05,
+      },
+    };
+
+    function renderHunters(time) {
+      const look = HUNTER_LOOK[rules.hunterKind];
+      if (!look) return;
+      for (const hunter of hunters) drawHunter(hunter, look, time);
+    }
+
+    /** One hunter, standing at (x, y) on the field, in its pose for what it is doing. */
+    function drawHunter(hunter, look, time) {
+      const walking = hunter.state === 'stalk';
+      const step = walking && !reducedMotion ? Math.sin(hunter.walk) : 0;
+      // The head: a nod when walking, a quick bob in the warning, down to the ground to peck.
+      let headDrop = walking ? Math.abs(step) * 1.4 : 0;
+      let headPush = 0;
+      if (hunter.state === 'windup') headDrop = reducedMotion ? 3 : 3 + 3 * Math.sin(hunter.stateTime * 0.05);
+      if (hunter.state === 'peck') {
+        const t = Math.min(1, hunter.stateTime / 140);
+        headDrop = 16 * t;
+        headPush = 6 * t;
+      }
+      if (hunter.state === 'graze') {
+        const t = reducedMotion ? 1 : 0.5 + 0.5 * Math.sin(hunter.stateTime * 0.03);
+        headDrop = 15 * t;
+        headPush = 4 * t;
+      }
+      if (hunter.state === 'frozen') headDrop = -2;
+      if (hunter.state === 'waiting') headDrop = 0;
+
+      const paint = (colour) => {
+        if (look.outline) {
+          ctx.strokeStyle = colour === look.crestColor || colour === look.wattle ? colour : look.line;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = colour;
+          ctx.fill();
+        }
+      };
+      const oval = (x, y, rx, ry, rotation, colour) => {
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, rotation, 0, Math.PI * 2);
+        paint(colour);
+      };
+
+      ctx.save();
+      ctx.translate(hunter.x, hunter.y);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+      ctx.beginPath();
+      ctx.ellipse(0, 1, 12 * look.scale, 3.5 * look.scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.scale(hunter.facing * look.scale, look.scale);
+      if (look.outline) {
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = look.glow;
+      }
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const bw = look.bodyW;
+      const bh = look.bodyH;
+      const hipY = -look.legLen;
+      const bodyY = hipY - bh * 0.35;
+
+      // Legs and toes, swinging as it walks.
+      ctx.strokeStyle = look.legs;
+      ctx.lineWidth = 2.1;
+      for (const side of [-1, 1]) {
+        const swing = step * 4 * side;
+        const footX = swing + side * 1.6;
+        ctx.beginPath();
+        ctx.moveTo(side * 1.6, hipY + 2);
+        ctx.lineTo(footX, 0);
+        ctx.lineTo(footX + 4, 0.6);
+        ctx.moveTo(footX, 0);
+        ctx.lineTo(footX - 2.5, 0.8);
+        ctx.stroke();
+      }
+      if (look.thigh) oval(0, hipY + 1, 4.5, 6.5, 0.1, look.thigh);
+
+      // The tail, behind the body (a fan stands up behind it).
+      const rearX = -bw * 0.42;
+      const rearY = bodyY - bh * 0.1;
+      drawHunterTail(look, rearX, rearY, bw, bh, time);
+
+      // Body, its darker back, and the folded wing.
+      if (look.paper) {
+        ctx.beginPath();
+        ctx.moveTo(-bw * 0.5, bodyY - bh * 0.15);
+        ctx.lineTo(-bw * 0.05, bodyY - bh * 0.55);
+        ctx.lineTo(bw * 0.48, bodyY - bh * 0.2);
+        ctx.lineTo(bw * 0.3, bodyY + bh * 0.5);
+        ctx.lineTo(-bw * 0.3, bodyY + bh * 0.45);
+        ctx.closePath();
+        paint(look.body);
+        ctx.strokeStyle = look.fold;
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(-bw * 0.05, bodyY - bh * 0.55);
+        ctx.lineTo(0, bodyY + bh * 0.48);
+        ctx.moveTo(-bw * 0.5, bodyY - bh * 0.15);
+        ctx.lineTo(bw * 0.3, bodyY + bh * 0.5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-bw * 0.3, bodyY - bh * 0.05);
+        ctx.lineTo(bw * 0.12, bodyY - bh * 0.25);
+        ctx.lineTo(bw * 0.05, bodyY + bh * 0.25);
+        ctx.closePath();
+        paint(look.wing);
+      } else {
+        oval(0, bodyY, bw / 2, bh / 2, -0.12, look.body);
+        if (!look.outline) oval(-1.5, bodyY - bh * 0.2, bw * 0.42, bh * 0.28, -0.12, look.back);
+        oval(-2.5, bodyY + 0.5, bw * 0.3, bh * 0.27, -0.25, look.wing);
+      }
+
+      // Neck and head: the neck runs from the front of the body up to the head, so the two are
+      // always joined, whatever the head is doing.
+      const neckX = bw * 0.3;
+      const neckY = bodyY - bh * 0.28;
+      const headX = neckX + 3 + look.neckLen * 0.45 + headPush;
+      const headY = neckY - look.neckLen - 2 + headDrop;
+      ctx.strokeStyle = look.outline ? look.line : look.neck;
+      ctx.lineWidth = look.neckW;
+      ctx.beginPath();
+      ctx.moveTo(neckX - 1, neckY + 2);
+      ctx.quadraticCurveTo(neckX + 1, (neckY + headY) / 2, headX - 1, headY + 1);
+      ctx.stroke();
+      drawHunterHead(look, headX, headY, hunter.state === 'peck' || hunter.state === 'graze');
+      ctx.restore();
+    }
+
+    function drawHunterTail(look, x, y, bw, bh, time) {
+      ctx.save();
+      if (look.outline) {
+        ctx.strokeStyle = look.line;
+        ctx.lineWidth = 1.4;
+      }
+      const fillOrLine = (colour) => {
+        if (look.outline) ctx.stroke();
+        else {
+          ctx.fillStyle = colour;
+          ctx.fill();
+        }
+      };
+      switch (look.tailShape) {
+        case 'long':
+          ctx.beginPath();
+          ctx.moveTo(x + 3, y - 2);
+          ctx.lineTo(x - 15, y + 8);
+          ctx.lineTo(x - 14, y + 10);
+          ctx.lineTo(x + 3, y + 3);
+          ctx.closePath();
+          fillOrLine(look.tail);
+          break;
+        case 'sickle':
+          ctx.lineWidth = look.outline ? 1.6 : 2.6;
+          for (let i = 0; i < 3; i++) {
+            ctx.strokeStyle = look.outline ? look.line : i === 1 ? look.tailSheen : look.tail;
+            ctx.beginPath();
+            ctx.moveTo(x + 2, y + 1 + i);
+            ctx.quadraticCurveTo(x - 9 - i * 2, y - 14 + i * 3, x - 13 - i * 2, y + 2 + i * 3);
+            ctx.stroke();
+          }
+          break;
+        case 'fan': {
+          const bars = 9;
+          for (let i = 0; i < bars; i++) {
+            const a = -Math.PI * 0.95 + (i / (bars - 1)) * Math.PI * 0.75;
+            ctx.beginPath();
+            ctx.moveTo(x + 3, y);
+            ctx.lineTo(x + 3 + Math.cos(a - 0.09) * 17, y + Math.sin(a - 0.09) * 17);
+            ctx.lineTo(x + 3 + Math.cos(a + 0.09) * 17, y + Math.sin(a + 0.09) * 17);
+            ctx.closePath();
+            fillOrLine(look.tail);
+            if (!look.outline) {
+              ctx.strokeStyle = look.tailBars;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.arc(x + 3, y, 14, a - 0.08, a + 0.08);
+              ctx.stroke();
+            }
+          }
+          break;
+        }
+        case 'paper':
+          ctx.beginPath();
+          ctx.moveTo(x + 3, y - 1);
+          ctx.lineTo(x - 7, y - 12);
+          ctx.lineTo(x - 3, y + 4);
+          ctx.closePath();
+          fillOrLine(look.tail);
+          ctx.strokeStyle = look.fold;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(x + 3, y - 1);
+          ctx.lineTo(x - 5, y - 6);
+          ctx.stroke();
+          break;
+        default:
+          ctx.beginPath();
+          ctx.moveTo(x + 3, y - 2);
+          ctx.lineTo(x - 7, y + 1);
+          ctx.lineTo(x + 3, y + 4);
+          ctx.closePath();
+          fillOrLine(look.tail);
+      }
+      ctx.restore();
+    }
+
+    function drawHunterHead(look, x, y, pecking) {
+      const r = look.headR;
+      const paint = (colour) => {
+        if (look.outline) {
+          ctx.strokeStyle = colour === look.crestColor || colour === look.wattle || colour === look.beak ? colour : look.line;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = colour;
+          ctx.fill();
+        }
+      };
+      // Crests that sit behind the head go first.
+      if (look.crest === 'quills') {
+        ctx.strokeStyle = look.crestColor;
+        ctx.lineWidth = 1.2;
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(x - r * 0.4, y - r * 0.3);
+          ctx.lineTo(x - r - 6 - i, y - r - 2 + i * 2.2);
+          ctx.stroke();
+        }
+      }
+      if (look.crest === 'plume' || look.crest === 'plume-white') {
+        ctx.strokeStyle = look.crestColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x - r * 0.5, y - r * 0.4);
+        ctx.quadraticCurveTo(x - r - 6, y - r - 2, x - r - 12, y + 2);
+        if (look.crest === 'plume-white') {
+          ctx.moveTo(x - r * 0.5, y - r * 0.2);
+          ctx.quadraticCurveTo(x - r - 5, y - r + 1, x - r - 10, y + 4);
+        }
+        ctx.stroke();
+      }
+      // The head itself, then what is on it.
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      paint(look.head);
+      if (look.face && !look.outline) {
+        ctx.beginPath();
+        ctx.ellipse(x + r * 0.25, y - r * 0.05, r * 0.55, r * 0.45, 0, 0, Math.PI * 2);
+        ctx.fillStyle = look.face;
+        ctx.fill();
+      }
+      if (look.crest === 'plume' && !look.outline) {
+        ctx.strokeStyle = look.crestColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(x + r * 0.5, y - r * 0.45);
+        ctx.lineTo(x - r * 0.8, y - r * 0.55);
+        ctx.stroke();
+      }
+      if (look.crest === 'stripe') {
+        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.beginPath();
+        ctx.moveTo(x + r * 0.4, y - r * 0.15);
+        ctx.lineTo(x - r * 1.1, y - r * 0.1);
+        ctx.stroke();
+        ctx.strokeStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(x + r * 0.3, y - r * 0.5);
+        ctx.lineTo(x - r * 1.1, y - r * 0.45);
+        ctx.stroke();
+      }
+      if (look.crest === 'comb') {
+        ctx.beginPath();
+        ctx.moveTo(x - r * 0.7, y - r * 0.6);
+        for (let i = 0; i < 3; i++) {
+          const cx = x - r * 0.5 + i * r * 0.55;
+          ctx.quadraticCurveTo(cx, y - r - 3.5, cx + r * 0.3, y - r * 0.75);
+        }
+        ctx.closePath();
+        paint(look.crestColor);
+      }
+      // The beak, opening a little to peck.
+      const base = x + r * 0.75;
+      const tipX = x + r + look.beakLen;
+      ctx.beginPath();
+      ctx.moveTo(base, y - 1.4);
+      ctx.lineTo(tipX, y + (pecking ? 1.4 : 0.6));
+      ctx.lineTo(base, y + 1.5);
+      ctx.closePath();
+      paint(look.beak);
+      if (look.crest === 'snood') {
+        ctx.strokeStyle = look.crestColor;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(x + r * 0.6, y - r * 0.4);
+        ctx.quadraticCurveTo(x + r + 2, y - r * 0.2, x + r + 2.5, y + 4);
+        ctx.stroke();
+      }
+      if (look.wattle) {
+        ctx.beginPath();
+        ctx.ellipse(x + r * 0.55, y + r * 0.85, 1.4, 2.4, 0.2, 0, Math.PI * 2);
+        paint(look.wattle);
+      }
+      if (look.crest === 'plume-white' && !look.outline) {
+        ctx.fillStyle = '#0d1322';
+        ctx.beginPath();
+        ctx.arc(x - 0.5, y - r * 0.35, r * 0.75, Math.PI, Math.PI * 2);
+        ctx.fill();
+      }
+      // The eye.
+      ctx.beginPath();
+      ctx.arc(x + r * 0.3, y - r * 0.2, Math.max(0.9, r * 0.24), 0, Math.PI * 2);
+      ctx.fillStyle = look.eye;
+      ctx.fill();
+      if (!look.outline) {
+        ctx.beginPath();
+        ctx.arc(x + r * 0.36, y - r * 0.26, 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.fill();
+      }
+    }
+
+    // ================= THE WAYS OUT (added in the collection) =================
+    // While fruit is left the edges are closed, drawn as a thin rim; once the field is bare
+    // they glow, every one of them a way out.
+    function renderExits(time) {
+      if (!rules.exitsOnlyWhenBare || game.state !== 'playing') return;
+      ctx.save();
+      if (!game.bare) {
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+        ctx.restore();
+        return;
+      }
+      const glow = reducedMotion ? 0.75 : 0.6 + 0.3 * Math.sin(time * 0.006);
+      const band = 24;
+      const edge = (x0, y0, x1, y1, x, y, w, h) => {
+        const g = ctx.createLinearGradient(x0, y0, x1, y1);
+        g.addColorStop(0, `rgba(255, 214, 102, ${0.75 * glow})`);
+        g.addColorStop(1, 'rgba(255, 214, 102, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(x, y, w, h);
+      };
+      edge(0, 0, 0, band, 0, 0, W, band);
+      edge(0, H, 0, H - band, 0, H - band, W, band);
+      edge(0, 0, band, 0, 0, 0, band, H);
+      edge(W, 0, W - band, 0, W - band, 0, band, H);
+      ctx.restore();
+    }
+
+    // ================= FENCES (added in the collection) =================
+    function renderFences(time) {
+      if (!rules.fences.length) return;
+      const look = FENCE_LOOK[currentTheme] ?? FENCE_LOOK.savanna;
+      ctx.save();
+      for (const r of rules.fences) {
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath();
+        ctx.roundRect(r.x + 3, r.y + 4, r.w, r.h, 5);
+        ctx.fill();
+        ctx.save();
+        if (look.kind === 'neon') {
+          ctx.shadowBlur = 16;
+          ctx.shadowColor = look.body;
+        }
+        ctx.fillStyle = look.body;
+        ctx.beginPath();
+        ctx.roundRect(r.x, r.y, r.w, r.h, 5);
+        ctx.fill();
+        ctx.restore();
+        drawFenceGrain(r, look, time);
+      }
+      ctx.restore();
+    }
+
+    /** The texture along a stretch of fence: thorns, reeds, bamboo nodes, stone joints, a neon core, folds or leaves. */
+    function drawFenceGrain(r, look, time) {
+      const along = r.w >= r.h;
+      const length = along ? r.w : r.h;
+      // A point `t` pixels along the stretch, `side` pixels off its middle line.
+      const at = (t, side) => along
+        ? [r.x + t, r.y + r.h / 2 + side]
+        : [r.x + r.w / 2 + side, r.y + t];
+      const line = (a, b, colour, width) => {
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+        ctx.stroke();
+      };
+      ctx.lineCap = 'round';
+      line(at(4, -3), at(length - 4, -3), look.light, 1.5);
+      switch (look.kind) {
+        case 'thorn':
+          for (let t = 6; t < length - 4; t += 9) {
+            const side = (t / 9) % 2 < 1 ? -1 : 1;
+            line(at(t, side * 5), at(t + 3, side * 10), look.dark, 1.4);
+          }
+          break;
+        case 'reeds':
+          for (let t = 5; t < length - 3; t += 8) {
+            const sway = Math.sin(time * 0.002 + t * 0.4) * (reducedMotion ? 0 : 1.5);
+            line(at(t, 0), at(t + sway, -11 - (t % 3) * 2), look.light, 1.6);
+            ctx.fillStyle = look.dark;
+            const [x, y] = at(t + sway, -13 - (t % 3) * 2);
+            ctx.beginPath();
+            ctx.ellipse(x, y, along ? 1.6 : 3, along ? 3 : 1.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          break;
+        case 'bamboo':
+          for (let t = 18; t < length - 4; t += 22) line(at(t, -6), at(t, 6), look.dark, 2);
+          break;
+        case 'stone':
+          for (let t = 20; t < length - 4; t += 20) line(at(t, -6), at(t, 6), look.dark, 1.2);
+          line(at(3, 4), at(length - 3, 4), look.dark, 1);
+          break;
+        case 'neon':
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          line(at(3, 0), at(length - 3, 0), look.light, 2.5);
+          ctx.restore();
+          break;
+        case 'paper':
+          for (let t = 0; t < length - 8; t += 16) {
+            line(at(t + 2, -5), at(t + 10, 5), look.dark, 0.8);
+            line(at(t + 10, 5), at(t + 16, -5), look.light, 0.8);
+          }
+          break;
+        case 'hedge':
+          ctx.fillStyle = look.dark;
+          for (let t = 5; t < length - 2; t += 8) {
+            for (const side of [-6, 6]) {
+              const [x, y] = at(t, side);
+              ctx.beginPath();
+              ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          break;
+      }
+    }
+
+    /** Fruit's last moments before it withers: it shrinks and fades. */
+    const WITHERING_MS = 6000;
+
+    function updateApples(dt) {
+      for (const a of apples) {
+        a.spin += dt * 0.003;
+        a.bob  += dt * 0.0022;
+      }
+      // Fruit nobody takes withers away in the end, and the next grows elsewhere, so every
+      // harvest runs out and every flight ends (added in the collection).
+      if (game.state !== 'playing') return;
+      for (let i = apples.length - 1; i >= 0; i--) {
+        apples[i].age += dt;
+        if (apples[i].age < Math.min(rules.fruitLifeMs, apples[i].life ?? Infinity)) continue;
+        game.withered++;
+        takeFruit(i);
+        emit({ type: 'withered', left: fruitLeft() });
+        checkBare();
+      }
+    }
+
+    function renderApples(time) {
+      for (const a of apples) renderApple(a, time);
+    }
+
+    function renderApple(apple, time) {
+      ctx.save();
+      ctx.translate(apple.x, apple.y + Math.sin(apple.bob) * 3);
+      const lifeLeft = Math.min(rules.fruitLifeMs, apple.life ?? Infinity) - apple.age;
+      if (lifeLeft < WITHERING_MS) {
+        const fresh = Math.max(0, lifeLeft / WITHERING_MS);
+        ctx.globalAlpha = 0.35 + 0.65 * fresh;
+        ctx.scale(0.55 + 0.45 * fresh, 0.55 + 0.45 * fresh);
+      }
+      const spin = Math.sin(apple.spin);
+      const spinAbs = Math.abs(spin);
+
+      // ---- Ground shadow (soft ellipse) ----
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.20)';
+      ctx.filter = 'blur(3px)';
+      ctx.beginPath();
+      ctx.ellipse(0, 13, 8, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ---- Apple body (proper apple silhouette with stem well + calyx) ----
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = T.appleGlow;
+
+      const widthMod = 1 + spinAbs * 0.12;   // subtle width breathing with spin
+      const w = 10 * widthMod;
+      const h = 11;
+
+      ctx.beginPath();
+      // Top-left of stem well
+      ctx.moveTo(-2, -h + 1);
+      // Dip down into stem well
+      ctx.quadraticCurveTo(-1, -h + 2.5, 0, -h + 1.8);
+      ctx.quadraticCurveTo(1, -h + 2.5, 2, -h + 1);
+      // Right shoulder
+      ctx.bezierCurveTo(6, -h + 0.5, w * 0.95, -h * 0.55, w, -h * 0.15);
+      // Right side & bottom
+      ctx.bezierCurveTo(w * 1.05, h * 0.4, w * 0.6, h * 0.95, w * 0.3, h * 0.92);
+      // Calyx (bottom center dip)
+      ctx.quadraticCurveTo(w * 0.1, h * 1.05, 0, h * 0.90);
+      ctx.quadraticCurveTo(-w * 0.1, h * 1.05, -w * 0.3, h * 0.92);
+      // Left side & bottom
+      ctx.bezierCurveTo(-w * 0.6, h * 0.95, -w * 1.05, h * 0.4, -w, -h * 0.15);
+      // Left shoulder
+      ctx.bezierCurveTo(-w * 0.95, -h * 0.55, -6, -h + 0.5, -2, -h + 1);
+      ctx.closePath();
+
+      // Radial gradient body (lighter top-left → darker bottom-right)
+      const bodyGrad = ctx.createRadialGradient(
+        -3 + spin * 2, -3, 1,
+        1, 3, w * 1.6
+      );
+      bodyGrad.addColorStop(0, lightenColor(T.apple, 0.35));
+      bodyGrad.addColorStop(0.55, T.apple);
+      bodyGrad.addColorStop(1, darkenColor(T.apple, 0.35));
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+
+      // ---- Freckles / speckles for realism (skip on origami — paper is smooth) ----
+      if (!T.paperFold) {
+        ctx.save();
+        ctx.clip();
+        ctx.fillStyle = darkenColor(T.apple, 0.25);
+        ctx.globalAlpha = 0.35;
+        ctx.shadowBlur = 0;
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2 + spin * 0.5;
+          const r = 4 + (i % 3);
+          ctx.beginPath();
+          ctx.arc(Math.cos(angle) * r, Math.sin(angle) * r + 2, 0.4 + (i % 2) * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // ---- Paper fold crease for origami theme ----
+      if (T.paperFold) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(0, -h + 2);
+        ctx.lineTo(0, h * 0.9);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // ---- Main glossy highlight (elongated diagonal) ----
+      ctx.save();
+      ctx.shadowBlur = 0;
+      const hlGrad = ctx.createRadialGradient(
+        -3 + spin * 3, -4, 0,
+        -3 + spin * 3, -4, 6
+      );
+      hlGrad.addColorStop(0, T.appleHighlight);
+      hlGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = hlGrad;
+      ctx.translate(-3 + spin * 3, -4);
+      ctx.rotate(-0.35);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 2.4, 5.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ---- Sharp specular dot (glossy highlight peak) ----
+      ctx.save();
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = 'rgba(255,255,255,0.9)';
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath();
+      ctx.arc(-4 + spin * 3, -6, 1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ---- Bottom subtle shading (adds roundness) ----
+      ctx.save();
+      ctx.shadowBlur = 0;
+      const bottomGrad = ctx.createRadialGradient(0, 8, 1, 0, 8, 8);
+      bottomGrad.addColorStop(0, 'rgba(0,0,0,0.25)');
+      bottomGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = bottomGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 8, 7, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ---- Calyx notch (tiny dark spot at bottom) ----
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(0, 10, 0.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ---- Stem well shadow ----
+      ctx.fillStyle = 'rgba(0,0,0,0.30)';
+      ctx.beginPath();
+      ctx.ellipse(0, -10, 1.8, 0.9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ---- Stem (curved, tapered) ----
+      ctx.save();
+      ctx.strokeStyle = T.appleStem;
+      ctx.lineWidth = 1.9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -10);
+      ctx.quadraticCurveTo(1.5, -13, 3, -14);
+      ctx.stroke();
+      // Stem shading (thinner darker line on one side)
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(0.5, -10.5);
+      ctx.quadraticCurveTo(2, -13, 3.3, -13.8);
+      ctx.stroke();
+      ctx.restore();
+
+      // ---- Leaf (with veins + gradient shading) ----
+      ctx.save();
+      ctx.translate(3, -13);
+      ctx.rotate(-0.45);
+      // Leaf outline shape (asymmetric, pointed)
+      ctx.beginPath();
+      ctx.moveTo(0, 0.5);
+      ctx.quadraticCurveTo(2, -3, 5.5, -1.2);
+      ctx.quadraticCurveTo(6.5, 0, 5, 1);
+      ctx.quadraticCurveTo(2, 2, 0, 0.5);
+      ctx.closePath();
+      // Leaf gradient
+      const leafGrad = ctx.createLinearGradient(0, -1.5, 6, 1.5);
+      leafGrad.addColorStop(0, lightenColor(T.appleLeaf, 0.25));
+      leafGrad.addColorStop(1, darkenColor(T.appleLeaf, 0.2));
+      ctx.fillStyle = leafGrad;
+      ctx.shadowColor = T.appleLeafGlow;
+      ctx.shadowBlur = 5;
+      ctx.fill();
+      // Central vein
+      ctx.strokeStyle = 'rgba(0,40,10,0.45)';
+      ctx.lineWidth = 0.55;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(0, 0.3);
+      ctx.lineTo(5.5, -0.5);
+      ctx.stroke();
+      // Side veins
+      ctx.lineWidth = 0.35;
+      ctx.beginPath();
+      ctx.moveTo(1.5, 0);
+      ctx.lineTo(2, -1);
+      ctx.moveTo(1.5, 0.3);
+      ctx.lineTo(2, 1);
+      ctx.moveTo(3, -0.2);
+      ctx.lineTo(3.5, -1.2);
+      ctx.moveTo(3, 0.4);
+      ctx.lineTo(3.5, 1.2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    // ================= ENEMY (Eagle or Owl) =================
+    const eagle = {
+      x: 200, y: 100,
+      vx: 100, vy: 30,
+      altitude: 0.8,
+      state: 'glide',
+      stateTime: 0,
+      wingPhase: 0,
+      targetX: 0, targetY: 0,
+      patience: ORIGINAL_TUNE.patience,
+      lockMs: ORIGINAL_TUNE.lockMs,
+      diveMs: ORIGINAL_TUNE.diveMs,
+      fromX: 0, fromY: 0, fromAltitude: 0.6,
+      // The snake it is after: null for the player's, or a rival (added in the collection).
+      quarry: null,
+      lookAgainIn: 0,
+    };
+
+    /** What the bird is after: 'you', a 'rival' or a shed tail ('decoy'). */
+    function quarryKind() {
+      if (!eagle.quarry) return 'you';
+      return eagle.quarry.decoy ? 'decoy' : 'rival';
+    }
+
+    /** The head of the bird's quarry: a rival's while it is on the field, otherwise the player's. */
+    function quarryHead() {
+      return eagle.quarry && !eagle.quarry.gone ? eagle.quarry.segments[0] : snake.segments[0];
+    }
+
+    /**
+     * The bird hunts whichever snake is nearest to it: the player's or a rival's. A player on
+     * the way out is no longer hunted; null stands for the player.
+     */
+    function nearestQuarry() {
+      const own = snake.segments[0];
+      let nearest = null;
+      let distance = game.leaving ? Infinity : Math.hypot(own.x - eagle.x, own.y - eagle.y);
+      for (const other of [...rivals, ...decoys]) {
+        const head = other.segments[0];
+        const d = Math.hypot(head.x - eagle.x, head.y - eagle.y);
+        if (d < distance) {
+          nearest = other;
+          distance = d;
+        }
+      }
+      return nearest;
+    }
+
+    /**
+     * How long the bird glides before it locks on. The port drew a fresh number every frame
+     * (4500 + up to 2500 ms), so in practice it locked on a few frames after 4.5 s; drawing once
+     * per glide keeps that feel and makes a seeded flight repeatable.
+     */
+    function drawPatience() {
+      if (game.bare) return rules.ravenous(game.divesSinceBare).patienceMs + rand() * 200;
+      // The more the snake carries, the less the bird waits (src/carry.mjs).
+      return (tune.patience + rand() * tune.patienceSpread) * rules.carry(game.score).patience * game.birdHunger;
+    }
+
+    function updateEagle(dt) {
+      // On the desk the bird keeps circling, but never locks on.
+      if (game.state !== 'playing' && game.state !== 'menu') return;
+      eagle.stateTime += dt;
+      const dtSec = dt / 1000;
+      // Gliding, the bird looks round for the nearest snake every second; it settles on one
+      // when it locks on.
+      if (eagle.state === 'glide') {
+        eagle.lookAgainIn -= dt;
+        if (eagle.lookAgainIn <= 0) {
+          eagle.quarry = nearestQuarry();
+          eagle.lookAgainIn = 1000;
+        }
+      }
+      const { x: px, y: py } = quarryHead();
+
+      switch (eagle.state) {
+        case 'glide': {
+          const ang = Math.atan2(py - eagle.y, px - eagle.x);
+          const circleAng = ang + Math.PI * 0.42;
+          const tgtVx = Math.cos(circleAng) * tune.glideSpeed;
+          const tgtVy = Math.sin(circleAng) * tune.glideSpeed;
+          eagle.vx += (tgtVx - eagle.vx) * Math.min(1, 0.0022 * dt);
+          eagle.vy += (tgtVy - eagle.vy) * Math.min(1, 0.0022 * dt);
+          eagle.x += eagle.vx * dtSec;
+          eagle.y += eagle.vy * dtSec;
+          eagle.altitude = 0.72 + 0.06 * Math.sin(eagle.wingPhase * 0.5);
+          eagle.wingPhase += dt * 0.0035;
+          if (game.state === 'playing' && !game.birdAsleep && eagle.stateTime > eagle.patience
+            && (nearestQuarry() || !game.leaving)) {
+            eagle.state = 'lock';
+            eagle.stateTime = 0;
+            eagle.quarry = nearestQuarry();
+            eagle.lockMs = tune.lockMs * (game.bare
+              ? rules.ravenous(game.divesSinceBare).lock
+              : rules.carry(game.score).lock);
+            emit({ type: 'lock', quarry: quarryKind() });
+          }
+          break;
+        }
+        case 'lock': {
+          // The ring follows the head while the bird takes aim; the dive goes where it ends.
+          eagle.targetX = px;
+          eagle.targetY = py;
+          eagle.vx *= Math.pow(0.4, dtSec * 3);
+          eagle.vy *= Math.pow(0.4, dtSec * 3);
+          eagle.x += eagle.vx * dtSec;
+          eagle.y += eagle.vy * dtSec;
+          eagle.altitude -= 0.00018 * dt;
+          eagle.wingPhase += dt * 0.006;
+          if (eagle.stateTime > eagle.lockMs) {
+            eagle.state = 'dive';
+            eagle.stateTime = 0;
+            eagle.targetX = px;
+            eagle.targetY = py;
+            eagle.fromX = eagle.x;
+            eagle.fromY = eagle.y;
+            eagle.fromAltitude = eagle.altitude;
+            // A dive is long enough for a snake keeping straight on to be clear of it; once the
+            // field is bare that holds for a few dives more, then each comes quicker
+            // (src/carry.mjs).
+            eagle.diveMs = tune.diveMs * rules.carry(game.score).dive * game.diveQuickening
+              * (game.bare ? rules.ravenous(game.divesSinceBare++).dive : 1);
+            emit({ type: 'dive', quarry: quarryKind() });
+          }
+          break;
+        }
+        case 'dive': {
+          // The dive takes the same time from wherever it starts, so the warning always means
+          // the same: keep moving, and the talons come down where you were.
+          const t = Math.min(1, eagle.stateTime / eagle.diveMs);
+          const fall = t * t;
+          const nx = eagle.fromX + (eagle.targetX - eagle.fromX) * fall;
+          const ny = eagle.fromY + (eagle.targetY - eagle.fromY) * fall;
+          if (dtSec > 0) {
+            eagle.vx = (nx - eagle.x) / dtSec;
+            eagle.vy = (ny - eagle.y) / dtSec;
+          }
+          eagle.x = nx;
+          eagle.y = ny;
+          eagle.altitude = eagle.fromAltitude + (0.05 - eagle.fromAltitude) * fall;
+          eagle.wingPhase += dt * 0.020;
+          if (t >= 1) {
+            eagle.state = 'strike';
+            eagle.stateTime = 0;
+            eagle.altitude = 0.02;
+            spawnStrike(eagle.x, eagle.y);
+          }
+          break;
+        }
+        case 'strike': {
+          eagle.altitude = 0.02;
+          if (eagle.stateTime > 260) {
+            eagle.state = 'climb';
+            eagle.stateTime = 0;
+            // A dodge is the player's only when the dive was meant for the player.
+            if (game.state === 'playing' && !eagle.quarry) emit({ type: 'dodged' });
+            const angleAway = Math.atan2(eagle.y - py, eagle.x - px);
+            eagle.vx = Math.cos(angleAway) * 160;
+            eagle.vy = Math.sin(angleAway) * 160 - 120;
+          }
+          break;
+        }
+        case 'climb': {
+          eagle.altitude += 0.0013 * dt;
+          eagle.x += eagle.vx * dtSec;
+          eagle.y += eagle.vy * dtSec;
+          eagle.vy += 55 * dtSec;
+          eagle.wingPhase += dt * 0.014;
+          if (eagle.altitude > 0.75) {
+            eagle.state = 'glide';
+            eagle.stateTime = 0;
+            eagle.patience = drawPatience();
+          }
+          break;
+        }
+      }
+
+      if (eagle.x < -80)    eagle.x = W + 80;
+      if (eagle.x > W + 80) eagle.x = -80;
+      if (eagle.y < 40)     eagle.y = 40;
+      if (eagle.y > H - 40) eagle.y = H - 40;
+
+      stateLabel.textContent = game.bare && game.state === 'playing' && eagle.state === 'glide'
+        ? 'RAVENOUS'
+        : eagle.state.toUpperCase();
+    }
+
+    function renderEagle(time) {
+      // Shadow on ground plane
+      const shadowScale = 0.4 + eagle.altitude * 1.2;
+      const shadowAlpha = 0.15 + (1 - eagle.altitude) * 0.6;
+      const grad = ctx.createRadialGradient(eagle.x, eagle.y, 0, eagle.x, eagle.y, 32 * shadowScale);
+      grad.addColorStop(0,   `rgba(0,0,0,${shadowAlpha})`);
+      grad.addColorStop(0.6, `rgba(0,0,0,${shadowAlpha * 0.35})`);
+      grad.addColorStop(1,   `rgba(0,0,0,0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(eagle.x, eagle.y, 32 * shadowScale, 16 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lock-on warning ring
+      if (eagle.state === 'lock' || eagle.state === 'dive') {
+        const t = Math.min(1, eagle.stateTime / (eagle.state === 'lock' ? eagle.lockMs : eagle.diveMs));
+        const r = 40 * (1 - t * 0.6);
+        ctx.strokeStyle = `rgba(255,80,80,${0.55 * (1 - t * 0.5)})`;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(eagle.targetX || eagle.x, eagle.targetY || eagle.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      const drawY = eagle.y - eagle.altitude * 75;
+      const scale = 0.85 + (1 - eagle.altitude) * 0.6;
+      const heading = Math.atan2(eagle.vy, eagle.vx);
+
+      let wingFactor, wingSweep;
+      if (eagle.state === 'dive') {
+        wingFactor = 0.6;  wingSweep = -0.35;
+      } else if (eagle.state === 'strike') {
+        wingFactor = 0.8;  wingSweep = 0.4;
+      } else {
+        wingFactor = Math.sin(eagle.wingPhase * (eagle.state === 'climb' ? 11 : 5.5));
+        wingSweep  = 0;
+      }
+      const wingAngle = wingFactor * 0.55;
+
+      ctx.save();
+      ctx.translate(eagle.x, drawY);
+      ctx.rotate(heading);
+      ctx.scale(scale, scale);
+
+      if (T.enemyShape === 'owl') {
+        renderOwl(wingAngle, wingSweep);
+      } else {
+        renderEagleSprite(wingAngle, wingSweep);
+      }
+
+      ctx.restore();
+    }
+
+    function renderEagleSprite(wingAngle, wingSweep) {
+      const bodyDark = darkenColor(T.enemy, 0.30);
+      const bodyLight = lightenColor(T.enemy, 0.18);
+
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+
+      // =============== TAIL WEDGE (drawn first, behind everything) ===============
+      drawEagleTail(bodyDark);
+
+      // =============== WINGS (rotated by flap angle) ===============
+      ctx.save();
+      ctx.rotate(-wingAngle + wingSweep);
+      drawEagleWing(-1, bodyDark, bodyLight);
+      ctx.restore();
+
+      ctx.save();
+      ctx.rotate(wingAngle - wingSweep);
+      drawEagleWing(1, bodyDark, bodyLight);
+      ctx.restore();
+
+      // =============== BODY ===============
+      drawEagleBody(bodyDark, bodyLight);
+
+      // =============== HEAD + BEAK ===============
+      drawEagleHead(bodyDark, bodyLight);
+
+      ctx.restore();
+    }
+
+    function drawEagleTail(bodyDark) {
+      // Proper wedge fan (5 individual feathers with visible separation)
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 8;
+
+      const baseX = -7;
+      const tipX = -20;
+      const halfW = 7;
+
+      // Base wedge fill (gradient)
+      const grad = ctx.createLinearGradient(baseX, 0, tipX, 0);
+      grad.addColorStop(0, T.enemy);
+      grad.addColorStop(0.6, bodyDark);
+      grad.addColorStop(1, T.enemyTip);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(baseX, -2.5);
+      ctx.lineTo(baseX, 2.5);
+      ctx.quadraticCurveTo(-11, halfW, tipX, halfW * 0.9);
+      ctx.quadraticCurveTo(tipX - 1.5, 0, tipX, -halfW * 0.9);
+      ctx.quadraticCurveTo(-11, -halfW, baseX, -2.5);
+      ctx.closePath();
+      ctx.fill();
+
+      // Feather separation lines (radiating from base)
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 0.5;
+      ctx.shadowBlur = 0;
+      for (let i = 1; i <= 4; i++) {
+        const t = (i / 5) - 0.5;   // -0.3 to +0.3
+        ctx.beginPath();
+        ctx.moveTo(baseX, t * 2);
+        ctx.lineTo(tipX + 1, t * halfW * 2);
+        ctx.stroke();
+      }
+
+      // Tail tip band (lighter accents at feather tips)
+      ctx.fillStyle = T.enemyTip;
+      ctx.shadowColor = T.enemyTip;
+      ctx.shadowBlur = 4;
+      ctx.globalAlpha = 0.7;
+      for (let i = 0; i < 5; i++) {
+        const t = (i / 4) - 0.5;
+        ctx.beginPath();
+        ctx.arc(tipX + 0.5, t * halfW * 1.8, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+    }
+
+    function drawEagleBody(bodyDark, bodyLight) {
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 12;
+
+      // Smaller, sleeker body (was 13x5, now 10x3.5 — better proportion vs new wingspan)
+      const bodyGrad = ctx.createLinearGradient(0, -4, 0, 4);
+      bodyGrad.addColorStop(0, bodyDark);
+      bodyGrad.addColorStop(0.5, T.enemy);
+      bodyGrad.addColorStop(1, bodyLight);
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 10, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dorsal stripe
+      ctx.strokeStyle = 'rgba(0,0,0,0.40)';
+      ctx.lineWidth = 0.9;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(-8, 0);
+      ctx.lineTo(9, 0);
+      ctx.stroke();
+
+      // Body feather texture stipples (skip origami)
+      if (!T.paperFold) {
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.arc(-6 + i * 3.5, -1.5, 0.35, 0, Math.PI * 2);
+          ctx.arc(-6 + i * 3.5, 1.5, 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Neck highlight (light chest area between body and head)
+      ctx.fillStyle = T.enemyTip;
+      ctx.globalAlpha = 0.30;
+      ctx.shadowColor = T.enemyTip;
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.ellipse(6, 0, 3.2, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Origami fold along body center
+      if (T.paperFold) {
+        ctx.strokeStyle = 'rgba(0,0,0,0.20)';
+        ctx.lineWidth = 0.7;
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.moveTo(18, 0);
+        ctx.lineTo(-9, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawEagleHead(bodyDark, bodyLight) {
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 8;
+
+      // Head positioned at (12, 0)
+      const headGrad = ctx.createRadialGradient(12, -1, 0, 12, 0, 5);
+      headGrad.addColorStop(0, bodyLight);
+      headGrad.addColorStop(1, T.enemy);
+      ctx.fillStyle = headGrad;
+      ctx.beginPath();
+      ctx.ellipse(12, 0, 3.5, 2.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Brow ridge
+      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      ctx.lineWidth = 0.7;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(10.8, -1.8);
+      ctx.quadraticCurveTo(12.5, -2.6, 13.8, -2.1);
+      ctx.moveTo(10.8, 1.8);
+      ctx.quadraticCurveTo(12.5, 2.6, 13.8, 2.1);
+      ctx.stroke();
+
+      // Eyes
+      ctx.fillStyle = T.beak;
+      ctx.shadowColor = T.beak;
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.arc(12.5, -1.3, 1.1, 0, Math.PI * 2);
+      ctx.arc(12.5, 1.3, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupils
+      ctx.fillStyle = '#000';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(13, -1.3, 0.5, 0, Math.PI * 2);
+      ctx.arc(13, 1.3, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      // Specular
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.beginPath();
+      ctx.arc(13.2, -1.5, 0.22, 0, Math.PI * 2);
+      ctx.arc(13.2, 1.1, 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Curved hooked beak
+      ctx.save();
+      ctx.shadowColor = T.beak;
+      ctx.shadowBlur = 4;
+      const beakGrad = ctx.createLinearGradient(14, 0, 18, 0);
+      beakGrad.addColorStop(0, T.beak);
+      beakGrad.addColorStop(1, darkenColor(T.beak, 0.25));
+      ctx.fillStyle = beakGrad;
+      ctx.beginPath();
+      ctx.moveTo(14, -1.2);
+      ctx.quadraticCurveTo(17, -1.2, 18.5, 0);
+      ctx.quadraticCurveTo(18.7, 0.7, 17.5, 1);
+      ctx.quadraticCurveTo(17.7, 0.4, 16.5, 0.4);
+      ctx.quadraticCurveTo(14.5, 0.4, 14, 1.2);
+      ctx.closePath();
+      ctx.fill();
+      // Mouth line
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.lineWidth = 0.5;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(14.2, 0);
+      ctx.quadraticCurveTo(16.5, 0.1, 18, 0.35);
+      ctx.stroke();
+      // Nostril
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.beginPath();
+      ctx.arc(15.5, -0.35, 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawEagleWing(side, bodyDark, bodyLight) {
+      // Fully spread eagle wing with prominent primary finger feathers.
+      // side = -1 (top of top-down view) or +1 (bottom)
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 12;
+
+      // ---- ARM PORTION: base wing (from body attachment out to primary bases) ----
+      const armGrad = ctx.createLinearGradient(0, 0, 0, side * 22);
+      armGrad.addColorStop(0, T.enemy);
+      armGrad.addColorStop(0.65, bodyDark);
+      armGrad.addColorStop(1, T.enemy);
+      ctx.fillStyle = armGrad;
+
+      ctx.beginPath();
+      // Leading edge — from body, sweeps slightly forward then curves back
+      ctx.moveTo(3, side * 3);
+      ctx.bezierCurveTo(
+        6, side * 8,
+        5, side * 16,
+        -1, side * 22
+      );
+      // Wingtip zone (below primary bases)
+      ctx.quadraticCurveTo(-8, side * 23, -14, side * 20);
+      // Trailing edge — sweeps back to body
+      ctx.bezierCurveTo(
+        -12, side * 14,
+        -8, side * 8,
+        -3, side * 3
+      );
+      ctx.closePath();
+      ctx.fill();
+
+      // ---- SECONDARY FEATHERS (trailing edge scallops) ----
+      ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+      ctx.lineWidth = 0.5;
+      ctx.shadowBlur = 0;
+      for (let i = 0; i < 5; i++) {
+        const t = i / 4;
+        // Scallops arc along the trailing edge
+        const sx = -3 - t * 10;
+        const sy = side * (4 + t * 12);
+        const ex = -5 - t * 10;
+        const ey = side * (7 + t * 12);
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.quadraticCurveTo((sx + ex) / 2 - 1, (sy + ey) / 2 + side * 0.5, ex, ey);
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 12;
+
+      // ---- PRIMARY "FINGER" FEATHERS (5, prominent & separated) ----
+      // Each primary is a tapered feather extending outward from wingtip zone.
+      // Positions & lengths chosen so the fan resembles the reference silhouette:
+      // - inner primary shortest, points nearly outward
+      // - mid primaries longest, sweep back
+      // - outer primary shorter, points back
+      const primaries = [
+        { base: [0,   side * 21], tip: [-1,  side * 33], w: 1.7 },
+        { base: [-3,  side * 22], tip: [-6,  side * 35], w: 1.9 },
+        { base: [-6,  side * 22.5], tip: [-11, side * 35], w: 2.0 },
+        { base: [-9,  side * 22], tip: [-15, side * 33], w: 1.9 },
+        { base: [-12, side * 20.5], tip: [-18, side * 29], w: 1.6 },
+      ];
+
+      for (const p of primaries) {
+        const [bx, by] = p.base;
+        const [tx, ty] = p.tip;
+        const dx = tx - bx, dy = ty - by;
+        const len = Math.hypot(dx, dy);
+        const nx = -dy / len, ny = dx / len;   // unit perpendicular
+        const w = p.w;
+
+        // Feather gradient — dark toward tip
+        const featherGrad = ctx.createLinearGradient(bx, by, tx, ty);
+        featherGrad.addColorStop(0, T.enemy);
+        featherGrad.addColorStop(0.55, bodyDark);
+        featherGrad.addColorStop(1, T.enemy);
+        ctx.fillStyle = featherGrad;
+        ctx.shadowBlur = 8;
+
+        // Tapered feather (leaf-shaped)
+        ctx.beginPath();
+        ctx.moveTo(bx - nx * w, by - ny * w);
+        ctx.quadraticCurveTo(
+          bx + dx * 0.35 - nx * w * 1.05,
+          by + dy * 0.35 - ny * w * 1.05,
+          bx + dx * 0.80 - nx * w * 0.35,
+          by + dy * 0.80 - ny * w * 0.35
+        );
+        ctx.quadraticCurveTo(tx, ty, bx + dx * 0.80 + nx * w * 0.35, by + dy * 0.80 + ny * w * 0.35);
+        ctx.quadraticCurveTo(
+          bx + dx * 0.35 + nx * w * 1.05,
+          by + dy * 0.35 + ny * w * 1.05,
+          bx + nx * w, by + ny * w
+        );
+        ctx.closePath();
+        ctx.fill();
+
+        // Feather shaft
+        ctx.strokeStyle = 'rgba(0,0,0,0.42)';
+        ctx.lineWidth = 0.45;
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + dx * 0.92, by + dy * 0.92);
+        ctx.stroke();
+      }
+
+      // ---- WING COVERTS (small feather cluster at wing base — layered detail) ----
+      ctx.save();
+      ctx.fillStyle = bodyLight;
+      ctx.globalAlpha = 0.5;
+      ctx.shadowBlur = 0;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.ellipse(-1 - i * 1.6, side * (4.5 + i * 2.5), 2.5, 1.4, side * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // ---- WINGTIP HIGHLIGHT (bright spot at outermost primary tip) ----
+      ctx.fillStyle = T.enemyTip;
+      ctx.shadowColor = T.enemyTip;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(-18, side * 29, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ---- LEADING EDGE ACCENT LINE ----
+      ctx.strokeStyle = 'rgba(0,0,0,0.38)';
+      ctx.lineWidth = 0.7;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(3, side * 3);
+      ctx.bezierCurveTo(6, side * 8, 5, side * 16, -1, side * 22);
+      ctx.stroke();
+
+      // ---- ORIGAMI PAPER FOLD ----
+      if (T.paperFold) {
+        ctx.strokeStyle = 'rgba(0,0,0,0.20)';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(0, side * 3);
+        ctx.lineTo(-8, side * 20);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function renderOwl(wingAngle, wingSweep) {
+      const bodyDark = darkenColor(T.enemy, 0.30);
+      const bodyLight = lightenColor(T.enemy, 0.15);
+      const patternColor = 'rgba(80,60,120,0.55)';
+
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+
+      // =============== TAIL ===============
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 6;
+      const tailFeathers = 4;
+      const tailSpread = 0.35;
+      for (let i = 0; i < tailFeathers; i++) {
+        const t = (i / (tailFeathers - 1)) - 0.5;
+        const angle = t * tailSpread;
+        ctx.save();
+        ctx.translate(-11, 0);
+        ctx.rotate(Math.PI + angle);
+        const featherGrad = ctx.createLinearGradient(0, 0, 8, 0);
+        featherGrad.addColorStop(0, bodyDark);
+        featherGrad.addColorStop(0.6, T.enemy);
+        featherGrad.addColorStop(1, bodyDark);
+        ctx.fillStyle = featherGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, -1.6);
+        ctx.quadraticCurveTo(4, -1.7, 8, -0.5);
+        ctx.quadraticCurveTo(9, 0, 8, 0.5);
+        ctx.quadraticCurveTo(4, 1.7, 0, 1.6);
+        ctx.closePath();
+        ctx.fill();
+        // Barring pattern on tail feather
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 0.4;
+        ctx.shadowBlur = 0;
+        for (let b = 1; b < 4; b++) {
+          ctx.beginPath();
+          ctx.moveTo(b * 2, -1.4);
+          ctx.lineTo(b * 2, 1.4);
+          ctx.stroke();
+        }
+        ctx.shadowBlur = 6;
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // =============== WINGS (broad, rounded) ===============
+      ctx.save();
+      ctx.rotate(-wingAngle + wingSweep);
+      drawOwlWing(-1, bodyDark, bodyLight, patternColor);
+      ctx.restore();
+
+      ctx.save();
+      ctx.rotate(wingAngle - wingSweep);
+      drawOwlWing(1, bodyDark, bodyLight, patternColor);
+      ctx.restore();
+
+      // =============== BODY (fat & round) ===============
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 14;
+
+      const bodyGrad = ctx.createRadialGradient(0, 0, 2, 0, 2, 10);
+      bodyGrad.addColorStop(0, bodyLight);
+      bodyGrad.addColorStop(0.7, T.enemy);
+      bodyGrad.addColorStop(1, bodyDark);
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 11, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly barring pattern (owl signature)
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = patternColor;
+      ctx.lineWidth = 0.6;
+      for (let i = 0; i < 4; i++) {
+        const y = -3 + i * 2;
+        ctx.beginPath();
+        ctx.moveTo(-6, y);
+        ctx.quadraticCurveTo(0, y - 0.5, 6, y);
+        ctx.stroke();
+      }
+
+      // Belly V-spots (denser center pattern)
+      ctx.fillStyle = patternColor;
+      for (let i = 0; i < 6; i++) {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        ctx.beginPath();
+        ctx.arc(-2 + col * 4, -3 + row * 3, 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // =============== HEAD (big & round) ===============
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 12;
+
+      const headGrad = ctx.createRadialGradient(8, -2, 0, 8, 0, 8);
+      headGrad.addColorStop(0, bodyLight);
+      headGrad.addColorStop(1, T.enemy);
+      ctx.fillStyle = headGrad;
+      ctx.beginPath();
+      ctx.arc(8, 0, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ear tufts (asymmetric little horns)
+      ctx.fillStyle = bodyDark;
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.moveTo(4.5, -5.8);
+      ctx.quadraticCurveTo(3.5, -10, 5, -10.5);
+      ctx.quadraticCurveTo(6.5, -8, 6.5, -6);
+      ctx.closePath();
+      ctx.moveTo(4.5, 5.8);
+      ctx.quadraticCurveTo(3.5, 10, 5, 10.5);
+      ctx.quadraticCurveTo(6.5, 8, 6.5, 6);
+      ctx.closePath();
+      ctx.fill();
+
+      // Facial disc — heart-shaped outline (owl characteristic)
+      ctx.save();
+      ctx.strokeStyle = bodyDark;
+      ctx.lineWidth = 0.6;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      // Upper facial disc boundary (goes above eyes, curves down to beak)
+      ctx.moveTo(4, -5);
+      ctx.quadraticCurveTo(8, -6.5, 12, -4);
+      // Right side down
+      ctx.quadraticCurveTo(14, 0, 12, 4);
+      ctx.quadraticCurveTo(8, 6.5, 4, 5);
+      // Below chin
+      ctx.quadraticCurveTo(6, 2, 6, 0);
+      ctx.quadraticCurveTo(6, -2, 4, -5);
+      ctx.stroke();
+      ctx.restore();
+
+      // Eye "surround" — slight darkening rings around eyes
+      ctx.fillStyle = bodyDark;
+      ctx.globalAlpha = 0.5;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(10, -3, 3.3, 0, Math.PI * 2);
+      ctx.arc(10,  3, 3.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Large forward-facing eyes (yellow with subtle radial gradient)
+      const eyeGrad = ctx.createRadialGradient(10, -3, 0, 10, -3, 3);
+      eyeGrad.addColorStop(0, '#ffee88');
+      eyeGrad.addColorStop(0.6, T.enemyTip);
+      eyeGrad.addColorStop(1, '#cc9900');
+      ctx.fillStyle = eyeGrad;
+      ctx.shadowColor = T.enemyTip;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(10, -3, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      const eyeGrad2 = ctx.createRadialGradient(10, 3, 0, 10, 3, 3);
+      eyeGrad2.addColorStop(0, '#ffee88');
+      eyeGrad2.addColorStop(0.6, T.enemyTip);
+      eyeGrad2.addColorStop(1, '#cc9900');
+      ctx.fillStyle = eyeGrad2;
+      ctx.beginPath();
+      ctx.arc(10,  3, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupils (large — owl pupils dilate at night)
+      ctx.fillStyle = '#000';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(10.5, -3, 1.3, 0, Math.PI * 2);
+      ctx.arc(10.5,  3, 1.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Eye specular
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath();
+      ctx.arc(10.8, -3.4, 0.4, 0, Math.PI * 2);
+      ctx.arc(10.8,  2.6, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      // Small secondary reflection
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(10.2, -2.4, 0.25, 0, Math.PI * 2);
+      ctx.arc(10.2,  3.4, 0.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // =============== BEAK (small hooked triangle between eyes) ===============
+      ctx.save();
+      ctx.shadowColor = T.beak;
+      ctx.shadowBlur = 3;
+      ctx.fillStyle = T.beak;
+      ctx.beginPath();
+      ctx.moveTo(13.5, -1);
+      ctx.quadraticCurveTo(15.5, -0.5, 15.5, 0);
+      ctx.quadraticCurveTo(15.5, 0.5, 13.5, 1);
+      ctx.quadraticCurveTo(13, 0, 13.5, -1);
+      ctx.closePath();
+      ctx.fill();
+      // Beak shading
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 0.4;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(13.5, 0);
+      ctx.lineTo(15.3, 0);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawOwlWing(side, bodyDark, bodyLight, patternColor) {
+      ctx.save();
+      ctx.shadowColor = T.enemyGlow;
+      ctx.shadowBlur = 13;
+
+      // --- Broad, rounded wing outline (owl wings are wider than eagle's) ---
+      const wingGrad = ctx.createLinearGradient(0, 0, 0, side * 20);
+      wingGrad.addColorStop(0, T.enemy);
+      wingGrad.addColorStop(0.7, bodyDark);
+      wingGrad.addColorStop(1, T.enemy);
+      ctx.fillStyle = wingGrad;
+      ctx.beginPath();
+      ctx.moveTo(-3, side * 4);
+      // Trailing edge (broad curve)
+      ctx.quadraticCurveTo(-17, side * 12, -13, side * 20);
+      // Wing tip (rounded — no sharp finger feathers, unlike eagle)
+      ctx.quadraticCurveTo(-4, side * 22, 2, side * 12);
+      // Leading edge back to body
+      ctx.quadraticCurveTo(4, side * 6, 3, side * 3);
+      ctx.closePath();
+      ctx.fill();
+
+      // --- Barring pattern (owl signature — bars across wing) ---
+      ctx.strokeStyle = patternColor;
+      ctx.lineWidth = 0.7;
+      ctx.shadowBlur = 0;
+      for (let i = 0; i < 4; i++) {
+        const t = 0.2 + i * 0.18;
+        ctx.beginPath();
+        // Bar arcs across wing from leading edge to trailing edge
+        const startX = 3 - t * 15;
+        const startY = side * (3 + t * 3);
+        const endX = -13 + t * 10;
+        const endY = side * (20 - t * 5);
+        const midX = (startX + endX) / 2 - 2;
+        const midY = (startY + endY) / 2 + side * 1;
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(midX, midY, endX, endY);
+        ctx.stroke();
+      }
+
+      // --- Wing spot pattern (soft feathery dots) ---
+      ctx.save();
+      ctx.fillStyle = patternColor;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 0.6;
+        const r = 6 + (i % 3) * 3;
+        const px = -3 + Math.cos(angle) * -r;
+        const py = side * (4 + Math.sin(angle) * r * 0.9);
+        ctx.beginPath();
+        ctx.arc(px, py, 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // --- Coverts (small feather layer at wing base) ---
+      ctx.save();
+      ctx.fillStyle = bodyLight;
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.ellipse(-2 - i * 1.8, side * (5 + i * 2), 2.8, 1.8, side * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // --- Trailing edge highlight (soft light on outer feathers) ---
+      ctx.fillStyle = bodyLight;
+      ctx.globalAlpha = 0.4;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = bodyLight;
+      ctx.beginPath();
+      ctx.ellipse(-8, side * 18, 4, 1.5, side * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+    }
+
+    // ================= STRIKE PARTICLES =================
+    const particles = [];
+    function spawnStrike(x, y) {
+      // With reduced motion only the ring stays: it still shows where the talons came down.
+      for (let i = 0; i < (reducedMotion ? 0 : 22); i++) {
+        const a = (i / 22) * Math.PI * 2 + Math.random() * 0.4;
+        const s = 90 + Math.random() * 160;
+        particles.push({
+          x, y,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 700, maxLife: 700,
+          color: i % 3 === 0 ? '#ffffff' : (i % 3 === 1 ? T.enemy : T.enemyTip),
+          size: 2 + Math.random() * 1.5,
+        });
+      }
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 500, maxLife: 500,
+        ring: true, radius: 5,
+        color: T.enemyTip,
+      });
+    }
+    function updateParticles(dt) {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= dt;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        const dtSec = dt / 1000;
+        if (p.ring) {
+          p.radius += 200 * dtSec;
+        } else {
+          p.x += p.vx * dtSec;
+          p.y += p.vy * dtSec;
+          p.vx *= Math.pow(0.05, dtSec);
+          p.vy *= Math.pow(0.05, dtSec);
+        }
+      }
+    }
+    function renderParticles() {
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      for (const p of particles) {
+        const a = p.life / p.maxLife;
+        if (p.ring) {
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = a * 0.8;
+          ctx.lineWidth = 3 * a;
+          ctx.shadowBlur = 12; ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = a;
+          ctx.shadowBlur = 12; ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    // ================= BACKGROUND =================
+    const drift = [];
+    for (let i = 0; i < 40; i++) {
+      drift.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: -6 - Math.random() * 12,
+        vy: (Math.random() - 0.5) * 4,
+        r: 0.6 + Math.random() * 1.2,
+        hueIdx: Math.random() < 0.6 ? 0 : 1,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+    // Stars (static positions, only shown when T.stars)
+    const stars = [];
+    for (let i = 0; i < 60; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.9,
+        r: 0.5 + Math.random() * 1.4,
+        phase: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.001 + Math.random() * 0.003,
+      });
+    }
+
+    function updateDrift(dt) {
+      const dtSec = dt / 1000;
+      for (const d of drift) {
+        if (T.risingParticles) {
+          // Bubbles: rise upward with gentle horizontal wobble
+          d.x += Math.sin((d.phase + performance.now() * 0.001)) * 8 * dtSec;
+          d.y -= (30 + d.r * 10) * dtSec;
+          if (d.y < -10) {
+            d.y = H + 10;
+            d.x = Math.random() * W;
+          }
+        } else if (T.sandBlow) {
+          // Sand: strong horizontal blow, minimal vertical
+          d.x += d.vx * 2.2 * dtSec;
+          d.y += d.vy * 0.4 * dtSec;
+          if (d.x < -10) { d.x = W + 10; d.y = Math.random() * H; }
+          if (d.y < -10) d.y = H + 10;
+          if (d.y > H + 10) d.y = -10;
+        } else {
+          d.x += d.vx * dtSec;
+          d.y += d.vy * dtSec;
+          if (d.x < -10) { d.x = W + 10; d.y = Math.random() * H; }
+          if (d.y < -10) d.y = H + 10;
+          if (d.y > H + 10) d.y = -10;
+        }
+      }
+    }
+
+    function renderGrid(time) {
+      // ---- STATIC LAYER (blit cached bg + vignette + grid + moon) ----
+      ensureStaticLayer();
+      ctx.drawImage(staticLayer, 0, 0);
+
+      // ---- STARS twinkle (dynamic — Midnight only) ----
+      if (T.stars) {
+        ctx.save();
+        for (const s of stars) {
+          const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(time * s.twinkleSpeed + s.phase));
+          ctx.fillStyle = `rgba(255,255,220,${twinkle})`;
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = '#ffeecc';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * twinkle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // ---- DRIFT PARTICLES (dynamic) ----
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      for (const d of drift) {
+        const pulse = 0.5 + 0.5 * Math.sin(time * 0.002 + d.phase);
+        const color = T.driftColors[d.hueIdx].replace('ALPHA', (0.25 * pulse).toFixed(2));
+        ctx.fillStyle = color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = color;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // ================= UTILITIES =================
+    function lerpColor(c1, c2, t) {
+      const p = c => [
+        parseInt(c.slice(1,3),16),
+        parseInt(c.slice(3,5),16),
+        parseInt(c.slice(5,7),16),
+      ];
+      const [r1,g1,b1] = p(c1);
+      const [r2,g2,b2] = p(c2);
+      return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
+    }
+    // Lighten a hex color toward white by factor (0..1)
+    function lightenColor(hex, factor) {
+      const r = parseInt(hex.slice(1,3), 16);
+      const g = parseInt(hex.slice(3,5), 16);
+      const b = parseInt(hex.slice(5,7), 16);
+      const lr = Math.round(r + (255 - r) * factor);
+      const lg = Math.round(g + (255 - g) * factor);
+      const lb = Math.round(b + (255 - b) * factor);
+      return `rgb(${lr},${lg},${lb})`;
+    }
+    // Darken a hex color toward black by factor (0..1)
+    function darkenColor(hex, factor) {
+      const r = parseInt(hex.slice(1,3), 16);
+      const g = parseInt(hex.slice(3,5), 16);
+      const b = parseInt(hex.slice(5,7), 16);
+      const dr = Math.round(r * (1 - factor));
+      const dg = Math.round(g * (1 - factor));
+      const db = Math.round(b * (1 - factor));
+      return `rgb(${dr},${dg},${db})`;
+    }
+
+    // ================= MAIN LOOP =================
+    /** One step of everything that moves in play. */
+    function stepWorld(dt) {
+      updateSnake(dt);
+      updateDecoys();
+      updateRivals(dt);
+      updateHunters(dt);
+      checkContacts();
+      if (rules.mode && game.state === 'playing') rules.mode.step?.(modeApi, dt);
+      updateApples(dt);
+      updateEagle(dt);
+      updateParticles(dt);
+    }
+
+    let lastTime = performance.now();
+    function loop(time) {
+      // Paused (the Hall's menu, a hidden tab), the scene holds still and the clock waits.
+      const dt = paused ? 0 : Math.min(50, time - lastTime);
+      lastTime = time;
+
+      if (game.state !== 'playing') game.overOffTime += dt;
+
+      updateDrift(dt);
+      stepWorld(dt);
+
+      renderGrid(time);
+      renderExits(time);
+      renderFences(time);
+      rules.mode?.under?.(ctx, modeApi, time);
+      renderApples(time);
+      renderRivals(time);
+      renderDecoys(time);
+      renderPeckWarnings();
+      renderParticles();
+
+      // Fade snake gradually during death, hide fully after a moment.
+      if (game.state === 'dead') {
+        const t = Math.min(1, game.overOffTime / 400);
+        ctx.save();
+        ctx.globalAlpha = 1 - t;
+        renderSnake(time);
+        ctx.restore();
+      } else {
+        renderSnake(time);
+      }
+
+      renderHunters(time);
+      renderEagle(time);
+      rules.mode?.over?.(ctx, modeApi, time);
+      emit({ type: 'frame', canvas });
+
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // ================= THE DESK'S HANDLE =================
+    window.TalonGame = {
+      themes: Object.fromEntries(Object.entries(THEMES).map(([key, t]) => [key, { name: t.name, swatch: t.swatch }])),
+      on(listen) { listeners.push(listen); },
+      /** The desk is open: the region's scene in the background, the bird circling. */
+      showMenu(theme) {
+        setTheme(theme);
+        hideOverlay();
+        game.state = 'menu';
+        game.score = 0;
+        rules = PORT_RULES;
+        rivals.length = 0;
+        hunters.length = 0;
+        decoys.length = 0;
+        eagle.quarry = null;
+        initApples();
+        updateScoreDisplay();
+      },
+      /**
+       * A flight in a region: its scene, its bird, its rules (src/rules.mjs: fence, harvest,
+       * rivals, carrying), the best escape the line under the field shows, and (for the Daily
+       * Flight) its random draw.
+       */
+      begin({ theme, tuning, rules: flightRules, random, best = 0 }) {
+        setTheme(theme);
+        tune = { ...ORIGINAL_TUNE, ...tuning };
+        rules = flightRules || PORT_RULES;
+        rand = random || Math.random;
+        game.bestScore = best;
+        game.birdAsleep = false;
+        game.birdHunger = 1;
+        game.diveQuickening = 1;
+        game.fruitSpot = null;
+        modeApi.state = {};
+        restartGame();
+        rules.mode?.start?.(modeApi);
+        emit({ type: 'start', left: fruitLeft() });
+      },
+      setPaused(value) { paused = value; },
+      /** The handle a challenge's mode plays on (the desk reads its status and result). */
+      get modeApi() { return modeApi; },
+      /** Space in a flight: shed the tail as a decoy, if it can be shed now. */
+      shedTail() { return shedTail(); },
+      setReducedMotion(value) { reducedMotion = value; },
+      get state() { return game.state; },
+      get score() { return game.score; },
+      /** For the browser tests and the balance check: what is on the field. */
+      peek() {
+        return { head: { ...snake.segments[0] }, heading: { dx: snake.dx, dy: snake.dy },
+          length: snake.segments.length, carried: game.score, left: fruitLeft(), bare: game.bare,
+          rivalsAte: game.rivalsAte, rivalsTaken: game.rivalsTaken, rivalsCutOff: game.rivalsCutOff,
+          withered: game.withered,
+          leaving: game.leaving?.edge ?? null,
+          apples: apples.map((a) => ({ x: a.x, y: a.y })),
+          rivals: rivals.map((r) => ({ x: r.segments[0].x, y: r.segments[0].y, ate: r.ate,
+            body: r.segments.filter((_, i) => i >= NECK && i % 3 === 0).map((s) => ({ x: s.x, y: s.y })) })),
+          hunters: hunters.map((h) => ({ x: h.x, y: h.y, state: h.state, aim: h.aim })),
+          pecks: game.pecks, huntersAte: game.huntersAte,
+          fences: rules.fences,
+          eagle: { state: eagle.state, x: eagle.x, y: eagle.y, targetX: eagle.targetX, targetY: eagle.targetY,
+            lockMs: eagle.lockMs, diveMs: eagle.diveMs, quarry: quarryKind() },
+          decoys: decoys.length, shedReadyIn: Math.max(0, game.shedReadyAt - game.clock),
+          selfCollision: Boolean(rules.selfCollision),
+          body: snake.segments.filter((_, i) => i >= 16 && i % 3 === 0).map((s) => ({ x: s.x, y: s.y })),
+          size: { width: W, height: H } };
+      },
+      /**
+       * For the balance check: plays on without drawing, `stepMs` at a time, asking
+       * `steer(peek)` for a direction ({ dx, dy }, or nothing to keep on) before every step,
+       * until the flight ends or `limitMs` has passed. Returns the game's state and the time.
+       */
+      fastForward(limitMs, steer, stepMs = 16) {
+        let t = 0;
+        for (; t < limitMs && game.state === 'playing'; t += stepMs) {
+          const want = steer(this.peek());
+          if (want) { input.dx = want.dx; input.dy = want.dy; }
+          stepWorld(stepMs);
+        }
+        return { state: game.state, ms: t };
+      },
+      /**
+       * For the browser tests of the desk's flow (reports, the ending, the Daily Flight): the
+       * hunters leave, and unless kept the rivals too and the bird stops locking on, so
+       * teleporting the head about cannot end the flight by accident.
+       */
+      clearThreats({ keepBird = false, keepRivals = false } = {}) {
+        hunters.length = 0;
+        if (!keepRivals) rivals.length = 0;
+        if (keepBird) return;
+        eagle.patience = Infinity;
+        eagle.quarry = null;
+        if (eagle.state !== 'glide') { eagle.state = 'climb'; eagle.stateTime = 0; }
+      },
+      /** For the browser tests: put the head somewhere, as if it had slithered there. */
+      placeHead(x, y) {
+        const head = snake.segments[0];
+        const dx = x - head.x;
+        const dy = y - head.y;
+        for (const segment of snake.segments) { segment.x += dx; segment.y += dy; }
+      },
+    };
+    document.dispatchEvent(new Event('talon-ready'));
+  })();
+  </script>
+  <script type="module" src="src/desk.mjs"></script>
+</body>
+</html>
