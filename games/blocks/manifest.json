@@ -1,0 +1,127 @@
+{
+  "id": "blocks",
+  "title": "Sinkers",
+  "tagline": "Drop deep. Fill the row. Ride the bubbles.",
+  "teaser": "Shapes sink slowly through a glowing aquarium. Slide them, spin them, then send them plunging — the farther they fall, the more they score. Fill a row and it bursts into a column of bubbles. Born as a tiny, deliberately unreadable program in 1989.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 15],
+  "status": "shipped",
+  "accent": "#0f8fb0",
+  "emblem": "M12 18a8 8 0 0 1 16 0Q26 25 28 32a8 8 0 0 1-16 0Q14 25 12 18ZM36 6a4 4 0 1 0 .01 0M39 19a3 3 0 1 0 .01 0",
+  "inspiredBy": {
+    "program": "tetris",
+    "originalTitle": "tetris (BSD)",
+    "uiTitle": "the 1992 Berkeley falling-blocks game",
+    "year": 1992
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "sinkers — slide and spin shapes as they sink through a tank of water; plunge them deep for points and fill rows to burst them into bubbles.",
+    "description": "Chris Torek and Darren F. Provine's falling-blocks game began as a winner of the 1989 International Obfuscated C Code Contest and reached Berkeley's games in 1992. In it, rows score nothing: points come from landing a shape and from how far you drop it, times the level. Sinkers makes that drop the heart of the game, in an aquarium of glassy pebbles.",
+    "seeAlso": ["worm", "snake"]
+  },
+  "howToPlay": [
+    "Slide with ← and →, turn with ↑ or Z and X; ↓ sinks faster, Space plunges straight down.",
+    "The farther a shape plunges, the more it scores; fill a row from wall to wall and it bursts.",
+    "Plunges in a row build a depth combo that multiplies your next burst; letting one settle on its own starts it over."
+  ],
+  "cronGoals": [
+    {
+      "id": "rows",
+      "stat": "rows",
+      "label": "Burst {n} rows",
+      "min": 40,
+      "max": 200
+    },
+    {
+      "id": "plunged",
+      "stat": "plunged",
+      "label": "Plunge {n} rows in all",
+      "min": 150,
+      "max": 700
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-burst",
+      "title": "First burst",
+      "description": "Fill a row from wall to wall and watch it burst.",
+      "tier": "core"
+    },
+    {
+      "id": "four-row-burst",
+      "title": "Four at once",
+      "description": "Burst four rows with a single sinker.",
+      "tier": "core"
+    },
+    {
+      "id": "plunge-100",
+      "title": "Hundred-row plunge",
+      "description": "Plunge a hundred rows in all, in one run.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Dive seven Daily Dives.",
+      "tier": "core"
+    },
+    {
+      "id": "depth-combo-5",
+      "title": "Five deep",
+      "description": "Cash in a depth combo of five or more with a burst.",
+      "tier": "extra"
+    },
+    {
+      "id": "bubble-chain",
+      "title": "Bubble chain",
+      "description": "Burst rows with three sinkers in a row.",
+      "tier": "extra"
+    },
+    {
+      "id": "steady-hands",
+      "title": "Steady hands",
+      "description": "Win a dive without using the sink key once.",
+      "tier": "extra"
+    },
+    {
+      "id": "seaweed-gardener",
+      "title": "Seaweed gardener",
+      "description": "Clear every strand of seaweed from Kelp Forest.",
+      "tier": "extra"
+    },
+    {
+      "id": "night-diver",
+      "title": "Night diver",
+      "description": "Win the Night Dive by your sinkers’ own light.",
+      "tier": "extra"
+    },
+    {
+      "id": "counter-clockwise",
+      "title": "Counter-clockwise",
+      "description": "Earn three stars in a dive turning only to the left, as in 1992.",
+      "tier": "rare"
+    },
+    {
+      "id": "obfuscated",
+      "title": "Obfuscated",
+      "description": "Clear ten rows of Classic 1992 started at level 5 or higher.",
+      "tier": "rare"
+    },
+    {
+      "id": "champion",
+      "title": "Champion of the tank",
+      "description": "Set a Marathon record from every starting level, 1 to 9.",
+      "tier": "rare"
+    }
+  ]
+}
