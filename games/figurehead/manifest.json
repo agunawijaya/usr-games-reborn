@@ -1,0 +1,134 @@
+{
+  "id": "figurehead",
+  "title": "Figurehead",
+  "tagline": "Every ship has a face. Every voyage leaves a mark.",
+  "teaser": "Live the whole life of one frigate, from her launch to her last passage home: twelve chapters over thirty years. Take prizes whole and choose their prize crews by the six-to-one rule, make captains of your officers, and wear every battle's scars. Lose her, and the carving at her bow sails on.",
+  "category": "strategy",
+  "directory": "/usr/games/strategy",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [10, 25],
+  "status": "shipped",
+  "accent": "#b9842c",
+  "emblem": "M6 30h24c5 0 9-3 12-8M40 22l6-6M41 21c3-1 4-3 3-6M20 30V8M13 13h14M12 21h16M8 30l3 8h20l5-8",
+  "inspiredBy": {
+    "program": "sail",
+    "originalTitle": "sail",
+    "uiTitle": "sail",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "figurehead — sail one ship through her whole life, and bring her prizes home.",
+    "description": "A reborn sail, Dave Riggle's 1980 game of fighting sail from BSD Unix, with Ed Wang's and Craig Leres's later work. Its rules are kept, from the wind table to the six-to-one rule for prisoners; around them, a ship's life of twelve chapters, prizes that join her squadron, scars that stay, and a carving that outlives her hulls.",
+    "seeAlso": ["sail", "lightkeeper", "trek"]
+  },
+  "howToPlay": [
+    "Pick a dot on the chart to steer; the rose shows how far she can sail on each heading.",
+    "Fire what bears, then make it so; rake from ahead or astern for the heaviest broadside.",
+    "Bring prizes home with enough hands: one for every six prisoners, two more to keep her."
+  ],
+  "cronGoals": [
+    {
+      "id": "prizes",
+      "stat": "prizes",
+      "label": "Bring {n} prizes home",
+      "min": 2,
+      "max": 5
+    },
+    {
+      "id": "broadsides",
+      "stat": "broadsides",
+      "label": "Fire {n} broadsides",
+      "min": 20,
+      "max": 60
+    },
+    {
+      "id": "mentions",
+      "stat": "mentions",
+      "label": "Be mentioned {n} times in the log",
+      "min": 3,
+      "max": 9
+    }
+  ],
+  "packages": [
+    {
+      "id": "maiden-cruise",
+      "title": "Maiden cruise",
+      "description": "Sail her first chapter to its end.",
+      "tier": "core"
+    },
+    {
+      "id": "first-prize",
+      "title": "Her first prize",
+      "description": "Bring a prize home.",
+      "tier": "core"
+    },
+    {
+      "id": "raking-fire",
+      "title": "Raking fire",
+      "description": "Fire a broadside down an enemy’s length.",
+      "tier": "core"
+    },
+    {
+      "id": "taken-whole",
+      "title": "Taken whole",
+      "description": "Take a prize with her hull at half or better.",
+      "tier": "core"
+    },
+    {
+      "id": "fair-weather",
+      "title": "Fair weather",
+      "description": "Win a Today’s Weather.",
+      "tier": "core"
+    },
+    {
+      "id": "signal-flying",
+      "title": "Signal flying",
+      "description": "Hoist a signal to your squadron.",
+      "tier": "core"
+    },
+    {
+      "id": "old-hands",
+      "title": "Old hands",
+      "description": "See her crew become crack.",
+      "tier": "extra"
+    },
+    {
+      "id": "captain-made",
+      "title": "A captain made",
+      "description": "Give one of your officers a prize to command.",
+      "tier": "extra"
+    },
+    {
+      "id": "brought-home",
+      "title": "Brought her home",
+      "description": "Take back your own ship.",
+      "tier": "extra"
+    },
+    {
+      "id": "bare-poles",
+      "title": "Bare poles",
+      "description": "Bring down every mast of an enemy ship.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-life",
+      "title": "A full life",
+      "description": "See a ship to her last anchorage.",
+      "tier": "rare"
+    },
+    {
+      "id": "best-crew-afloat",
+      "title": "The best crew afloat",
+      "description": "See her crew become elite.",
+      "tier": "rare"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@usr-games/game-figurehead",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Figurehead: the life of one sailing ship, from her launch to her last voyage. Inspired by sail (BSD games, 1980).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5320 --strictPort",
+    "sim": "tsx scripts/sim.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}
