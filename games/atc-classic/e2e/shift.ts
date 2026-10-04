@@ -8,7 +8,7 @@ import { gameFrame, inGame } from '../../../packages/bridge/testing/hall';
  */
 
 /** Truthy inside the game's page once the game menu's desk has its tabs and the logbook. */
-export const READY = "document.querySelectorAll('#title-desk .desk-tab').length === 4";
+export const READY = "document.querySelectorAll('#title-desk .desk-tab').length === 5";
 
 /** The desk's tabs by their number keys. */
 const MODE_KEYS = { career: '1', open: '2', daily: '3' } as const;

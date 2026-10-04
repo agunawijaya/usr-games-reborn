@@ -94,24 +94,39 @@ test('offers the Hall one still of the radar a few seconds into the shift', asyn
   expect(await page.evaluate('window.__posters.length')).toBe(1);
 });
 
-test('switching sector in the middle of a shift reports the old one as quit', async ({ page }) => {
+test('switching sector in the middle of a shift asks first, then reports the old one as quit', async ({
+  page,
+}) => {
   await runInHall(page, game.id);
   await waitForGame(page, game.ready);
   await beginShift(page);
   await forceTick(page);
-  await gameFrame(page).locator('.pf-btn[data-pf="default"]').click();
+  const frame = gameFrame(page);
+  await frame.locator('.pf-btn[data-pf="default"]').click();
+  // Keeping on working changes nothing; the second time the controller switches.
+  await frame.locator('[data-action="confirm-no"]').click();
+  await expect(frame.locator('#menu-overlay')).not.toHaveClass(/shown/);
+  await expect(frame.locator('#bezel-sector')).toContainText('Training');
+  await frame.locator('.pf-btn[data-pf="default"]').click();
+  await frame.locator('[data-action="confirm-yes"]').click();
+  await expect(frame.locator('#briefing-overlay')).toHaveClass(/shown/);
   await expect
     .poll(() => savedGameStats(page, game.id))
     .toMatchObject({ sessions: 1, completed: 0 });
 });
 
 test.describe('Escape and the tutorial', () => {
-  test('on the title, ? opens nothing and Escape leads back to the Hall', async ({ page }) => {
+  test('on the title, ? opens how to play, Escape closes it, and Escape again leads back to the Hall', async ({
+    page,
+  }) => {
     await runInHall(page, game.id);
     await waitForGame(page, game.ready);
     await expect(page.locator('.pl-page')).toHaveClass(/is-on-title/);
     await page.keyboard.press('?');
+    await expect(gameFrame(page).locator('#help-overlay')).toHaveClass(/shown/);
+    await page.keyboard.press('Escape');
     await expect(gameFrame(page).locator('#help-overlay')).not.toHaveClass(/shown/);
+    await expect(page.locator('.pl-page')).toHaveClass(/is-on-title/);
     await page.keyboard.press('Escape');
     await expectBackInHall(page);
   });

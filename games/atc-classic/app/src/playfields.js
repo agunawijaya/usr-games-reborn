@@ -1,13 +1,15 @@
 // atc/fancy-web — Built-in playfields
 // Ported from BSD atc /games/ directory (Ed James's original hand-crafted maps)
 // Coordinates are 0-indexed. Directions per engine.js DIR constants.
+// The sector codes on the bezel start with Q, a letter no ICAO region uses for its airports, so
+// none of them can name a real airport (docs/NOTES.md, "Our own names").
 
 import { DIR } from './engine.js';
 
 /** DEFAULT — Ed James's reference training map. 30x21 with 7 exits + 3 airports. */
 export const DEFAULT_FIELD = {
   name: 'Default',
-  displayName: 'KJFK-Approach · Reference Sector',
+  displayName: 'QREF Approach · Reference Sector',
   width: 30,
   height: 21,
   updateSecs: 5,
@@ -51,7 +53,7 @@ export const DEFAULT_FIELD = {
 /** EASY — A gentler 20x15 sector, 4 exits + 1 airport + 1 beacon. */
 export const EASY_FIELD = {
   name: 'Easy',
-  displayName: 'KTNG-Approach · Training Sector',
+  displayName: 'QTRN Approach · Training Sector',
   width: 20,
   height: 15,
   updateSecs: 6,
@@ -84,7 +86,7 @@ export const EASY_FIELD = {
 /** KILLER — Ed James's notoriously hard map. Faster ticks, more spawns. */
 export const KILLER_FIELD = {
   name: 'Killer',
-  displayName: 'KILLER · Advanced Sector',
+  displayName: 'QKLR Approach · Advanced Sector',
   width: 30,
   height: 21,
   updateSecs: 3,

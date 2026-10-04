@@ -16,16 +16,18 @@ const SEED = 1986;
 
 test.beforeEach(({ page }) => seedTheShift(page, SEED));
 
-/**
- * Begins a Default shift with the radar in full view: the reference panel (\) is put away, and
- * the Hall's strip, which lingers a moment after the title, has tucked itself away.
- */
+/** A new career's first-shift tips are for players; a tip still up is dismissed for the picture. */
+async function dismissTips(page: Page) {
+  const close = gameFrame(page).locator('#tip:not([hidden]) .tip-close');
+  while (await close.count()) await close.click();
+}
+
+/** Begins an open shift on the Default sector; the reference card starts closed. */
 async function beginOnDefault(page: Page) {
   await page.keyboard.press('2');
   await gameFrame(page).locator('.title-sector-btn[data-pf="default"]').click();
   await beginShift(page, 'open');
-  await page.keyboard.press('\\');
-  await expect(page.locator('.pl-page')).not.toHaveClass(/is-strip-open/, { timeout: 10_000 });
+  await dismissTips(page);
 }
 
 /** The cheat panel helps the suite type; players never see it, so the pictures do not either. */
@@ -37,6 +39,7 @@ async function hideCheat(page: Page) {
 /** The first assignment flown to its relief, with the report printed in full. */
 async function relieved(page: Page) {
   await beginShift(page, 'career');
+  await dismissTips(page);
   await followTheHints(page, 2);
   await expect(gameFrame(page).locator('#game-over')).toHaveClass(/shown/);
   await page.keyboard.press('Shift');

@@ -124,6 +124,28 @@ What made the difference on the slow path: the danger hatching is a cached tile,
 cached sprites, glow is skipped on small squares, the window light and night vignette are painted
 once per size, and between turns the board redraws at 30 fps (11 fps on the Long Night's field).
 
+## Polish pass (prompt P1-Z, 2026-10-02)
+
+The consolidation review (`docs/media/review/REVIEW.md`) found the cat a speck on big boards, the
+room-cleared reveal too quiet, the day trails blobby and the panel untidy. This pass changed
+presentation only: `src/engine/` is untouched, and the solver proves every stored par again
+(`src/data/house.test.ts`, 55 unit tests in all). The before-and-after frames and the critique
+rounds are in [`media/polish/POLISH.md`](media/polish/POLISH.md).
+
+| What                         | Number                                                                                  |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| The cat's height             | 0.695 of its drawing size, drawn at 1.32 squares: about 0.92 of a square                |
+| Smallest square (`MIN_CELL`) | 53 px, so the cat is at least 48 px tall at 1280×720 and above                          |
+| Rooms that follow the cat    | The Long Night always; at 1280×720 also the whole house (17×11) and the bathroom (19×5) |
+| The follow                   | A 140 ms ease towards the cat, instant under reduced motion                             |
+| A big floor's pixels         | At most nine megapixels: past that the floor is painted a little softer                 |
+| Hatching away from the cat   | A third as strong (0.32) as on the cat's eight neighbours                               |
+| The day lane                 | 0.36 of a square wide (was 0.62); the night lane stays 0.62                             |
+| The payoff                   | 2.25 s: close-up to 1.45×, hops, stretch and "mrrp" at 0.82 s, trails 1.3–2.15 s        |
+| The reduced-motion payoff    | A still of the tangle with the trails, held 0.7 s                                       |
+| Frames in the payoff         | 60 fps, p95 16.8 ms, worst frame 16.8 ms at 1920×1080, both looks (136 frames)          |
+| Frames on the Long Night     | 60 fps, p95 16.8 ms while the camera follows four turns at 1920×1080                    |
+
 ## Decisions log
 
 | Date       | Decision                                                                              | Why                                                                      |
@@ -136,9 +158,14 @@ once per size, and between turns the board redraws at 30 fps (11 fps on the Long
 | 2026-10-01 | The Long Night's panel sits under the field                                           | 59 columns need the width: squares grow from 16 to 21 pixels at 1280×720 |
 | 2026-10-01 | Real-time mode (`-r`) left out                                                        | A timer fights a puzzle; recorded as an open idea                        |
 | 2026-10-01 | House rooms are searched against a difficulty band, not taken at the first valid seed | The first search made the first two rooms the hardest                    |
+| 2026-10-02 | P1-Z: the owner approved the polish frames                                            | The checkpoint after §5                                                  |
+| 2026-10-02 | The Long Night follows the cat too, with edge markers and Whole room (O)              | A 48 px cat leaves about 36 of its 59 columns in view at 1920            |
+| 2026-10-02 | Packages earned mid-room are announced with the results                               | The Hall's notes now sit bottom-left, over the floor; none mid-puzzle    |
+| 2026-10-02 | The counter, the line and the room's packages change only after the payoff            | The win is seen before it is read                                        |
 
 ## Open questions
 
 - A real-time chapter after `-r` (vacuums move every three seconds) could be a later room or a
   Long Night option.
-- The owner may want a hero-frame review of the two looks before the game is promoted on Home.
+- Hush the Wumpus keeps its room card where the Hall's toasts stack (KNOWN-ISSUES #49); that is
+  for its owner, not for Zoomies.

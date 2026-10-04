@@ -1,5 +1,8 @@
+import { worldName } from '../data/worlds';
 import type { Beat } from '../engine/beats';
+import { systemsDown } from '../engine/preview';
 import type { Point, WatchState } from '../engine/types';
+import { type FlareGuide, flareGuide } from './flare-guide';
 import { decorRandom, hashOf, type Look, PALETTES, type Palette } from './palette';
 import { type Scene, sceneAtArrival, sceneOf, samePoint } from './scene';
 import {
@@ -68,6 +71,15 @@ export interface Geometry {
 
 const now = () => performance.now() / 1000;
 
+/** The Lantern drawn a third larger than her cell: the hero of the zone. */
+const SHIP_SCALE = 1.32;
+/** How long a saved world's moment lasts, in seconds; the order's animation waits for it. */
+const MOMENT_SECONDS = 1.5;
+const STILL_MOMENT_SECONDS = 1.2;
+
+const easeOut = (k: number) => 1 - (1 - k) * (1 - k);
+const smooth = (k: number) => k * k * (3 - 2 * k);
+
 export class ZoneView {
   readonly ctx: CanvasRenderingContext2D;
   look: Look;
@@ -82,8 +94,14 @@ export class ZoneView {
     shrouded: false,
     moored: false,
     ember: false,
+    beamsReady: false,
   };
   overlay: ZoneOverlay = { kind: 'none' };
+  /**
+   * When the last order's saved-world moment begins, in seconds after the order started, or
+   * null when it saved none here. The screen times the chime and the chart by it.
+   */
+  lastMomentAt: number | null = null;
   cursor: Point | null = null;
   selected: Point | null = null;
   showCursor = false;
@@ -101,6 +119,8 @@ export class ZoneView {
   private visible = true;
   private busyUntil = 0;
   private stillTime = 1.3;
+  /** A world being saved: the camera eases towards it while its moment plays. */
+  private moment: { at: Point; name: string; start: number; end: number } | null = null;
 
   constructor(
     readonly canvas: HTMLCanvasElement,
@@ -162,6 +182,7 @@ export class ZoneView {
     this.shipTween = null;
     this.pending = [];
     this.busyUntil = 0;
+    this.moment = null;
   }
 
   get busy(): boolean {
@@ -172,6 +193,19 @@ export class ZoneView {
   skip(next: WatchState) {
     for (const item of this.pending) item.apply();
     this.show(next);
+  }
+
+  /** The flare being aimed, as it is drawn; null when no flare is being aimed. */
+  flareGuide(): FlareGuide | null {
+    const overlay = this.overlay;
+    if (overlay.kind !== 'flare' || !this.scene) return null;
+    return flareGuide(this.geometry, this.scene.ship, overlay);
+  }
+
+  /** The world whose saving is blooming right now, if any. */
+  get blooming(): string | null {
+    const m = this.moment;
+    return m && now() >= m.start && now() <= m.end ? m.name : null;
   }
 
   center(at: Point): { x: number; y: number } {
@@ -188,12 +222,19 @@ export class ZoneView {
   }
 
   private syncShip(s: WatchState) {
+    const moored = s.ship.condition === 'moored';
     this.ship = {
       shieldUp: s.ship.shieldUp,
       shieldFraction: s.ship.shield / s.params.shield,
       shrouded: s.ship.shrouded,
-      moored: s.ship.condition === 'moored',
+      moored,
       ember: s.ship.vessel === 'ember',
+      // The emitters glow while a volley could be fired: power aboard, the banks working.
+      beamsReady:
+        !moored &&
+        !s.ship.shrouded &&
+        s.ship.energy > 0 &&
+        !systemsDown(s).some((down) => down.system === 'beams'),
     };
   }
 
@@ -211,6 +252,7 @@ export class ZoneView {
     const shipPos = () => this.scene?.ship ?? next.ship.cell;
     let volleyAt = -1;
     let beamAt = -1;
+    this.lastMomentAt = null;
 
     beats.forEach((beat, index) => {
       if (beat.type !== 'shot' && volleyAt >= 0) {
@@ -430,6 +472,21 @@ export class ZoneView {
             if (this.scene) this.scene.swept.push(...beat.cells);
           });
           break;
+        case 'world-relit': {
+          // The signature moment: once the beams have landed, the saved world blooms.
+          if (!beat.byUs || !samePoint(beat.zone, next.ship.zone) || !next.worldCell) break;
+          const time = t + d(0.3);
+          const duration = this.reducedMotion ? STILL_MOMENT_SECONDS : MOMENT_SECONDS;
+          const where = { ...next.worldCell };
+          const name = worldName(beat.world);
+          this.lastMomentAt = time - start;
+          at(time, () => {
+            this.moment = { at: where, name, start: time, end: time + duration };
+          });
+          this.addEffect(time, duration, (ctx, k) => this.bloom(ctx, where, name, beat.world, k));
+          t = time + duration;
+          break;
+        }
         default:
       }
     });
@@ -482,6 +539,12 @@ export class ZoneView {
     const t = this.reducedMotion ? this.stillTime : time;
     ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
     ctx.clearRect(0, 0, this.width, this.height);
+    const camera = this.camera(time);
+    if (camera) {
+      ctx.translate(camera.x + camera.focusX, camera.y + camera.focusY);
+      ctx.scale(camera.zoom, camera.zoom);
+      ctx.translate(-camera.focusX, -camera.focusY);
+    }
     this.drawBackground();
     const scene = this.scene;
     if (scene) {
@@ -497,6 +560,39 @@ export class ZoneView {
       effect.draw(ctx, k, this);
       ctx.restore();
     }
+  }
+
+  /**
+   * While a saved world's moment plays, the view leans in towards it: a little closer, and a
+   * world in a corner drawn towards the middle, so the moment is seen. Still under reduced
+   * motion.
+   */
+  private camera(
+    time: number,
+  ): { zoom: number; x: number; y: number; focusX: number; focusY: number } | null {
+    const m = this.moment;
+    if (!m || this.reducedMotion || time < m.start || time > m.end) return null;
+    const k = (time - m.start) / (m.end - m.start);
+    const lean = k < 0.25 ? smooth(k / 0.25) : k > 0.8 ? smooth((1 - k) / 0.2) : 1;
+    const focus = this.center(m.at);
+    const middleX = this.width / 2;
+    const middleY = this.height / 2;
+    const offCentre = Math.min(
+      1,
+      Math.hypot(focus.x - middleX, focus.y - middleY) / (this.geometry.board * 0.45),
+    );
+    const pull = 0.38 * lean * offCentre;
+    const zoom = 1 + 0.16 * lean;
+    // Never pull so far that the view slides off the painted canvas and bares its edge.
+    const keepCovered = (shift: number, at: number, size: number) =>
+      Math.min(at * (zoom - 1), Math.max(-(size - at) * (zoom - 1), shift));
+    return {
+      zoom,
+      x: keepCovered((middleX - focus.x) * pull, focus.x, this.width),
+      y: keepCovered((middleY - focus.y) * pull, focus.y, this.height),
+      focusX: focus.x,
+      focusY: focus.y,
+    };
   }
 
   private drawBackground() {
@@ -559,7 +655,11 @@ export class ZoneView {
       drawGleaner(ctx, pos.x, pos.y, cell, p, look, t, g.charge, g.key % 7);
     }
     const shipPos = this.shipTween ? this.lerp(this.shipTween, time) : this.center(scene.ship);
-    drawShip(ctx, shipPos.x, shipPos.y, cell, p, look, t, { ...this.ship, heading: this.heading });
+    drawShip(ctx, shipPos.x, shipPos.y, cell * SHIP_SCALE, p, look, t, {
+      ...this.ship,
+      heading: this.heading,
+      beamReach: 1.7,
+    });
   }
 
   private drawDarkness(scene: Scene) {
@@ -630,37 +730,76 @@ export class ZoneView {
       }
       ctx.restore();
     }
-    if (overlay.kind === 'flare') {
-      const scene = this.scene!;
-      const from = this.center(scene.ship);
-      ctx.save();
-      // The scatter wedge: where a flare may really go.
-      const bearing = (overlay.bearing * Math.PI) / 180;
-      const spread = (overlay.scatter * Math.PI) / 180;
+    const guide = this.flareGuide();
+    if (guide) {
+      const { from, to: end } = guide;
       const reach = cell * 11;
-      const base = bearing - Math.PI / 2;
-      ctx.fillStyle =
-        this.look === 'night' ? 'rgba(255, 210, 120, 0.09)' : 'rgba(184, 95, 0, 0.08)';
-      for (const offset of overlay.burst > 0 ? [-overlay.burst, 0, overlay.burst] : [0]) {
-        const o = (offset * Math.PI) / 180;
-        ctx.beginPath();
-        ctx.moveTo(from.x, from.y);
-        ctx.arc(from.x, from.y, reach, base + o - spread, base + o + spread);
-        ctx.closePath();
-        ctx.fill();
+      ctx.save();
+      // The stray wedges: where the flare may really go, ±scatter either side of the bearing;
+      // a spread of three (Shift) adds two faint ones. Then the bearing itself, flown true.
+      for (const wedge of guide.wedges) {
+        ctx.save();
+        if (wedge.faint) ctx.globalAlpha = 0.35;
+        this.wedge(ctx, from, reach, wedge.from, wedge.to);
+        ctx.restore();
       }
       ctx.strokeStyle = p.flare;
       ctx.lineWidth = Math.max(2, cell * 0.05);
-      ctx.setLineDash([cell * 0.06, cell * 0.1]);
+      ctx.lineCap = 'round';
+      ctx.setLineDash([cell * 0.12, cell * 0.08]);
+      ctx.lineDashOffset = this.reducedMotion ? 0 : -t * cell * 0.25;
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
-      for (const c of overlay.path) {
-        const pt = this.center(c);
-        ctx.lineTo(pt.x, pt.y);
-      }
+      ctx.lineTo(end.x, end.y);
       ctx.stroke();
       ctx.restore();
     }
+  }
+
+  /** The stray wedge of a flare; in the Chart look hatched in ink with a darker edge. */
+  private wedge(
+    ctx: CanvasRenderingContext2D,
+    from: { x: number; y: number },
+    reach: number,
+    a0: number,
+    a1: number,
+  ) {
+    const { cell } = this.geometry;
+    const path = () => {
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.arc(from.x, from.y, reach, a0, a1);
+      ctx.closePath();
+    };
+    ctx.save();
+    path();
+    if (this.look === 'night') {
+      ctx.fillStyle = 'rgba(255, 210, 120, 0.11)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 210, 120, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = 'rgba(184, 95, 0, 0.12)';
+      ctx.fill();
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(122, 64, 0, 0.32)';
+      ctx.lineWidth = 1;
+      const step = cell * 0.18;
+      for (let d = -reach; d < reach; d += step) {
+        ctx.beginPath();
+        ctx.moveTo(from.x + d - reach, from.y - reach);
+        ctx.lineTo(from.x + d + reach, from.y + reach);
+        ctx.stroke();
+      }
+      ctx.restore();
+      ctx.save();
+      path();
+      ctx.strokeStyle = '#8a4a00';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   private drawOverlayOver(t: number) {
@@ -845,6 +984,81 @@ export class ZoneView {
     ctx.beginPath();
     ctx.arc(c.x, c.y, cell * (from + (to - from) * k), 0, Math.PI * 2);
     ctx.stroke();
+  }
+
+  /**
+   * A world saved: its light swells outward in two rings, the world shines over everything,
+   * and its name lifts above it in the display face. Under reduced motion: a steady ring and
+   * the name, at once.
+   */
+  private bloom(ctx: CanvasRenderingContext2D, at: Point, name: string, world: number, k: number) {
+    const c = this.center(at);
+    const { cell, x0, board } = this.geometry;
+    const { p, look } = this;
+    const still = this.reducedMotion;
+    const fade = k > 0.82 ? (1 - k) / 0.18 : 1;
+    if (!still) {
+      const grow = easeOut(Math.min(1, k / 0.65));
+      const radius = cell * (0.6 + 2.8 * grow);
+      const light = ctx.createRadialGradient(c.x, c.y, cell * 0.2, c.x, c.y, radius);
+      light.addColorStop(
+        0,
+        look === 'night' ? 'rgba(255, 214, 130, 0.7)' : 'rgba(242, 166, 50, 0.5)',
+      );
+      light.addColorStop(
+        0.45,
+        look === 'night' ? 'rgba(255, 196, 92, 0.22)' : 'rgba(242, 166, 50, 0.18)',
+      );
+      light.addColorStop(1, 'rgba(255, 196, 92, 0)');
+      ctx.globalAlpha = (k < 0.65 ? 1 : 1 - (k - 0.65) / 0.35) * fade;
+      ctx.fillStyle = light;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = p.lamp;
+      for (const delay of [0, 0.16]) {
+        const f = Math.max(0, Math.min(1, (k - delay) / 0.6));
+        if (f <= 0 || f >= 1) continue;
+        ctx.globalAlpha = (1 - f) * fade;
+        ctx.lineWidth = Math.max(1.5, cell * 0.06 * (1 - f));
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, cell * (0.45 + 2.3 * easeOut(f)), 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else {
+      ctx.globalAlpha = fade;
+      ctx.strokeStyle = p.lamp;
+      ctx.lineWidth = Math.max(2, cell * 0.06);
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, cell * 0.62, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = fade;
+    const swell = still ? 0 : 0.06 * Math.sin(Math.min(1, k / 0.5) * Math.PI);
+    drawWorld(ctx, c.x, c.y, cell * (0.32 + swell), p, look, 1.3, 'lit', world * 31);
+    // The name rises over the world (below it when the world sits on the top row).
+    const rise = still ? 1 : easeOut(Math.min(1, k / 0.35));
+    const below = at.row < 1;
+    const size = Math.max(20, cell * 0.44);
+    ctx.font = `600 ${size}px "Source Serif 4 Variable", "Source Serif 4", Georgia, serif`;
+    const width = ctx.measureText(name).width;
+    const x = Math.min(Math.max(c.x, x0 + width / 2 + 4), x0 + board - width / 2 - 4);
+    const y = below ? c.y + cell * (0.55 + 0.4 * rise) + size : c.y - cell * (0.5 + 0.45 * rise);
+    ctx.globalAlpha = (still ? 1 : Math.min(1, k / 0.25)) * fade;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(4, size * 0.22);
+    ctx.strokeStyle = look === 'night' ? 'rgba(6, 10, 23, 0.85)' : 'rgba(244, 235, 215, 0.92)';
+    ctx.strokeText(name, x, y);
+    ctx.fillStyle = look === 'night' ? p.lampSoft : p.ink;
+    ctx.fillText(name, x, y);
+    ctx.font = `600 ${Math.max(11, size * 0.42)}px "IBM Plex Mono", ui-monospace, monospace`;
+    const small = 'SAFE';
+    ctx.lineWidth = 3;
+    ctx.strokeText(small, x, y + size * 0.62);
+    ctx.fillStyle = p.lamp;
+    ctx.fillText(small, x, y + size * 0.62);
   }
 
   private nova(ctx: CanvasRenderingContext2D, at: Point, k: number) {

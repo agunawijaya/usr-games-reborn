@@ -102,6 +102,33 @@ On the workbench at 1920×1080 on this machine's GPU (`tsx scripts/perf.ts`): 60
 16.8 ms) idle in a zone, while the gleaners fire, and during a volley. Everything is Canvas 2D; the
 zone's background is painted once per zone and size into an offscreen canvas.
 
+## Polish pass (prompt P1-L, 2026-10-02)
+
+The consolidation review (`docs/media/review/REVIEW.md`) found play reading like a control panel
+and the signature moment "a thin line and a number". This pass changed presentation, layout and
+the timing of feedback only: `src/engine/` is untouched and its golden runs
+(`src/engine/engine.test.ts`, `src/engine/balance.test.ts`) pass unchanged. The before-and-after
+frames, with the critique rounds, are in [`media/polish/POLISH.md`](media/polish/POLISH.md).
+
+| What                | Number                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| The bloom           | 0.3 s after the shots land, for 1.5 s (1.2 s, still, under reduced motion)             |
+| The view's lean     | Up to 1.16× closer and 0.38 of the way to the middle, clamped to the painted canvas    |
+| The Lantern         | Drawn at 1.32 cells; her lamp reaches 1.7 cells                                        |
+| The log drawer      | The last 3 lines on screen; the whole watch (up to 200 orders) in the drawer           |
+| Layout breakpoints  | Orders in one column at ≥ 1,000 px tall; standing hints hide under 800 px tall         |
+| Frame time in bloom | 60 fps, p95 16.8 ms, worst frame 16.8 ms at 1920×1080, both looks (90 frames measured) |
+
+Two timing faults turned up and were fixed on the way. A package earned during an order put the
+Hall's note over the moment, so installs now wait for the landing. The orders' notes already
+counted the gleaners after the order while the zone's facts still showed them, so the orders wait
+for the landing too. An order issued in the 30 ms between an animation's end and its landing
+would also have dropped the previous order's log lines; the next order now lands the last first.
+Under 1,180 px wide the first layout collapsed its rows (a grid of fixed height shrinks `auto` rows
+to nothing when its content overflows), so the narrow layouts size their rows to their content and
+scroll, and the status bar wraps its chips under the meters when the row is short. Checked at
+2560×1440, 1200×760, 1024×768 and 800×900.
+
 ## Decisions log
 
 | Date       | Decision                                                                                                    | Why                                                                                         |
@@ -112,10 +139,15 @@ zone's background is painted once per zone and size into an offscreen canvas.
 | 2026-10-02 | Beams preview and suggestion use the real formula, searched at worst luck                                   | The original's own estimate is about four times too high                                    |
 | 2026-10-02 | The time portal rewinds the galaxy, not the ship                                                            | The 1976 intent; the NetBSD copy ran backwards                                              |
 | 2026-10-02 | Catalog position: after the toys, before `sail`                                                             | Next to the strategy games; the Hall's progression simulation stays on target with it there |
+| 2026-10-02 | P1-L: the owner approved the polish frames                                                                  | The checkpoint after §4                                                                     |
+| 2026-10-02 | The log sits under the calls, at the foot of the right column                                               | It keeps every order in view at 1280×720; the brief placed only the calls                   |
+| 2026-10-02 | The panels, the orders and the log turn only after the bloom                                                | As briefed; turning the world card with the bloom was tried and set aside                   |
+| 2026-10-02 | The flare line keeps the exact bearing and stops level with the cell the flight meets                       | The card says "flown true"; drawing to the cell's centre bent the line by a degree or two   |
 
 ## Open questions
 
 - The Hall's progression target "a casual player reaches `user` on day 1" depends on the seeded
   choice of favourite games, so adding a catalog row can flip it; Lightkeeper's position was chosen
   to keep it green. A sturdier target is for the kit owner.
-- No hero-frame review happened; the owner may want one before promoting the game.
+- The Hall's Pause pill still shows on the game menu and the results screen; that is the Hall's to
+  change (prompt P1-Z).

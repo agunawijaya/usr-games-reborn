@@ -16,31 +16,31 @@ import {
 } from '../src/chatter.js';
 import { DIR, FEATURE, STATUS } from '../src/engine.js';
 
-test('speakCallsign expands airline + digits', () => {
-  assert.equal(speakCallsign('UAL42'), 'United four two');
-  assert.equal(speakCallsign('DAL9'), 'Delta niner');
-  assert.equal(speakCallsign('BAW100'), 'Speedbird one zero zero');
+test('speakCallsign expands the carrier’s radio name + digits', () => {
+  assert.equal(speakCallsign('HBM42'), 'Hornbeam four two');
+  assert.equal(speakCallsign('QLW9'), 'Quailwood niner');
+  assert.equal(speakCallsign('STW100'), 'Stackwind one zero zero');
 });
 
 test('speakCallsign uses niner for 9', () => {
-  const s = speakCallsign('UAL99');
+  const s = speakCallsign('HBM99');
   assert.ok(s.includes('niner niner'));
 });
 
 test('chatterOnSpawn: PILOT speaker, includes callsign + altitude', () => {
-  const line = chatterOnSpawn('UAL42', 7, 'C', 'Easy');
+  const line = chatterOnSpawn('HBM42', 7, 'C', 'Easy');
   assert.equal(line.speaker, SPEAKER.PILOT);
-  assert.ok(line.subtitle.includes('UAL42'));
+  assert.ok(line.subtitle.includes('HBM42'));
   assert.ok(line.subtitle.includes('level 7000'));
-  assert.ok(line.tts.includes('United four two'));
+  assert.ok(line.tts.includes('Hornbeam four two'));
   assert.ok(line.tts.includes('seven thousand'));
 });
 
 test('chatterOnCommand altitude: YOU speaker, correct verb', () => {
   const plane = { altitude: 5, dir: DIR.N };
-  const climb = chatterOnCommand('DAL10', { action: 'altitude', arg: 7 }, plane);
-  const descend = chatterOnCommand('DAL10', { action: 'altitude', arg: 3 }, plane);
-  const level = chatterOnCommand('DAL10', { action: 'altitude', arg: 5 }, plane);
+  const climb = chatterOnCommand('QLW10', { action: 'altitude', arg: 7 }, plane);
+  const descend = chatterOnCommand('QLW10', { action: 'altitude', arg: 3 }, plane);
+  const level = chatterOnCommand('QLW10', { action: 'altitude', arg: 5 }, plane);
   assert.equal(climb.speaker, SPEAKER.YOU);
   assert.ok(climb.subtitle.includes('climb and maintain'));
   assert.ok(descend.subtitle.includes('descend and maintain'));
@@ -49,7 +49,7 @@ test('chatterOnCommand altitude: YOU speaker, correct verb', () => {
 
 test('chatterOnCommand turn: heading in tts uses phonetic digits', () => {
   const plane = { altitude: 5, dir: DIR.N };
-  const line = chatterOnCommand('BAW7', { action: 'turn', arg: DIR.E }, plane);
+  const line = chatterOnCommand('STW7', { action: 'turn', arg: DIR.E }, plane);
   assert.ok(line.tts.includes('zero niner zero'));
   assert.ok(line.subtitle.includes('090'));
 });
@@ -62,27 +62,26 @@ test('chatterOnCommand admin actions return null', () => {
 });
 
 test('chatterOnLand: controller farewells', () => {
-  const line = chatterOnLand('AFR12', '0');
+  const line = chatterOnLand('ELW12', '0');
   assert.equal(line.speaker, SPEAKER.YOU);
   assert.ok(line.subtitle.toLowerCase().includes('welcome'));
 });
 
 test('chatterOnExit: hand-off to center', () => {
-  const line = chatterOnExit('UAL5', '2');
+  const line = chatterOnExit('GYF5', '2');
   assert.equal(line.speaker, SPEAKER.YOU);
   assert.ok(line.subtitle.toLowerCase().includes('contact center'));
 });
 
-test('chatterOnLoss: MAYDAY from pilot', () => {
-  const line = chatterOnLoss('UAL42', 'ran out of fuel');
-  assert.equal(line.speaker, SPEAKER.PILOT);
-  assert.ok(line.subtitle.includes('MAYDAY'));
-  assert.ok(line.subtitle.includes('UAL42'));
-  assert.ok(line.subtitle.toLowerCase().includes('fuel'));
+test('chatterOnLoss: the controller says what happened, calmly', () => {
+  const line = chatterOnLoss('HBM42', 'fuel exhausted, diverted');
+  assert.equal(line.speaker, SPEAKER.YOU);
+  assert.equal(line.subtitle, 'HBM42, fuel exhausted, diverted. All stations, stand by.');
+  assert.ok(line.tts.startsWith('Hornbeam four two, fuel exhausted'));
 });
 
 test('chatterOnFuelWarn: PILOT declares minimum fuel', () => {
-  const line = chatterOnFuelWarn('AAL13');
+  const line = chatterOnFuelWarn('CPW13');
   assert.equal(line.speaker, SPEAKER.PILOT);
   assert.ok(line.subtitle.toLowerCase().includes('minimum fuel'));
 });

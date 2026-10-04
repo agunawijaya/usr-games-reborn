@@ -82,6 +82,8 @@ class PlayScreen {
   private observer: ResizeObserver;
   private dragFrom: Point | null = null;
   private watching = false;
+  private wholeRoom = false;
+  private earned: string[] = [];
   /** A loss is reported only once the player moves on: an undo takes it back. */
   private pendingLoss: (() => void) | null = null;
 
@@ -115,6 +117,7 @@ class PlayScreen {
       undo: () => this.undo(),
       nap: () => this.request(() => this.loafRun('nap')),
       toggleWhiskers: () => this.toggleWhiskers(),
+      toggleWholeRoom: () => this.toggleWholeRoom(),
     });
     this.board.append(this.canvas);
     const element = h(
@@ -127,11 +130,13 @@ class PlayScreen {
       this.panel.element,
     );
     this.playElement = element;
-    this.observer = new ResizeObserver(() =>
-      this.view.resize(this.board.clientWidth, this.board.clientHeight),
-    );
+    this.observer = new ResizeObserver(() => {
+      this.view.resize(this.board.clientWidth, this.board.clientHeight);
+      this.panel.offerWholeRoom(this.view.roomOutgrowsView);
+    });
     this.observer.observe(this.board);
     this.bindPointer();
+    this.bindFocus();
     this.view.start();
     this.refresh();
     this.panel.say(this.openingLine());
@@ -145,6 +150,7 @@ class PlayScreen {
       },
       focus: () => this.canvas.focus({ preventScroll: true }),
       destroy: () => {
+        this.flushEarned();
         this.flushLoss();
         this.observer.disconnect();
         this.view.destroy();
@@ -245,8 +251,14 @@ class PlayScreen {
   // Input
 
   private onKey(event: KeyboardEvent): boolean {
+    // Any key lands the room-cleared payoff at once.
+    if (this.view.celebrating) {
+      this.view.skipCelebration();
+      return true;
+    }
     if (this.overlay) return this.overlayKey(event);
     if (this.watching) return false;
+    if (document.activeElement === this.canvas) this.showFocus(true);
     const action = this.app.keys.actionFor(event);
     if (!action || event.repeat) return action !== null;
     if (action in MOVES) {
@@ -258,6 +270,7 @@ class PlayScreen {
     else if (action === 'nap' && this.mode.kind === 'night')
       this.request(() => this.loafRun('nap'));
     else if (action === 'whiskers') this.toggleWhiskers();
+    else if (action === 'whole-room') this.toggleWholeRoom();
     return true;
   }
 
@@ -282,6 +295,11 @@ class PlayScreen {
     });
     this.canvas.addEventListener('pointerleave', () => this.view.setHover(null));
     this.canvas.addEventListener('pointerdown', (event) => {
+      this.showFocus(false);
+      if (this.view.celebrating) {
+        this.view.skipCelebration();
+        return;
+      }
       if (this.overlay || this.watching) return;
       this.dragFrom = this.view.cellFromClient(event.clientX, event.clientY);
       this.canvas.setPointerCapture(event.pointerId);
@@ -298,6 +316,24 @@ class PlayScreen {
       const aim = fromCat && to ? to : target;
       this.step(Math.sign(aim.x - cat.x) as Step, Math.sign(aim.y - cat.y) as Step);
     });
+  }
+
+  /**
+   * The board shows the keyboard's focus on the cat itself, not as a frame around the board:
+   * only when it came by keyboard, and gone again on a click.
+   */
+  private bindFocus() {
+    this.canvas.addEventListener('focus', () =>
+      this.showFocus(this.canvas.matches(':focus-visible')),
+    );
+    this.canvas.addEventListener('blur', () => this.showFocus(false));
+  }
+
+  /** The cue is drawn on the board; `data-focus` says so for anything reading the page. */
+  private showFocus(on: boolean) {
+    this.view.setFocused(on);
+    if (on) this.canvas.dataset.focus = 'cat';
+    else delete this.canvas.dataset.focus;
   }
 
   private step(dx: Step, dy: Step) {
@@ -360,11 +396,15 @@ class PlayScreen {
     this.setSession(session);
     const after = current(session);
     this.app.sounds.turn(events);
-    this.checkPackages(events);
-    this.describe(events, after);
-    this.refresh();
+    // A clearing turn keeps its news for the end of the payoff: the counter updates last.
+    const clears = after.status === 'cleared';
+    if (!clears) {
+      this.checkPackages(events);
+      this.describe(events, after);
+      this.refresh();
+    }
     await this.view.animateTurn(before, after, events);
-    if (after.status !== 'playing') await this.finishRoom(after);
+    if (after.status !== 'playing') await this.finishRoom(after, events);
     else if (mustZoom(after) && action.type !== 'wait') {
       this.panel.say('Nowhere safe to step. Time to zoom!', true);
       this.panel.shakeZoom();
@@ -431,6 +471,19 @@ class PlayScreen {
     this.canvas.classList.add('zm-shake');
   }
 
+  /** On a room too big for the view: follow the cat, or see the whole room at once. */
+  private toggleWholeRoom() {
+    if (!this.view.roomOutgrowsView && !this.wholeRoom) return;
+    this.wholeRoom = !this.wholeRoom;
+    this.view.setWholeRoom(this.wholeRoom);
+    this.panel.setWholeRoom(this.wholeRoom);
+    this.panel.say(
+      this.wholeRoom
+        ? 'Whole room: everything at once, a little smaller.'
+        : 'Following the cat: the view moves with you.',
+    );
+  }
+
   private toggleWhiskers() {
     const on = !this.app.saves.prefs.load().whiskers;
     this.app.saves.prefs.update((p) => ({ ...p, whiskers: on }));
@@ -477,31 +530,50 @@ class PlayScreen {
     this.panel.say(lines.join(' '));
   }
 
+  /**
+   * Packages earned mid-room wait for the room's end, so the Hall's notes never cover the floor
+   * in the middle of a puzzle.
+   */
+  private earn(id: string) {
+    if (!this.earned.includes(id)) this.earned.push(id);
+  }
+
+  private flushEarned() {
+    for (const id of this.earned.splice(0)) this.app.install(id);
+  }
+
   private checkPackages(events: readonly TurnEvent[]) {
     let tangledNow = 0;
     for (const event of events) {
       if (event.type === 'bonk') {
         tangledNow += event.ids.length;
-        if (event.ids.length >= 2 && event.onTangle === null) this.app.install('first-bonk');
-        if (event.onTangle === 'sock') this.app.install('sock-trap');
+        if (event.ids.length >= 2 && event.onTangle === null) this.earn('first-bonk');
+        if (event.onTangle === 'sock') this.earn('sock-trap');
       }
-      if (event.type === 'safe-zoom-earned') this.app.install('earned-loaf');
-      if (event.type === 'dock-jammed') this.app.install('jammed-dock');
+      if (event.type === 'safe-zoom-earned') this.earn('earned-loaf');
+      if (event.type === 'dock-jammed') this.earn('jammed-dock');
     }
-    if (tangledNow >= 4) this.app.install('domino-day');
+    if (tangledNow >= 4) this.earn('domino-day');
   }
 
   // -------------------------------------------------------------------------------------------
   // The end of a room
 
-  private async finishRoom(state: RoomState) {
+  private async finishRoom(state: RoomState, events: readonly TurnEvent[]) {
     this.ended = true;
     if (state.status === 'cleared') {
       this.app.sounds.play('tidy');
-      await this.view.revealTrails();
+      // While the payoff plays the board says so (`data-moment`), for anything reading the page.
+      this.canvas.dataset.moment = 'payoff';
+      await this.view.celebrate({ mrrp: () => this.app.sounds.play('mrrp') });
+      delete this.canvas.dataset.moment;
+      this.checkPackages(events);
+      this.describe(events, state);
+      this.refresh();
     } else {
       await new Promise((resolve) => setTimeout(resolve, this.app.reducedMotion ? 200 : 900));
     }
+    this.flushEarned();
     if (this.mode.kind === 'night') {
       if (state.status === 'cleared') this.waveCleared(state);
       else this.nightOver();

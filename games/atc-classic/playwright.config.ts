@@ -10,13 +10,13 @@ import { GPU_LAUNCH_ARGS } from '../../packages/bridge/testing/shots';
  */
 const { baseURL, webServer } = hostedSuiteConfig();
 
-// `SHOTS=1` runs only the documentation screenshots.
+// `SHOTS=1` runs only the documentation screenshots (shots.spec.ts, polish-shots.spec.ts).
 const shots = Boolean(process.env.SHOTS);
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: shots ? '**/shots.spec.ts' : '**/*.spec.ts',
-  testIgnore: shots ? [] : ['**/shots.spec.ts'],
+  testMatch: shots ? '**/*shots.spec.ts' : '**/*.spec.ts',
+  testIgnore: shots ? [] : ['**/*shots.spec.ts'],
   outputDir: 'test-results',
   timeout: 120_000,
   workers: 1,

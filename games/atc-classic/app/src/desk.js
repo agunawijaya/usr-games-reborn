@@ -36,9 +36,11 @@ function chevrons(rank) {
 export function licenceCard({ career, service, licence }) {
   const rank = rankIndex(career);
   const need = nextRankNeed(career);
-  const endorsements = Object.keys(SECTOR_NAMES)
-    .map((key) => `<span class="endorse ${isEndorsed(career, key) ? 'on' : ''}">${SECTOR_NAMES[key].toUpperCase()}</span>`)
-    .join('');
+  const endorsements =
+    Object.keys(SECTOR_NAMES)
+      .map((key) => `<span class="endorse ${isEndorsed(career, key) ? 'on' : ''}">${SECTOR_NAMES[key].toUpperCase()}</span>`)
+      .join('') +
+    `<span class="endorse fluent ${career.fluent ? 'on' : ''}" title="${career.fluent ? `Earned ${esc(career.fluent)}: ` : ''}50 orders typed by hand in one shift">FLUENT</span>`;
   const row = (label, value) => `<div class="svc-row"><span>${label}</span><b>${esc(value)}</b></div>`;
   return `
     <section class="licence" aria-label="Controller licence">
@@ -152,7 +154,8 @@ export function renderDesk(host, view) {
         : dailyPanel(view.daily);
   host.innerHTML = `
     <div class="desk-tabs" role="group" aria-label="How to work the shift">${tabs}
-      <button type="button" class="desk-tab logbook-btn" data-logbook><kbd>L</kbd> LOGBOOK</button></div>
+      <button type="button" class="desk-tab logbook-btn" data-logbook><kbd>L</kbd> LOGBOOK</button>
+      <button type="button" class="desk-tab" data-settings><kbd>S</kbd> SETTINGS</button></div>
     <div class="desk">
       ${licenceCard(view)}
       <div class="desk-panel">${panel}</div>

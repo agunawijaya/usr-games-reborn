@@ -6,14 +6,14 @@
 // spellings ("niner" for 9, digit-by-digit for headings).
 //
 // Two speakers:
-//   PILOT — the aircraft crew (calls in on spawn, reads back, mayday)
+//   PILOT — the aircraft crew (calls in on spawn, reports at a beacon, minimum fuel)
 //   YOU   — the controller (that is you, the player)
 //
 // Phraseology approximates real ATC / ICAO conventions for authenticity
 // without pretending to be exhaustive. This is game-flavor, not a
 // training tool.
 
-import { DIR_NAMES } from './engine.js';
+import { radioName } from './carriers.js';
 
 export const SPEAKER = { PILOT: 'PILOT', YOU: 'YOU' };
 
@@ -23,21 +23,12 @@ const PHONETIC = {
   '5': 'five', '6': 'six', '7': 'seven', '8': 'eight', '9': 'niner',
 };
 
-const AIRLINE_CALLSIGNS = {
-  UAL: 'United', DAL: 'Delta', AAL: 'American', SWA: 'Southwest',
-  FDX: 'FedEx', JBU: 'JetBlue', ACA: 'Air Canada', BAW: 'Speedbird',
-  DLH: 'Lufthansa', AFR: 'Air France', KLM: 'KLM', QFA: 'Qantas',
-  ANA: 'All Nippon', JAL: 'Japan Air', CPA: 'Cathay',
-};
-
-/** Speak a callsign like "UAL42" as "United four two". */
+/** Speak a callsign like "HBM42" as "Hornbeam four two". */
 export function speakCallsign(cs) {
   if (!cs) return '';
-  const airline = cs.slice(0, 3);
   const num = cs.slice(3);
-  const name = AIRLINE_CALLSIGNS[airline] || airline;
   const spoken = [...num].map(c => PHONETIC[c] || c).join(' ');
-  return `${name} ${spoken}`;
+  return `${radioName(cs)} ${spoken}`;
 }
 
 /** Altitude digit → spoken thousands. e.g. 3 → "three thousand". */
@@ -187,14 +178,14 @@ export function chatterOnFuelWarn(callsign) {
   };
 }
 
-/** Game-losing event. Pilot declares emergency. */
+/** The shift ends: the controller says what happened, calmly, and holds the frequency. */
 export function chatterOnLoss(callsign, reason) {
   const cs = speakCallsign(callsign);
   const shortReason = reason.replace(/\.$/, '');
   return {
-    speaker: SPEAKER.PILOT,
-    subtitle: `MAYDAY MAYDAY MAYDAY. ${callsign}. ${shortReason}.`,
-    tts: `Mayday, mayday, mayday. ${cs}. ${shortReason}.`,
+    speaker: SPEAKER.YOU,
+    subtitle: `${callsign}, ${shortReason}. All stations, stand by.`,
+    tts: `${cs}, ${shortReason}. All stations, stand by.`,
   };
 }
 

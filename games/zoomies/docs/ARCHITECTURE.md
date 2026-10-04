@@ -38,6 +38,9 @@ flowchart LR
 | `src/data/`              | The twelve house rooms (blueprints and the searched layouts) and the daily plan                     |
 | `src/game/`              | Saves, the ladder of results, the Pattern Lab, today's room, package definitions                    |
 | `src/render/`            | `BoardView` (animation from turn events), floor, dust and trails, sprites, effects, icons           |
+| `src/render/camera.ts`   | The camera for big rooms: the smallest square (`MIN_CELL`), framing and the follow                  |
+| `src/render/trails.ts`   | Every roll of the room, in order, and the two ways of drawing the trails                            |
+| `src/render/payoff.ts`   | The room-cleared payoff as a timeline: close-up, hops, stretch, "mrrp", trails, dimming             |
 | `src/ui/`                | The `App` shell, screens, key map, styles                                                           |
 | `src/audio/sounds.ts`    | Synth patches and which turn events play them                                                       |
 | `scripts/`               | Developer tools: room search, rival simulation, workbench screenshots and timing (not shipped)      |
@@ -55,10 +58,10 @@ stateDiagram-v2
   Playing --> Playing: a turn, loaf, undo
   Playing --> Paused: Esc
   Paused --> Playing: Resume
-  Playing --> Reveal: tidy
+  Playing --> Payoff: tidy
   Playing --> Results: caught
-  Reveal --> Results
-  Reveal --> WaveCard: Long Night wave
+  Payoff --> Results: over, or skipped by any key
+  Payoff --> WaveCard: Long Night wave
   WaveCard --> Playing: Next wave
   Results --> Watching: Watch a rival
   Watching --> Results
@@ -121,25 +124,31 @@ circle a lone vacuum for good).
 
 ## Where visuals are defined
 
-| Visual                                      | Defined in                                       | Change it by                                      |
-| ------------------------------------------- | ------------------------------------------------ | ------------------------------------------------- |
-| Day and night colours per room              | `src/render/palette.ts` (`LOOKS`)                | Editing a room's `day` or `night` entry           |
-| Vacuum colours, coats, rival coats          | `src/render/palette.ts`                          | `vacuumColors`, `COATS`, `RIVAL_COATS`            |
-| Floor boards, rugs, tiles, the window light | `src/render/floor.ts`, `BoardView.drawLight`     | Floor and surface painters; painted once per size |
-| Dust, clean stripes, paw prints, night glow | `src/render/dust.ts`                             | `sprinkle`, `sweep`, `paw`                        |
-| The cat and its poses                       | `src/render/sprites/cat.ts`                      | `drawCat` (sit, step, loaf, zoom, fluffed, happy) |
-| Vacuums, visor eyes and moods               | `src/render/sprites/vacuum.ts`                   | `drawVacuum`, `sizeFor`, `drawKindDetails`        |
-| Tangles, socks, cables, the dock            | `src/render/sprites/things.ts`                   |                                                   |
-| Furniture                                   | `src/render/sprites/furniture.ts`                | One function per kind; night shading at the end   |
-| Bonk words, puffs, fur, sparkles, streaks   | `src/render/effects.ts`                          |                                                   |
-| Turn animation, hints, the trail reveal     | `src/render/board-view.ts`                       | `BASE` timings, `drawHints`, `revealTrails`       |
-| Menus, panel, cards                         | `src/ui/styles.css`                              | Tokens at the top: `--zm-*` for each look         |
-| House-map miniatures, icons                 | `src/render/miniature.ts`, `src/render/icons.ts` |                                                   |
+| Visual                                      | Defined in                                       | Change it by                                       |
+| ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
+| Day and night colours per room              | `src/render/palette.ts` (`LOOKS`)                | Editing a room's `day` or `night` entry            |
+| Vacuum colours, coats, rival coats          | `src/render/palette.ts`                          | `vacuumColors`, `COATS`, `RIVAL_COATS`             |
+| Floor boards, rugs, tiles, the window light | `src/render/floor.ts`, `BoardView.drawLight`     | Floor and surface painters; painted once per size  |
+| Dust, clean stripes, paw prints, night glow | `src/render/dust.ts`                             | `sprinkle`, `sweep`, `paw`                         |
+| The cat and its poses                       | `src/render/sprites/cat.ts`                      | `drawCat` (sit, step, loaf, zoom, fluffed, happy)  |
+| Vacuums, visor eyes and moods               | `src/render/sprites/vacuum.ts`                   | `drawVacuum`, `sizeFor`, `drawKindDetails`         |
+| Tangles, socks, cables, the dock            | `src/render/sprites/things.ts`                   |                                                    |
+| Furniture                                   | `src/render/sprites/furniture.ts`                | One function per kind; night shading at the end    |
+| Bonk words, puffs, fur, sparkles, streaks   | `src/render/effects.ts`                          |                                                    |
+| Turn animation, hints, focus cue, markers   | `src/render/board-view.ts`                       | `BASE` timings, `drawHints`, `drawFocusCue`        |
+| The camera on big rooms                     | `src/render/camera.ts`                           | `MIN_CELL`, the follow's time constant             |
+| The room-cleared payoff                     | `src/render/payoff.ts`, `BoardView.celebrate`    | `PAYOFF` timings, `closeness`, `stretch`, `bounce` |
+| The trails (combed by day, dots by night)   | `src/render/trails.ts`                           | `NAP` colours, `combNap`, `glowDots`               |
+| Menus, panel, cards                         | `src/ui/styles.css`                              | Tokens at the top: `--zm-*` for each look          |
+| House-map miniatures, icons                 | `src/render/miniature.ts`, `src/render/icons.ts` |                                                    |
+
+The board keeps its state where the page can read it: `data-moment="payoff"` on the board while the
+room-cleared payoff plays, and `data-focus="cat"` while the keyboard's focus cue is showing.
 
 The game has its own two looks, chosen by the Hall's appearance: **Afternoon** (light) and
 **Midnight** (dark), both designed. It follows appearance changes live. Fonts come from the Hall
-(Fredoka for display, the Hall's body face). Reduced motion: turns change at once, no camera zoom,
-shake or streaks, and the demo slows down. The night glow and other blurs are skipped on small
+(Fredoka for display, the Hall's body face). Reduced motion: turns change at once, the camera jumps
+instead of following, the payoff is a still, no shake or streaks, and the demo slows down. The night glow and other blurs are skipped on small
 squares, and between turns the board redraws at a calmer rate.
 
 ## Where sounds are defined
@@ -160,6 +169,7 @@ All in `src/audio/sounds.ts`, played through the kit's synthesiser (no files):
 | refuse  | A step is refused                           |
 | caught  | A vacuum reaches the cat                    |
 | tidy    | The room is tidy                            |
+| mrrp    | The cat's proud stretch in the payoff       |
 
 ## Hall integration
 
@@ -168,7 +178,7 @@ All in `src/audio/sounds.ts`, played through the kit's synthesiser (no files):
 | A House or daily room is tidied | `reportResult({ outcome: 'win', score, stats: { vacuumsTangled, roomsTidied: 1 }, xpEvents, daily, presentation: 'game' })` |
 | A room is lost                  | The same with `outcome: 'loss'`, sent when the player leaves the results (an undo cancels it)                               |
 | A Long Night ends               | `outcome: 'win'` if a wave was cleared, `stats: { vacuumsTangled, wavesCleared, roomsTidied: 0 }`                           |
-| Events during play              | `installPackage(id)` for the twelve packages                                                                                |
+| Events during play              | `installPackage(id)` for the twelve packages, held until the room ends so the Hall's notes never cover the floor mid-puzzle |
 | Title screen                    | `setOnTitleScreen(true)`; every other screen `false`                                                                        |
 | Pause items                     | In play: "Restart the room" (or "Start the night again") and, in the House, "House map"                                     |
 | Today's Mess                    | Seed and number from `context.daily`; `share()` with the day, turns against par, stars and rivals beaten                    |
@@ -192,6 +202,8 @@ hidden. `poster()` draws the living room one turn before the end of its par rout
 | House and daily rooms         | (same)                                                                      | Every stored par is proven again; daily rooms are deterministic and solvable       |
 | Rivals and ladder             | (same)                                                                      | Mochi and Pip read the original; the Professor's ghost and corner quirks; ranking  |
 | In the Hall                   | `pnpm exec playwright test -c games/zoomies`                                | Launch, a room cleared by keyboard, results, packages, ways out, no requests       |
+| The polish pass               | (same; `e2e/polish.spec.ts`)                                                | The payoff (played, skipped, reduced motion), 9+ vacuums, focus cue, keyboard only |
+| Before-and-after frames       | `SHOTS=1 pnpm exec playwright test -c games/zoomies polish-shots`           | `docs/media/polish/`, with POLISH.md                                               |
 | Workbench screenshots         | `pnpm --dir games/zoomies dev`, then `tsx games/zoomies/scripts/drive.ts …` | The screenshots in `docs/media/`                                                   |
 | Frame timing                  | `tsx games/zoomies/scripts/perf.ts …`                                       | 60 fps at 1920×1080 (see NOTES.md)                                                 |
 | Rival ladder over many nights | `tsx games/zoomies/scripts/sim-rivals.ts 40`                                | The medians in NOTES.md                                                            |

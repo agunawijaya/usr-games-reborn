@@ -16,6 +16,8 @@ export const REPORT_WIDTH = 44;
  * @property {number} exits
  * @property {number} takeoffs
  * @property {number} orders     orders the engine accepted
+ * @property {number} [buttonOrders]  of those, orders given with the order buttons
+ * @property {boolean} [fluent]  this shift earned the Fluent nod
  * @property {number} refused    orders the parser or the engine refused
  * @property {number} seconds    time on position, pauses left out
  * @property {'relieved' | 'lost' | 'quit'} ended
@@ -118,5 +120,6 @@ export function reportLines(summary) {
   for (const text of wrap(result(summary))) lines.push(line(text, 'result'));
   lines.push(line(`RANK: ${summary.rank.title.toUpperCase()}${summary.rank.promoted ? ' · PROMOTED' : ''}`, 'result'));
   if (summary.rank.next) lines.push(line(`NEXT: ${summary.rank.next.toUpperCase()}`));
+  if (summary.fluent) lines.push(line('FLUENT · 50 ORDERS TYPED BY HAND', 'result'));
   return lines;
 }

@@ -75,8 +75,8 @@ barrel distortion). Green phosphor palette exclusively; letters
 rendered via VT323 font at ~90% cell height with glow.
 
 Rationale: the fancy-web port style (ADR-006) explicitly permits
-visual reinterpretation; the terminal-appearance monopoly on
-BSD-lineage web ATC games is exactly the identity gap this port
+visual reinterpretation; the terminal look that every
+BSD-lineage web ATC game shares is exactly the identity gap this port
 targets.
 
 ### Command line
@@ -457,19 +457,19 @@ replaces the help overlay.
 ### ATC radio chatter (voice + subtitles)
 The port now emits ATC radio-style phraseology for game events:
 
-- **Spawn (from exit)** — PILOT calls approach: *"Approach, UAL42,
+- **Spawn (from exit)** — PILOT calls approach: *"Approach, HBM42,
   level 7000, information Charlie, requesting instructions."*
 - **Spawn (from airport, ground)** — PILOT requests departure:
-  *"Ground, UAL42, ready for departure airport 0."*
-- **Player command** — CONTROLLER (you) transmits: *"UAL42, descend
-  and maintain 3000."* / *"UAL42, turn heading 090."* / etc.
-- **Beacon crossing** — PILOT reports: *"UAL42, over beacon 1."*
-- **Landing** — CONTROLLER farewells: *"UAL42, welcome to airport 0.
+  *"Ground, HBM42, ready for departure airport 0."*
+- **Player command** — CONTROLLER (you) transmits: *"HBM42, descend
+  and maintain 3000."* / *"HBM42, turn heading 090."* / etc.
+- **Beacon crossing** — PILOT reports: *"HBM42, over beacon 1."*
+- **Landing** — CONTROLLER farewells: *"HBM42, welcome to airport 0.
   Contact ground, good day."*
-- **Exit** — CONTROLLER hands off: *"UAL42, contact center, good day."*
-- **Low fuel (≤6)** — PILOT declares: *"UAL42, minimum fuel,
+- **Exit** — CONTROLLER hands off: *"HBM42, contact center, good day."*
+- **Low fuel (≤6)** — PILOT declares: *"HBM42, minimum fuel,
   requesting priority."*
-- **Loss** — PILOT emergency: *"MAYDAY MAYDAY MAYDAY. UAL42. Ran out
+- **Loss** — PILOT emergency: *"MAYDAY MAYDAY MAYDAY. HBM42. Ran out
   of fuel."*
 
 Two display channels, independently toggleable:
@@ -479,7 +479,7 @@ Two display channels, independently toggleable:
    line, auto-hides after ~2.5–5s based on line length.
 2. **Voice (TTS)** (default OFF) — Web Speech API synthesizes the
    TTS-formatted line. Uses aviation phonetics ("niner", digit-by-
-   digit headings) and airline callsign expansion (UAL42 → "United
+   digit headings) and airline callsign expansion (HBM42 → "Hornbeam
    four two"). Browsers vary in voice quality; the port picks
    `en-US` if available, falls back to any English voice, then the
    default.
@@ -526,7 +526,7 @@ approximate the look of a real 1980s ATC radar screen:
    `→A0` for airport 0) rendered as a compact two-line data block
    to the right of each plane's letter.
 5. **Realistic callsigns** — each plane is assigned a random
-   callsign on spawn (e.g. `UAL42`, `DAL887`, `BAW1234`) drawn
+   callsign on spawn (e.g. `HBM42`, `QLW887`, `STW1234`) drawn
    from a pool of 15 real airline ICAO codes. Callsigns appear
    in the traffic sidebar and event log but **the command
    grammar is unchanged** — you still type `A`, `B`, `C` to
@@ -569,18 +569,18 @@ radar?" question raised in initial playtest (2026-09-21).
   gradient).
 - **All 17 canonical sectors.** MVP ships 3; the remaining 14
   (Novice, Crossover, Crosshatch, Box, Two-Corners, Airports,
-  Game_2/3/4, Tic-Tac-Toe, OHare, Atlantis, Real-JFK, Real-LHR)
-  are v2.
+  Game_2/3/4, Tic-Tac-Toe, Atlantis and the maps named after real
+  airports) are v2.
 - **Delayed commands.** `@b<n>` / `ab<n>` "do action at beacon N"
   suffix. Grammar parser already accepts them; engine does not act
   on `delayedBeacon` yet.
 - **Voice input.** Web Speech API + ATC phraseology parser.
   Educational hook for the aviation-nerd audience.
-- **Daily-seed leaderboard.** Requires a backend (Cloudflare KV
-  candidate). Wordle-style social loop.
-- **LiveATC.net ambient overlay.** Public-domain audio feed loop
+- **Daily-seed leaderboard.** Requires a backend (a key-value
+  store). A once-a-day social loop.
+- **Recorded-radio ambient overlay.** A public-domain audio loop
   as optional atmospheric layer.
-- **Full ICAO phraseology mode.** Callsigns ("United 42"), ATIS
+- **Full ICAO phraseology mode.** Callsigns ("Hornbeam 42"), ATIS
   broadcasts, STAR/approach patterns.
 - **Coop / adversarial multiplayer.** WebRTC / WebSocket driven.
 - **VR tower fantasy.** 3D interior scene with plane blips visible

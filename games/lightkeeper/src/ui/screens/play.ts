@@ -23,27 +23,54 @@ import {
 } from '../../engine/preview';
 import type { Point, SystemId } from '../../engine/types';
 import type { WatchKind } from '../../game/saves';
+import { lights } from '../../engine/score';
 import { type OrderOutcome, WatchSession } from '../../game/session';
 import { ChartView } from '../../render/chart-view';
 import { ZoneView } from '../../render/zone-view';
 import type { App, Screen } from '../app';
-import { days, type LogLine, power, SYSTEM_DOWN, SYSTEM_NAMES, zoneLabel } from '../copy';
+import {
+  days,
+  type LogLine,
+  power,
+  SYSTEM_DOWN,
+  SYSTEM_NAMES,
+  type Tone,
+  zoneLabel,
+} from '../copy';
 import { button, h } from '../dom';
 import { coachTip } from './coach';
 import { statusBar } from './status';
 
 /**
- * A watch in progress. The zone on the left is where orders are aimed; the chart on the right
- * is the whole Reach with its lights and calls; the log and the dock sit beside and below.
- * Every order goes through the session; the views only animate what it reports.
+ * A watch in progress. The zone on the left is the stage, where orders are aimed. The bridge
+ * column beside it holds the zone's facts, the preview of the order being aimed, the First
+ * Officer, the world in view and the orders; the column on the right holds the chart of the
+ * whole Reach, its calls and the ship's log, folded to its last three lines. Every order goes
+ * through the session; the views animate what it reports, and the panels and the log catch up
+ * once the animation has landed.
  */
+
+/** Each line's mark in the log, so its kind never depends on colour alone. */
+const TONE_MARKS: Record<Tone, { icon: string; label: string }> = {
+  good: { icon: '✓', label: 'Good news' },
+  bad: { icon: '✕', label: 'Harm' },
+  warn: { icon: '!', label: 'Warning' },
+  radio: { icon: '◉', label: 'Radio' },
+  info: { icon: '·', label: 'Note' },
+};
+/** Lines the log drawer shows; "Open log" (L) shows them all. */
+const RECENT_LINES = 3;
 
 type Mode = 'helm' | 'flare' | 'hail' | 'sweep';
 type Sheet = 'beams' | 'rest' | 'more' | null;
 
 export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen {
+  // Packages earned by an order are reported once the order has landed, so the Hall's note
+  // never announces a world saved before the screen shows it.
+  let issuing = false;
+  const heldPackages: string[] = [];
   const hooks = {
-    install: (id: string) => app.install(id),
+    install: (id: string) => (issuing ? heldPackages.push(id) : app.install(id)),
     report: (result: Parameters<App['report']>[0]) => app.report(result),
     dateKey: () => app.context.daily.dateKey(),
     daySeed: () => app.context.daily.seed(),
@@ -80,19 +107,17 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   });
   const coach = h('div', { class: 'lk-coach', dataset: { testid: 'lk-coach' } });
   const sheet = h('div', { class: 'lk-sheet', hidden: true, dataset: { testid: 'lk-sheet' } });
+  const worldCard = h('section', {
+    class: 'lk-world',
+    'aria-label': 'World in view',
+    hidden: true,
+    dataset: { testid: 'lk-world' },
+  });
+  const dock = h('footer', { class: 'lk-dock', 'aria-label': 'Orders' });
   const zonePanel = h(
     'section',
     { class: 'lk-zone', 'aria-label': 'Zone' },
     h('div', { class: 'lk-zone__stage' }, zoneCanvas),
-    h(
-      'div',
-      { class: 'lk-zone__info' },
-      h('div', { class: 'lk-zone__head' }, zoneTitle, zoneFacts),
-      modeHint,
-      tip,
-      coach,
-      sheet,
-    ),
   );
   const chartCanvas = h('canvas', {
     class: 'lk-chart__canvas',
@@ -108,11 +133,48 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     dataset: { testid: 'lk-calls' },
   });
   const systems = h('div', { class: 'lk-systems', dataset: { testid: 'lk-systems' } });
-  const log = h('ol', {
+  const recentLog = h('ol', {
     class: 'lk-log',
     'aria-live': 'polite',
-    'aria-label': 'Log',
+    'aria-label': 'Latest log lines, newest first',
     dataset: { testid: 'lk-log' },
+  });
+  const logBox = h(
+    'section',
+    { class: 'lk-logbox', 'aria-labelledby': 'lk-logbox-title' },
+    h(
+      'div',
+      { class: 'lk-logbox__head' },
+      h('h2', { class: 'lk-logbox__title', id: 'lk-logbox-title' }, 'Ship’s log'),
+      button('Open log', {
+        onClick: () => toggleLog(),
+        key: 'L',
+        variant: 'quiet',
+        testId: 'lk-log-open',
+      }),
+    ),
+    recentLog,
+  );
+  // The orders stay in reach at the foot of the bridge; on a short screen the notes above them
+  // scroll instead.
+  const bridgeNotes = h(
+    'div',
+    { class: 'lk-bridge__info', role: 'group', 'aria-label': 'Notes on the zone' },
+    h('div', { class: 'lk-zone__head' }, zoneTitle, zoneFacts),
+    modeHint,
+    tip,
+    coach,
+    worldCard,
+    sheet,
+  );
+  const bridge = h('aside', { class: 'lk-bridge', 'aria-label': 'Bridge' }, bridgeNotes, dock);
+  const fullLog = h('div', {
+    class: 'lk-logsheet',
+    hidden: true,
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-labelledby': 'lk-logsheet-title',
+    dataset: { testid: 'lk-log-full' },
   });
   const side = h(
     'aside',
@@ -125,16 +187,16 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
       chartTip,
     ),
     h('div', { class: 'lk-side__lists' }, calls, systems),
-    log,
+    logBox,
   );
-  const dock = h('footer', { class: 'lk-dock', 'aria-label': 'Orders' });
   const element = h(
     'section',
     { class: 'lk-screen lk-play', dataset: { testid: 'lk-play' } },
     status.element,
     zonePanel,
+    bridge,
     side,
-    dock,
+    fullLog,
   );
 
   const zoneView = new ZoneView(zoneCanvas, app.look, app.reducedMotion);
@@ -155,6 +217,14 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   let beamEnergy = 0;
   let endTimer = 0;
   let animationTimer = 0;
+  let chimeTimer = 0;
+  /** The order whose animation is still playing: the panels and the log show it once it lands. */
+  let landing: OrderOutcome | null = null;
+  /** The log, one entry per order, for the full log's turn headings. */
+  const turns: { day: number; lines: LogLine[] }[] = [];
+  let logOpen = false;
+  /** What had the focus when the whole log opened, to give it back on closing. */
+  let logOpener: HTMLElement | null = null;
 
   const state = () => session.state;
   const isDown = (system: SystemId) => systemsDown(state()).some((d) => d.system === system);
@@ -163,9 +233,12 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   // ---- Orders -------------------------------------------------------------------------
   function issue(order: Order) {
     if (session.over) return;
-    if (zoneView.busy) finishAnimation();
+    // The order before this one lands first, so none of its log is lost.
+    if (zoneView.busy || landing) finishAnimation();
     armed = null;
+    issuing = true;
     const outcome = session.issue(order);
+    issuing = false;
     if (!outcome.accepted) {
       app.sounds.play('refused');
       showTip(outcome.lines[0]?.text ?? 'That order cannot be carried out.', 'warn');
@@ -174,32 +247,55 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     playOutcome(outcome);
   }
 
+  /**
+   * Plays an order: the zone and the chart animate it at once, and the status, the panels and
+   * the log wait until it has landed, so a world saved is seen before it is read about. Any key
+   * or click lands it at once.
+   */
   function playOutcome(outcome: OrderOutcome) {
     const speed = (app.reducedMotion ? 0.45 : 1) * zoneView.pace;
     const duration = zoneView.play(outcome.prev, outcome.state, outcome.beats);
-    chartView.play(outcome.prev, outcome.state, outcome.beats);
-    app.sounds.forBeats(outcome.beats, speed);
-    appendLog(outcome.lines);
-    const stretched = outcome.beats.some((b) => b.type === 'clock' && b.after > b.before);
-    status.update(outcome.state, stretched);
+    const momentAt = zoneView.lastMomentAt;
+    chartView.play(outcome.prev, outcome.state, outcome.beats, momentAt);
+    app.sounds.forBeats(outcome.beats, speed, momentAt === null ? [] : ['relit']);
+    window.clearTimeout(chimeTimer);
+    if (momentAt !== null)
+      chimeTimer = window.setTimeout(() => app.sounds.play('relit'), momentAt * 1000);
     if (!samePoint(outcome.prev.ship.zone, outcome.state.ship.zone)) {
       zoneCursor = { ...outcome.state.ship.cell };
       chartCursor = { ...outcome.state.ship.zone };
     }
     mode = 'helm';
     closeSheet();
+    landing = outcome;
     window.clearTimeout(animationTimer);
-    animationTimer = window.setTimeout(() => refreshAll(), duration * 1000 + 30);
-    refreshAll();
+    animationTimer = window.setTimeout(land, duration * 1000 + 30);
+    refreshDock();
+    refreshZoneHead();
     if (session.over) {
       window.clearTimeout(endTimer);
       endTimer = window.setTimeout(finishWatch, duration * 1000 + (app.reducedMotion ? 300 : 900));
     }
   }
 
+  /** The order's animation has landed: the status, the panels and the log catch up. */
+  function land() {
+    const outcome = landing;
+    landing = null;
+    window.clearTimeout(animationTimer);
+    for (const id of heldPackages.splice(0)) app.install(id);
+    if (!outcome) return;
+    appendLog(outcome.lines);
+    const stretched = outcome.beats.some((b) => b.type === 'clock' && b.after > b.before);
+    status.update(outcome.state, stretched);
+    refreshAll();
+  }
+
   function finishAnimation() {
     zoneView.skip(state());
     chartView.show(state());
+    window.clearTimeout(chimeTimer);
+    land();
   }
 
   function finishWatch() {
@@ -508,12 +604,141 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   }
 
   // ---- Panels -------------------------------------------------------------------------
+  function logLine(line: LogLine) {
+    const mark = TONE_MARKS[line.tone];
+    return h(
+      'li',
+      { class: 'lk-log__line', dataset: { tone: line.tone } },
+      h('span', { class: 'lk-log__mark', 'aria-label': mark.label, role: 'img' }, mark.icon),
+      h('span', { class: 'lk-log__text' }, line.text),
+    );
+  }
+
   function appendLog(lines: readonly LogLine[]) {
-    for (const line of lines) {
-      log.append(h('li', { class: 'lk-log__line', dataset: { tone: line.tone } }, line.text));
+    if (lines.length === 0) return;
+    turns.push({ day: state().now.date - state().params.date, lines: [...lines] });
+    while (turns.length > 200) turns.shift();
+    const recent = turns
+      .flatMap((turn) => turn.lines)
+      .slice(-RECENT_LINES)
+      .reverse();
+    recentLog.replaceChildren(...recent.map(logLine));
+    if (logOpen) renderFullLog();
+  }
+
+  /** Every line of the watch, newest order first, each order under its own heading. */
+  function renderFullLog() {
+    const sections = [...turns]
+      .reverse()
+      .map((turn, i) =>
+        h(
+          'section',
+          { class: 'lk-logsheet__turn' },
+          h('h3', {}, `Order ${turns.length - i} · day ${turn.day.toFixed(1)}`),
+          h('ol', {}, ...turn.lines.map(logLine)),
+        ),
+      );
+    fullLog.replaceChildren(
+      h(
+        'div',
+        { class: 'lk-logsheet__panel' },
+        h(
+          'div',
+          { class: 'lk-logsheet__head' },
+          h('h2', { id: 'lk-logsheet-title' }, 'Ship’s log'),
+          button('Close', {
+            onClick: () => toggleLog(false),
+            key: 'L',
+            variant: 'quiet',
+            testId: 'lk-log-close',
+            autofocus: true,
+          }),
+        ),
+        h(
+          'div',
+          { class: 'lk-logsheet__body', tabindex: '0', 'aria-label': 'The whole log' },
+          ...(sections.length ? sections : [h('p', {}, 'Nothing logged yet.')]),
+        ),
+      ),
+    );
+  }
+
+  /** Escape closes the full log before the Hall's pause menu would take it. */
+  function escapeLog(event: KeyboardEvent) {
+    if (event.key !== 'Escape' || !logOpen) return;
+    event.preventDefault();
+    toggleLog(false);
+  }
+
+  function toggleLog(open = !logOpen) {
+    logOpen = open;
+    fullLog.hidden = !open;
+    // While the whole log is open, the play screen behind it is out of reach, as in any dialog.
+    for (const part of [status.element, zonePanel, bridge, side]) part.inert = open;
+    if (open) {
+      logOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      renderFullLog();
+      document.addEventListener('keydown', escapeLog, true);
+      fullLog.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+    } else {
+      document.removeEventListener('keydown', escapeLog, true);
+      fullLog.replaceChildren();
+      const back = logOpener?.isConnected ? logOpener : zoneCanvas;
+      back.focus({ preventScroll: true });
+      logOpener = null;
     }
-    while (log.children.length > 60) log.firstElementChild?.remove();
-    log.scrollTop = log.scrollHeight;
+  }
+
+  /**
+   * The world in view: the one in the chart zone being looked at, else the ship's own, else the
+   * world of the most urgent call, with its light as the crew knows it.
+   */
+  function refreshWorldCard() {
+    const s = landing ? landing.prev : state();
+    const looked = hoverZone ?? (chartView.showCursor ? chartCursor : null);
+    const pick = (at: Point) => s.zones[at.row]![at.col]!.world;
+    const urgent = knownCalls(s).find((call) => call.world !== null);
+    const at =
+      looked && pick(looked) !== null
+        ? looked
+        : pick(s.ship.zone) !== null || !urgent
+          ? s.ship.zone
+          : urgent.zone;
+    const world = pick(at);
+    if (world === null) {
+      worldCard.hidden = true;
+      return;
+    }
+    const light = lights(s).find((l) => l.world === world);
+    const call = knownCalls(s).find((c) => c.world === world);
+    const zone = s.zones[at.row]![at.col]!;
+    const lightState = light?.state ?? 'lit';
+    const status =
+      lightState === 'threatened'
+        ? `Under attack · falls in ${days(Math.max(0, (call?.deadline ?? s.now.date) - s.now.date))}`
+        : lightState === 'dark'
+          ? 'Dark · gleaners are building'
+          : lightState === 'lost'
+            ? 'Lost'
+            : 'Lit · safe';
+    const seen = zone.seen;
+    const facts = [
+      samePoint(at, s.ship.zone) ? 'The Lantern is here' : `Zone ${zoneLabel(at)}`,
+      seen?.gleaners === null || !seen
+        ? 'not yet scanned'
+        : seen.gleaners === 0
+          ? 'no gleaners seen'
+          : `${seen.gleaners} ${seen.gleaners === 1 ? 'gleaner' : 'gleaners'} seen`,
+      zone.harbour ? 'a harbour' : null,
+    ].filter(Boolean);
+    worldCard.hidden = false;
+    worldCard.dataset.state = lightState;
+    worldCard.replaceChildren(
+      h('span', { class: 'lk-world__dot', 'aria-hidden': 'true' }),
+      h('h3', { class: 'lk-world__name' }, worldName(world)),
+      h('p', { class: 'lk-world__status' }, status),
+      h('p', { class: 'lk-world__facts' }, facts.join(' · ')),
+    );
   }
 
   function refreshCalls() {
@@ -590,7 +815,7 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   }
 
   function refreshZoneHead() {
-    const s = state();
+    const s = landing ? landing.prev : state();
     const zone = s.zones[s.ship.zone.row]![s.ship.zone.col]!;
     zoneTitle.textContent = `Zone ${zoneLabel(s.ship.zone)}`;
     const parts: string[] = [];
@@ -608,6 +833,7 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     };
     modeHint.textContent = hints[mode];
     modeHint.dataset.mode = mode;
+    bridge.dataset.mode = mode;
     zoneCanvas.dataset.mode = mode;
   }
 
@@ -621,13 +847,26 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     );
   }
 
+  /** An order in the dock: its name, and under it a word on what it would do now. */
   function dockButton(
     label: string,
     key: string,
     onClick: () => void,
-    options: { testId: string; disabled?: boolean; pressed?: boolean; title?: string },
+    options: {
+      testId: string;
+      note: string;
+      disabled?: boolean;
+      pressed?: boolean;
+      title?: string;
+    },
   ) {
-    const b = button(label, {
+    const words = h(
+      'span',
+      { class: 'lk-dock__words' },
+      h('b', {}, label),
+      h('small', { class: 'lk-dock__note' }, options.note),
+    );
+    const b = button(words, {
       onClick,
       key,
       testId: options.testId,
@@ -639,10 +878,12 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   }
 
   function refreshDock() {
-    const s = state();
+    // Like the panels, the orders show the moment before an order that is still landing.
+    const s = landing ? landing.prev : state();
+    const down = (system: SystemId) => systemsDown(s).some((d) => d.system === system);
     const over = session.over;
     const moored = s.ship.condition === 'moored';
-    const canFlare = s.ship.flares > 0 && (!isDown('flare-tubes') || moored) && !s.ship.shrouded;
+    const canFlare = s.ship.flares > 0 && (!down('flare-tubes') || moored) && !s.ship.shrouded;
     const drive = h(
       'div',
       { class: 'lk-drive', role: 'group', 'aria-label': `Drive factor ${s.ship.drive}` },
@@ -665,14 +906,19 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
         title: 'Faster: costlier; above 6 the drive may strain',
       }),
     );
+    const here = s.gleaners.length;
+    const gleanersHere =
+      here === 0 ? 'no gleaners here' : `${here} ${here === 1 ? 'gleaner' : 'gleaners'} here`;
     const buttons: (HTMLElement | null)[] = [
       dockButton(mode === 'flare' ? 'Cancel flare' : 'Flare', 'F', () => toggleMode('flare'), {
         testId: 'lk-act-flare',
+        note: mode === 'flare' ? 'click where to aim' : `${s.ship.flares} left`,
         disabled: over || !canFlare,
         pressed: mode === 'flare',
       }),
       dockButton('Beams', 'B', () => toggleSheet('beams'), {
         testId: 'lk-act-beams',
+        note: moored ? 'not in harbour' : down('beams') ? 'aimed by hand' : gleanersHere,
         disabled: over || s.gleaners.length === 0 || moored,
       }),
       dockButton(
@@ -681,13 +927,19 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
         () => issue({ type: 'shield', up: !s.ship.shieldUp }),
         {
           testId: 'lk-act-shield',
-          disabled: over || moored || (!s.ship.shieldUp && isDown('shield')),
+          note: s.ship.shieldUp
+            ? 'up · travel costs double'
+            : down('shield')
+              ? 'under repair'
+              : 'down',
+          disabled: over || moored || (!s.ship.shieldUp && down('shield')),
         },
       ),
       s.params.rules.hail
         ? dockButton(mode === 'hail' ? 'Cancel hail' : 'Hail', 'H', () => toggleMode('hail'), {
             testId: 'lk-act-hail',
-            disabled: over || s.gleaners.length === 0 || isDown('radio'),
+            note: down('radio') ? 'radio down' : mode === 'hail' ? 'click a gleaner' : gleanersHere,
+            disabled: over || s.gleaners.length === 0 || down('radio'),
             pressed: mode === 'hail',
           })
         : null,
@@ -695,16 +947,36 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
         moored ? 'Leave harbour' : 'Moor',
         'M',
         () => issue(moored ? { type: 'unmoor' } : { type: 'moor' }),
-        { testId: 'lk-act-moor', disabled: over || (!moored && !harbourIsNear(s)) },
+        {
+          testId: 'lk-act-moor',
+          note: moored
+            ? 'in harbour'
+            : harbourIsNear(s)
+              ? 'a harbour beside you'
+              : s.cells.some((row) => row.includes('harbour'))
+                ? 'fly beside the harbour'
+                : 'no harbour in this zone',
+          disabled: over || (!moored && !harbourIsNear(s)),
+        },
       ),
-      dockButton('Rest', 'R', () => toggleSheet('rest'), { testId: 'lk-act-rest', disabled: over }),
-      dockButton('More', '.', () => toggleSheet('more'), { testId: 'lk-act-more', disabled: over }),
+      dockButton('Rest', 'R', () => toggleSheet('rest'), {
+        testId: 'lk-act-rest',
+        note: systemsDown(s).length ? 'repairs and recharge' : 'let time pass',
+        disabled: over,
+      }),
+      dockButton('More', '.', () => toggleSheet('more'), {
+        testId: 'lk-act-more',
+        note: 'call a harbour, abandon',
+        disabled: over,
+      }),
       drive,
     ];
     dock.replaceChildren(...buttons.filter((b): b is HTMLElement => b !== null));
   }
 
   function refreshAll() {
+    // While an order is still landing, the panels keep showing the moment before it.
+    if (landing) return;
     const s = state();
     if (!zoneView.busy) {
       status.update(s, false);
@@ -719,6 +991,7 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     chartView.cursor = chartCursor;
     previewCell(hoverCell ?? (zoneView.showCursor ? zoneCursor : null));
     previewZone(hoverZone ?? (chartView.showCursor ? chartCursor : null));
+    refreshWorldCard();
   }
 
   function setDrive(step: number) {
@@ -1060,7 +1333,7 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     previewCell(null);
   });
   zoneCanvas.addEventListener('pointerdown', (event) => {
-    if (zoneView.busy) {
+    if (zoneView.busy || landing) {
       finishAnimation();
       refreshAll();
     }
@@ -1081,14 +1354,16 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     hoverZone = at;
     chartView.hover = at;
     previewZone(at);
+    refreshWorldCard();
   });
   chartCanvas.addEventListener('pointerleave', () => {
     hoverZone = null;
     chartView.hover = null;
     previewZone(null);
+    refreshWorldCard();
   });
   chartCanvas.addEventListener('pointerdown', (event) => {
-    if (zoneView.busy) {
+    if (zoneView.busy || landing) {
       finishAnimation();
       refreshAll();
     }
@@ -1142,6 +1417,7 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
       chartView.cursor = chartCursor;
       chartView.showCursor = true;
       previewZone(chartCursor);
+      refreshWorldCard();
     }
     return true;
   }
@@ -1149,10 +1425,15 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   function onKey(event: KeyboardEvent): boolean {
     if (event.ctrlKey || event.metaKey || event.altKey) return false;
     // A key during an animation finishes it and is then taken as the next order.
-    if (zoneView.busy) {
+    if (zoneView.busy || landing) {
       finishAnimation();
       refreshAll();
     }
+    if (event.key.toLowerCase() === 'l') {
+      toggleLog();
+      return true;
+    }
+    if (logOpen) return false;
     if (session.over) return false;
     const focus = document.activeElement;
     const inSheet = !!openSheet && sheet.contains(focus);
@@ -1221,14 +1502,23 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
   }
 
   // ---- Lifetime -----------------------------------------------------------------------
+  /** Whenever the bridge's notes overflow, they take the focus so a keyboard can scroll them. */
+  function keepNotesReachable() {
+    if (bridgeNotes.scrollHeight > bridgeNotes.clientHeight + 1) bridgeNotes.tabIndex = 0;
+    else bridgeNotes.removeAttribute('tabindex');
+  }
+
   const observer = new ResizeObserver(() => {
     const zoneStage = zoneCanvas.parentElement!;
     zoneView.resize(zoneStage.clientWidth, zoneStage.clientHeight);
     const chartStage = chartCanvas.parentElement!;
     chartView.resize(chartStage.clientWidth, chartStage.clientHeight);
+    keepNotesReachable();
   });
   observer.observe(zoneCanvas.parentElement!);
   observer.observe(chartCanvas.parentElement!);
+  // A note shown, hidden or rewritten changes its size, and so perhaps the overflow.
+  for (const note of [bridgeNotes, ...bridgeNotes.children]) observer.observe(note);
 
   appendLog(session.log);
   status.update(session.state, false);
@@ -1251,6 +1541,8 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
     // Workbench only: let the steady captain play through the real screen, for screenshots.
     Object.assign(window, {
       __lightkeeperState: () => session.state,
+      __lightkeeperBlooming: () => zoneView.blooming,
+      __lightkeeperFlareGuide: () => zoneView.flareGuide(),
       __lightkeeperAutopilot: (orders: number) => {
         for (let i = 0; i < orders && !session.over; i++) {
           const before = session.state;
@@ -1312,6 +1604,8 @@ export function playScreen(app: App, watch: WatchKind, resume: boolean): Screen 
       chartView.stop();
       window.clearTimeout(endTimer);
       window.clearTimeout(animationTimer);
+      window.clearTimeout(chimeTimer);
+      document.removeEventListener('keydown', escapeLog, true);
     },
   };
 }

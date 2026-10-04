@@ -25,11 +25,29 @@ Everything can be played with the mouse or the keyboard alone.
 | Drive factor down or up                   | `[` and `]`                  | − and + by Drive           |
 | More orders (beacon, shroud, abandon)     | `.`                          | More                       |
 | Cancel an aiming mode                     | Its key again                | Right-click                |
-| Skip an animation                         | Any order key                | Click                      |
+| Open or close the whole ship's log        | `L` (`Esc` also closes it)   | Open log / Close           |
+| Skip an animation                         | Any key                      | Click                      |
 | Pause                                     | `Esc`                        | Pause                      |
 
 Hovering over a cell or a zone shows what the order would cost and where it would go; the arrow
 keys do the same for keyboard players.
+
+## The play screen
+
+The zone fills the left of the screen, with the Lantern in it: her beam emitters glow at the pod
+tips while the beams can fire, and a raised shield shimmers around her. The middle column is the
+bridge: the zone's facts, the hint for the order being aimed, the First Officer's advice, and the
+card of the world in view (the one you look at on the chart, else the one in your zone, else the
+world of the most urgent call). The orders sit at its foot, each with a word on what it would do
+now ("9 left", "2 gleaners here", "fly beside the harbour"). The right column holds the chart of
+the Reach, the calls under it, any systems under repair and the ship's log.
+
+The log shows its last three lines, newest first, each with a mark as well as a colour: ✓ good
+news, ✕ harm, ! a warning, ◉ the radio, · a note. **Open log** (`L`) shows the whole watch, one
+heading per order; `L` or `Esc` closes it.
+
+On a short screen (under 800 pixels tall) the standing hints step aside, and the First Officer
+waits while you aim an order, so the orders always stay in view.
 
 ## The reserve clock
 
@@ -94,7 +112,10 @@ harbour for points.
 ## Lights and calls
 
 When gleaners attack a world, it calls with a deadline, shown on the chart and in the calls list.
-Clear its zone before then and the world is safe. Miss it and the world goes dark: its forge builds
+Clear its zone before then and the world is safe. Saving a world in your own zone is the watch's
+big moment: once the shots have landed the world blooms, its name rises over it and its call ring
+closes on the chart, and only then do the panels and the log catch up. Any key or click skips it;
+with reduced motion it is a still highlight. Miss the deadline and the world goes dark: its forge builds
 a gleaner now and then, and when the zone is full the new ones spill into a neighbour. Clear a dark
 world's zone and it lights up again. Worlds caught in a flare-up or a dying star are lost for good.
 

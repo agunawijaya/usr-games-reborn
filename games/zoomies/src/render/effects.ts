@@ -171,7 +171,8 @@ export class Effects {
   }
 }
 
-function star(ctx: Ctx, x: number, y: number, r: number, color: string) {
+/** An eight-point star, the sparkle's and the dizzy stars' shape. */
+export function star(ctx: Ctx, x: number, y: number, r: number, color: string) {
   ctx.beginPath();
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;

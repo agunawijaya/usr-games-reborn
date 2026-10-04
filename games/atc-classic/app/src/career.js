@@ -132,9 +132,13 @@ export const RANKS = [
 ];
 
 /**
- * The career as saved: the best stamps earned on each assignment passed.
- * @typedef {{ passed: Record<string, number> }} CareerRecord
+ * The career as saved: the best stamps earned on each assignment passed, and the day the
+ * controller first earned the Fluent nod, if they have.
+ * @typedef {{ passed: Record<string, number>, fluent?: string }} CareerRecord
  */
+
+/** Orders typed by hand, without the order buttons, in one shift for the Fluent nod. */
+export const FLUENT_ORDERS = 50;
 
 /** @returns {CareerRecord} */
 export function newCareer() {
@@ -210,4 +214,17 @@ export function withShift(career, assignmentId, passed, stamps) {
   if (!passed) return career;
   const best = Math.max(career.passed[assignmentId] ?? 0, stamps);
   return { ...career, passed: { ...career.passed, [assignmentId]: best } };
+}
+
+/**
+ * The career after a shift with `typed` orders typed by hand: the Fluent nod is earned once, on
+ * the first shift that reaches FLUENT_ORDERS, and kept.
+ * @param {CareerRecord} career
+ * @param {number} typed
+ * @param {string} dateKey
+ * @returns {CareerRecord}
+ */
+export function withTypedOrders(career, typed, dateKey) {
+  if (career.fluent || typed < FLUENT_ORDERS) return career;
+  return { ...career, fluent: dateKey };
 }

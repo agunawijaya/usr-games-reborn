@@ -17,6 +17,8 @@ export interface ShipLook {
   ember: boolean;
   /** How far the lamp's light reaches, in cells. */
   beamReach?: number;
+  /** A volley could be fired now: the beam emitters on the wingtips glow. */
+  beamsReady?: boolean;
 }
 
 /** The ship's length in cells: the Lantern reaches a little past her cell, the old Ember less. */
@@ -41,8 +43,44 @@ export function drawShip(
   drawLampCone(ctx, size, lensAhead, look, t, ship);
   if (ship.ember) drawEmber(ctx, length, p, look, t);
   else drawLantern(ctx, length, p, look, t);
+  if (ship.beamsReady && !ship.ember) drawEmitters(ctx, length, p, look, t);
   if (ship.shieldUp) drawShield(ctx, size, p, look, t, ship.shieldFraction);
   ctx.restore();
+}
+
+/** The beam emitters at the front of the wingtip pods, glowing while a volley is ready. */
+function drawEmitters(ctx: CanvasRenderingContext2D, u: number, p: Palette, look: Look, t: number) {
+  const pulse = 0.75 + 0.25 * Math.sin(t * 3.2);
+  for (const side of [-1, 1]) {
+    const x = side * 0.4 * u;
+    const y = 0.07 * u;
+    const r = 0.07 * u;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
+    glow.addColorStop(
+      0,
+      look === 'night' ? 'rgba(255, 236, 170, 0.95)' : 'rgba(242, 166, 50, 0.9)',
+    );
+    glow.addColorStop(
+      0.35,
+      look === 'night' ? 'rgba(255, 196, 92, 0.55)' : 'rgba(242, 166, 50, 0.4)',
+    );
+    glow.addColorStop(1, 'rgba(255, 196, 92, 0)');
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = look === 'night' ? p.lampSoft : p.lamp;
+    ctx.strokeStyle = look === 'night' ? p.lamp : p.ink;
+    ctx.lineWidth = Math.max(1, u * 0.01);
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 /** The lantern's light, thrown ahead of the lens and swaying very slightly. */
@@ -60,16 +98,50 @@ function drawLampCone(
   ctx.rotate(Math.sin(t * 0.6) * 0.05);
   const reach = size * (ship.beamReach ?? 2.2);
   const cone = ctx.createLinearGradient(0, 0, 0, -reach);
-  cone.addColorStop(0, look === 'night' ? 'rgba(255, 205, 110, 0.36)' : 'rgba(242, 166, 50, 0.28)');
-  cone.addColorStop(1, 'rgba(255, 205, 110, 0)');
+  cone.addColorStop(0, look === 'night' ? 'rgba(255, 205, 110, 0.36)' : 'rgba(242, 166, 50, 0.42)');
+  cone.addColorStop(1, look === 'night' ? 'rgba(255, 205, 110, 0)' : 'rgba(242, 166, 50, 0.04)');
   ctx.fillStyle = cone;
-  ctx.beginPath();
-  ctx.moveTo(-size * 0.04, 0);
-  ctx.lineTo(-size * 0.7, -reach);
-  ctx.quadraticCurveTo(0, -reach * 1.08, size * 0.7, -reach);
-  ctx.lineTo(size * 0.04, 0);
-  ctx.closePath();
+  const shape = () => {
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.04, 0);
+    ctx.lineTo(-size * 0.7, -reach);
+    ctx.quadraticCurveTo(0, -reach * 1.08, size * 0.7, -reach);
+    ctx.lineTo(size * 0.04, 0);
+    ctx.closePath();
+  };
+  shape();
   ctx.fill();
+  if (look === 'chart') {
+    // On paper the light is drawn as a navigator would: ink hatching and a darker edge that
+    // fades with the light, so it holds its own against the chart.
+    ctx.save();
+    shape();
+    ctx.clip();
+    const hatch = ctx.createLinearGradient(0, 0, 0, -reach);
+    hatch.addColorStop(0, 'rgba(122, 64, 0, 0.42)');
+    hatch.addColorStop(1, 'rgba(122, 64, 0, 0)');
+    ctx.strokeStyle = hatch;
+    ctx.lineWidth = Math.max(0.8, size * 0.012);
+    const step = Math.max(4, size * 0.09);
+    for (let d = -reach; d < reach; d += step) {
+      ctx.beginPath();
+      ctx.moveTo(d - reach, 0);
+      ctx.lineTo(d + reach, -reach * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    const edge = ctx.createLinearGradient(0, 0, 0, -reach);
+    edge.addColorStop(0, 'rgba(138, 74, 0, 0.85)');
+    edge.addColorStop(1, 'rgba(138, 74, 0, 0)');
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = Math.max(1, size * 0.018);
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.04, 0);
+    ctx.lineTo(-size * 0.7, -reach);
+    ctx.moveTo(size * 0.04, 0);
+    ctx.lineTo(size * 0.7, -reach);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -107,9 +179,15 @@ function drawShield(
   ctx.stroke();
   ctx.lineWidth = Math.max(1.5, size * 0.045);
   ctx.lineCap = 'round';
+  // Two sheens running opposite ways round the bubble: the shield's shimmer.
   const sheen = t * 0.9;
   ctx.beginPath();
   ctx.ellipse(0, 0, rx, ry, 0, sheen, sheen + 0.7);
+  ctx.stroke();
+  ctx.globalAlpha = strength * 0.6;
+  ctx.lineWidth = Math.max(1, size * 0.028);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx, ry, 0, -sheen * 1.3 + 2.4, -sheen * 1.3 + 2.9);
   ctx.stroke();
   ctx.restore();
 }

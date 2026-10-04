@@ -4,7 +4,8 @@ import type { TurnEvent } from '../engine/types';
 /**
  * Every sound is a patch for the kit's synthesiser: soft paws, the whirr of a turn, a cartoon
  * bonk with a spring in it, a gulp, the whoosh of a zoom, a purr for loafing, a little tune for
- * a tidy room. Quiet by default; the Hall's volume and mute apply.
+ * a tidy room, and the cat's proud little "mrrp". Quiet by default; the Hall's volume and mute
+ * apply.
  */
 
 const PATCHES = {
@@ -98,6 +99,23 @@ const PATCHES = {
       { wave: 'noise', duration: 0.35, gain: 0.22, lowpass: 2600, attack: 0.02 },
       { wave: 'sine', frequency: 392, delay: 0.3, duration: 0.25, gain: 0.25 },
       { wave: 'sine', frequency: 311, delay: 0.55, duration: 0.45, gain: 0.25 },
+    ],
+  },
+  mrrp: {
+    name: 'mrrp',
+    gain: 0.45,
+    voices: [
+      { wave: 'triangle', frequency: 430, glideTo: 640, duration: 0.09, gain: 0.2, lowpass: 2200 },
+      {
+        wave: 'triangle',
+        frequency: 640,
+        glideTo: 520,
+        delay: 0.08,
+        duration: 0.12,
+        gain: 0.18,
+        lowpass: 2200,
+      },
+      { wave: 'noise', duration: 0.12, gain: 0.03, lowpass: 900, attack: 0.02 },
     ],
   },
   tidy: {

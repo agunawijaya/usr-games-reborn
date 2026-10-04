@@ -105,7 +105,7 @@ can show completion hints incrementally.
 Per identity discipline:
 
 - **Do not add touch-drag path input.** That belongs to the
-  Flight Control lineage; it is not this game.
+  touch-and-drag mobile traffic games; it is not this game.
 - **Do not colourise beyond the palette.** No blue skies, no
   purple accents.
 - **Do not add music.** Real control rooms don't have music.
@@ -117,7 +117,7 @@ Per identity discipline:
 - **Engine:** `node --test tests/engine.test.js` — must all pass
   before shipping any change to `src/engine.js` or `src/parser.js`.
 - **UI:** manual per `docs/test-scenarios.md` (TODO — v2).
-- **Cross-browser:** verify in Chrome, Firefox, Safari before
+- **Cross-browser:** verify in the major desktop browsers before
   release.
 
 ## File map

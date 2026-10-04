@@ -104,6 +104,11 @@
       "action": "whiskers",
       "label": "Whiskers (danger hints) on or off",
       "keys": ["KeyV"]
+    },
+    {
+      "action": "whole-room",
+      "label": "Whole room or follow the cat (big rooms)",
+      "keys": ["KeyO"]
     }
   ],
   "cronGoals": [

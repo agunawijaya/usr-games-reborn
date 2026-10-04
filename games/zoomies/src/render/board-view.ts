@@ -1,15 +1,25 @@
 import { chebyshev } from '../engine/layout';
 import { applyAction, isDangerous, isFree, nextStep, whiskers } from '../engine/rules';
 import type { Point, RoomState, Tangle, TurnEvent, Vacuum, VacuumKind } from '../engine/types';
+import { follow, frameRoom, type View, viewFor } from './camera';
 import { DustLayer } from './dust';
-import { DISPLAY_FONT, Effects } from './effects';
+import { DISPLAY_FONT, Effects, star } from './effects';
 import { paintStatic } from './floor';
-import { cellAt, cellCenter, fitGeometry, type Geometry } from './geometry';
-import { type Coat, LOOKS, type Look, type SceneLook, type SceneTheme } from './palette';
-import { clamp01, easeInOut, easeOutCubic, hash2, lerp, withAlpha } from './shapes';
+import { cellAt, cellCenter, type Geometry } from './geometry';
+import {
+  type Coat,
+  LOOKS,
+  type Look,
+  type SceneLook,
+  type SceneTheme,
+  vacuumColors,
+} from './palette';
+import { bounce, closeness, dimming, PAYOFF, starsAlpha, stretch, trailProgress } from './payoff';
+import { clamp01, easeInOut, hash2, lerp, withAlpha } from './shapes';
 import { type CatPose, drawCat } from './sprites/cat';
 import { drawDock, drawTangle } from './sprites/things';
 import { drawSnooze, drawVacuum, type Mood } from './sprites/vacuum';
+import { drawTrails, TrailLog } from './trails';
 
 /**
  * Draws a room and plays each turn as a short animation read from the turn's events: the cat
@@ -57,6 +67,18 @@ type TrailMark =
   | { kind: 'sweep'; x1: number; y1: number; x2: number; y2: number }
   | { kind: 'paw'; x: number; y: number; facing: number };
 
+/** The room-cleared payoff in progress (see `payoff.ts` for its timeline). */
+interface Payoff {
+  start: number;
+  /** Where the last vacuum bonked, if it did: the pile that bounces. */
+  pile: Point | null;
+  cues: Cue[];
+  done: () => void;
+}
+
+/** The keyboard focus cue's colours: the Hall's focus blue by day and by night. */
+const FOCUS = { day: '#2459a8', night: '#8ec5ff' } as const;
+
 const BASE = { step: 130, zoom: 300, wait: 90, roll: 180, turbo: 150 };
 
 const key = (p: Point) => `${p.x},${p.y}`;
@@ -76,7 +98,16 @@ export class BoardView {
   private hover: Point | null = null;
   private loafing = false;
   private ghost: Coat | null = null;
-  private reveal: { start: number } | null = null;
+  private trails = new TrailLog();
+  /** How much of the trails shows between moments: none during play, all once revealed. */
+  private trailsShown = 0;
+  private trailReveal: { start: number; duration: number } | null = null;
+  private payoff: Payoff | null = null;
+  private lastBonk: Point | null = null;
+  private follows = false;
+  private wholeRoom = false;
+  private view: View = { x: 0, y: 0 };
+  private focused = false;
   private shake: { start: number } | null = null;
   private frame = 0;
   private running = false;
@@ -109,8 +140,10 @@ export class BoardView {
     this.scene = LOOKS[theme][this.options.look];
     this.seed = seed;
     this.trail = [];
+    this.trails.clear();
+    this.lastBonk = null;
     this.lastSwept.clear();
-    this.reveal = null;
+    this.endMoments();
     this.shake = null;
     this.loafing = false;
     this.facing = 1;
@@ -123,8 +156,17 @@ export class BoardView {
   showState(state: RoomState) {
     this.finish();
     this.state = state;
-    this.reveal = null;
+    this.endMoments();
     this.refreshHints();
+  }
+
+  /** Back to plain play: no payoff or reveal running, the trails hidden again. */
+  private endMoments() {
+    const payoff = this.payoff;
+    this.payoff = null;
+    payoff?.done();
+    this.trailReveal = null;
+    this.trailsShown = 0;
   }
 
   resize(width: number, height: number) {
@@ -149,6 +191,29 @@ export class BoardView {
     this.hover = cell;
   }
 
+  /** Whether the board has the keyboard's focus: the cat and the chosen square show it. */
+  setFocused(focused: boolean) {
+    this.focused = focused;
+  }
+
+  /** For a room too big to show at full size: follow the cat, or show the whole room smaller. */
+  setWholeRoom(wholeRoom: boolean) {
+    if (wholeRoom === this.wholeRoom) return;
+    this.wholeRoom = wholeRoom;
+    this.repaint();
+  }
+
+  /** True when the room is bigger than the view at the cat's smallest size. */
+  get roomOutgrowsView(): boolean {
+    if (!this.state || this.cssWidth === 0) return false;
+    const { width, height } = this.state.layout;
+    return frameRoom(width, height, this.cssWidth, this.cssHeight, {
+      maxCell: width > 30 ? 40 : 84,
+      margin: width > 30 ? 0.5 : 0.9,
+      wholeRoom: false,
+    }).follows;
+  }
+
   setLoafing(loafing: boolean) {
     this.loafing = loafing;
   }
@@ -161,7 +226,7 @@ export class BoardView {
   cellFromClient(clientX: number, clientY: number): Point | null {
     if (!this.geo) return null;
     const rect = this.canvas.getBoundingClientRect();
-    return cellAt(this.geo, clientX - rect.left, clientY - rect.top);
+    return cellAt(this.geo, clientX - rect.left + this.view.x, clientY - rect.top + this.view.y);
   }
 
   /** Where a cell's centre is on the page, for placing labels over the board. */
@@ -169,7 +234,7 @@ export class BoardView {
     if (!this.geo) return null;
     const rect = this.canvas.getBoundingClientRect();
     const c = cellCenter(this.geo, x, y);
-    return { x: rect.left + c.x, y: rect.top + c.y };
+    return { x: rect.left + c.x - this.view.x, y: rect.top + c.y - this.view.y };
   }
 
   get cellSize(): number {
@@ -186,24 +251,40 @@ export class BoardView {
     this.canvas.width = Math.round(this.cssWidth * ratio);
     this.canvas.height = Math.round(this.cssHeight * ratio);
     const { width, height } = this.state.layout;
-    this.geo = fitGeometry(width, height, this.cssWidth, this.cssHeight, {
+    const framing = frameRoom(width, height, this.cssWidth, this.cssHeight, {
       maxCell: width > 30 ? 40 : 84,
       margin: width > 30 ? 0.5 : 0.9,
+      wholeRoom: this.wholeRoom,
     });
+    this.geo = framing.geo;
+    this.follows = framing.follows;
+    const floorRatio = this.floorRatio(this.geo);
     paintStatic(
       this.staticCanvas,
       this.geo,
       this.scene,
       this.state.layout.furniture,
       this.options.look,
-      ratio,
+      floorRatio,
     );
     const still = this.staticCanvas.getContext('2d')!;
-    still.setTransform(ratio, 0, 0, ratio, 0, 0);
+    still.setTransform(floorRatio, 0, 0, floorRatio, 0, 0);
     this.drawLight(still, this.geo);
-    this.vignette = this.options.look === 'night' ? this.paintVignette(this.geo, ratio) : null;
-    this.dust = new DustLayer(this.geo, this.scene, this.options.look, ratio, this.seed);
+    this.vignette = this.options.look === 'night' ? this.paintVignette(ratio) : null;
+    this.dust = new DustLayer(this.geo, this.scene, this.options.look, floorRatio, this.seed);
     for (const mark of this.trail) this.replayMark(mark);
+    const cat = this.state.cat;
+    this.view = viewFor(
+      cellCenter(this.geo, cat.x, cat.y),
+      this.geo,
+      this.cssWidth,
+      this.cssHeight,
+    );
+  }
+
+  /** A floor bigger than the view is painted a little softer past nine megapixels, to spare memory. */
+  private floorRatio(geo: Geometry): number {
+    return Math.min(this.ratio(), Math.sqrt(9_000_000 / (geo.width * geo.height)));
   }
 
   private replayMark(mark: TrailMark) {
@@ -290,6 +371,7 @@ export class BoardView {
       done: () => undefined,
     };
     let phaseEnd = catEnd;
+    this.recordTrails(events);
     const tangledThisTurn = events
       .filter((e) => e.type === 'bonk')
       .reduce((sum, e) => sum + (e.type === 'bonk' ? e.ids.length : 0), 0);
@@ -317,6 +399,7 @@ export class BoardView {
         case 'bonk': {
           const at = event.phase === 1 ? phase1End : phase2End;
           phaseEnd = Math.max(phaseEnd, at);
+          this.lastBonk = event.at;
           for (const id of event.ids) anim.deaths.set(id, at);
           anim.appear.set(key(event.at), at);
           const heavy = tangledThisTurn >= 3;
@@ -355,8 +438,18 @@ export class BoardView {
     });
   }
 
+  /** Notes every roll of a turn for the reveal, in the order the vacuums rolled. */
+  private recordTrails(events: readonly TurnEvent[]) {
+    const rolls: { phase: 1 | 2; from: Point; to: Point }[] = [];
+    for (const event of events)
+      if (event.type === 'vacuum-move')
+        rolls.push({ phase: event.phase === 1 ? 1 : 2, from: event.from, to: event.to });
+    this.trails.addTurn(rolls);
+  }
+
   /** Leaves a turn's marks on the floor without playing it (rebuilding trails after a replay). */
   traceTurn(events: readonly TurnEvent[]) {
+    this.recordTrails(events);
     for (const event of events) {
       if (event.type === 'vacuum-move')
         this.mark({
@@ -410,11 +503,86 @@ export class BoardView {
   // -------------------------------------------------------------------------------------------
   // Moments
 
-  /** The rug remembers: after a clear, the sprites fade and the trails come forward. */
+  /**
+   * The rug remembers: the sprites dim and the trails draw themselves on, turn by turn. Used
+   * after a rival's replay; the player's own clear gets the whole payoff (`celebrate`).
+   */
   revealTrails(): Promise<void> {
     this.finish();
-    this.reveal = { start: performance.now() };
-    return new Promise((resolve) => setTimeout(resolve, this.options.reducedMotion ? 300 : 1500));
+    this.payoff = null;
+    const duration = this.options.reducedMotion ? 1 : 900;
+    this.trailReveal = { start: performance.now(), duration };
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        this.trailsShown = 1;
+        resolve();
+      }, duration),
+    );
+  }
+
+  /**
+   * The room is tidy and the last vacuum has arrived: the camera eases in on the cat and the
+   * pile, the cat stretches with a "mrrp", the pile bounces under dizzy stars, then the trails
+   * draw onto the rug. Resolves when it is over or skipped. Under reduced motion it is a still
+   * of the tangle with the trails already drawn.
+   */
+  celebrate(cues: { mrrp(): void }): Promise<void> {
+    this.finish();
+    this.trailReveal = null;
+    const still = this.options.reducedMotion;
+    return new Promise((resolve) => {
+      const payoff: Payoff = {
+        start: performance.now() - (still ? PAYOFF.end : 0),
+        pile: this.lastBonk,
+        cues: still
+          ? []
+          : [
+              { at: PAYOFF.mrrp, run: cues.mrrp },
+              { at: PAYOFF.mrrp, run: () => this.mrrpWord() },
+            ],
+        done: () => undefined,
+      };
+      let settled = false;
+      payoff.done = () => {
+        if (settled) return;
+        settled = true;
+        this.trailsShown = 1;
+        resolve();
+      };
+      this.payoff = payoff;
+      // The still version holds for a moment too, so the tangle and its trails can be seen.
+      setTimeout(() => payoff.done(), still ? 700 : PAYOFF.end);
+    });
+  }
+
+  /** Jumps a running payoff to its last frame. */
+  skipCelebration() {
+    const payoff = this.payoff;
+    if (!payoff) return;
+    payoff.start = performance.now() - PAYOFF.end;
+    payoff.cues = [];
+    payoff.done();
+  }
+
+  get celebrating(): boolean {
+    const payoff = this.payoff;
+    return payoff !== null && performance.now() - payoff.start < PAYOFF.end;
+  }
+
+  private mrrpWord() {
+    if (!this.geo || !this.state) return;
+    const c = this.center(this.state.cat);
+    const s = this.geo.cell;
+    const isDay = this.options.look === 'day';
+    this.effects.word(
+      performance.now(),
+      c.x + this.facing * s * 0.45,
+      c.y - s * 0.55,
+      s * 0.95,
+      'mrrp',
+      isDay ? '#fff6d6' : '#2a2448',
+      isDay ? '#3a2a1a' : '#ffe6a0',
+    );
   }
 
   private center(p: Point) {
@@ -517,52 +685,216 @@ export class BoardView {
     const ctx = this.ctx;
     if (!geo || !state || !this.dust) return;
     const anim = this.anim;
+    const payoff = this.payoff;
+    const payoffT = payoff ? now - payoff.start : null;
+    const reveal = this.trailReveal;
+    const elapsed = anim ? now - anim.start : Infinity;
+    const target = this.follows
+      ? viewFor(this.catCentre(state, anim, elapsed), geo, this.cssWidth, this.cssHeight)
+      : { x: 0, y: 0 };
+    const panning =
+      Math.abs(target.x - this.view.x) > 0.5 || Math.abs(target.y - this.view.y) > 0.5;
     // Between turns only blinks and tails move: a calmer frame rate is plenty, and big fields
     // (the Long Night's) get calmer still.
     const settling =
-      anim || this.effects.busy || this.shake || (this.reveal && now - this.reveal.start < 1500);
+      anim ||
+      this.effects.busy ||
+      this.shake ||
+      panning ||
+      (payoffT !== null && payoffT < PAYOFF.end) ||
+      (reveal && now - reveal.start < reveal.duration);
     const idleGap = geo.cols * geo.rows > 400 ? 90 : 33;
     if (!settling && now - this.lastDraw < idleGap) return;
+    const dt = now - this.lastDraw;
     this.lastDraw = now;
-    const elapsed = anim ? now - anim.start : Infinity;
+    this.view = follow(this.view, target, dt, this.options.reducedMotion);
     if (anim) {
       for (const cue of anim.cues) if (cue.at <= elapsed) cue.run();
       anim.cues = anim.cues.filter((cue) => cue.at > elapsed);
       this.sweepTo(anim, elapsed);
     }
+    if (payoff && payoffT !== null) {
+      for (const cue of payoff.cues) if (cue.at <= payoffT) cue.run();
+      payoff.cues = payoff.cues.filter((cue) => cue.at > payoffT);
+    }
     const ratio = this.ratio();
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, geo.width, geo.height);
+    ctx.clearRect(0, 0, this.cssWidth, this.cssHeight);
     ctx.save();
-    const revealT = this.reveal ? clamp01((now - this.reveal.start) / 1400) : 0;
     if (this.shake) {
       const t = (now - this.shake.start) / 380;
       if (t >= 1) this.shake = null;
       else ctx.translate(Math.sin(t * 40) * (1 - t) * geo.cell * 0.08, 0);
     }
-    if (revealT > 0 && !this.options.reducedMotion) {
-      const zoom = 1 - easeOutCubic(revealT) * 0.035;
-      ctx.translate(geo.width / 2, geo.height / 2);
-      ctx.scale(zoom, zoom);
-      ctx.translate(-geo.width / 2, -geo.height / 2);
+    const close = payoffT !== null && !this.options.reducedMotion ? closeness(payoffT) : 0;
+    const lens = payoff && close > 0 ? this.closeUp(state, payoff.pile, close) : null;
+    if (lens) {
+      ctx.translate(lens.tx, lens.ty);
+      ctx.scale(lens.zoom, lens.zoom);
     }
+    ctx.translate(-Math.round(this.view.x), -Math.round(this.view.y));
     ctx.drawImage(this.staticCanvas, 0, 0, geo.width, geo.height);
-    this.dust.draw(ctx, 0.45 + revealT * 0.9);
-    if (revealT > 0 && this.options.look === 'day') {
-      // Darken what is left of the dust, so the clean stripes stand out.
-      withAlpha(ctx, revealT * 0.85, () => this.dust!.draw(ctx, 0));
-    }
+    const shown = this.trailAmount(now, payoffT);
+    // The vacuums' own faint glow gives way to the drawn trails as they come.
+    this.dust.draw(ctx, 0.45 * (1 - shown));
+    drawTrails(ctx, geo, this.trails, shown, this.options.look, this.scene);
+    const dim = payoffT !== null ? dimming(payoffT) : shown;
     const time = now / 1000;
-    withAlpha(ctx, 1 - revealT * 0.7, () => {
-      if (!anim && state.status === 'playing') this.drawHints(ctx, geo, state);
-      this.drawObjects(ctx, geo, state, anim, elapsed, time);
-    });
+    if (!anim && state.status === 'playing') this.drawHints(ctx, geo, state);
+    const cat = this.drawObjects(ctx, geo, state, anim, elapsed, time, payoffT, dim);
+    if (this.focused && state.status === 'playing' && !this.ghost)
+      this.drawFocusCue(ctx, cat, geo.cell, time);
+    if (payoff?.pile && payoffT !== null) this.drawDizzyStars(ctx, payoff.pile, payoffT, time);
     this.effects.draw(ctx, now);
     ctx.restore();
-    if (this.vignette) ctx.drawImage(this.vignette, 0, 0, geo.width, geo.height);
+    if (lens) this.drawSpotlight(ctx, lens, close);
+    if (this.vignette) ctx.drawImage(this.vignette, 0, 0, this.cssWidth, this.cssHeight);
+    if (this.follows && state.status === 'playing') this.drawMarkers(ctx, geo, state);
     if (anim && elapsed >= anim.end) {
       this.anim = null;
       anim.done();
+    }
+  }
+
+  /** How much of the trails to draw: they come on during a payoff or a reveal, then stay. */
+  private trailAmount(now: number, payoffT: number | null): number {
+    if (payoffT !== null) return this.options.reducedMotion ? 1 : trailProgress(payoffT);
+    const reveal = this.trailReveal;
+    if (reveal) return easeInOut(clamp01((now - reveal.start) / reveal.duration));
+    return this.trailsShown;
+  }
+
+  private catCentre(state: RoomState, anim: Animation | null, elapsed: number): Point {
+    const cat = this.catPlacement(state, anim, elapsed);
+    return cellCenter(this.geo!, cat.x, cat.y);
+  }
+
+  /**
+   * The payoff's close-up: a zoom about the cat and the pile, with the pair drawn part of the
+   * way to the middle, never so far that the view's edge shows.
+   */
+  private closeUp(state: RoomState, pile: Point | null, close: number) {
+    const geo = this.geo!;
+    const s = geo.cell;
+    const cat = cellCenter(geo, state.cat.x, state.cat.y);
+    const end = pile ? cellCenter(geo, pile.x, pile.y) : cat;
+    const focus = { x: (cat.x + end.x) / 2 - this.view.x, y: (cat.y + end.y) / 2 - this.view.y };
+    const spanX = Math.abs(cat.x - end.x) + s * 2.6;
+    const spanY = Math.abs(cat.y - end.y) + s * 2.6;
+    const width = this.cssWidth;
+    const height = this.cssHeight;
+    const most = Math.max(1, Math.min(1.45, (width * 0.7) / spanX, (height * 0.7) / spanY));
+    const zoom = 1 + (most - 1) * close;
+    const place = (at: number, size: number) => {
+      const land = at + (size / 2 - at) * 0.5 * close;
+      return Math.min(0, Math.max(size * (1 - zoom), land - zoom * at));
+    };
+    const tx = place(focus.x, width);
+    const ty = place(focus.y, height);
+    return {
+      tx,
+      ty,
+      zoom,
+      x: tx + zoom * focus.x,
+      y: ty + zoom * focus.y,
+      radius: (Math.max(spanX, spanY) / 2) * zoom,
+    };
+  }
+
+  /** A soft spotlight on the close-up: the rest of the room darkens a little. */
+  private drawSpotlight(
+    ctx: CanvasRenderingContext2D,
+    lens: { x: number; y: number; radius: number },
+    close: number,
+  ) {
+    const shade = this.options.look === 'day' ? '40, 24, 10' : '4, 2, 16';
+    const gradient = ctx.createRadialGradient(
+      lens.x,
+      lens.y,
+      lens.radius,
+      lens.x,
+      lens.y,
+      lens.radius * 2.4,
+    );
+    gradient.addColorStop(0, `rgba(${shade}, 0)`);
+    gradient.addColorStop(1, `rgba(${shade}, ${0.34 * close})`);
+    ctx.save();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, this.cssWidth, this.cssHeight);
+    ctx.restore();
+  }
+
+  /** Three little stars circling over the pile while it bounces. */
+  private drawDizzyStars(ctx: CanvasRenderingContext2D, pile: Point, t: number, time: number) {
+    const alpha = this.options.reducedMotion ? 0 : starsAlpha(t);
+    if (alpha <= 0 || !this.geo) return;
+    const s = this.geo.cell;
+    const c = cellCenter(this.geo, pile.x, pile.y);
+    const lift = bounce(t).lift;
+    const ink = this.options.look === 'day' ? '#5a3a14' : '#1a1430';
+    withAlpha(ctx, alpha, () => {
+      for (let i = 0; i < 3; i++) {
+        const a = time * 4.2 + (i * Math.PI * 2) / 3;
+        const x = c.x + Math.cos(a) * s * 0.38;
+        const y = c.y - s * (0.6 + lift) + Math.sin(a) * s * 0.11;
+        star(ctx, x, y, s * 0.13, ink);
+        star(ctx, x, y, s * 0.1, '#ffd75e');
+      }
+    });
+  }
+
+  /** The keyboard's focus is on the cat: a ring that walks slowly around it. */
+  private drawFocusCue(ctx: CanvasRenderingContext2D, at: Point, s: number, time: number) {
+    ctx.save();
+    ctx.strokeStyle = FOCUS[this.options.look];
+    ctx.lineWidth = Math.max(2.5, s * 0.055);
+    ctx.setLineDash([s * 0.16, s * 0.1]);
+    ctx.lineDashOffset = this.options.reducedMotion ? 0 : -time * s * 0.3;
+    ctx.beginPath();
+    ctx.ellipse(at.x, at.y + s * 0.04, s * 0.6, s * 0.56, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /** On a followed room, a small marker at the view's edge points at every vacuum beyond it. */
+  private drawMarkers(ctx: CanvasRenderingContext2D, geo: Geometry, state: RoomState) {
+    const inset = 20;
+    const width = this.cssWidth;
+    const height = this.cssHeight;
+    const ink = this.options.look === 'day' ? '#3a2a1a' : '#f2ecff';
+    for (const v of state.vacuums) {
+      if (!v.alive) continue;
+      const c = cellCenter(geo, v.x, v.y);
+      const x = c.x - this.view.x;
+      const y = c.y - this.view.y;
+      if (x >= 0 && x <= width && y >= 0 && y <= height) continue;
+      const mx = Math.min(width - inset, Math.max(inset, x));
+      const my = Math.min(height - inset, Math.max(inset, y));
+      const colors = vacuumColors(v.kind, this.options.look);
+      ctx.save();
+      ctx.translate(mx, my);
+      // A soft backing disc, so the marker reads on a busy floor in either look.
+      ctx.beginPath();
+      ctx.arc(0, 0, 15, 0, Math.PI * 2);
+      ctx.fillStyle =
+        this.options.look === 'day' ? 'rgba(255, 250, 240, 0.85)' : 'rgba(20, 16, 40, 0.8)';
+      ctx.fill();
+      ctx.rotate(Math.atan2(y - my, x - mx));
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.moveTo(16, 0);
+      ctx.lineTo(8, -6);
+      ctx.lineTo(8, 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fillStyle = colors.body;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = ink;
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
@@ -594,25 +926,27 @@ export class BoardView {
     ctx.restore();
   }
 
-  /** Night darkens towards the edges of the room; painted once per size. */
-  private paintVignette(geo: Geometry, ratio: number): HTMLCanvasElement {
+  /** Night darkens towards the edges of the view; painted once per size. */
+  private paintVignette(ratio: number): HTMLCanvasElement {
+    const width = this.cssWidth;
+    const height = this.cssHeight;
     const canvas = document.createElement('canvas');
-    canvas.width = Math.round(geo.width * ratio);
-    canvas.height = Math.round(geo.height * ratio);
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
     const ctx = canvas.getContext('2d')!;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     const gradient = ctx.createRadialGradient(
-      geo.width / 2,
-      geo.height / 2,
-      Math.min(geo.width, geo.height) * 0.35,
-      geo.width / 2,
-      geo.height / 2,
-      Math.max(geo.width, geo.height) * 0.75,
+      width / 2,
+      height / 2,
+      Math.min(width, height) * 0.35,
+      width / 2,
+      height / 2,
+      Math.max(width, height) * 0.75,
     );
     gradient.addColorStop(0, 'rgba(6, 4, 20, 0)');
     gradient.addColorStop(1, 'rgba(6, 4, 20, 0.55)');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, geo.width, geo.height);
+    ctx.fillRect(0, 0, width, height);
     return canvas;
   }
 
@@ -621,11 +955,18 @@ export class BoardView {
     const isDay = this.options.look === 'day';
     if (this.options.whiskers) {
       // Squares a vacuum could reach next turn: fine hatching, so danger never relies on colour.
+      // Full strength only where the cat could step next; elsewhere just a whisper of it.
       const tile = this.hatchTile(s, isDay);
-      for (const cell of this.danger) {
-        const [x, y] = cell.split(',').map(Number) as [number, number];
-        ctx.drawImage(tile, geo.boardX + x * s, geo.boardY + y * s, s, s);
+      const cat = state.cat;
+      for (const near of [false, true]) {
+        ctx.globalAlpha = near ? 1 : 0.32;
+        for (const cell of this.danger) {
+          const [x, y] = cell.split(',').map(Number) as [number, number];
+          if (Math.max(Math.abs(x - cat.x), Math.abs(y - cat.y)) <= 1 !== near) continue;
+          ctx.drawImage(tile, geo.boardX + x * s, geo.boardY + y * s, s, s);
+        }
       }
+      ctx.globalAlpha = 1;
     }
     // The cat's own options: a paw print on every square it can safely step to, a cross on
     // the ones a vacuum would reach.
@@ -656,13 +997,23 @@ export class BoardView {
       }
     }
     if (this.hover) {
+      // The chosen square: dashed under the pointer, a solid focus-blue frame while the board
+      // has the keyboard's focus.
       const px = geo.boardX + this.hover.x * s;
       const py = geo.boardY + this.hover.y * s;
-      ctx.strokeStyle = isDay ? 'rgba(60, 40, 20, 0.7)' : 'rgba(255, 240, 200, 0.75)';
-      ctx.lineWidth = Math.max(2, s * 0.05);
-      ctx.setLineDash([s * 0.12, s * 0.08]);
-      ctx.strokeRect(px + s * 0.06, py + s * 0.06, s * 0.88, s * 0.88);
-      ctx.setLineDash([]);
+      ctx.save();
+      if (this.focused) {
+        ctx.strokeStyle = FOCUS[this.options.look];
+        ctx.lineWidth = Math.max(3, s * 0.06);
+      } else {
+        ctx.strokeStyle = isDay ? 'rgba(60, 40, 20, 0.7)' : 'rgba(255, 240, 200, 0.75)';
+        ctx.lineWidth = Math.max(2, s * 0.05);
+        ctx.setLineDash([s * 0.12, s * 0.08]);
+      }
+      ctx.beginPath();
+      ctx.roundRect(px + s * 0.06, py + s * 0.06, s * 0.88, s * 0.88, s * 0.12);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
@@ -696,6 +1047,11 @@ export class BoardView {
       .map((v) => v.kind);
   }
 
+  /**
+   * Every thing on the floor, back to front. During the payoff the pile bounces and the cat
+   * stretches; as the trails come forward everything but those two dims. Returns where the
+   * cat is drawn.
+   */
   private drawObjects(
     ctx: CanvasRenderingContext2D,
     geo: Geometry,
@@ -703,16 +1059,27 @@ export class BoardView {
     anim: Animation | null,
     elapsed: number,
     time: number,
-  ) {
+    payoffT: number | null,
+    dim: number,
+  ): Point {
     const s = geo.cell;
     const look = this.options.look;
+    const moving = payoffT !== null && !this.options.reducedMotion;
+    const pile = this.payoff?.pile ?? null;
+    const pileKey = pile ? key(pile) : null;
+    const hop = moving ? bounce(payoffT) : { lift: 0, sx: 1, sy: 1 };
+    const faded = 1 - 0.55 * dim;
+    const kept = 1 - 0.1 * dim;
     const drawers: { y: number; draw: () => void }[] = [];
     const dock = state.dock;
     if (dock) {
       const c = this.center(dock);
       drawers.push({
         y: c.y - s,
-        draw: () => drawDock(ctx, c.x, c.y, s, look, dock.remaining, dock.jammed, time),
+        draw: () =>
+          withAlpha(ctx, faded, () =>
+            drawDock(ctx, c.x, c.y, s, look, dock.remaining, dock.jammed, time),
+          ),
       });
     }
     // Tangles: those already there, those appearing at their bonk, minus any swallowed.
@@ -734,21 +1101,33 @@ export class BoardView {
       const shown = tangles.get(k)!;
       const c = this.center(shown);
       const kinds = this.tangleKinds(state, shown);
+      const isPile = k === pileKey;
       drawers.push({
         y: c.y,
         draw: () =>
-          drawTangle(
-            ctx,
-            c.x,
-            c.y,
-            s * 1.15,
-            look,
-            shown.kind,
-            shown.size,
-            kinds,
-            time,
-            hash2(shown.x, shown.y, this.seed) * 1000,
-          ),
+          withAlpha(ctx, isPile ? kept : faded, () => {
+            ctx.save();
+            if (isPile) {
+              // Squash and stretch about the pile's base, lifted by the hop.
+              const base = c.y + s * 0.3;
+              ctx.translate(c.x, base - hop.lift * s);
+              ctx.scale(hop.sx, hop.sy);
+              ctx.translate(-c.x, -base);
+            }
+            drawTangle(
+              ctx,
+              c.x,
+              c.y,
+              s * 1.15,
+              look,
+              shown.kind,
+              shown.size,
+              kinds,
+              time,
+              hash2(shown.x, shown.y, this.seed) * 1000,
+            );
+            ctx.restore();
+          }),
       });
     }
     for (const v of state.vacuums) {
@@ -759,29 +1138,38 @@ export class BoardView {
       const mood = anim ? 'calm' : (this.moods.get(v.id) ?? 'calm');
       drawers.push({
         y: c.y,
-        draw: () => {
-          drawVacuum(ctx, c.x, c.y, s, {
-            kind: v.kind,
-            look,
-            heading,
-            mood,
-            resting: v.alive && v.kind === 'slow' && v.resting,
-            full: v.full,
-            time,
-            hop: visible.hop,
-          });
-          if (v.alive && v.kind === 'slow' && v.resting && !this.options.reducedMotion)
-            drawSnooze(ctx, c.x, c.y, s, time, look);
-        },
+        draw: () =>
+          withAlpha(ctx, faded, () => {
+            drawVacuum(ctx, c.x, c.y, s, {
+              kind: v.kind,
+              look,
+              heading,
+              mood,
+              resting: v.alive && v.kind === 'slow' && v.resting,
+              full: v.full,
+              time,
+              hop: visible.hop,
+            });
+            if (v.alive && v.kind === 'slow' && v.resting && !this.options.reducedMotion)
+              drawSnooze(ctx, c.x, c.y, s, time, look);
+          }),
       });
     }
     const cat = this.catPlacement(state, anim, elapsed);
     const catCenter = cellCenter(geo, cat.x, cat.y);
+    const proud = moving ? stretch(payoffT) : { sx: 1, sy: 1 };
     drawers.push({
       y: catCenter.y + 0.01,
       draw: () =>
-        withAlpha(ctx, cat.alpha, () =>
-          drawCat(ctx, catCenter.x, catCenter.y - (0.06 + cat.lift) * s, s * 1.32, {
+        withAlpha(ctx, cat.alpha * kept, () => {
+          const y = catCenter.y - (0.06 + cat.lift) * s;
+          // The proud stretch grows up from the paws.
+          const feet = y + 0.355 * s * 1.32;
+          ctx.save();
+          ctx.translate(catCenter.x, feet);
+          ctx.scale(proud.sx, proud.sy);
+          ctx.translate(-catCenter.x, -feet);
+          drawCat(ctx, catCenter.x, y, s * 1.32, {
             coat: this.ghost ?? this.options.coat,
             pose: cat.pose,
             facing: this.facing,
@@ -789,12 +1177,14 @@ export class BoardView {
             time,
             look,
             ghost: this.ghost !== null,
-          }),
-        ),
+          });
+          ctx.restore();
+        }),
     });
     drawers.sort((a, b) => a.y - b.y);
     for (const d of drawers) d.draw();
     if (this.ghost) this.drawGhostLabel(ctx, catCenter, s);
+    return catCenter;
   }
 
   private drawGhostLabel(ctx: CanvasRenderingContext2D, at: Point, s: number) {

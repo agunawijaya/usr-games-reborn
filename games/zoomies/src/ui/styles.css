@@ -449,8 +449,9 @@
   cursor: pointer;
 }
 
+/* The board's keyboard focus is drawn on the cat and the chosen square, not as a frame. */
 .zm-board > canvas:focus-visible {
-  outline-offset: -6px;
+  outline: none;
 }
 
 .zm-panel {
@@ -527,11 +528,54 @@
   color: var(--zm-ink-2);
 }
 
+/* The vacuum counter spans the panel, so "6 left · 3 docked" and its dots share one line. */
+.zm-counter--wide {
+  grid-column: 1 / -1;
+}
+
+.zm-counter__row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+/* Safe zooms (or the Long Night's score): one slim line across the panel. */
+.zm-counter--slim {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-block: 8px;
+}
+
+.zm-counter--slim .zm-counter__label {
+  display: inline;
+}
+
+.zm-counter--slim .zm-counter__row {
+  align-items: center;
+}
+
+.zm-counter--slim .zm-counter__value {
+  font-size: 1.5rem;
+}
+
 .zm-pips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 4px;
-  margin-top: 6px;
+}
+
+.zm-pips__count {
+  margin: 0 6px 0 1px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--zm-ink-2);
 }
 
 .zm-pip {
@@ -624,9 +668,26 @@
 }
 
 .zm-keys {
-  margin: auto 0 0;
+  margin: -4px 0 0;
   font-size: 0.85rem;
   color: var(--zm-ink-2);
+}
+
+.zm-toggle[hidden] {
+  display: none;
+}
+
+/* On a short screen the panel tightens, so the status line stays in view; the room's idea is
+   on its intro card already. */
+@media (max-height: 760px) {
+  .zm-panel {
+    gap: 10px;
+    padding-top: 76px;
+  }
+
+  .zm-panel__idea {
+    display: none;
+  }
 }
 
 .zm-ladder {
@@ -715,6 +776,16 @@
 
 .zm-play--wide .zm-counters {
   grid-template-columns: repeat(4, minmax(92px, auto));
+}
+
+.zm-play--wide .zm-counter--wide,
+.zm-play--wide .zm-counter--slim {
+  display: block;
+  grid-column: auto;
+}
+
+.zm-play--wide .zm-counter--slim .zm-counter__label {
+  display: block;
 }
 
 .zm-play--wide .zm-counter {

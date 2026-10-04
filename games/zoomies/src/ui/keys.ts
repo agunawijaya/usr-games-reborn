@@ -9,7 +9,7 @@ import type { Step } from '../engine/types';
 export type MoveAction =
   'up-left' | 'up' | 'up-right' | 'left' | 'stay' | 'right' | 'down-left' | 'down' | 'down-right';
 
-export type KeyAction = MoveAction | 'loaf' | 'zoom' | 'undo' | 'nap' | 'whiskers';
+export type KeyAction = MoveAction | 'loaf' | 'zoom' | 'undo' | 'nap' | 'whiskers' | 'whole-room';
 
 export const MOVES: Record<MoveAction, readonly [Step, Step]> = {
   'up-left': [-1, -1],
@@ -38,6 +38,7 @@ export const DEFAULT_KEYS: Record<KeyAction, readonly string[]> = {
   undo: ['KeyU', 'Backspace'],
   nap: ['KeyN'],
   whiskers: ['KeyV'],
+  'whole-room': ['KeyO'],
 };
 
 export const KEY_LABELS: Record<KeyAction, string> = {
@@ -55,6 +56,7 @@ export const KEY_LABELS: Record<KeyAction, string> = {
   undo: 'Undo a turn',
   nap: 'Nap until the wave is over (Long Night)',
   whiskers: 'Whiskers (danger hints) on or off',
+  'whole-room': 'Whole room or follow the cat (big rooms)',
 };
 
 export interface KeyMap {

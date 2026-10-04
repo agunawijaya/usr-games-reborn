@@ -69,9 +69,12 @@ export class DustLayer {
     }
   }
 
-  /** A vacuum rolled from one point to another (canvas coordinates): clean the stripe. */
+  /**
+   * A vacuum rolled from one point to another (canvas coordinates): clean the stripe. By day the
+   * lane is narrow, so the combed trail the reveal draws on it stays clear where lanes cross.
+   */
   sweep(x1: number, y1: number, x2: number, y2: number) {
-    const width = this.geo.cell * 0.62;
+    const width = this.geo.cell * (this.look === 'day' ? 0.36 : 0.62);
     const ctx = this.dustCtx;
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';

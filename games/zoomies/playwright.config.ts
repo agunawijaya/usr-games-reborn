@@ -5,7 +5,8 @@ import { GPU_LAUNCH_ARGS } from '../../packages/bridge/testing/shots';
 /**
  * Zoomies inside the Hall. Run with `pnpm exec playwright test -c games/zoomies`. The suite
  * starts its own Hall dev server on port 5291 (or `HALL_PORT`), so it never shares one with
- * another session. `SHOTS=1` runs only the documentation screenshots.
+ * another session. `SHOTS=1` runs only the documentation screenshots (shots.spec.ts and
+ * polish-shots.spec.ts).
  */
 process.env.HALL_PORT ??= '5291';
 const { baseURL, webServer } = hostedSuiteConfig();
@@ -13,8 +14,8 @@ const shots = Boolean(process.env.SHOTS);
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: shots ? '**/shots.spec.ts' : '**/*.spec.ts',
-  testIgnore: shots ? [] : ['**/shots.spec.ts'],
+  testMatch: shots ? '**/*shots.spec.ts' : '**/*.spec.ts',
+  testIgnore: shots ? [] : ['**/*shots.spec.ts'],
   outputDir: 'test-results',
   timeout: 90_000,
   workers: 1,

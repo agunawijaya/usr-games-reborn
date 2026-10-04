@@ -1,6 +1,6 @@
 # atc · fancy-web
 
-> A **spiritual successor** to BSD `atc(6)` (Ed James, 1986), reimagined
+> A **spiritual successor** to BSD `atc(6)` (Ed James, 1986–87), reimagined
 > as a *Control Room 1986* browser simulator: curved CRT phosphor
 > radar, typed command grammar, ambient console audio, and a shift
 > that expects you to think like a controller — not click like a
@@ -98,9 +98,8 @@ changed, added, or deferred.
 
 **Positioning:** we live in the *BSD-lineage* typed-radar slot
 (see [`../../docs/port-ideas.md`](../../docs/port-ideas.md)
-§Competitive Landscape), **not** the Flight Control / Air
-Control / Air Control Lite mobile-touch-drag lineage. If you
-came here expecting to drag paths with your finger, this is a
+§Competitive Landscape), **not** the touch-and-drag mobile traffic
+games. If you came here expecting to drag paths with your finger, this is a
 different game — and probably not the one you meant.
 
 ## Tech stack
@@ -110,7 +109,7 @@ different game — and probably not the one you meant.
   scanline overlay + drop-shadow filter is enough for MVP)
 - **Web Audio API** for the ambient console bed and interaction
   SFX (procedural — no assets)
-- **Google Fonts** (VT323, Share Tech Mono) via preconnect
+- **VT323** and **Share Tech Mono**, self-hosted in `src/fonts/`
 - **No dependencies.** No `node_modules`, no build step.
 
 Rationale: see
@@ -152,7 +151,7 @@ mechanical contract every port must honour.
 - ✅ 360° compass card around border (tick marks every 10°, bearings every 30°)
 - ✅ Radar afterglow / blip persistence (4-position phosphor trail)
 - ✅ ATC data blocks: `FL050` altitude + heading + destination
-- ✅ Realistic callsigns (UAL42, DAL887, etc. — display only)
+- ✅ Callsigns from invented carriers (HBM42, QLW887, etc. — display only)
 - ✅ METAR-style bezel with rotating ATIS
 - ✅ Typed command grammar with live hints
 - ✅ 3 built-in playfields (Easy, Default, Killer)
@@ -208,9 +207,9 @@ priority-ordering delivers many more planes than autoplay.
 - All 17 canonical playfields
 - Voice-command input via Web Speech API (ATC phraseology
   teaching mode)
-- Daily-seed global leaderboard (needs server; Cloudflare KV
-  candidate)
-- LiveATC.net ambient background feed integration
+- Daily-seed global leaderboard (needs a server and a key-value
+  store)
+- An ambient background loop of recorded radio
 - Delayed commands (`@bN` / `abN` — do action at beacon N)
 - Full ICAO phraseology mode (callsigns, ATIS, STAR/approach
   patterns)

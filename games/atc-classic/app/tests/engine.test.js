@@ -283,7 +283,7 @@ test('loss when two planes collide', () => {
   tick(g);
   // after a tick, A goes to (6,7), B goes to (6,7) → collision
   assert.equal(g.lost, true);
-  assert.ok(g.lostReason.includes('collided'));
+  assert.ok(g.lostReason.includes('lost separation with B'));
 });
 
 test('success: exit at altitude 9 delivers plane', () => {

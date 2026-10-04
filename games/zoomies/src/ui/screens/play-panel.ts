@@ -5,8 +5,12 @@ import { button, h } from '../dom';
 
 /**
  * The side panel during play: where you are, the counters that matter, the actions that are
- * not plain steps, and one line saying what just happened (read out to screen readers).
+ * not plain steps with the keys beside them, and one line saying what just happened (read out
+ * to screen readers).
  */
+
+/** Past this many vacuums the dots give way to two counts, so the row never wraps. */
+const MAX_PIPS = 8;
 
 export interface PanelInfo {
   eyebrow: string;
@@ -23,13 +27,14 @@ export interface PanelHandlers {
   undo(): void;
   nap(): void;
   toggleWhiskers(): void;
+  toggleWholeRoom(): void;
 }
 
 export class PlayPanel {
   readonly element: HTMLElement;
   private turn = h('span', { class: 'zm-counter__value', dataset: { testid: 'zm-turn' } });
   private left = h('span', { class: 'zm-counter__value', dataset: { testid: 'zm-left' } });
-  private leftPips = h('span', { class: 'zm-pips', 'aria-hidden': 'true' });
+  private leftPips = h('span', { class: 'zm-pips', dataset: { testid: 'zm-pips' } });
   private third = h('span', { class: 'zm-counter__value' });
   private thirdLabel = h('span', { class: 'zm-counter__label' });
   private thirdPips = h('span', { class: 'zm-pips', 'aria-hidden': 'true' });
@@ -45,6 +50,8 @@ export class PlayPanel {
   private title = h('h1', { class: 'zm-panel__title' });
   private idea = h('p', { class: 'zm-panel__idea' });
   private whiskerSwitch: HTMLButtonElement;
+  private wholeRoomSwitch: HTMLButtonElement;
+  private wholeRoomRow: HTMLElement;
   private undoButton: HTMLButtonElement;
   private zoomButton: HTMLButtonElement;
   private loafButton: HTMLButtonElement;
@@ -85,6 +92,21 @@ export class PlayPanel {
       onclick: handlers.toggleWhiskers,
       dataset: { testid: 'zm-whiskers' },
     });
+    this.wholeRoomSwitch = h('button', {
+      type: 'button',
+      class: 'zm-switch',
+      role: 'switch',
+      'aria-checked': 'false',
+      'aria-label': 'Whole room: show the whole room instead of following the cat',
+      onclick: handlers.toggleWholeRoom,
+      dataset: { testid: 'zm-whole-room' },
+    });
+    this.wholeRoomRow = h(
+      'label',
+      { class: 'zm-toggle', hidden: true },
+      h('span', {}, 'Whole room ', h('kbd', { class: 'zm-kbd' }, keys.first('whole-room'))),
+      this.wholeRoomSwitch,
+    );
     const actions =
       info.rules === 'classic'
         ? [this.loafButton, this.zoomButton, nap]
@@ -103,29 +125,34 @@ export class PlayPanel {
           h('span', { class: 'zm-counter__label' }, 'Turn'),
           this.turn,
         ),
+        h('div', { class: 'zm-counter' }, this.fourthLabel, this.fourth),
         h(
           'div',
-          { class: 'zm-counter' },
-          h('span', { class: 'zm-counter__label' }, 'Vacuums left'),
-          this.left,
-          this.leftPips,
+          { class: 'zm-counter zm-counter--wide' },
+          h('span', { class: 'zm-counter__label' }, 'Vacuums'),
+          h('span', { class: 'zm-counter__row' }, this.left, this.leftPips),
         ),
-        h('div', { class: 'zm-counter' }, this.thirdLabel, this.third, this.thirdPips),
-        h('div', { class: 'zm-counter' }, this.fourthLabel, this.fourth),
+        h(
+          'div',
+          { class: 'zm-counter zm-counter--slim' },
+          this.thirdLabel,
+          h('span', { class: 'zm-counter__row' }, this.third, this.thirdPips),
+        ),
       ),
       h('div', { class: 'zm-actions' }, ...actions),
+      h(
+        'p',
+        { class: 'zm-keys' },
+        'Step: Q W E · A D · Z X C, arrows or number pad. Stay: S or Space. Or click a square next to the cat.',
+      ),
       h(
         'label',
         { class: 'zm-toggle' },
         h('span', {}, 'Whiskers ', h('kbd', { class: 'zm-kbd' }, keys.first('whiskers'))),
         this.whiskerSwitch,
       ),
+      this.wholeRoomRow,
       this.status,
-      h(
-        'p',
-        { class: 'zm-keys' },
-        'Step: Q W E · A D · Z X C, arrows or number pad. Stay: S or Space. Or click a square next to the cat.',
-      ),
     );
     this.setInfo(info);
   }
@@ -139,6 +166,16 @@ export class PlayPanel {
 
   setWhiskers(on: boolean) {
     this.whiskerSwitch.setAttribute('aria-checked', String(on));
+  }
+
+  /** The Whole room switch shows only when the room outgrows the view. */
+  offerWholeRoom(offered: boolean) {
+    const on = this.wholeRoomSwitch.getAttribute('aria-checked') === 'true';
+    this.wholeRoomRow.hidden = !offered && !on;
+  }
+
+  setWholeRoom(on: boolean) {
+    this.wholeRoomSwitch.setAttribute('aria-checked', String(on));
   }
 
   say(text: string, warn = false) {
@@ -161,10 +198,12 @@ export class PlayPanel {
     );
     this.left.replaceChildren(
       String(alive),
-      waiting ? h('small', {}, ` +${waiting} in the dock`) : '',
+      h('small', {}, waiting ? ` left · ${waiting} docked` : ' left'),
     );
-    this.leftPips.replaceChildren(
-      ...state.vacuums.map((v) => h('span', { class: v.alive ? 'zm-pip' : 'zm-pip zm-pip--on' })),
+    this.leftPips.replaceChildren(...vacuumPips(state));
+    this.leftPips.setAttribute(
+      'aria-label',
+      `${state.vacuums.length - alive} of ${state.vacuums.length} tangled`,
     );
     if (this.info.rules === 'classic') {
       this.thirdLabel.textContent = 'Score';
@@ -189,4 +228,21 @@ export class PlayPanel {
     this.loafButton.disabled = state.status !== 'playing';
     this.zoomButton.disabled = state.status !== 'playing';
   }
+}
+
+/**
+ * One dot per vacuum, filled once it is tangled; past eight, a filled dot and an empty one,
+ * each with its count, so the row always fits on one line.
+ */
+function vacuumPips(state: RoomState): HTMLElement[] {
+  const tangled = state.vacuums.filter((v) => !v.alive).length;
+  const rolling = state.vacuums.length - tangled;
+  if (state.vacuums.length <= MAX_PIPS)
+    return state.vacuums.map((v) => h('span', { class: v.alive ? 'zm-pip' : 'zm-pip zm-pip--on' }));
+  return [
+    h('span', { class: 'zm-pip zm-pip--on' }),
+    h('span', { class: 'zm-pips__count' }, `×${tangled}`),
+    h('span', { class: 'zm-pip' }),
+    h('span', { class: 'zm-pips__count' }, `×${rolling}`),
+  ];
 }

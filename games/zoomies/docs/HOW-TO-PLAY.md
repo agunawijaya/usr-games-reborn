@@ -7,23 +7,46 @@ a room is a puzzle with a par; in the Long Night the waves keep coming until one
 
 ## Controls
 
-| Action                                  | Keyboard                                    | Mouse                                           | Remappable |
-| --------------------------------------- | ------------------------------------------- | ----------------------------------------------- | ---------- |
-| Step (eight directions)                 | Q W E · A D · Z X C, arrow keys, number pad | Click a square next to the cat, or drag the cat | yes        |
-| Stay put for one turn                   | S, Space, `.` or number pad 5               | Click the cat                                   | yes        |
-| Loaf (wait while it is safe)            | L                                           | Loaf                                            | yes        |
-| Zoom (dash to a random square)          | T                                           | Zoom                                            | yes        |
-| Undo a turn (House, Today's Mess)       | U, Backspace, Ctrl+Z or ⌘Z                  | Undo                                            | yes        |
-| Nap until the wave is over (Long Night) | N                                           | Nap till it's over                              | yes        |
-| Whiskers on or off                      | V                                           | The Whiskers switch                             | yes        |
-| Start a room (intro card)               | Enter                                       | Start                                           | no         |
-| Next room (results)                     | Enter                                       | Next room                                       | no         |
-| Pause                                   | Esc                                         | Pause button                                    | no         |
-| Play again (results)                    | R                                           | Play again                                      | no         |
-| Back to the Hall (results)              | H                                           | Back to the Hall                                | no         |
+| Action                                   | Keyboard                                    | Mouse                                           | Remappable |
+| ---------------------------------------- | ------------------------------------------- | ----------------------------------------------- | ---------- |
+| Step (eight directions)                  | Q W E · A D · Z X C, arrow keys, number pad | Click a square next to the cat, or drag the cat | yes        |
+| Stay put for one turn                    | S, Space, `.` or number pad 5               | Click the cat                                   | yes        |
+| Loaf (wait while it is safe)             | L                                           | Loaf                                            | yes        |
+| Zoom (dash to a random square)           | T                                           | Zoom                                            | yes        |
+| Undo a turn (House, Today's Mess)        | U, Backspace, Ctrl+Z or ⌘Z                  | Undo                                            | yes        |
+| Nap until the wave is over (Long Night)  | N                                           | Nap till it's over                              | yes        |
+| Whiskers on or off                       | V                                           | The Whiskers switch                             | yes        |
+| Whole room or follow the cat (big rooms) | O                                           | The Whole room switch                           | yes        |
+| Skip the room-cleared moment             | Any key                                     | Click                                           | no         |
+| Start a room (intro card)                | Enter                                       | Start                                           | no         |
+| Next room (results)                      | Enter                                       | Next room                                       | no         |
+| Pause                                    | Esc                                         | Pause button                                    | no         |
+| Play again (results)                     | R                                           | Play again                                      | no         |
+| Back to the Hall (results)               | H                                           | Back to the Hall                                | no         |
 
 Keys are remapped in the Hall's settings. In the Pattern Lab the step keys fill the pattern's
 slots, Backspace removes the last one and Enter runs it.
+
+When the board has the keyboard's focus, a dashed ring circles the cat; the square under the
+pointer gets a solid frame.
+
+## The room and the panel
+
+The cat is never smaller than 48 pixels. When a room is too big to show at that size (the Long
+Night always, the biggest house rooms on a small screen), the view follows the cat, and a small
+marker at the edge points at every vacuum out of sight. **Whole room** (`O`, or its switch in the
+panel, shown only when it applies) shows the whole room at once, smaller.
+
+With Whiskers on, every square a vacuum could reach next turn is hatched; the hatching is strong on
+the squares around the cat and faint further away.
+
+The panel counts the turn against par, the zooms used, the vacuums ("6 left · 3 docked", with one
+dot per vacuum, filled once it is tangled, or two counts past eight) and the safe zooms in hand.
+
+When the last vacuum tangles, the room has its moment: the view eases in on the cat and the pile,
+the pile bounces under dizzy stars, the cat stretches with a proud "mrrp", and then the trails of
+every vacuum draw themselves onto the rug. The counter changes after that, and the packages earned
+during the room are announced with the results.
 
 ## Rules
 

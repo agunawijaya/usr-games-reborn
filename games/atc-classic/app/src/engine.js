@@ -42,6 +42,32 @@ export const STATUS = {
 };
 
 // ---------------------------------------------------------------------------
+// Why a shift ends — the room's own words, calm and plain. The meaning of each follows the
+// original's checks; the original's messages are not reused (docs/NOTES.md).
+// ---------------------------------------------------------------------------
+
+export const LOSS = {
+  fuel: 'fuel exhausted, diverted',
+  againstRunway: 'came in against the runway arrow',
+  exitAltitude: 'left the sector at the wrong altitude',
+  ceiling: 'climbed above the sector ceiling',
+  wrongField: 'set down at the wrong field',
+  landedNotExited: 'set down instead of leaving the sector',
+  ground: 'reached the ground away from a field',
+  wrongExit: 'left the sector by the wrong exit',
+  exitedNotLanded: 'left the sector instead of landing',
+  strayed: 'strayed out of the sector between exits',
+  separation: (otherLetter) => `lost separation with ${otherLetter}`,
+};
+
+/** Orders that change where a plane points; only these can wait for a beacon. */
+const DIRECTION_ACTIONS = new Set([
+  'turn', 'turnLeft', 'turnRight', 'turnHardLeft', 'turnHardRight', 'circle',
+  'towardsBeacon', 'towardsAirport', 'towardsExit',
+]);
+const TARGET_KINDS = { towardsBeacon: 'beacon', towardsAirport: 'airport', towardsExit: 'exit' };
+
+// ---------------------------------------------------------------------------
 // Deterministic RNG (Mulberry32)
 // ---------------------------------------------------------------------------
 
@@ -233,14 +259,24 @@ export function spawnPlane(game, eventSink = null) {
  *     'towardsBeacon' arg = beacon idx
  *     'towardsAirport'arg = airport idx
  *     'towardsExit'   arg = exit idx
+ *   with an optional delayedBeacon (the `@b1` suffix): see executeDelayed.
  * @returns { ok: bool, error?: string }
  */
 export function executeCommand(game, cmd) {
   const all = [...game.air, ...game.ground];
   const plane = all.find(p => p.letter.toLowerCase() === cmd.plane.toLowerCase());
   if (!plane) return { ok: false, error: `No plane ${cmd.plane}` };
+  if (cmd.delayedBeacon !== undefined) return executeDelayed(game.playfield, plane, cmd);
 
-  const pf = game.playfield;
+  if (DIRECTION_ACTIONS.has(cmd.action)) {
+    const next = newDirection(game.playfield, plane, cmd, { x: plane.xpos, y: plane.ypos });
+    if (next.error) return { ok: false, error: next.error };
+    plane.newDir = next.dir;
+    // A new direction replaces a turn that was waiting for its beacon; other orders leave it.
+    plane.delayed = false;
+    plane.delayedBeaconNo = -1;
+    return { ok: true, plane };
+  }
 
   switch (cmd.action) {
     case 'altitude':
@@ -253,44 +289,83 @@ export function executeCommand(game, cmd) {
     case 'altitudeDown':
       plane.newAltitude = Math.max(0, plane.altitude - cmd.arg);
       break;
-    case 'turn':
-      if (cmd.arg < 0 || cmd.arg > 7) return { ok: false, error: 'direction 0..7' };
-      plane.newDir = cmd.arg;
-      break;
-    case 'turnLeft':
-      plane.newDir = ((plane.dir - (cmd.arg ?? 1)) % MAXDIR + MAXDIR) % MAXDIR;
-      break;
-    case 'turnRight':
-      plane.newDir = (plane.dir + (cmd.arg ?? 1)) % MAXDIR;
-      break;
-    case 'turnHardLeft':
-      plane.newDir = ((plane.dir - 2) % MAXDIR + MAXDIR) % MAXDIR;
-      break;
-    case 'turnHardRight':
-      plane.newDir = (plane.dir + 2) % MAXDIR;
-      break;
-    case 'circle':
-      plane.newDir = MAXDIR; // sentinel meaning "circle"
-      break;
     case 'mark':      plane.status = STATUS.MARKED; break;
     case 'ignore':    plane.status = STATUS.IGNORED; break;
     case 'unmark':    plane.status = STATUS.UNMARKED; break;
-    case 'towardsBeacon':
-    case 'towardsAirport':
-    case 'towardsExit': {
-      const list = cmd.action === 'towardsBeacon' ? pf.beacons
-                 : cmd.action === 'towardsAirport' ? pf.airports
-                 : pf.exits;
-      if (cmd.arg < 0 || cmd.arg >= list.length) return { ok: false, error: 'index oob' };
-      const target = list[cmd.arg];
-      plane.newDir = dirTowards(plane.xpos, plane.ypos, target.x, target.y);
-      break;
-    }
     default:
       return { ok: false, error: 'unknown action ' + cmd.action };
   }
 
   return { ok: true, plane };
+}
+
+/**
+ * The direction a direction order asks for, aimed from `from`: the plane's position, or for a
+ * delayed order the beacon where it will turn. Relative turns count from the present heading,
+ * which a delayed plane keeps until its beacon.
+ * @returns {{ dir: number } | { error: string }}
+ */
+function newDirection(pf, plane, cmd, from) {
+  switch (cmd.action) {
+    case 'turn':
+      if (cmd.arg < 0 || cmd.arg > 7) return { error: 'direction 0..7' };
+      return { dir: cmd.arg };
+    case 'turnLeft':
+      return { dir: ((plane.dir - (cmd.arg ?? 1)) % MAXDIR + MAXDIR) % MAXDIR };
+    case 'turnRight':
+      return { dir: (plane.dir + (cmd.arg ?? 1)) % MAXDIR };
+    case 'turnHardLeft':
+      return { dir: ((plane.dir - 2) % MAXDIR + MAXDIR) % MAXDIR };
+    case 'turnHardRight':
+      return { dir: (plane.dir + 2) % MAXDIR };
+    case 'circle':
+      return { dir: MAXDIR }; // sentinel meaning "circle"
+    default: {
+      const kind = TARGET_KINDS[cmd.action];
+      const list = kind === 'beacon' ? pf.beacons : kind === 'airport' ? pf.airports : pf.exits;
+      if (cmd.arg < 0 || cmd.arg >= list.length) return { error: `No ${kind} ${cmd.arg} in this sector` };
+      const target = list[cmd.arg];
+      return { dir: dirTowards(from.x, from.y, target.x, target.y) };
+    }
+  }
+}
+
+/**
+ * An order that waits until the plane flies over a beacon (`Atd@b1`, or `Atdab1`): the plane
+ * holds its heading until then, and turns from there. As in the original, only direction orders
+ * can wait, and a "towards" order is aimed from the beacon. Unlike the original, which accepted
+ * any beacon in the general direction of flight (a plane that missed it held its heading for
+ * good), the beacon must lie on the plane's present track, so the plane is sure to reach it.
+ */
+function executeDelayed(pf, plane, cmd) {
+  if (!DIRECTION_ACTIONS.has(cmd.action)) {
+    return { ok: false, error: 'Only a turn or a circle can wait for a beacon' };
+  }
+  const beacon = pf.beacons[cmd.delayedBeacon];
+  if (!beacon) return { ok: false, error: `No beacon ${cmd.delayedBeacon} in this sector` };
+  if (!isOnTrack(plane, beacon)) {
+    return { ok: false, error: `Beacon ${cmd.delayedBeacon} is not on ${plane.letter}'s track` };
+  }
+  const next = newDirection(pf, plane, cmd, beacon);
+  if (next.error) return { ok: false, error: next.error };
+  if (TARGET_KINDS[cmd.action]) {
+    const target = (cmd.action === 'towardsBeacon' ? pf.beacons : cmd.action === 'towardsAirport' ? pf.airports : pf.exits)[cmd.arg];
+    if (target.x === beacon.x && target.y === beacon.y) return { ok: false, error: 'It would already be there' };
+    if (next.dir === plane.dir) return { ok: false, error: `${plane.letter} is already heading that way` };
+  }
+  plane.newDir = next.dir;
+  plane.delayed = true;
+  plane.delayedBeaconNo = cmd.delayedBeacon;
+  return { ok: true, plane };
+}
+
+/** True when flying straight on, the plane passes over the point. */
+export function isOnTrack(plane, point) {
+  const step = DISPLACEMENT[plane.dir % MAXDIR];
+  const dx = point.x - plane.xpos;
+  const dy = point.y - plane.ypos;
+  const steps = step.dx !== 0 ? dx / step.dx : dy / step.dy;
+  return Number.isInteger(steps) && steps >= 1 && dx === step.dx * steps && dy === step.dy * steps;
 }
 
 /** Compute the compass direction (0..7) from (fx,fy) toward (tx,ty). */
@@ -343,7 +418,7 @@ export function tick(game) {
     // fuel
     p.fuel--;
     if (p.fuel < 0) {
-      return endLoss(game, p, 'ran out of fuel', events);
+      return endLoss(game, p, LOSS.fuel, events);
     }
 
     // altitude change (±1 per tick)
@@ -370,10 +445,10 @@ export function tick(game) {
     if (p.delayed && p.delayedBeaconNo >= 0) {
       const bc = pf.beacons[p.delayedBeaconNo];
       if (bc && p.xpos === bc.x && p.ypos === bc.y) {
+        events.push({ type: 'beacon', plane: p.letter, beacon: p.delayedBeaconNo });
         p.delayed = false;
         p.delayedBeaconNo = -1;
         if (p.status === STATUS.UNMARKED) p.status = STATUS.MARKED;
-        events.push({ type: 'beacon', plane: p.letter, beacon: p.delayedBeaconNo });
       }
     }
 
@@ -386,7 +461,7 @@ export function tick(game) {
           events.push({ type: 'land', plane: p.letter, airport: p.destNo });
           continue;
         } else {
-          return endLoss(game, p, 'landed in the wrong direction', events);
+          return endLoss(game, p, LOSS.againstRunway, events);
         }
       }
     } else if (p.destType === FEATURE.EXIT) {
@@ -397,38 +472,38 @@ export function tick(game) {
           events.push({ type: 'exit', plane: p.letter, exit: p.destNo });
           continue;
         } else {
-          return endLoss(game, p, 'exited at the wrong altitude', events);
+          return endLoss(game, p, LOSS.exitAltitude, events);
         }
       }
     }
 
     // crash checks
     if (p.altitude > 9) {
-      return endLoss(game, p, 'exceeded flight ceiling', events);
+      return endLoss(game, p, LOSS.ceiling, events);
     }
     if (p.altitude <= 0) {
       const anyAirport = pf.airports.findIndex(a => a.x === p.xpos && a.y === p.ypos);
       if (anyAirport >= 0) {
         if (p.destType === FEATURE.AIRPORT && anyAirport !== p.destNo) {
-          return endLoss(game, p, 'landed at wrong airport', events);
+          return endLoss(game, p, LOSS.wrongField, events);
         } else if (p.destType === FEATURE.EXIT) {
-          return endLoss(game, p, 'landed instead of exited', events);
+          return endLoss(game, p, LOSS.landedNotExited, events);
         }
         // else fine — landing at own airport handled above
       } else {
-        return endLoss(game, p, 'crashed on the ground', events);
+        return endLoss(game, p, LOSS.ground, events);
       }
     }
     if (p.xpos < 0 || p.xpos >= pf.width || p.ypos < 0 || p.ypos >= pf.height) {
       const anyExit = pf.exits.findIndex(e => e.x === p.xpos && e.y === p.ypos);
       if (anyExit >= 0) {
         if (p.destType === FEATURE.EXIT && anyExit !== p.destNo) {
-          return endLoss(game, p, 'exited via the wrong exit', events);
+          return endLoss(game, p, LOSS.wrongExit, events);
         } else if (p.destType === FEATURE.AIRPORT) {
-          return endLoss(game, p, 'exited instead of landed', events);
+          return endLoss(game, p, LOSS.exitedNotLanded, events);
         }
       } else {
-        return endLoss(game, p, 'illegally left the flight arena', events);
+        return endLoss(game, p, LOSS.strayed, events);
       }
     }
   }
@@ -448,7 +523,7 @@ export function tick(game) {
       if (Math.abs(a.altitude - b.altitude) <= 1 &&
           Math.abs(a.xpos - b.xpos) <= 1 &&
           Math.abs(a.ypos - b.ypos) <= 1) {
-        return endLoss(game, a, `collided with ${b.letter}`, events);
+        return endLoss(game, a, LOSS.separation(b.letter), events);
       }
     }
   }

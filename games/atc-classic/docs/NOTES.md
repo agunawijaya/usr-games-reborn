@@ -8,6 +8,8 @@ no files, no progress.
 On 2026-10-02 the owner asked for gamification around the adopted game: a career, briefings with
 stamps, printed reports with a logbook and Daily Traffic, together with the Hall's pause reaching
 the game and the cheat panel kept out of sight. That work is recorded in "Gamification" below.
+Later that day polish prompt P1-C added the order buttons, a readable radar, the moment a plane
+comes home, our own names and words, and fixed the quirks listed below; see "Polish P1-C".
 
 ## Sources studied
 
@@ -110,14 +112,16 @@ recorded by reading `app/src/engine.js` and `app/src/parser.js` and kept on adop
 - New planes are held back by planes within four cells across, from any origin, without comparing
   altitude.
 - Letter case is swapped: jets (fast) are uppercase, props lowercase.
-- The delay suffix (`@b1`, `ab1`) is parsed and then ignored: the order runs at once, and the
-  `beacon` event never fires. The relative turns, `tt*`, `cl` and `cr` are not parsed.
+- The delay suffix (`@b1`, `ab1`) was parsed and then ignored. Fixed in P1-C (see below). The
+  relative turns, `tt*`, `cl` and `cr` are not parsed.
 - In a tick that loses a plane, the engine stops before counting that tick’s arrivals, though the
   event log and the radio already reported them. `hall.js` follows the score and counts nothing
   from that tick.
-- `?` does nothing on the title screen, though the title’s own help line offers it.
-- Choosing a sector on the title screen does not move the highlight in the sidebar’s sector
-  buttons, which keep showing the previous choice until one of them is pressed.
+- `?` did nothing on the title screen, though the title’s own help line offered it. Fixed in
+  P1-C: it opens how to play there too.
+- Choosing a sector on the title screen did not move the highlight in the sidebar’s sector
+  buttons. Since the gamification `startNewGame` sets the highlight for every shift; checked
+  again in P1-C.
 - The sector comments in `playfields.js` call Easy and Killer the original’s maps; they are new
   layouts (see [`CHANGES-FROM-ORIGINAL.md`](CHANGES-FROM-ORIGINAL.md)).
 - The `SHIFT` clock counts down fifteen minutes and stops at zero; nothing reads it.
@@ -205,7 +209,7 @@ ships `index.html` (54 KB, all CSS inline), 113 KB of its own JavaScript and 31 
 | 2026-10-01 | Nothing counts from a tick that loses a plane                                           | The engine leaves those arrivals out of the score                                                                                              |
 | 2026-10-01 | Poster: the radar six seconds into the first shift, with a plane in the air             | The radar is the game; the title’s canvas holds only a sweep                                                                                   |
 | 2026-10-01 | CDN web fonts replaced by self-hosted files; voice limited to on-device voices          | No runtime network requests (hard rule 4, ADR 0011)                                                                                            |
-| 2026-10-01 | Airline names, call signs and the airport code kept in `app/` for now                   | Copy is not edited on adoption; listed in `docs/KNOWN-ISSUES.md`                                                                               |
+| 2026-10-01 | Airline names, call signs and the airport code kept in `app/` for now                   | Copy is not edited on adoption; listed in `docs/KNOWN-ISSUES.md` (replaced in P1-C)                                                            |
 | 2026-10-01 | Test script `node --test "tests/*.test.js"` instead of `tests/`                         | Node 22 reads `tests/` as a pattern and finds no files                                                                                         |
 
 ## Gamification (2026-10-02)
@@ -270,29 +274,127 @@ re-run and every target still holds (`docs/NOTES-progression.md`). A second week
 | 2026-10-02 | The licence number comes from the clock, not `Math.random`                                                      | The in-Hall suites seed `Math.random` so the engine's traffic repeats                                                                                            |
 | 2026-10-02 | Prompt C1: follows the Hall’s sound, motion and pause (bridge 1.1)                                              | ADR 0012; the pause already worked; the Hall’s mute turns the sound switch for the visit only, and reduced motion reaches the two places the game had a path for |
 
+## Polish P1-C (2026-10-02)
+
+Prompt `prompts/p1-c-control-room.md`, after the consolidation review: an on-ramp for players who
+do not know the typed language, while typing keeps working exactly as before. The before and after
+frames, and four rounds of critique, are in [`media/polish/POLISH.md`](media/polish/POLISH.md);
+the owner approved them.
+
+| Piece           | Where                   | What it does                                                                                                                                                       |
+| --------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Order board     | `app/src/orders.js`     | For a plane: every order with its typed command, piece by piece, and the command as the parser reads it; off when the engine would refuse it or it changes nothing |
+| Order panel     | `app/src/orderpanel.js` | The board as buttons in the sheet beside the radar, the beacon picker for waiting orders, the "Typed as" line                                                      |
+| Pause, settings | `app/src/sheets.js`     | The pause menu (Resume · order buttons · How to play · settings · Game menu · Back to the Hall), the settings, the leave questions                                 |
+| Settings        | `app/src/settings.js`   | Order buttons (and their default from the service record), radar text size, reference card, the tips done                                                          |
+| Tips            | `app/src/tips.js`       | The three first-shift tips and where they point                                                                                                                    |
+| Carriers        | `app/src/carriers.js`   | The invented carriers: codes, radio names, call signs                                                                                                              |
+| Radar colours   | `app/src/palette.js`    | The radar's colours and the contrast arithmetic that tests them                                                                                                    |
+| Testing aid     | `app/src/planner.js`    | The cheat panel's planner (below), owner's request                                                                                                                 |
+
+### The credit: 1986 or 1987
+
+- The manual page `atc.6.in` carries `Copyright (c) 1986 Ed James. All rights reserved.` (line
+  35, under the Berkeley SCCS line `@(#)atc.6 8.1 (Berkeley) 5/31/93`).
+- Every source file (`main.c`, `input.c`, `update.c`, `grammar.y`, `lex.l` and the rest) carries
+  `Copyright (c) 1987 by Ed James, UC Berkeley. All rights reserved.`
+- Both sit under the Regents’ copyright of 1990 and 1993; `LICENSES/atc-Ed-James.txt` keeps the
+  1987 notice of the code we derive from.
+
+The game menu, ABOUT and CHANGES therefore credit him **1986–87**: the year on his manual and the
+year on his code. The title "Control Room 1986" is the port's own name and stays.
+
+### Our own names
+
+The fifteen carriers, as `CODE` Radio name: `HBM` Hornbeam, `QLW` Quailwood, `MRW` Merrow, `SVF`
+Silverfen, `BCK` Bracken, `ELW` Elderwood, `GYF` Greyfell, `STW` Stackwind, `LMP` Lamplight,
+`TLM` Tallowmere, `CPW` Copperwing, `DLF` Dalefold, `FNW` Fernway, `THD` Thistledown, `RVM`
+Ravenmoor. Codes avoid the bezel's weather words (`BKN`, `SCT`, `FEW`, `CLR`). They are not checked
+against the full ICAO register of airline designators; the radio names are what a player reads
+and hears. The sectors are `QREF Approach` (Default), `QTRN Approach` (Easy) and `QKLR Approach`
+(Killer): no ICAO region uses Q for its airports, so none can be a real one. `tests/names.test.js`
+keeps the old real names out of everything the game ships.
+
+### Loss wording
+
+The meaning of each of the original's checks, in the room's own words (`LOSS` in `engine.js`):
+
+| Check                                        | Wording                                 |
+| -------------------------------------------- | --------------------------------------- |
+| Fuel below zero                              | fuel exhausted, diverted                |
+| At its airport at 0, against the arrow       | came in against the runway arrow        |
+| At its exit below 9                          | left the sector at the wrong altitude   |
+| Above 9                                      | climbed above the sector ceiling        |
+| At 0 on another airport                      | set down at the wrong field             |
+| At 0 on an airport when bound for an exit    | set down instead of leaving the sector  |
+| At 0 away from any airport                   | reached the ground away from a field    |
+| Off the grid by another exit (never happens) | left the sector by the wrong exit       |
+| Off the grid when bound for an airport       | left the sector instead of landing      |
+| Off the grid                                 | strayed out of the sector between exits |
+| Collision                                    | lost separation with _B_                |
+
+The pilot's mayday on a loss became the controller's calm call: "HBM42, lost separation with B.
+All stations, stand by."
+
+### The delay
+
+`executeDelayed` follows `delayb()` in `input.c`: only direction orders (turns, circling,
+"towards") may wait; a "towards" order is aimed from the beacon; "already there" and "already going
+that way" are refused. Two choices of ours: the beacon must be on the plane's track (the original
+checked only the general direction, and a plane that missed the beacon held its heading for good),
+and an altitude or status order leaves a waiting turn alone (the original's next order of any kind
+cleared it, so a climb after a delayed turn made the plane turn at once). The `beacon` event now
+names the beacon.
+
+### The testing aid's planner
+
+The owner asked for the cheat panel to be fixed: following its rules of thumb never landed a plane
+(0 landings in 30 Easy shifts) and lost every shift to fuel, strays and separation. `planner.js`
+finds each plane a route by an A* search over its possible moves (a quarter turn and 1,000 feet a
+move at most, counted in ticks, as props move every other tick). The planes are planned shortest on
+fuel first, each keeping clear of the routes already planned and, at first, of where the others
+are heading. A plane with no clear route gets the safest next move, one that stays in the sector,
+off the ground and with a way on. A plane on the ground waits until its climb-out is clear. Small
+tie-break costs make the routes ones a controller would fly: present orders kept, few turns,
+altitude changed only towards where it is needed, and an early climb for an exit. The suggestions
+are the fewest orders that fly the route exactly.
+
+Following every suggestion, 30 seeds a sector, 300 ticks each (`tests/planner.test.js` locks a
+smaller run):
+
+| Sector  | Lost | Landings | Handoffs | Orders typed | Slowest plan |
+| ------- | ---- | -------- | -------- | ------------ | ------------ |
+| Easy    | 0    | 207      | 874      | 3,004        | 50 ms        |
+| Default | 0    | 379      | 1,290    | 5,513        | 155 ms       |
+| Killer  | 0    | 797      | 1,932    | 10,586       | 161 ms       |
+
+The old rules of thumb stay in `hints.js` as the last fallback, with their own tests. The
+"Targets" table above was measured with them, so it is now a floor well below what the cheat
+reaches.
+
+### Decisions
+
+| Date       | Decision                                                                                         | Why                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| 2026-10-02 | A button sends its command through the same path as Enter, after typing it a key at a time       | What the engine receives is exactly what a player would type; the language is seen every time          |
+| 2026-10-02 | A typed key closes the panel and keeps the letter a click put on the line                        | Typing is never blocked; clicking then typing the rest is a natural mix                                |
+| 2026-10-02 | Enter on the letter alone brings the next tick                                                   | The letter was put there by a click, not typed; it should not count as a refused order                 |
+| 2026-10-02 | A key pressed while a button types drops the button's order; Enter sends it at once              | The keys are the player's                                                                              |
+| 2026-10-02 | Escape stays the command line's clear key; pause is the bezel button and Alt+P                   | Every keyboard controller's habit since 1986; the owner agreed at the checkpoint                       |
+| 2026-10-02 | Settings keys are Alt with a letter (`e.code`, so other layouts work); AltGr still types         | Letters and digits are orders                                                                          |
+| 2026-10-02 | Enter reaches a button only when Tab brought the focus there                                     | A clicked button keeps the focus; Enter must still send the line. `:focus-visible` cannot tell the two |
+| 2026-10-02 | The console is inert while the game menu covers it                                               | Tab must not reach buttons hidden behind the menu                                                      |
+| 2026-10-02 | The sheet beside the radar takes width the radar does not use at 16:9                            | The radar is bound by its height there and keeps its size; the reference card never covers an exit     |
+| 2026-10-02 | The order panel stays docked (idle when no plane is chosen) while the buttons are on             | A layout that jumped each time a plane was clicked would be worse                                      |
+| 2026-10-02 | The data block sits across from the heading, inside near the edges                               | The heading arrow ran through it, and through the letter                                               |
+| 2026-10-02 | The reference card's state has a new save, closed by default                                     | The old key was written on every visit with the old default (open), so it could not tell a choice      |
+| 2026-10-02 | Reduced motion: no sweep, positions fade in per tick; a Hall at full motion wins over the system | The prompt; and the edge case in `docs/KNOWN-ISSUES.md` #37, fixed here for this game                  |
+
 ## Open questions
 
 Listed in `docs/KNOWN-ISSUES.md` for the owner or a modification prompt:
 
-- The temporary trademark exception: real airline names and call signs in the radio, the traffic
-  panel and the event log, and a real airport’s code in the Default sector’s name.
-- Upstream wording: the loss reasons repeat the original’s messages almost word for word.
-- One dark look only; no light appearance.
-- Fixed 2026-10-02: the Hall's pause and a hidden page now stop the clock and quiet the room.
-- No `:focus-visible` styles, no ARIA beyond a hidden subtitle bar, and little reduced-motion
-  handling: since prompt C1 the Hall’s setting prints the report at once and stops the title’s
-  pulse, but the sweep, the title’s fade, the bezel blink, the hint pulse and the cursor blink
-  always run.
-- Fixed 2026-10-02: the game menu has keys for everything (1 2 3, ↑ ↓, L, Enter); Enter on a
-  Tab-focused button still begins the shift with the choice the desk shows.
-- The sidebar’s sector buttons abandon a running shift without asking.
-- `?` does nothing on the game menu, though the menu mentions it (the tutorial opens during a
-  shift).
-- The delay suffix is accepted and silently ignored.
-- Fixed 2026-10-02: the shift report offers the way on, then Again (R), Game menu (M) and Back to
-  the Hall (H).
-- Answered by prompt C1 (2026-10-02): the Hall’s volume and mute now reach the game; its own
-  switches still work, and what they remember is unchanged.
-- This session’s screenshots and in-Hall runs used a Hall that Playwright started on port 5209:
-  the Hall already running on 5174 had read the games’ manifests before this one existed, and its
-  dev server does not notice new manifest files until it restarts.
+- One dark look only; no light appearance (by design, the prompt left it open).
+- The relative turns (`tl`, `tr`), `tt*`, `cl` and `cr` of the original are still not parsed.
+- In a tick that loses a plane, arrivals are announced but not scored (upstream, kept).
+- The fifteen original sectors: three ship.

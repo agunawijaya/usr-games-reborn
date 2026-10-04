@@ -12,6 +12,8 @@ export const LOGBOOK_PAGES = 20;
  * @property {number} exits
  * @property {number} takeoffs
  * @property {number} orders
+ * @property {number} [buttonOrders]  of those, orders given with the order buttons (missing in
+ *   records saved before the buttons existed, when every order was typed)
  * @property {number} seconds        time on position over all shifts
  * @property {number} stamps         commendation stamps over all shifts
  * @property {Record<string, number>} bestOpen   best open shift per sector key
@@ -27,6 +29,7 @@ export function newService() {
     exits: 0,
     takeoffs: 0,
     orders: 0,
+    buttonOrders: 0,
     seconds: 0,
     stamps: 0,
     bestOpen: {},
@@ -52,6 +55,7 @@ export function withShift(service, summary, sectorKey) {
     exits: service.exits + summary.exits,
     takeoffs: service.takeoffs + summary.takeoffs,
     orders: service.orders + summary.orders,
+    buttonOrders: (service.buttonOrders ?? 0) + (summary.buttonOrders ?? 0),
     seconds: service.seconds + summary.seconds,
     stamps: service.stamps + stamps,
     bestOpen: { ...service.bestOpen },

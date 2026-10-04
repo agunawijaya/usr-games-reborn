@@ -136,8 +136,11 @@ export class ChartView {
     };
   }
 
-  /** Animates what one order did to the Reach and moves to the new state. */
-  play(prev: WatchState, next: WatchState, beats: readonly Beat[]) {
+  /**
+   * Animates what one order did to the Reach and moves to the new state. `momentAt` is when
+   * the zone view's saved-world moment begins, in seconds: that world's call ring closes then.
+   */
+  play(prev: WatchState, next: WatchState, beats: readonly Beat[], momentAt: number | null = null) {
     const speed = this.reducedMotion ? 0.45 : 1;
     const start = now();
     const from = this.shipPoint(prev);
@@ -156,6 +159,8 @@ export class ChartView {
       } else if (beat.type === 'siege' && beat.heard) {
         t += 0.2;
         this.ping(beat.zone, this.p.danger, t, 1.4 * speed);
+      } else if (beat.type === 'world-relit' && momentAt !== null && beat.byUs) {
+        this.closeCall(prev, beat.zone, start + momentAt);
       } else if (beat.type === 'world-relit') {
         t += 0.2;
         this.ping(beat.zone, this.p.lamp, t, 1.2 * speed);
@@ -167,6 +172,41 @@ export class ChartView {
         this.ping(beat.zone, this.p.collapsed, t, 1.6 * speed);
       }
     }
+  }
+
+  /**
+   * A call answered: its countdown ring sweeps closed in the lamp's colour, then fades with a
+   * last ping. Under reduced motion the closed ring simply shows for the moment.
+   */
+  private closeCall(prev: WatchState, zone: Point, start: number) {
+    const c = this.zoneCenter(zone);
+    const call = knownCalls(prev).find((k) => k.zone.row === zone.row && k.zone.col === zone.col);
+    const deadline = call?.deadline ?? null;
+    const from = deadline === null ? 0 : Math.min(1, Math.max(0, deadline - prev.now.date) / 4);
+    const duration = this.reducedMotion ? 1.2 : 1.4;
+    this.effects.push({
+      start,
+      end: start + duration,
+      draw: (ctx, k) => {
+        const close = this.reducedMotion ? 1 : Math.min(1, k / 0.4);
+        const share = from + (1 - from) * (1 - (1 - close) * (1 - close));
+        ctx.strokeStyle = this.p.lamp;
+        ctx.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+        ctx.lineWidth = Math.max(2.5, this.zone * 0.07);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, this.zone * 0.36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * share);
+        ctx.stroke();
+        if (!this.reducedMotion && k > 0.4) {
+          const f = (k - 0.4) / 0.6;
+          ctx.globalAlpha = 1 - f;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, this.zone * (0.36 + f * 0.7), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      },
+    });
   }
 
   private ping(zone: Point, color: string, start: number, duration: number) {

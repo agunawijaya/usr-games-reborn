@@ -10,7 +10,8 @@ You are the controller on a night shift in a room lit by one green radar. Planes
 warning at the edges of your sector and at its airports, each with somewhere to be: an airport,
 where it must touch down at zero feet flying along the runway arrow, or an exit, where it must
 leave at exactly 9,000 feet. You talk to them one typed line at a time. `Aa9` climbs plane A,
-`Atd` turns it east, `Ac` parks it in a circle while you think. Every few seconds the radar ticks
+`Atd` turns it east, `Ac` parks it in a circle while you think. New to the language? Click a plane
+and press an order: the button types the line for you, so you learn it as you play. Every few seconds the radar ticks
 and everything moves at once: altitudes change by a thousand feet, headings by up to ninety
 degrees, fuel drops. The shift runs until the first plane is lost.
 
@@ -22,9 +23,9 @@ the same planes.
 
 ## Where it comes from
 
-`atc` is Ed James’s air traffic control game from the BSD games, written at UC Berkeley; his own
-notice in the sources is dated 1987, and the manual page carries the Regents’ copyright of 1990
-and 1993. The manual admits it was based on someone’s description of a game for an unknown
+`atc` is Ed James’s air traffic control game from the BSD games, written at UC Berkeley in
+1986–87: his notice reads 1986 in the manual page and 1987 in the sources, which with the manual
+carry the Regents’ copyright of 1990 and 1993. The manual admits it was based on someone’s description of a game for an unknown
 PC, “maybe”. On a terminal it drew the sector as a grid of dots and letters, read every order a
 character at a time, and came with fifteen hand-made sectors, among them Default, Easy and
 Killer. There was no winning: the score list was sorted by planes safe.
@@ -41,6 +42,11 @@ two sit side by side.
   origin, destination, altitude, heading and fuel, which turns yellow, then red.
 - A command line that explains itself: after every key the line above it lists what may come next,
   or describes the finished order.
+- Order buttons for newcomers: click a plane, press an order, and watch it typed on the command
+  line before it goes. Typing works exactly as in 1986.
+- A moment for every plane home: a ring on the radar, HOME or HANDED OFF stamped on its strip, its
+  radio line picked out and a short climbing tone.
+- A radar text size setting and AA contrast for every line of text.
 - A radio: pilots call in, ask for priority when fuel runs short and read back your orders, as
   subtitles and, if you turn it on, a spoken voice that runs on your own device.
 - A career of twelve assignments over the three sectors, with ranks, sector endorsements and a
@@ -61,7 +67,7 @@ two sit side by side.
 | Players         | 1                   |
 | Session         | 5–15 minutes        |
 | Daily challenge | yes, Daily Traffic  |
-| Inspired by     | `atc` (1986)        |
+| Inspired by     | `atc` (1986–87)     |
 
 ## More
 

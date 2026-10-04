@@ -129,9 +129,12 @@ export class Sounds {
     this.synth.play(PATCHES[name]);
   }
 
-  /** One sound per kind of thing that happened, spread over the order's animation. */
-  forBeats(beats: readonly Beat[], speed: number) {
-    const queued = new Set<SoundName>();
+  /**
+   * One sound per kind of thing that happened, spread over the order's animation. Sounds named
+   * in `except` are left to the caller (the saved-world chime, timed to its moment).
+   */
+  forBeats(beats: readonly Beat[], speed: number, except: readonly SoundName[] = []) {
+    const queued = new Set<SoundName>(except);
     let delay = 0;
     const later = (name: SoundName, step = 0.18) => {
       if (queued.has(name)) return;

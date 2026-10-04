@@ -88,7 +88,9 @@ for (const look of LOOKS) {
       await open(page, look, width, height);
       await playRoute(page, 'living', 99);
       await expect(page.getByTestId('zm-results')).toBeVisible({ timeout: 15_000 });
-      await page.waitForTimeout(2200);
+      // The Hall's notes fade on their own; the picture waits for a clear floor.
+      await expect(page.locator('.pl-toast')).toHaveCount(0, { timeout: 12_000 });
+      await page.waitForTimeout(400);
       await saveScreenshot(
         page,
         `${MEDIA}/${width === 1920 ? 'hero' : 'results'}-${name(look)}-${width}.webp`,

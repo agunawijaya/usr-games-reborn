@@ -17,7 +17,12 @@
       --amber: #ffb14f;
       --red: #ff5252;
       --text: #b8dcc4;
-      --text-dim: #6a8478;
+      /* Dim, yet AA on every panel of the room (6.3:1 on the cards, 5.3:1 on the bezel). */
+      --text-dim: #84a091;
+      /* The green of labels and small headings on the lighter panels, where the radar's dim
+         phosphor would fall below AA. */
+      --phosphor-label: #3aad5a;
+      --sheet-w: 288px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,6 +61,16 @@
       gap: 10px;
       padding: 14px;
     }
+    /* The sheet beside the radar (order buttons above, the reference card below) takes room the
+       radar's grid does not use: the radar is bound by its height at 16:9, so it keeps its size. */
+    #app.with-sheet {
+      grid-template-columns: minmax(0, 1fr) var(--sheet-w) 284px;
+      grid-template-areas:
+        "bezel   bezel  sidebar"
+        "screen  sheet  sidebar"
+        "info    sheet  sidebar"
+        "cmd     sheet  sidebar";
+    }
 
     /* -------- Bezel (top strip) -------- */
     #bezel-top {
@@ -84,7 +99,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    #bezel-top .bezel-sep { color: var(--phosphor-dim); }
+    #bezel-top .bezel-sep { color: var(--phosphor-label); }
     #bezel-metar {
       color: var(--phosphor);
       text-shadow: 0 0 3px rgba(94, 255, 138, 0.4);
@@ -322,35 +337,31 @@
       color: var(--phosphor-dim);
     }
 
-    /* -------- Command reference (static help) panel -------- */
+    /* -------- The reference card, docked in the sheet beside the radar -------- */
+    #sheet {
+      grid-area: sheet;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      min-height: 0;
+    }
+    #app.with-sheet #sheet { display: flex; }
     #help-panel {
-      position: absolute;
-      top: 40px;
-      left: 22px;
-      z-index: 6;
-      width: 285px;
-      max-height: calc(100% - 80px);
-      background: rgba(4, 10, 6, 0.9);
-      border: 1px solid var(--phosphor-dim);
-      border-radius: 6px;
-      box-shadow: 0 0 25px rgba(94, 255, 138, 0.15);
+      flex: 1 1 220px;
+      min-height: 150px;
+      background: linear-gradient(180deg, #131a13 0%, #0a120a 100%);
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
       color: var(--text);
       font-family: 'Share Tech Mono', monospace;
       font-size: 12px;
       line-height: 1.4;
       overflow: hidden;
-      display: flex;
+      display: none;
       flex-direction: column;
-      transform: translateX(-8px);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.25s ease, opacity 0.25s ease;
     }
-    #help-panel.shown {
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
+    #help-panel.shown { display: flex; }
     #help-panel header {
       display: flex;
       align-items: center;
@@ -386,7 +397,9 @@
     #help-panel .cheat-body::-webkit-scrollbar { width: 6px; }
     #help-panel .cheat-body::-webkit-scrollbar-track { background: transparent; }
     #help-panel .cheat-body::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
-    #help-panel .cheat-section { margin-bottom: 10px; }
+    #help-panel .cheat-section { margin-bottom: 10px; padding: 2px 4px; border-radius: 3px; }
+    /* The line a pressed order came from, picked out for a moment when the card opens on it. */
+    #help-panel .cheat-section.picked { background: rgba(255, 177, 79, 0.1); box-shadow: inset 2px 0 0 var(--amber); }
     #help-panel .cheat-section:last-child { margin-bottom: 0; }
     #help-panel .cheat-h {
       color: var(--phosphor);
@@ -455,7 +468,7 @@
       padding: 0 3px;
     }
     #help-panel .cheat-compass .c-c {
-      color: var(--phosphor-dim);
+      color: var(--phosphor-label);
       font-size: 14px;
     }
     #help-panel .win-hint {
@@ -494,6 +507,14 @@
       flex-wrap: wrap;
     }
     #subtitle-bar.shown { opacity: 1; }
+    #subtitle-bar.moment #subtitle-text {
+      padding: 0 10px;
+      border-radius: 3px;
+      background: rgba(6, 34, 16, 0.92);
+      box-shadow: 0 0 0 1px rgba(94, 255, 138, 0.55), 0 0 18px rgba(94, 255, 138, 0.25);
+      color: #ffffff;
+      text-shadow: 0 0 10px var(--phosphor);
+    }
     #subtitle-bar.hidden-mode { display: none !important; }
     #subtitle-speaker {
       display: inline-block;
@@ -546,7 +567,7 @@
     /* Corner labels inside the CRT */
     .crt-corner {
       position: absolute;
-      color: var(--phosphor-dim);
+      color: var(--phosphor-label);
       font-size: 12px;
       letter-spacing: 0.1em;
       z-index: 5;
@@ -659,7 +680,7 @@
     }
     .pf-btn:hover { background: #1a2a1a; color: var(--phosphor); }
     .pf-btn.active {
-      background: var(--phosphor-dim);
+      background: rgba(94, 255, 138, 0.16);
       color: var(--phosphor-bright);
       border-color: var(--phosphor);
     }
@@ -673,6 +694,7 @@
     }
     #shift-status span { text-shadow: 0 0 3px rgba(255, 177, 79, 0.4); }
     #planes {
+      list-style: none;
       overflow-y: auto;
       max-height: 100%;
       display: flex;
@@ -680,21 +702,58 @@
       gap: 6px;
       padding-right: 4px;
     }
+    .strip { position: relative; }
     .plane-row {
       display: flex;
       gap: 10px;
       align-items: flex-start;
+      width: 100%;
       padding: 6px 8px;
       background: #050c05;
+      border: 0;
       border-left: 3px solid var(--phosphor);
       border-radius: 2px;
+      font-family: inherit;
       font-size: 12px;
       line-height: 1.4;
       color: var(--text);
+      text-align: left;
     }
-    .plane-row.status-marked { border-color: var(--phosphor-bright); }
-    .plane-row.status-unmarked { border-color: var(--phosphor-dim); opacity: 0.75; }
-    .plane-row.status-ignored { border-color: #444; opacity: 0.5; }
+    button.plane-row { cursor: pointer; }
+    button.plane-row:hover { background: #0b170b; }
+    .strip.status-marked .plane-row { border-color: var(--phosphor-bright); }
+    .strip.status-unmarked .plane-row { border-color: var(--phosphor-dim); }
+    .strip.status-ignored .plane-row { border-color: #4a4a4a; color: var(--text-dim); }
+    .strip.status-ignored .plane-letter { color: var(--text-dim); text-shadow: none; }
+    .strip.selected .plane-row {
+      background: rgba(255, 177, 79, 0.1);
+      border-left-color: var(--amber);
+      box-shadow: inset 0 0 0 1px rgba(255, 177, 79, 0.7);
+    }
+    .plane-detail .waiting { color: var(--amber); }
+    /* A plane home or handed off keeps its strip a moment longer, stamped. */
+    .strip.arrived .plane-row { background: #071a0c; border-left-color: var(--phosphor-bright); }
+    .stamp {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      padding: 0 8px;
+      border: 2px solid var(--amber);
+      border-radius: 3px;
+      color: var(--amber);
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      letter-spacing: 0.12em;
+      text-shadow: 0 0 6px rgba(255, 177, 79, 0.6);
+      background: rgba(20, 14, 4, 0.85);
+      transform: translateY(-50%) rotate(-7deg);
+      animation: stamp-down 0.26s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+      pointer-events: none;
+    }
+    @keyframes stamp-down {
+      from { transform: translateY(-50%) rotate(-7deg) scale(1.9); opacity: 0; }
+      to   { transform: translateY(-50%) rotate(-7deg) scale(1); opacity: 1; }
+    }
     .plane-letter {
       font-family: 'VT323', monospace;
       font-size: 24px;
@@ -786,13 +845,14 @@
       z-index: 5;
       mix-blend-mode: multiply;
     }
-    #title-radar-canvas {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      opacity: 0.32;
-      pointer-events: none;
+    #title-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
     }
+    #title-words { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    #title-scope { width: 112px; height: 112px; flex: none; }
     #title-content {
       position: relative;
       z-index: 3;
@@ -812,7 +872,6 @@
       font-size: 14px;
       letter-spacing: 0.4em;
       text-shadow: 0 0 4px rgba(255, 177, 79, 0.5);
-      opacity: 0.75;
       margin-bottom: -6px;
     }
     #title-name {
@@ -951,13 +1010,12 @@
       min-width: 16px;
       text-align: center;
     }
-    #title-help .dot { color: var(--phosphor-dim); }
+    #title-help .dot { color: var(--phosphor-label); }
     #title-attribution {
       color: var(--text-dim);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.15em;
       margin-top: 4px;
-      opacity: 0.7;
     }
 
     /* -------- Help / how-to-play modal -------- */
@@ -965,7 +1023,8 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.88);
-      z-index: 200;
+      /* Above the game menu too: ? opens it there. */
+      z-index: 460;
       display: none;
       align-items: center;
       justify-content: center;
@@ -1206,7 +1265,6 @@
     /* The briefing and the logbook open over the game menu, which sits above the console. */
     .overlay { z-index: 400; }
     #logbook-overlay { background: rgba(2, 6, 4, 0.94); }
-    body.in-hall .overlay, body.in-hall #game-over { padding-top: 66px; }
     kbd {
       display: inline-block;
       font-family: 'VT323', monospace;
@@ -1305,7 +1363,7 @@
       white-space: pre;
     }
     .rl.title { font-weight: 700; letter-spacing: 0.08em; }
-    .rl.rule { color: #6b7d6a; }
+    .rl.rule { color: #4f5f4e; }
     .rl.result { font-weight: 700; color: #102414; }
     .share-line {
       max-width: 92vw;
@@ -1411,6 +1469,7 @@
       box-shadow: 0 0 12px rgba(94, 255, 138, 0.25);
     }
     .desk-tab.logbook-btn { margin-left: auto; }
+    .endorse.fluent.on { border-color: var(--phosphor); color: var(--phosphor-bright); text-shadow: 0 0 4px rgba(94, 255, 138, 0.5); }
     .desk-tab kbd { margin-right: 4px; font-size: 11px; }
     .desk {
       display: grid;
@@ -1499,11 +1558,11 @@
     .assignment:hover:not(:disabled) { border-color: var(--console-border); }
     .assignment.selected { border-color: var(--phosphor); background: rgba(94, 255, 138, 0.1); color: var(--phosphor-bright); }
     .assignment.passed .a-title { color: var(--phosphor); }
-    .assignment.locked { color: #3b4a40; cursor: default; }
+    .assignment.locked { color: var(--text-dim); cursor: default; }
     .assignment .a-no { color: var(--amber); }
     .assignment.locked .a-no { color: inherit; }
     .assignment .a-sector, .assignment .a-target { color: var(--text-dim); font-size: 11px; letter-spacing: 0.08em; }
-    .assignment.locked .stamps { color: #3b4a40; font-size: 10px; letter-spacing: 0.1em; }
+    .assignment.locked .stamps { color: var(--text-dim); font-size: 10px; letter-spacing: 0.1em; }
     .panel-open #title-sectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .title-sector-btn .best { color: var(--amber); font-style: normal; }
     .daily-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--amber); letter-spacing: 0.2em; font-size: 12px; }
@@ -1543,9 +1602,345 @@
 
     #title-desk { width: 100%; }
 
-    /* Inside the Hall its strip lies over the top of the game menu. */
-    body.in-hall #title-screen { padding-top: 58px; }
-    body.in-hall #title-inner, body.in-hall #title-content { max-height: calc(100vh - 70px); }
+    /* -------- The order panel: buttons that type orders, in the sheet beside the radar -------- */
+    /* The panel fills its column; the "Typed as" line keeps to its foot. */
+    #order-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #131a13 0%, #0a120a 100%);
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 12px;
+    }
+    #order-panel[hidden] { display: none; }
+    #order-panel::-webkit-scrollbar { width: 6px; }
+    #order-panel::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
+    .op-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 8px 10px 7px 12px;
+      background: linear-gradient(180deg, #1a2619 0%, #111a11 100%);
+      border-bottom: 1px solid var(--console-border);
+    }
+    .op-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 3px rgba(255, 177, 79, 0.4);
+    }
+    .op-letter {
+      font-family: 'VT323', monospace;
+      font-size: 28px;
+      line-height: 0.9;
+      letter-spacing: 0;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 6px var(--phosphor);
+    }
+    .op-cs { font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.06em; color: var(--phosphor-bright); text-shadow: none; }
+    .op-close {
+      margin-left: auto;
+      padding: 2px 8px;
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--text-dim);
+      font: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+    .op-close:hover { color: var(--phosphor); border-color: var(--phosphor); }
+    .op-state { margin-top: 3px; color: var(--text); letter-spacing: 0.04em; }
+    .op-goal { margin-top: 1px; color: var(--amber); font-size: 11px; letter-spacing: 0.08em; }
+    .op-body { padding: 2px 10px 10px 12px; }
+    .op-section { margin-top: 9px; }
+    .op-h {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      color: var(--phosphor-label);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .op-h small { color: var(--text-dim); font-size: 10px; letter-spacing: 0.04em; text-transform: none; }
+    .op-turns { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1.55fr); gap: 6px; }
+    .op-grid { display: grid; gap: 4px; }
+    .op-grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .op-grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .op-grid.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .op-grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .op-stack { display: grid; gap: 4px; align-content: start; }
+    .op-section > .ob { width: 100%; }
+    .op-hub {
+      display: grid;
+      place-items: center;
+      font-family: 'VT323', monospace;
+      font-size: 26px;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 6px var(--phosphor);
+    }
+    /* One order: what it does on top, the command it types underneath. */
+    .ob {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      min-width: 0;
+      min-height: 40px;
+      padding: 3px 3px 2px;
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      background: #050c05;
+      color: var(--phosphor-bright);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.1;
+      cursor: pointer;
+    }
+    .ob-face { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .ob-face b { font-family: 'VT323', monospace; font-size: 19px; font-weight: 400; }
+    .ob-typed { font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 0.06em; color: var(--amber); }
+    .ob:hover:enabled { border-color: var(--phosphor); background: rgba(94, 255, 138, 0.09); }
+    .ob:active:enabled { background: rgba(94, 255, 138, 0.18); }
+    .ob:disabled { cursor: default; border-style: dashed; background: transparent; color: var(--text-dim); }
+    .ob:disabled .ob-typed { color: var(--text-dim); }
+    .ob.current { border-style: solid; border-color: var(--phosphor-dim); background: rgba(94, 255, 138, 0.13); color: var(--phosphor-bright); }
+    .ob.current .ob-typed { color: var(--phosphor); }
+    .ob.goal { border-color: var(--amber); border-style: solid; }
+    .ob.pressing, .ob.pressing:disabled { border-color: var(--phosphor-bright); background: rgba(94, 255, 138, 0.3); box-shadow: 0 0 12px rgba(94, 255, 138, 0.45); }
+    .ob.goal::after {
+      content: '★';
+      position: absolute;
+      top: 1px;
+      right: 3px;
+      color: var(--amber);
+      font-size: 9px;
+    }
+    .ob.wide { flex-direction: row; justify-content: space-between; gap: 6px; padding: 4px 8px; min-height: 30px; }
+    #order-panel.busy .ob { pointer-events: none; }
+    .op-delay {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--amber);
+      border-radius: 3px;
+      background: rgba(255, 177, 79, 0.08);
+      color: var(--amber);
+      letter-spacing: 0.04em;
+    }
+    #help-panel.shown ~ #order-panel, #order-panel:has(~ #help-panel.shown) { flex: 0 1 auto; }
+    .op-echo {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 8px;
+      padding: 7px 12px 8px;
+      border-top: 1px dashed var(--console-border);
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+    .op-echo[hidden] { display: none; }
+    .op-echo code { font-family: 'VT323', monospace; font-size: 20px; color: var(--phosphor-bright); letter-spacing: 0.08em; text-shadow: 0 0 5px rgba(94, 255, 138, 0.6); }
+    .op-echo .op-parts { flex-basis: 100%; color: var(--text); letter-spacing: 0.02em; }
+    .op-echo .op-parts i { font-style: normal; color: var(--amber); font-family: 'VT323', monospace; font-size: 16px; }
+    .op-ref {
+      margin-left: auto;
+      padding: 1px 7px;
+      border: 1px solid var(--console-border);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--phosphor-label);
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .op-ref:hover { color: var(--phosphor); border-color: var(--phosphor); }
+    .op-idle { padding: 12px 12px 14px; line-height: 1.55; }
+    .op-idle .op-title { margin-bottom: 6px; }
+    .op-idle p { margin-top: 4px; }
+    .op-idle b { color: var(--phosphor-bright); font-weight: 400; }
+
+    /* -------- First-shift tips: a small amber card pointing at what to do next -------- */
+    #tip {
+      position: fixed;
+      z-index: 150;
+      max-width: 270px;
+      padding: 10px 12px 10px 14px;
+      border: 1px solid var(--amber);
+      border-radius: 6px;
+      background: #231a09;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65), 0 0 18px rgba(255, 177, 79, 0.22);
+      color: #ffe6c4;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    #tip[hidden] { display: none; }
+    #tip .tip-step { color: var(--amber); font-size: 10px; letter-spacing: 0.2em; margin-bottom: 3px; }
+    #tip b { color: #ffffff; font-weight: 400; }
+    #tip code { font-family: 'VT323', monospace; font-size: 17px; color: var(--phosphor-bright); }
+    #tip .tip-close {
+      float: right;
+      margin: -2px -4px 0 8px;
+      padding: 1px 7px;
+      border: 1px solid rgba(255, 177, 79, 0.6);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--amber);
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    #tip::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #231a09;
+      border: 1px solid var(--amber);
+      transform: rotate(45deg);
+    }
+    #tip[data-side='left']::before { right: -7px; top: var(--arrow, 50%); border-left: 0; border-bottom: 0; margin-top: -6px; }
+    #tip[data-side='right']::before { left: -7px; top: var(--arrow, 50%); border-right: 0; border-top: 0; margin-top: -6px; }
+    #tip[data-side='above']::before { bottom: -7px; left: var(--arrow, 50%); border-left: 0; border-top: 0; margin-left: -6px; }
+
+    /* -------- The pause menu, the settings and the questions before leaving -------- */
+    #menu-overlay { z-index: 450; background: rgba(0, 0, 0, 0.72); }
+    .menu-sheet {
+      width: min(540px, 94vw);
+      max-height: 94vh;
+      overflow-y: auto;
+      padding: 20px 24px 22px;
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #131a13 0%, #0a120a 100%);
+      box-shadow: 0 0 40px rgba(94, 255, 138, 0.14), 0 30px 60px rgba(0, 0, 0, 0.7);
+      color: var(--text);
+    }
+    .menu-sheet h2 {
+      font-family: 'VT323', monospace;
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 8px rgba(94, 255, 138, 0.5);
+    }
+    .menu-sub { margin: 2px 0 12px; color: var(--text-dim); font-size: 12px; letter-spacing: 0.1em; }
+    .menu-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 7px;
+      padding: 10px 14px;
+      border: 1px solid var(--console-border);
+      border-radius: 4px;
+      background: rgba(4, 10, 6, 0.85);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-align: left;
+      cursor: pointer;
+    }
+    .menu-btn:hover { border-color: var(--phosphor); color: var(--phosphor-bright); }
+    .menu-btn.primary { border-color: var(--phosphor); color: var(--phosphor-bright); box-shadow: 0 0 14px rgba(94, 255, 138, 0.2); }
+    .menu-btn .menu-key { color: var(--text-dim); font-size: 11px; letter-spacing: 0.08em; }
+    .menu-settings { margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--console-border); }
+    .menu-label { margin: 6px 0 4px; color: var(--amber); font-size: 11px; letter-spacing: 0.22em; }
+    .set-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px 12px;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--console-border);
+    }
+    .set-row:last-child { border-bottom: 0; }
+    .set-name { color: var(--phosphor-bright); letter-spacing: 0.06em; }
+    .set-note { grid-column: 1 / -1; color: var(--text-dim); font-size: 11px; line-height: 1.45; }
+    .seg { display: inline-flex; border: 1px solid var(--console-border); border-radius: 4px; overflow: hidden; }
+    .seg button {
+      padding: 5px 11px;
+      border: 0;
+      border-left: 1px solid var(--console-border);
+      background: transparent;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+    .seg button:first-child { border-left: 0; }
+    .seg button:hover { color: var(--phosphor-bright); }
+    .seg button[aria-pressed='true'] { background: rgba(94, 255, 138, 0.16); color: var(--phosphor-bright); }
+    /* The pause menu in two columns: the ways on at the left (the way out at the foot), the
+       settings at the right, so nothing falls below the fold of a short window. */
+    .menu-sheet.pause {
+      width: min(900px, 94vw);
+      display: grid;
+      grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+      grid-template-rows: repeat(5, auto) 1fr auto auto;
+      column-gap: 28px;
+    }
+    .menu-sheet.pause > * { grid-column: 1; }
+    .menu-sheet.pause > .menu-settings { grid-column: 2; grid-row: 1 / 9; margin-top: 0; padding-top: 0; border-top: 0; }
+    .menu-sheet.pause > .menu-leave { grid-row: 7; align-self: end; }
+    .menu-sheet.pause > .menu-hall { grid-row: 8; }
+    .confirm-text { margin: 10px 0 6px; line-height: 1.55; }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .confirm-actions .menu-btn { justify-content: center; margin-top: 0; }
+
+    /* Keyboard focus shows on every control; the mouse leaves no ring behind. */
+    :focus { outline: none; }
+    :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    .ob:focus-visible, .seg button:focus-visible { outline-offset: -2px; }
+
+    /* A short window (about 720 pixels): the order panel and the radio line get compact. */
+    @media (max-height: 800px) {
+      .op-head { padding: 6px 10px 5px 12px; }
+      .op-section { margin-top: 6px; }
+      .op-h { margin-bottom: 2px; }
+      .ob { min-height: 33px; padding: 2px; }
+      .ob-face b { font-size: 17px; }
+      .ob-typed { font-size: 14px; }
+      .op-grid, .op-stack { gap: 3px; }
+      #subtitle-bar { font-size: 18px; bottom: 30px; min-height: 36px; padding: 6px 14px; }
+      .set-row { padding: 4px 0; }
+      .set-note { display: none; }
+    }
+
+    /* A tall window: the order buttons grow into the room the column has. */
+    @media (min-height: 950px) {
+      .ob { min-height: 46px; font-size: 13px; }
+      .ob-face b { font-size: 21px; }
+      .ob-typed { font-size: 16px; }
+      .op-section { margin-top: 12px; }
+      .op-grid, .op-stack { gap: 5px; }
+    }
+
+    /* Narrower windows: the sheet gives up a little width before the radar does. */
+    @media (max-width: 1440px) {
+      :root { --sheet-w: 268px; }
+      #app.with-sheet { grid-template-columns: minmax(0, 1fr) var(--sheet-w) 264px; }
+    }
 
     /* A window about 720 pixels high: the desk keeps its place, the decoration steps back. */
     @media (max-height: 800px) {
@@ -1563,11 +1958,18 @@
       #title-help { margin-top: 6px; }
     }
 
+    /* Reduced motion, from the system or from the Hall (src/hall.js sets data-motion; a Hall at
+       full motion wins over the system): nothing pulses, blinks or fades. The radar's sweep is
+       handled in main.js. */
     @media (prefers-reduced-motion: reduce) {
-      #title-name, #title-begin { animation: none; }
+      :root:not([data-motion='full']) :is(#title-name, #title-begin, #bezel-top .indicator, .hint-row.priority-urgent, .stamp) { animation: none; }
+      :root:not([data-motion='full']) #cmd-input::after { animation: none; }
+      :root:not([data-motion='full']) :is(#title-screen, #subtitle-bar, #cheat-live-panel) { transition: none; }
     }
-    /* The same in the Hall when its own setting asks for reduced motion (set by src/hall.js). */
-    :root[data-motion='reduce'] :is(#title-name, #title-begin) { animation: none; }
+    :root[data-motion='reduce'] :is(#title-name, #title-begin, #bezel-top .indicator, .hint-row.priority-urgent, .stamp) { animation: none; }
+    /* Pseudo-elements cannot sit inside :is(), so the cursor has its own rule. */
+    :root[data-motion='reduce'] #cmd-input::after { animation: none; }
+    :root[data-motion='reduce'] :is(#title-screen, #subtitle-bar, #cheat-live-panel) { transition: none; }
 
     @media (max-width: 760px) {
       .desk { grid-template-columns: 1fr; }
@@ -1576,15 +1978,20 @@
 
     /* Small screens */
     @media (max-width: 900px) {
-      #app {
+      #app, #app.with-sheet {
         grid-template-columns: 1fr;
         grid-template-areas:
           "bezel"
           "screen"
           "info"
           "cmd"
+          "sheet"
           "sidebar";
+        height: auto;
+        min-height: 100vh;
       }
+      html, body { overflow: auto; }
+      #screen { min-height: 56vh; }
       #sidebar { max-height: 40vh; }
     }
   </style>
@@ -1601,20 +2008,19 @@
         <span id="bezel-atis">ATIS INFO A</span>
       </span>
       <span class="bezel-controls">
-        <button id="help-panel-btn" title="Toggle help / command reference (\ key)">≡ help</button>
-        <button id="cheat-btn" hidden title="Toggle dynamic cheat (per-plane suggestions)">▶ cheat</button>
-        <button id="sub-toggle" title="Toggle subtitles">✎ subs on</button>
-        <button id="voice-toggle" title="Toggle voice">◉ voice off</button>
-        <button id="audio-toggle" title="Toggle sound (ambient + SFX)">♪ sound on</button>
+        <button type="button" id="pause-btn" title="Pause: settings, how to play, the way out (Alt+P)" aria-keyshortcuts="Alt+P">❚❚ pause</button>
+        <button type="button" id="help-panel-btn" title="The command reference beside the radar (\ key)" aria-keyshortcuts="\">≡ reference</button>
+        <button type="button" id="cheat-btn" hidden title="Toggle dynamic cheat (per-plane suggestions)">▶ cheat</button>
+        <button type="button" id="sub-toggle" title="Subtitles (Alt+S)" aria-keyshortcuts="Alt+S">✎ subs on</button>
+        <button type="button" id="voice-toggle" title="Voice (Alt+V)" aria-keyshortcuts="Alt+V">◉ voice off</button>
+        <button type="button" id="audio-toggle" title="Sound: the room and its signals (Alt+M)" aria-keyshortcuts="Alt+M">♪ sound on</button>
       </span>
     </div>
 
     <div id="screen">
       <canvas id="radar"></canvas>
-      <div class="crt-corner corner-tl">RADAR ACTIVE</div>
-      <div class="crt-corner corner-tr">CH 121.9</div>
-      <div class="crt-corner corner-bl">JETS ↑ · PROPS ↓</div>
-      <div class="crt-corner corner-br">v1986.10</div>
+      <div class="crt-corner corner-bl">RADAR ACTIVE · JETS ↑ PROPS ↓</div>
+      <div class="crt-corner corner-br">CH 121.9 · v1986.10</div>
       <div id="subtitle-bar" aria-hidden="true">
         <span id="subtitle-speaker"></span>
         <span id="subtitle-text"></span>
@@ -1631,25 +2037,29 @@
         </div>
       </aside>
 
-      <aside id="help-panel">
+    </div>
+
+    <div id="sheet">
+      <section id="order-panel" aria-label="Order buttons" hidden></section>
+      <aside id="help-panel" aria-label="Command reference">
         <header>
-          <span class="cheat-title">≡ HELP</span>
-          <button id="help-panel-close" title="Hide (\ key)">✕</button>
+          <span class="cheat-title">≡ REFERENCE</span>
+          <button type="button" id="help-panel-close" title="Close (\ key)">✕</button>
         </header>
         <div class="cheat-body">
           <div class="cheat-section">
             <div class="cheat-h">PLANE LETTER</div>
-            <div class="cheat-row"><code>A</code>–<code>Z</code> <span>letter shown on the radar (jets = uppercase, props = lowercase)</span></div>
+            <div class="cheat-row"><code>A</code>–<code>Z</code> <span>the letter on the radar (jets upper case, props lower case)</span></div>
           </div>
 
-          <div class="cheat-section">
+          <div class="cheat-section" data-ref="altitude">
             <div class="cheat-h">ALTITUDE</div>
-            <div class="cheat-row"><code>Aa5</code> <span>set to 5000 ft</span></div>
-            <div class="cheat-row"><code>Aa+3</code> <span>climb 3000 ft</span></div>
-            <div class="cheat-row"><code>Aa-2</code> <span>descend 2000 ft</span></div>
+            <div class="cheat-row"><code>Aa5</code> <span>to 5,000 ft</span></div>
+            <div class="cheat-row"><code>Aa+3</code> <span>climb 3,000 ft</span></div>
+            <div class="cheat-row"><code>Aa-2</code> <span>descend 2,000 ft</span></div>
           </div>
 
-          <div class="cheat-section">
+          <div class="cheat-section" data-ref="turn">
             <div class="cheat-h">TURN (compass)</div>
             <div class="cheat-compass">
               <div><code>Atq</code> NW</div><div><code>Atw</code> N</div><div><code>Ate</code> NE</div>
@@ -1660,33 +2070,51 @@
             <div class="cheat-row"><code>AtR</code> <span>hard right 90°</span></div>
           </div>
 
-          <div class="cheat-section">
+          <div class="cheat-section" data-ref="towards">
             <div class="cheat-h">TURN TOWARDS</div>
-            <div class="cheat-row"><code>Attb0</code> <span>beacon 0 (see <code>*0</code>)</span></div>
-            <div class="cheat-row"><code>Atta1</code> <span>airport 1 (see <code>A1</code>)</span></div>
-            <div class="cheat-row"><code>Atte2</code> <span>exit 2 (see <code>2</code> on border)</span></div>
+            <div class="cheat-row"><code>Attb0</code> <span>beacon 0 (the <code>*0</code> on the radar)</span></div>
+            <div class="cheat-row"><code>Atta1</code> <span>airport 1 (<code>A1</code>)</span></div>
+            <div class="cheat-row"><code>Atte2</code> <span>exit 2 (the <code>2</code> on the border)</span></div>
           </div>
 
-          <div class="cheat-section">
-            <div class="cheat-h">HOLD / STATUS</div>
-            <div class="cheat-row"><code>Ac</code> <span>circle in place (right turn)</span></div>
+          <div class="cheat-section" data-ref="delay">
+            <div class="cheat-h">AT A BEACON</div>
+            <div class="cheat-row"><code>Atd@b0</code> <span>fly on to beacon 0, then turn east (also <code>Atdab0</code>)</span></div>
+            <div class="cheat-row"><span>works with any turn or circle; the beacon must lie ahead on the plane's track</span></div>
+          </div>
+
+          <div class="cheat-section" data-ref="hold">
+            <div class="cheat-h">HOLD</div>
+            <div class="cheat-row"><code>Ac</code> <span>circle where it is (right turns)</span></div>
+          </div>
+
+          <div class="cheat-section" data-ref="status">
+            <div class="cheat-h">STATUS</div>
             <div class="cheat-row"><code>Am</code> / <code>Ai</code> / <code>Au</code> <span>mark / ignore / unmark</span></div>
           </div>
 
           <div class="cheat-section">
             <div class="cheat-h">SPECIAL KEYS</div>
-            <div class="cheat-row"><kbd>Enter</kbd> (empty) <span>force a tick now</span></div>
-            <div class="cheat-row"><kbd>Enter</kbd> (typed) <span>execute command</span></div>
-            <div class="cheat-row"><kbd>Backspace</kbd> <span>delete last char</span></div>
-            <div class="cheat-row"><kbd>Esc</kbd> <span>clear command buffer</span></div>
-            <div class="cheat-row"><kbd>?</kbd> <span>full how-to-play (pauses)</span></div>
-            <div class="cheat-row"><kbd>\</kbd> <span>toggle this cheat sheet</span></div>
+            <div class="cheat-row"><kbd>Enter</kbd> (empty) <span>a tick now</span></div>
+            <div class="cheat-row"><kbd>Enter</kbd> (typed) <span>send the order</span></div>
+            <div class="cheat-row"><kbd>Backspace</kbd> <span>delete the last character</span></div>
+            <div class="cheat-row"><kbd>Esc</kbd> <span>clear the command line</span></div>
+            <div class="cheat-row"><kbd>?</kbd> <span>how to play (pauses)</span></div>
+            <div class="cheat-row"><kbd>\</kbd> <span>open or close this card</span></div>
+          </div>
+
+          <div class="cheat-section">
+            <div class="cheat-h">SETTINGS KEYS</div>
+            <div class="cheat-row"><kbd>Alt+P</kbd> <span>pause</span></div>
+            <div class="cheat-row"><kbd>Alt+O</kbd> <span>order buttons on or off</span></div>
+            <div class="cheat-row"><kbd>Alt+T</kbd> <span>radar text size</span></div>
+            <div class="cheat-row"><kbd>Alt+S</kbd> / <kbd>Alt+V</kbd> / <kbd>Alt+M</kbd> <span>subtitles / voice / sound</span></div>
           </div>
 
           <div class="cheat-section">
             <div class="cheat-h">GOAL PER PLANE</div>
-            <div class="cheat-row"><span class="win-hint">✓ EXIT</span> <span>reach destination exit at <b>alt 9</b></span></div>
-            <div class="cheat-row"><span class="win-hint">✓ AIRPORT</span> <span>reach it at <b>alt 0</b> flying its arrow direction</span></div>
+            <div class="cheat-row"><span class="win-hint">✓ EXIT</span> <span>reach its exit at <b>altitude 9</b></span></div>
+            <div class="cheat-row"><span class="win-hint">✓ AIRPORT</span> <span>reach it at <b>altitude 0</b>, flying its arrow's way</span></div>
           </div>
         </div>
       </aside>
@@ -1722,13 +2150,13 @@
       </div>
 
       <div class="card" style="min-height: 200px;">
-        <h3>Active Traffic</h3>
-        <div id="planes"><div class="empty">— no traffic —</div></div>
+        <h3 id="traffic-heading">Active Traffic</h3>
+        <ul id="planes" aria-labelledby="traffic-heading"><li class="empty">— no traffic —</li></ul>
       </div>
 
       <div class="card">
-        <h3>Events</h3>
-        <div id="events"></div>
+        <h3 id="events-heading">Events</h3>
+        <div id="events" role="log" aria-labelledby="events-heading"></div>
       </div>
     </div>
   </div>
@@ -1736,17 +2164,23 @@
   <div id="game-over"></div>
   <div id="briefing-overlay" class="overlay"></div>
   <div id="logbook-overlay" class="overlay"></div>
+  <div id="menu-overlay" class="overlay"></div>
+  <div id="tip" role="status" hidden></div>
 
   <div id="title-screen">
     <div id="title-inner">
-      <canvas id="title-radar-canvas"></canvas>
       <div id="title-content">
-        <div id="title-mark">CTL</div>
-        <h1 id="title-name">ATC</h1>
-        <div id="title-subtitle">Control Room · 1986</div>
+        <div id="title-heading">
+          <canvas id="title-scope" aria-hidden="true"></canvas>
+          <div id="title-words">
+            <div id="title-mark">CTL</div>
+            <h1 id="title-name">ATC</h1>
+            <div id="title-subtitle">Control Room · 1986</div>
+          </div>
+        </div>
         <div id="title-tagline">
           A spiritual successor to BSD <code>atc(6)</code><br>
-          Ed James, University of California · 1986
+          by Ed James, UC Berkeley · 1986–87
         </div>
 
         <div id="title-desk"></div>
@@ -1754,13 +2188,15 @@
         <button id="title-begin">▶  BEGIN SHIFT  ◀</button>
 
         <div id="title-help">
-          <span>type commands</span>
-          <span class="dot">·</span>
-          <span><kbd>?</kbd> tutorial</span>
-          <span class="dot">·</span>
-          <span><kbd>\</kbd> reference</span>
+          <span><kbd>Enter</kbd> begin</span>
           <span class="dot">·</span>
           <span><kbd>↑</kbd><kbd>↓</kbd> choose</span>
+          <span class="dot">·</span>
+          <span><kbd>?</kbd> how to play</span>
+          <span class="dot">·</span>
+          <span><kbd>S</kbd> settings</span>
+          <span class="dot">·</span>
+          <span><kbd>L</kbd> logbook</span>
         </div>
         <div id="title-attribution">
           Port by Agun Wijaya · Claude Opus · MIT license
@@ -1774,6 +2210,20 @@
       <button id="help-close">✕ close</button>
       <h1>ATC — How to Play</h1>
       <div class="subtitle">Control Room 1986 · BSD atc(6) spiritual successor</div>
+
+      <h2>Two Ways to Give an Order</h2>
+      <p>
+        <b>With the order buttons</b> (on for a new career): click a plane on the radar, or its
+        strip in the traffic list. The order panel beside the radar offers what that plane can do:
+        turn, change altitude, head for a beacon, exit or airport, circle, wait for a beacon. Press
+        one and it <b>types the command for you</b> on the command line, a key at a time, then sends
+        it, so you always see the language behind the button.
+      </p>
+      <p>
+        <b>By typing</b>, as controllers did in 1986: every key you type goes to the command line,
+        and closes the order panel if it is open. Both ways can be mixed freely. Switch the buttons
+        off or on in the pause menu's settings, or with <kbd>Alt+O</kbd>.
+      </p>
 
       <h2>The Job</h2>
       <p>
@@ -1793,8 +2243,8 @@
           <b>An airplane in flight.</b>
           <b>Uppercase</b> letter = <b>jet</b> (fast, ticks every update).
           <b>Lowercase</b> letter = <b>prop</b> (slow, ticks every other
-          update). The small digit below (<code>5</code>) is the plane's
-          <b>altitude in thousands of feet</b> (0–9 → 0–9000 ft).
+          update). Beside it, the data block: <code>FL070</code> is its
+          <b>altitude</b> (7,000 ft; 0–9 thousand), then its heading and destination.
           The arrow points in its current heading. Brightness = status:
           bright = MARKED (paying attention), dim = UNMARKED, faded = IGNORED.
         </div>
@@ -1845,6 +2295,7 @@
         <div class="cmd">Atta1</div>     <div class="desc">Plane <code>A</code>, <b>turn toward airport 1</b>.</div>
         <div class="cmd">Atte2</div>     <div class="desc">Plane <code>A</code>, <b>turn toward exit 2</b>.</div>
         <div class="cmd">Ac</div>        <div class="desc">Plane <code>A</code>, <b>circle</b> in place until you say otherwise.</div>
+        <div class="cmd">Atd@b0</div>    <div class="desc">Plane <code>A</code>, fly on to <b>beacon 0</b>, then turn east. Any turn or circle can wait for a beacon ahead on the plane's track (<code>Atdab0</code> works too).</div>
         <div class="cmd">Am / Ai / Au</div><div class="desc">Plane <code>A</code>, mark / ignore / unmark (brightness cues).</div>
       </div>
       <p><b>Compass keys</b> (8 directions, laid out like a numpad):</p>
@@ -1866,12 +2317,16 @@
         <div class="cmd"><kbd>Backspace</kbd></div>      <div class="desc">Delete the last character.</div>
         <div class="cmd"><kbd>Esc</kbd></div>            <div class="desc">Clear the whole command buffer.</div>
         <div class="cmd"><kbd>?</kbd></div>              <div class="desc">Toggle this help screen.</div>
+        <div class="cmd"><kbd>\</kbd></div>              <div class="desc">Open or close the reference card beside the radar.</div>
+        <div class="cmd"><kbd>Alt+P</kbd></div>          <div class="desc">Pause: settings, how to play, the game menu, the way back to the Hall.</div>
+        <div class="cmd"><kbd>Alt+O</kbd> / <kbd>Alt+T</kbd></div> <div class="desc">Order buttons on or off / the radar's text size (Standard, Large, Extra large).</div>
+        <div class="cmd"><kbd>Alt+S</kbd> <kbd>Alt+V</kbd> <kbd>Alt+M</kbd></div> <div class="desc">Subtitles, voice, sound.</div>
       </div>
 
       <h2>The Sidebar (Right)</h2>
       <p>Four cards, top to bottom:</p>
       <p>
-        <b>1. Sector Selection.</b> Buttons to switch between sectors.
+        <b>1. Sector Selection.</b> Buttons to switch to an open shift in another sector (during a shift, they ask first).
         <b>Easy</b> is the training sector (slow, one airport, four exits).
         <b>Default</b> is Ed James's reference difficulty. <b>Killer</b> is
         the fast, punishing sector — do not start here.
@@ -1914,15 +2369,15 @@
         <li>✓ <b>Exit departure:</b> plane reaches its destination exit at altitude 9 (9000 ft).</li>
       </ul>
 
-      <h2>Losing the Shift</h2>
-      <p>Any of these ends the game immediately:</p>
+      <h2>When the Shift Ends</h2>
+      <p>Any of these ends the shift at once:</p>
       <ul class="lose-list">
-        <li>✗ Two planes within 1 cell of each other and within 1000 ft of altitude (<b>collision</b>).</li>
-        <li>✗ Any plane runs <b>out of fuel</b> (fuel < 0).</li>
-        <li>✗ Plane reaches its <b>destination exit at wrong altitude</b> (not 9).</li>
-        <li>✗ Plane <b>lands at wrong airport</b>, or from wrong direction.</li>
-        <li>✗ Plane leaves the arena through a border cell that isn't its destination exit.</li>
-        <li>✗ Plane climbs above altitude 9 or descends to 0 outside an airport.</li>
+        <li>✗ <b>Lost separation:</b> two planes within one cell of each other and within 1,000 ft.</li>
+        <li>✗ <b>Fuel exhausted:</b> a plane's fuel runs out and it diverts.</li>
+        <li>✗ A plane reaches its <b>exit at the wrong altitude</b> (not 9).</li>
+        <li>✗ A plane sets down at the <b>wrong field</b>, or comes in against the runway arrow.</li>
+        <li>✗ A plane leaves the sector anywhere but its own exit.</li>
+        <li>✗ A plane climbs above 9, or reaches the ground away from a field.</li>
       </ul>
 
       <h2>Walk-through: Your First Plane</h2>
@@ -1945,7 +2400,7 @@
       </ul>
 
       <div class="footer-hint">
-        Press <kbd>?</kbd> or click <kbd>? help</kbd> anytime to see this again.
+        Press <kbd>?</kbd> any time to see this again, or open How to play from the pause menu.
       </div>
     </div>
   </div>

@@ -32,7 +32,7 @@
     "seeAlso": ["atc", "robots"]
   },
   "howToPlay": [
-    "Type a plane’s letter, then an order: Aa9 climbs plane A to 9,000 feet, Atd turns it east.",
+    "Type a plane’s letter, then an order (Aa9 climbs A to 9,000 feet), or click it and press an order button.",
     "Land at altitude 0 along the runway arrow; leave by the right exit at 9,000 feet.",
     "Keep planes apart and fuelled: a career assignment ends when its target is home, any shift when a plane is lost."
   ],

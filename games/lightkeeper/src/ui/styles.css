@@ -677,25 +677,29 @@
 
 /* ---- A watch --------------------------------------------------------------------------- */
 
+/* The zone is the stage, as tall as the screen allows; the bridge column beside it holds the
+   zone's facts, the order being aimed, the First Officer, the world in view and the orders; the
+   side column holds the chart, its calls and the ship's log. */
 .lk-play {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 31vw, 470px);
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) clamp(270px, 20vw, 380px) clamp(300px, 25vw, 480px);
+  grid-template-rows: auto minmax(0, 1fr);
   grid-template-areas:
-    'status status'
-    'zone side'
-    'dock side';
+    'status status status'
+    'zone bridge side';
   gap: 10px 14px;
   padding: 12px 16px 14px;
 }
 
+/* The top right 220 × 64 px stays clear for the Hall's Pause pill. */
 .lk-status {
   grid-area: status;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: clamp(12px, 2vw, 28px);
+  gap: 6px clamp(12px, 2vw, 28px);
   min-height: 56px;
-  padding-right: 168px;
+  padding-right: 236px;
 }
 
 .lk-clock {
@@ -749,11 +753,12 @@
   }
 }
 
+/* Two meters at their narrowest; when the row is shorter than that, the chips wrap below. */
 .lk-status__meters {
   display: flex;
   gap: 18px;
   flex: 1;
-  min-width: 0;
+  min-width: 298px;
 }
 
 .lk-meter {
@@ -849,26 +854,91 @@
 
 .lk-zone {
   grid-area: zone;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(262px, 31%, 360px);
-  gap: 14px;
-  min-width: 0;
-  min-height: 0;
-}
-
-.lk-zone__stage {
   position: relative;
   min-width: 0;
   min-height: 0;
 }
 
-.lk-zone__info {
+.lk-zone__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.lk-bridge {
+  grid-area: bridge;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  padding-top: 4px;
+}
+
+.lk-bridge__info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-height: 0;
-  padding-top: 6px;
   overflow: auto;
+}
+
+/* The world in view: its name in the display face, its light as the crew knows it. */
+.lk-world {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border: 1px solid var(--lk-line-strong);
+  border-radius: 12px;
+  background: var(--lk-surface);
+}
+
+.lk-world[hidden] {
+  display: none;
+}
+
+.lk-world__dot {
+  grid-row: 1 / span 3;
+  align-self: start;
+  width: 14px;
+  height: 14px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--lk-lamp-fill);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lk-lamp-fill) 30%, transparent);
+}
+
+.lk-world[data-state='threatened'] .lk-world__dot {
+  background: var(--lk-coral);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lk-coral) 35%, transparent);
+}
+
+.lk-world[data-state='dark'] .lk-world__dot,
+.lk-world[data-state='lost'] .lk-world__dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--lk-ink-2);
+}
+
+.lk-world__name {
+  margin: 0;
+  font: 600 21px/1.15 var(--lk-display);
+}
+
+.lk-world__status {
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.lk-world[data-state='threatened'] .lk-world__status {
+  color: var(--lk-coral);
+}
+
+.lk-world__facts {
+  margin: 0;
+  color: var(--lk-ink-2);
+  font-size: 14px;
 }
 
 .lk-zone__head {
@@ -902,6 +972,24 @@
   border-color: var(--lk-lamp-fill);
   color: var(--lk-lamp);
   font-weight: 600;
+}
+
+/* On a short screen the standing hints give their room to what changes; the hints for an order
+   being aimed still show. */
+@media (max-height: 800px) {
+  .lk-zone__mode[data-mode='helm'] {
+    display: none;
+  }
+
+  /* While an order is being aimed, the First Officer steps back for its hint and its tip. */
+  .lk-bridge:not([data-mode='helm']) .lk-coach {
+    display: none;
+  }
+
+  /* The chart's standing hint gives its room to the calls; a jump's own tip still shows. */
+  .lk-chart__tip[data-tone='quiet'] {
+    display: none;
+  }
 }
 
 .lk-zone__canvas,
@@ -974,8 +1062,9 @@
 .lk-side {
   grid-area: side;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
+  min-width: 0;
   min-height: 0;
   padding-top: 0;
 }
@@ -989,12 +1078,15 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 0.9;
-  max-height: 42vh;
+  max-height: 50vh;
 }
 
 .lk-side__lists {
   display: grid;
+  align-content: start;
   gap: 8px;
+  min-height: 0;
+  overflow: auto;
 }
 
 .lk-calls {
@@ -1070,21 +1162,139 @@
   color: var(--lk-ink-2);
 }
 
-.lk-log {
-  min-height: 0;
-  margin: 0;
-  padding: 8px 10px;
-  overflow: auto;
+/* The ship's log, folded to its last three lines, newest first, just above the orders; "Open
+   log" (L) shows it all. */
+.lk-logbox {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px 10px;
   border: 1px solid var(--lk-line);
   border-radius: 12px;
   background: color-mix(in srgb, var(--lk-surface) 70%, transparent);
+}
+
+.lk-logbox__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lk-logbox__title {
+  margin: 0;
+  color: var(--lk-ink-2);
+  font: 600 12px var(--lk-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lk-logbox .lk-button {
+  min-height: 30px;
+  padding: 2px 8px 2px 10px;
+  font-size: 13px;
+}
+
+.lk-log {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
   list-style: none;
   font-size: 14px;
 }
 
 .lk-log__line {
-  padding: 2px 0 2px 10px;
+  display: grid;
+  grid-template-columns: 1.5em minmax(0, 1fr);
+  align-items: baseline;
+  padding: 2px 0 2px 8px;
   border-left: 3px solid transparent;
+}
+
+.lk-log__mark {
+  color: var(--lk-ink-2);
+  font: 700 13px var(--lk-mono);
+  text-align: center;
+}
+
+.lk-log__line[data-tone='good'] .lk-log__mark {
+  color: var(--lk-good);
+}
+
+.lk-log__line[data-tone='bad'] .lk-log__mark {
+  color: var(--lk-danger);
+}
+
+.lk-log__line[data-tone='warn'] .lk-log__mark {
+  color: var(--lk-coral);
+}
+
+.lk-log__line[data-tone='radio'] .lk-log__mark {
+  color: var(--lk-radio);
+}
+
+.lk-log .lk-log__line:first-child {
+  font-weight: 600;
+}
+
+/* The whole log, over the play screen, one heading per order. */
+.lk-logsheet {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 72px 24px 24px;
+  background: color-mix(in srgb, var(--lk-bg) 72%, transparent);
+}
+
+.lk-logsheet[hidden] {
+  display: none;
+}
+
+.lk-logsheet__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 100%);
+  max-height: 100%;
+  border: 1.5px solid var(--lk-line-strong);
+  border-radius: 16px;
+  background: var(--lk-surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.lk-logsheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--lk-line);
+}
+
+.lk-logsheet__head h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.lk-logsheet__body {
+  overflow: auto;
+  padding: 6px 18px 18px;
+}
+
+.lk-logsheet__turn h3 {
+  margin: 14px 0 4px;
+  color: var(--lk-lamp);
+  font: 600 12px var(--lk-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lk-logsheet__turn ol {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .lk-log__line[data-tone='good'] {
@@ -1104,18 +1314,37 @@
   border-left-color: var(--lk-coral);
 }
 
+/* The orders, at the foot of the bridge column: two to a row, the drive across the bottom. */
 .lk-dock {
-  grid-area: dock;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--lk-line);
 }
 
 .lk-dock .lk-button {
-  min-height: 38px;
-  padding: 5px 9px 5px 12px;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 6px 9px 6px 12px;
   font-size: 14px;
+  text-align: left;
+}
+
+.lk-dock__words {
+  display: grid;
+  gap: 1px;
+}
+
+.lk-dock__note {
+  color: var(--lk-ink-2);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.lk-dock .lk-button[aria-pressed='true'] .lk-dock__note,
+.lk-button--primary .lk-dock__note {
+  color: inherit;
 }
 
 .lk-dock .lk-kbd {
@@ -1125,7 +1354,35 @@
 }
 
 .lk-dock > .lk-drive {
-  margin-left: auto;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+}
+
+/* On a tall screen the orders stand in one column, each with its word beside its name, so the
+   bridge is filled by what can be done rather than by a gap. */
+@media (min-width: 1181px) and (min-height: 1000px) {
+  .lk-dock {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .lk-dock .lk-button {
+    min-height: 50px;
+  }
+
+  .lk-dock__words {
+    grid-template-columns: minmax(7.5em, auto) 1fr;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .lk-dock__words b {
+    font-size: 15px;
+  }
+
+  .lk-dock__note {
+    font-size: 13px;
+  }
 }
 
 .lk-drive {
@@ -1252,12 +1509,25 @@
 
 /* ---- Results --------------------------------------------------------------------------- */
 
+/* The end of a watch: one centred card, the words and the score at the left, the chart and
+   the promotion at the right, balanced at any size. */
 .lk-results {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: clamp(16px, 3vw, 40px);
+  place-items: center;
   padding: 72px clamp(16px, 4vw, 56px) 24px;
   overflow: auto;
+}
+
+.lk-results__card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(20px, 3vw, 48px);
+  width: min(1240px, 100%);
+  padding: clamp(20px, 2.5vw, 36px);
+  border: 1.5px solid var(--lk-line-strong);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--lk-surface) 88%, transparent);
 }
 
 .lk-results__title {
@@ -1298,7 +1568,6 @@
 .lk-sheetlines {
   display: grid;
   gap: 4px;
-  max-width: 520px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1348,14 +1617,14 @@
 
 .lk-results__side {
   display: grid;
-  grid-template-rows: minmax(260px, 1fr) auto;
   gap: 14px;
   min-height: 0;
 }
 
 .lk-results__chart-box {
   position: relative;
-  min-height: 260px;
+  aspect-ratio: 1 / 0.9;
+  min-height: 240px;
 }
 
 .lk-results__chart {
@@ -1424,18 +1693,62 @@
   transition-duration: 0.01ms !important;
 }
 
-@media (max-width: 960px) {
+/* A narrower screen: the zone and the bridge fill the screen below the status, and the chart, the
+   calls and the log follow a scroll below, side by side. The other rows are max-content: the
+   screen scrolls, so they keep their content's height instead of shrinking to fit it. */
+@media (max-width: 1180px) {
   .lk-play {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(320px, 60vh) auto auto;
-    grid-template-areas: 'status' 'zone' 'dock' 'side';
+    grid-template-columns: minmax(0, 1fr) clamp(260px, 30vw, 340px);
+    grid-template-rows: max-content max(440px, calc(100vh - 130px)) max-content;
+    grid-template-areas:
+      'status status'
+      'zone bridge'
+      'side side';
     overflow: auto;
   }
 
+  .lk-side__lists {
+    overflow: visible;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1180px) {
+  .lk-side {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+    column-gap: 14px;
+  }
+
+  .lk-side > .lk-chart {
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 960px) {
+  .lk-play {
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content minmax(320px, 60vh) max-content max-content;
+    grid-template-areas: 'status' 'zone' 'bridge' 'side';
+    overflow: auto;
+  }
+
+  .lk-results__card {
+    grid-template-columns: 1fr;
+  }
+
   .lk-status {
-    flex-wrap: wrap;
     padding-top: 52px;
     padding-right: 0;
+  }
+
+  /* One column: the bridge's notes and orders take the room they need. */
+  .lk-bridge {
+    grid-template-rows: auto auto;
+  }
+
+  .lk-bridge__info {
+    overflow: visible;
   }
 
   .lk-results {
