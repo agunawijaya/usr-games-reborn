@@ -1,0 +1,119 @@
+/* Broken Well — the desk: the game menu, briefings, pause, reports, the logbook and Free Dig
+   settings. Everything here sits over #game-container and is built by src/desk.mjs; the colour
+   tokens come from index.html's :root (light and dark both designed there, not derived). */
+
+.desk {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 6, 4, 0.72);
+  backdrop-filter: blur(6px);
+}
+:root[data-theme='light'] .desk {
+  background: rgba(230, 220, 200, 0.75);
+}
+.desk.open { display: flex; }
+
+.desk-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 86vh;
+  overflow-y: auto;
+  color: var(--ink);
+}
+
+.desk-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  color: var(--lamp-gold);
+  text-shadow: 0 0 10px var(--lamp-glow);
+  margin-bottom: 10px;
+}
+
+.desk-lede, .desk-idea { color: var(--ink-dim); line-height: 1.5; margin-bottom: 14px; }
+.desk-rank { margin-bottom: 18px; }
+.desk-site { font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 4px; }
+
+.desk-menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.desk-btn {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--panel-border);
+  color: var(--ink);
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+.desk-btn:hover:not(:disabled) {
+  border-color: var(--lamp-gold);
+  box-shadow: 0 0 14px var(--lamp-glow);
+}
+.desk-btn:active:not(:disabled) { transform: translateY(1px); }
+.desk-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.desk-key {
+  display: inline-block;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  margin: 0 2px;
+}
+
+.desk-task-list, .desk-help-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 12px 0 20px; }
+.desk-task-list li { padding-left: 1.4em; position: relative; }
+.desk-task-list li::before { content: '◇'; position: absolute; left: 0; color: var(--lamp-gold); }
+
+.desk-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.desk-actions .desk-btn { flex: 1 1 auto; text-align: center; }
+
+.desk-seals { display: inline-flex; gap: 4px; font-size: 1.1rem; }
+.seal { color: var(--ink-dim); }
+.seal.is-earned { color: var(--lamp-gold); }
+
+.desk-trail-list, .desk-log-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+.desk-trail-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.desk-trail-list .desk-btn { flex: 1 1 auto; }
+.desk-locked { color: var(--ink-dim); padding: 12px 18px; }
+.is-cleared .desk-btn { border-color: var(--lamp-gold); }
+
+.desk-log-entry { border-left: 2px solid var(--panel-border); padding-left: 14px; }
+.desk-log-entry h3 { font-size: 0.95rem; color: var(--lamp-gold); margin-bottom: 4px; }
+.desk-log-entry p { color: var(--ink-dim); font-size: 0.9rem; line-height: 1.5; }
+
+.desk-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-size: 0.9rem; }
+.desk-select, .desk-field input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--panel-border);
+  color: var(--ink);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.desk-promoted { color: var(--lamp-gold); font-weight: 600; margin: 10px 0; }
+.desk-share { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: rgba(0, 0, 0, 0.2); padding: 8px 10px; border-radius: 6px; margin: 10px 0; }
+.desk-chronicle { list-style: none; display: flex; flex-direction: column; gap: 6px; margin: 10px 0 18px; color: var(--ink-dim); font-size: 0.92rem; }
+.desk-report-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--lamp-gold); margin-bottom: 8px; }
+
+.desk-confirm p { color: var(--ink-dim); margin-bottom: 16px; }

@@ -1,0 +1,13 @@
+{
+  "name": "@usr-games/blocks-classic-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Broken Well: the owner's earlier fancy-web port of the BSD falling-blocks original, reshaped wells and all, with a quarry foreman's career, contracts, a logbook and a Daily Shift.",
+  "main": "src/engine.js",
+  "scripts": {
+    "test": "node --test tests/engine.test.js \"tests/*.test.mjs\""
+  },
+  "keywords": ["bsdgames", "falling-blocks", "canvas"],
+  "author": "Agun Wijaya",
+  "license": "MIT"
+}

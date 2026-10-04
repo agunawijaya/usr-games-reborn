@@ -1,0 +1,38 @@
+/* Two families already self-hosted elsewhere in this collection (Rajdhani in games/robots, JetBrains
+   Mono in games/hunt), copied here rather than added as a new family (/usr/games Reborn, hard rule 4:
+   no runtime network requests; CLAUDE.md asks us to prefer a font a sibling already hosts). Latin
+   subsets of the @fontsource builds, both under the SIL Open Font License 1.1; see
+   LICENSES/FONTS.md at the repository root. Rajdhani carries the quarry's headings and HUD labels;
+   JetBrains Mono sets every number (score, lines, level, timer) so digits never jitter in width. */
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./rajdhani-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./rajdhani-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./rajdhani-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('./jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+}

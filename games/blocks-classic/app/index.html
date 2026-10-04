@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Broken Well</title>
+<link rel="stylesheet" href="src/fonts/fonts.css" />
+<link rel="stylesheet" href="src/desk.css" />
+<style>
+  :root {
+    --stone-dark: #1c1712;
+    --stone-mid: #2c241c;
+    --stone-light: #4a3c2d;
+    --ember: #f0944a;
+    --lamp-gold: #f5c242;
+    --lamp-glow: rgba(245, 194, 66, 0.35);
+    --panel-bg: rgba(20, 16, 12, 0.92);
+    --panel-border: rgba(245, 194, 66, 0.3);
+    --ink: #ece3d6;
+    --ink-dim: #b9ab97;
+    --danger: #ef5a6f;
+    --well-bg-top: #241d16;
+    --well-bg-bottom: #0e0b08;
+    --well-canvas-bg: rgba(0, 0, 0, 0.25);
+  }
+
+  :root[data-theme='light'] {
+    --stone-dark: #e9e1d3;
+    --stone-mid: #d8cab3;
+    --stone-light: #b89d78;
+    --ember: #c0631f;
+    --lamp-gold: #8a6210;
+    --lamp-glow: rgba(138, 98, 16, 0.25);
+    --panel-bg: rgba(250, 246, 238, 0.95);
+    --panel-border: rgba(138, 98, 16, 0.35);
+    --ink: #2a2117;
+    --ink-dim: #6c5f4d;
+    --danger: #a3233a;
+    --well-bg-top: #f3ead9;
+    --well-bg-bottom: #d9c9ab;
+    --well-canvas-bg: rgba(255, 255, 255, 0.55);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--stone-dark);
+    color: var(--ink);
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+  button { font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--lamp-gold); outline-offset: 2px; }
+
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 20%, var(--well-bg-top) 0%, var(--well-bg-bottom) 100%);
+    display: flex;
+    flex-direction: column;
+  }
+
+  #top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 64px;
+    flex: 0 0 auto;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+    z-index: 10;
+  }
+  .bw-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: 1px; color: var(--lamp-gold); text-shadow: 0 0 10px var(--lamp-glow); }
+  .bw-rank { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.5px; margin-left: 10px; }
+  .bw-stats { display: flex; gap: 18px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; }
+  .bw-stat { display: flex; flex-direction: column; align-items: center; min-width: 54px; }
+  .bw-stat-label { font-size: 0.6rem; letter-spacing: 1px; color: var(--ink-dim); text-transform: uppercase; }
+  .bw-stat-value { font-weight: 700; color: var(--ink); }
+  .bw-pause-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    padding: 7px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .bw-pause-btn:hover { border-color: var(--lamp-gold); box-shadow: 0 0 10px var(--lamp-glow); }
+  .bw-pause-btn kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.7; }
+
+  #play-area {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    min-height: 0;
+    padding: 8px 24px 24px;
+  }
+
+  #well-canvas {
+    background: var(--well-canvas-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5) inset;
+  }
+
+  #side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 160px;
+  }
+  .bw-panel-box {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .bw-panel-box h2 {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  #next-canvas { width: 100%; height: 90px; display: block; }
+  .bw-contract-list { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; }
+  .bw-contract-list li { display: flex; gap: 6px; align-items: baseline; color: var(--ink-dim); }
+  .bw-contract-list li.is-met { color: var(--lamp-gold); }
+
+  @media (max-width: 900px) {
+    #play-area { flex-direction: column; }
+    #side-panel { width: 100%; max-width: 320px; flex-direction: row; }
+  }
+</style>
+</head>
+<body data-desk="menu">
+  <div id="game-container">
+    <div id="top-bar">
+      <div>
+        <span class="bw-title">BROKEN WELL</span>
+        <span class="bw-rank" id="hud-rank">Hand Digger</span>
+      </div>
+      <div class="bw-stats">
+        <div class="bw-stat"><span class="bw-stat-label">Level</span><span class="bw-stat-value" id="hud-level">1</span></div>
+        <div class="bw-stat"><span class="bw-stat-label">Lines</span><span class="bw-stat-value" id="hud-lines">0</span></div>
+        <div class="bw-stat"><span class="bw-stat-label">Score</span><span class="bw-stat-value" id="hud-score">0</span></div>
+      </div>
+      <button class="bw-pause-btn" id="btn-pause" title="Pause">&#10074;&#10074; Pause <kbd>Esc</kbd></button>
+    </div>
+    <div id="play-area">
+      <canvas id="well-canvas"></canvas>
+      <div id="side-panel">
+        <div class="bw-panel-box">
+          <h2>Next</h2>
+          <canvas id="next-canvas" width="140" height="90"></canvas>
+        </div>
+        <div class="bw-panel-box">
+          <h2>Contracts</h2>
+          <ul class="bw-contract-list" id="hud-contracts"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Hall's bridge, then the core engine. The desk (menu, briefing, pause, report, logbook,
+       settings) is built by src/desk.mjs; this page only draws the live well and its HUD. -->
+  <script src="../../bridge/bridge.js"></script>
+  <script src="src/engine.js"></script>
+
+  <script>
+    const wellCanvas = document.getElementById('well-canvas');
+    const wellCtx = wellCanvas.getContext('2d');
+    const nextCanvas = document.getElementById('next-canvas');
+    const nextCtx = nextCanvas.getContext('2d');
+    const playArea = document.getElementById('play-area');
+
+    let game = null;
+    let cellSize = 24;
+    let lastTime = 0;
+    let running = false;
+    let particles = [];
+    let masterLevel = 1;
+    let reducedMotion = false;
+
+    function resize() {
+      if (!game) {
+        wellCanvas.width = 300;
+        wellCanvas.height = 600;
+        return;
+      }
+      const availW = Math.max(120, playArea.clientWidth - 220);
+      const availH = Math.max(120, playArea.clientHeight - 16);
+      const aspect = game.width / game.height;
+      let w = availW;
+      let h = w / aspect;
+      if (h > availH) {
+        h = availH;
+        w = h * aspect;
+      }
+      cellSize = Math.max(8, Math.min(34, w / game.width));
+      wellCanvas.width = Math.round(cellSize * game.width);
+      wellCanvas.height = Math.round(cellSize * game.height);
+      draw();
+    }
+    window.addEventListener('resize', resize);
+
+    function updateHUD() {
+      document.getElementById('hud-level').textContent = game.level;
+      document.getElementById('hud-lines').textContent = game.lines;
+      document.getElementById('hud-score').textContent = game.score;
+    }
+
+    function drawBlock(ctx, x, y, cs, color, alpha, outlineOnly) {
+      const px = x * cs;
+      const py = y * cs;
+      ctx.globalAlpha = alpha;
+      if (outlineOnly) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px + 2, py + 2, cs - 4, cs - 4);
+      } else {
+        ctx.fillStyle = color;
+        ctx.fillRect(px + 1, py + 1, cs - 2, cs - 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.22)';
+        ctx.fillRect(px + 1, py + 1, cs - 2, cs * 0.22);
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px + 1.5, py + 1.5, cs - 3, cs - 3);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawRock(ctx, x, y, cs) {
+      const px = x * cs;
+      const py = y * cs;
+      ctx.fillStyle = BrokenWellEngine.ROCK_COLOR;
+      ctx.fillRect(px, py, cs, cs);
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1);
+    }
+
+    function drawWell() {
+      wellCtx.clearRect(0, 0, wellCanvas.width, wellCanvas.height);
+      const cs = cellSize;
+      // The open-cell grid reads as a faint light etching on dark stone, and a faint dark
+      // etching on the light look's pale stone — never the same colour inverted.
+      const gridLine = document.documentElement.dataset.theme === 'light' ? 'rgba(42,33,23,0.10)' : 'rgba(255,255,255,0.05)';
+      for (let y = 0; y < game.height; y++) {
+        for (let x = 0; x < game.width; x++) {
+          const cell = game.board[y][x];
+          if (cell.type === 'rock') drawRock(wellCtx, x, y, cs);
+          else if (cell.type === 'filled') drawBlock(wellCtx, x, y, cs, cell.color, 1, false);
+          else {
+            wellCtx.strokeStyle = gridLine;
+            wellCtx.lineWidth = 1;
+            wellCtx.strokeRect(x * cs + 0.5, y * cs + 0.5, cs - 1, cs - 1);
+          }
+        }
+      }
+      if (game.current) {
+        for (const c of game.current.cells) {
+          const x = game.current.x + c.x;
+          const y = game.ghostY + c.y;
+          if (y >= 0) drawBlock(wellCtx, x, y, cs, BrokenWellEngine.PIECE_COLORS[game.current.type], BrokenWellEngine.GHOST_ALPHA, true);
+        }
+        for (const c of game.current.cells) {
+          const x = game.current.x + c.x;
+          const y = game.current.y + c.y;
+          if (y >= 0) drawBlock(wellCtx, x, y, cs, BrokenWellEngine.PIECE_COLORS[game.current.type], 1, false);
+        }
+      }
+      for (const p of particles) {
+        wellCtx.globalAlpha = Math.max(0, p.life);
+        wellCtx.fillStyle = p.color;
+        wellCtx.beginPath();
+        wellCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        wellCtx.fill();
+        wellCtx.globalAlpha = 1;
+      }
+    }
+
+    function drawNext() {
+      nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      if (!game || !game.nextType) return;
+      // The next piece is always drawn in its spawn rotation.
+      const shapeCells = (window.__brokenWellShapes || {})[game.nextType];
+      if (!shapeCells) return;
+      let minX = 0, maxX = 0, minY = 0, maxY = 0;
+      for (const c of shapeCells) {
+        minX = Math.min(minX, c.x);
+        maxX = Math.max(maxX, c.x);
+        minY = Math.min(minY, c.y);
+        maxY = Math.max(maxY, c.y);
+      }
+      const bw = maxX - minX + 1;
+      const bh = maxY - minY + 1;
+      const cs = Math.min(nextCanvas.width / (bw + 1), nextCanvas.height / (bh + 1));
+      const offX = (nextCanvas.width - cs * bw) / 2 - minX * cs;
+      const offY = (nextCanvas.height - cs * bh) / 2 - minY * cs;
+      nextCtx.fillStyle = BrokenWellEngine.PIECE_COLORS[game.nextType];
+      for (const c of shapeCells) {
+        nextCtx.fillRect(offX + c.x * cs + 1, offY + c.y * cs + 1, cs - 2, cs - 2);
+      }
+    }
+
+    function spawnClearParticles(rows) {
+      if (reducedMotion || rows.length === 0) return;
+      const cs = cellSize;
+      for (const y of rows) {
+        for (let x = 0; x < game.width; x++) {
+          for (let i = 0; i < 4; i++) {
+            particles.push({
+              x: (x + 0.5) * cs,
+              y: (y + 0.5) * cs,
+              vx: (Math.random() - 0.5) * 7,
+              vy: (Math.random() - 0.5) * 7 - 2,
+              life: 1,
+              decay: 0.025 + Math.random() * 0.03,
+              color: '#f5c242',
+              size: cs * (0.12 + Math.random() * 0.18),
+            });
+          }
+        }
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.22;
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      drawWell();
+      drawNext();
+    }
+
+    function loop(time) {
+      if (!running) return;
+      const dt = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
+      if (game && !game.paused && !game.gameOver) {
+        game.update(dt);
+        if (game.clearedRowsLastLock && game.clearedRowsLastLock.length > 0) {
+          spawnClearParticles(game.clearedRowsLastLock);
+          game.clearedRowsLastLock = [];
+        }
+        updateHUD();
+        window.BrokenWellDesk?.checkShiftEnd();
+      }
+      updateParticles();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function handleKey(e, isDown) {
+      if (!game || document.body.dataset.desk !== 'play') return;
+      const key = e.key;
+      if (isDown && (key === 'ArrowLeft' || key === 'a' || key === 'A')) game.move(-1);
+      if (isDown && (key === 'ArrowRight' || key === 'd' || key === 'D')) game.move(1);
+      if (key === 'ArrowLeft' || key === 'a' || key === 'A') { game.setKey('left', isDown); e.preventDefault(); }
+      if (key === 'ArrowRight' || key === 'd' || key === 'D') { game.setKey('right', isDown); e.preventDefault(); }
+      if (key === 'ArrowDown' || key === 's' || key === 'S') { game.setKey('down', isDown); e.preventDefault(); }
+      if (isDown && (key === 'ArrowUp' || key === 'w' || key === 'W' || key === 'x' || key === 'X')) { game.rotate(1); e.preventDefault(); }
+      if (isDown && (key === 'z' || key === 'Z')) { game.rotate(-1); e.preventDefault(); }
+      if (isDown && key === ' ') {
+        game.hardDrop();
+        if (game.clearedRowsLastLock && game.clearedRowsLastLock.length > 0) {
+          spawnClearParticles(game.clearedRowsLastLock);
+          game.clearedRowsLastLock = [];
+        }
+        updateHUD();
+        window.BrokenWellDesk?.checkShiftEnd();
+        e.preventDefault();
+      }
+      // P and Esc are handled once, by desk.mjs's own document-level listener.
+    }
+    window.addEventListener('keydown', (e) => handleKey(e, true));
+    window.addEventListener('keyup', (e) => handleKey(e, false));
+    document.getElementById('btn-pause').addEventListener('click', () => window.BrokenWellDesk?.togglePause());
+
+    // --- The game menu's way in (src/desk.mjs) ---
+    window.BrokenWellPlay = {
+      /** Starts a shift with the engine's own config. The canvas replaces whatever was drawn. */
+      begin(options) {
+        // The career, the Daily Shift and Free Dig all name a preset; its width and height come
+        // from the engine's own table unless the caller already gave explicit ones (Free Dig's
+        // custom width/height, once that lands).
+        const dims = BrokenWellEngine.WELL_PRESETS[options.preset] ?? BrokenWellEngine.WELL_PRESETS.normal;
+        const resolved = { width: dims.width, height: dims.height, ...options };
+        game = new BrokenWellEngine.WellGame(resolved);
+        window.game = game;
+        particles = [];
+        updateHUD();
+        resize();
+        return game;
+      },
+      current: () => game,
+      canvas: () => wellCanvas,
+      setRunning(value) { running = value; if (value) { lastTime = performance.now(); requestAnimationFrame(loop); } },
+      setReducedMotion(value) { reducedMotion = value; },
+      setSoundLevel(level) { masterLevel = level; },
+      /** The side panel's reminder of this shift's contracts, from the briefing's own wording. */
+      setContracts(texts) {
+        const list = document.getElementById('hud-contracts');
+        list.replaceChildren(...texts.map((text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          return li;
+        }));
+      },
+    };
+
+    // The next-piece preview needs the raw shape table; engine.js keeps it private, so this
+    // small mirror (spawn rotation only) is enough for a side-panel icon.
+    window.__brokenWellShapes = {
+      I: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }],
+      O: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }],
+      T: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }],
+      S: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: -1 }],
+      Z: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: -1 }],
+      J: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }],
+      L: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: -1, y: 1 }],
+    };
+
+    resize();
+  </script>
+  <script type="module" src="src/desk.mjs"></script>
+</body>
+</html>

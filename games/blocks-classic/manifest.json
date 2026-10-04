@@ -1,0 +1,129 @@
+{
+  "id": "blocks-classic",
+  "title": "Broken Well",
+  "tagline": "The well never holds its shape. Clear it, or outlast the flood.",
+  "teaser": "The owner's earlier port of the 1992 Berkeley falling-blocks game, where the well keeps changing shape: a canyon, a split pillar, an hourglass neck, a standing pillar. Hold back a rising flood, and rise from Hand Digger to Master of the Broken Well through twelve shifts and a Daily Shift.",
+  "category": "arcade",
+  "directory": "/usr/games/arcade",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 15],
+  "status": "shipped",
+  "accent": "#f5c242",
+  "emblem": "M10 10h28v28H10zM10 24h28M24 10v28M16 17h4M28 31h4",
+  "inspiredBy": {
+    "program": "tetris",
+    "originalTitle": "tetris (BSD)",
+    "uiTitle": "the 1992 Berkeley falling-blocks game",
+    "year": 1992
+  },
+  "daily": true,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/blocks-classic/app",
+    "output": "play/blocks-classic/"
+  },
+  "manPage": {
+    "synopsis": "blocks-classic — a falling-blocks shift in a well the quarry keeps reshaping; clear the line target or outlast the rising rubble.",
+    "description": "The owner's earlier fancy-web port of the BSD falling-blocks original: seven tetrominoes, a next-piece preview, a ghost piece, a seven-bag randomizer, wall kicks and lock delay, all playing inside a well whose shape changes shift to shift — a canyon, a split pillar, an hourglass neck, a donut of standing rock, a staircase floor, a narrow tower, a wide cut — with an optional starting rubble stack and a flood mode where rubble rises from below. Around it, a quarry foreman's career of twelve shifts with ranks, a briefing of three contracts and a seal for each, a written logbook of every shift, a Free Dig mode and a Daily Shift. A second interpretation beside the collection's own Sinkers.",
+    "seeAlso": ["blocks"]
+  },
+  "howToPlay": [
+    "Move with ← / → (or A / D), rotate with ↑ / W / X clockwise and Z counter-clockwise.",
+    "↓ / S soft-drops; Space hard-drops onto the ghost outline below the falling piece.",
+    "Clear a shift's line target in the Long Dig, or hold the well through its rubble rows in the Rising Flood."
+  ],
+  "cronGoals": [
+    {
+      "id": "shifts-cleared",
+      "stat": "shiftsCleared",
+      "label": "Clear {n} shifts",
+      "min": 1,
+      "max": 4
+    },
+    {
+      "id": "lines-cleared",
+      "stat": "linesCleared",
+      "label": "Clear {n} lines",
+      "min": 20,
+      "max": 60
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-shift",
+      "title": "First shift cleared",
+      "description": "Clear any shift's target.",
+      "tier": "core"
+    },
+    {
+      "id": "first-quad",
+      "title": "Four at once",
+      "description": "Clear four lines in a single drop.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-digger",
+      "title": "Daily digger",
+      "description": "Finish a Daily Shift.",
+      "tier": "core"
+    },
+    {
+      "id": "clean-shift",
+      "title": "Clean shift",
+      "description": "Meet every contract on a single shift.",
+      "tier": "core"
+    },
+    {
+      "id": "canyon-cleared",
+      "title": "Through the canyon",
+      "description": "Clear the Canyon Cut shift.",
+      "tier": "core"
+    },
+    {
+      "id": "flood-holder",
+      "title": "Hold the flood",
+      "description": "Survive ten or more rising rubble rows in one shift.",
+      "tier": "extra"
+    },
+    {
+      "id": "foreman-rank",
+      "title": "Foreman",
+      "description": "Reach the rank of Foreman.",
+      "tier": "extra"
+    },
+    {
+      "id": "quad-trio",
+      "title": "Three in a shift",
+      "description": "Clear three four-line drops in a single shift.",
+      "tier": "extra"
+    },
+    {
+      "id": "free-digger",
+      "title": "Free digger",
+      "description": "Clear a Free Dig session on a well shape of your choosing.",
+      "tier": "extra"
+    },
+    {
+      "id": "sealbearer",
+      "title": "Sealbearer",
+      "description": "Hold twenty-four contracts across the twelve shifts.",
+      "tier": "rare"
+    },
+    {
+      "id": "quarry-warden",
+      "title": "Quarry Warden",
+      "description": "Reach the rank of Quarry Warden.",
+      "tier": "rare"
+    },
+    {
+      "id": "master-of-the-well",
+      "title": "Master of the Broken Well",
+      "description": "Clear all twelve shifts.",
+      "tier": "rare"
+    }
+  ]
+}
