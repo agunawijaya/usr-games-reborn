@@ -1,0 +1,935 @@
+/* Orchard Crawl — the orchard desk, in the port's own gallery style: warm paper, white cards, dark
+   ink by day; the same paper by lamplight in the dark appearance (index.html sets the tokens).
+   The orchard keeps crawling behind it. */
+
+[hidden] {
+  display: none !important;
+}
+
+.desk-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 18px 16px;
+  overflow-y: auto;
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+
+.desk-page {
+  width: min(1060px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 20px 26px 22px;
+  margin: auto 0;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 30px 60px -30px var(--shadow);
+}
+
+.desk-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.desk-hero-text {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.desk-hero-text .desk-btn-primary {
+  margin-top: 4px;
+}
+
+.desk-title {
+  font-size: 34px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.desk-tag,
+.desk-lead {
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+.desk-page h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'JetBrains Mono', 'Fira Code', SF Mono, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.desk-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.desk-head h1 {
+  font-size: 27px;
+  font-weight: 650;
+}
+
+/* ------------------------------------------------------------------ buttons and pills */
+
+.desk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font: 600 14px/1.1 inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.desk-btn:hover {
+  border-color: var(--ink-soft);
+}
+
+.desk-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.desk-btn-small {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+kbd {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+
+.desk-menu :focus-visible,
+.desk-report :focus-visible,
+.desk-run :focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.desk-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.desk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink-soft);
+  font: 500 13px/1.1 inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.desk-pill:hover:not(:disabled):not([aria-pressed='true']):not([aria-checked='true']) {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+
+.desk-pill[aria-pressed='true'],
+.desk-pill[aria-checked='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.desk-pill:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.desk-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.45);
+}
+
+.desk-small {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.desk-row,
+.desk-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.desk-links .desk-small {
+  margin-right: auto;
+}
+
+/* ------------------------------------------------------------------ the orchards page */
+
+.desk-daily {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px 12px 16px;
+  border-radius: 14px;
+  background: var(--page-bg-2);
+  border: 1.5px solid var(--card-border);
+}
+
+.desk-daily div {
+  display: grid;
+  gap: 3px;
+}
+
+.desk-daily span {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.desk-orchards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.desk-orchard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto auto;
+  column-gap: 12px;
+  row-gap: 3px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.desk-orchard .desk-swatch {
+  grid-row: 1 / 4;
+}
+
+.desk-orchard:hover:not(:disabled) {
+  border-color: var(--ink-soft);
+  transform: translateY(-1px);
+}
+
+.desk-orchard:disabled {
+  cursor: default;
+  background: var(--page-bg-2);
+}
+
+.desk-orchard:disabled b,
+.desk-orchard:disabled .desk-brings {
+  color: var(--ink-soft);
+}
+
+.desk-orchard.is-next {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.desk-orchard.is-cleared .desk-stars {
+  color: var(--gold);
+}
+
+.desk-orchard b {
+  font-size: 15px;
+}
+
+.desk-brings {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.desk-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.is-locked .desk-swatch {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.desk-stars,
+.desk-star {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+/* ------------------------------------------------------------------ briefing */
+
+.desk-goal {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.desk-creatures {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.desk-creatures li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 12px;
+  background: var(--page-bg-2);
+  font-size: 13.5px;
+  max-width: 330px;
+}
+
+/* A portrait: the game's own drawing on a soft card; one not yet met is only its shadow. */
+.desk-portrait-frame {
+  display: block;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at 50% 40%, var(--card) 0%, var(--page-bg-2) 100%);
+}
+
+.desk-portrait {
+  display: block;
+  width: 160px;
+  height: 120px;
+}
+
+.desk-portrait.is-unseen {
+  filter: brightness(0) opacity(0.28);
+}
+
+[data-appearance='dark'] .desk-portrait.is-unseen {
+  filter: brightness(0) invert(1) opacity(0.22);
+}
+
+.desk-creatures .desk-portrait {
+  width: 80px;
+  height: 60px;
+}
+
+.desk-starlist {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.desk-starlist li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 14.5px;
+}
+
+.desk-starlist .is-done {
+  color: var(--ink-soft);
+}
+
+.desk-starlist .is-fresh em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--good);
+}
+
+/* ------------------------------------------------------------------ free orchard, settings */
+
+.desk-free,
+.desk-settings {
+  display: grid;
+  gap: 12px;
+}
+
+.desk-choice {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.desk-choice-label {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.desk-setting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.desk-setting .desk-pill {
+  min-width: 150px;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------ almanac, records, help */
+
+.desk-almanac {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.desk-entry {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  justify-items: center;
+  padding: 8px 10px 10px;
+  border-radius: 12px;
+  border: 1.5px solid var(--card-border);
+  text-align: center;
+}
+
+.desk-entry p {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  text-align: left;
+}
+
+.desk-entry.is-unseen b,
+.desk-entry.is-unseen p {
+  color: var(--ink-soft);
+}
+
+.desk-entry .desk-portrait-frame {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.desk-entry .desk-portrait {
+  width: 136px;
+  height: 102px;
+}
+
+.desk-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 18px;
+}
+
+.desk-records ol {
+  padding-left: 22px;
+  display: grid;
+  gap: 3px;
+  font-size: 14px;
+}
+
+.desk-records p,
+.desk-help p {
+  line-height: 1.55;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.desk-help {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 6px 26px;
+}
+
+.desk-help h2 {
+  margin-bottom: 4px;
+}
+
+.desk-ending {
+  display: grid;
+  gap: 12px;
+  max-width: 740px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ the challenges */
+
+.desk-count {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.desk-families {
+  display: grid;
+  gap: 12px;
+}
+
+.desk-group {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--card-border);
+  background: var(--page-bg-2);
+}
+
+.desk-group h2 .desk-small {
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.desk-family {
+  display: grid;
+  grid-template-columns: minmax(180px, 230px) 1fr;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.desk-family-head {
+  display: grid;
+  gap: 2px;
+}
+
+.desk-family-head b {
+  font-size: 15px;
+}
+
+.desk-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.desk-tier {
+  display: grid;
+  gap: 2px;
+  min-width: 150px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-tier b {
+  font-size: 13.5px;
+}
+
+.desk-tier:hover:not(:disabled) {
+  border-color: var(--ink-soft);
+}
+
+.desk-tier.is-done {
+  border-color: var(--good);
+}
+
+.desk-tier.is-done .desk-small {
+  color: var(--good);
+}
+
+.desk-tier:disabled {
+  cursor: default;
+  background: var(--page-bg-2);
+  color: var(--ink-soft);
+}
+
+.run-status {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------------------------ the ledger beside the field */
+
+.desk-run {
+  flex: 0 0 280px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 20px 40px -28px var(--shadow);
+  font-size: 13.5px;
+}
+
+.run-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.run-where {
+  font-weight: 650;
+  font-size: 15px;
+}
+
+.run-block {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--card-border);
+}
+
+.run-label {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.run-count,
+.run-points {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-bar {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--page-bg-2);
+  overflow: hidden;
+}
+
+.run-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--good);
+  transition: width 0.25s ease-out;
+}
+
+.run-note {
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.run-note.is-open {
+  color: var(--good);
+  font-weight: 650;
+}
+
+.run-stars,
+.run-creatures {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.run-stars li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: baseline;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.run-stars li .desk-star {
+  color: var(--ink-faint);
+}
+
+.run-stars .is-going,
+.run-stars .is-held {
+  color: var(--ink);
+}
+
+.run-stars .is-held .desk-star {
+  color: var(--gold);
+}
+
+.run-progress {
+  display: block;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.run-stars .is-going .run-progress {
+  color: var(--good);
+  font-weight: 650;
+}
+
+.run-creatures li::before {
+  content: '·';
+  margin-right: 6px;
+  color: var(--ink-faint);
+}
+
+.run-keys kbd {
+  margin: 0 1px;
+}
+
+/* The line above the field, while it tells of a moment in the crawl. */
+.subtitle.is-news {
+  font-size: 16px;
+  font-weight: 650;
+  background: var(--card);
+  box-shadow: 0 0 0 1.5px var(--card-border), 0 8px 20px -14px var(--shadow);
+}
+
+/* ------------------------------------------------------------------ report and pause */
+
+.desk-report {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 10, 14, 0.38);
+  border-radius: 10px;
+}
+
+.desk-card {
+  width: min(480px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  display: grid;
+  gap: 8px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.55);
+  animation: desk-in 0.3s ease-out;
+}
+
+.desk-card h2 {
+  font-size: 30px;
+  font-weight: 650;
+}
+
+.desk-card.is-home h2 {
+  color: var(--good);
+}
+
+.desk-card.is-crashed h2 {
+  color: var(--bad);
+}
+
+.desk-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.desk-bigstars {
+  display: flex;
+  gap: 4px;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--ink-faint);
+}
+
+.desk-bigstars .is-on {
+  color: var(--gold);
+}
+
+.desk-bigstars .is-fresh {
+  animation: desk-star-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+.desk-bigstars .is-fresh:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.desk-bigstars .is-fresh:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes desk-star-pop {
+  from {
+    transform: scale(0.2) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+.desk-why {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.desk-haul {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.desk-news {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.desk-news.is-good {
+  color: var(--good);
+  font-size: 16px;
+}
+
+.desk-news.is-big {
+  font-size: 18px;
+  color: var(--gold);
+}
+
+.desk-pause-list {
+  display: grid;
+  gap: 8px;
+}
+
+.desk-pause .desk-btn {
+  justify-content: flex-start;
+}
+
+.desk-pause .desk-btn-primary {
+  justify-content: center;
+}
+
+.desk-pause-scroll {
+  max-height: 46vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.desk-pause-scroll .desk-help {
+  grid-template-columns: 1fr;
+}
+
+.desk-share {
+  word-break: break-word;
+}
+
+@keyframes desk-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ------------------------------------------------------------------ small and short windows */
+
+@media (max-width: 900px) {
+  .desk-orchards,
+  .desk-almanac {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .desk-family {
+    grid-template-columns: 1fr;
+  }
+
+  .desk-run {
+    flex: none;
+    width: min(100%, 640px);
+  }
+
+  .desk-choice {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+@media (max-height: 720px) {
+  .desk-page {
+    gap: 10px;
+    padding: 16px 22px 18px;
+  }
+
+  .desk-title {
+    font-size: 30px;
+  }
+
+  .desk-orchard {
+    padding: 10px 12px;
+  }
+}
+
+/* A large window: the desk, the cards and the ledger grow with the field. */
+@media (min-width: 1700px) and (min-height: 950px) {
+  .desk-page,
+  .desk-card,
+  .desk-run {
+    zoom: 1.2;
+  }
+
+  #c {
+    width: min(calc((100vh - 112px) * 1.5), calc(100vw - 420px), 1500px);
+  }
+}
+
+@media (min-width: 2300px) and (min-height: 1300px) {
+  .desk-page,
+  .desk-card,
+  .desk-run {
+    zoom: 1.5;
+  }
+
+  #c {
+    width: min(calc((100vh - 112px) * 1.5), calc(100vw - 500px), 1700px);
+  }
+}
+
+/* Reduced motion: the Hall's setting in the Hall, the system's on its own (desk.mjs sets it). */
+[data-motion='reduce'] .desk-card,
+[data-motion='reduce'] .desk-bigstars .is-fresh {
+  animation: none;
+}
+
+[data-motion='reduce'] .desk-orchard:hover:not(:disabled) {
+  transform: none;
+}
+
+[data-motion='reduce'] .run-bar i {
+  transition: none;
+}

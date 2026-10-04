@@ -1,0 +1,11 @@
+{
+  "name": "@usr-games/worm-classic-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Orchard Crawl: the owner's earlier fancy-web port of worm (numbered apples, a frog, a thief bird, wasps, a rival worm and a gardener), with a season of eight orchards, stars, an almanac and a Daily Orchard.",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\""
+  },
+  "author": "Agun Wijaya",
+  "license": "MIT"
+}

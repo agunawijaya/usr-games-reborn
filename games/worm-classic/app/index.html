@@ -1,0 +1,4119 @@
+<!DOCTYPE html>
+<html lang="en" class="is-starting">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Orchard Crawl</title>
+  <script>
+    // The appearance from the very first paint. In the Hall its frame already carries the Hall's
+    // colour scheme (light or dark); on its own, the system's. The Hall's greeting confirms it
+    // later (src/hall.mjs), and the page's colour scheme matching the frame's keeps the frame see-
+    // through while the title card shows.
+    (() => {
+      let scheme = null;
+      try {
+        const frame = window.frameElement;
+        if (frame) scheme = getComputedStyle(frame).colorScheme;
+      } catch (_) {
+        // A frame from another origin: fall back to the system's choice below.
+      }
+      if (scheme !== 'light' && scheme !== 'dark') {
+        scheme = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.appearance = scheme;
+    })();
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* The port's gallery frame, light as it was built; the dark one (added in the collection) is
+       an evening version of the same paper, not an inversion of it. */
+    :root {
+      --page-bg: #f7f4ee;
+      --page-bg-2: #efeae0;
+      --ink: #2a2a2e;
+      --ink-soft: #5f5f67;
+      --ink-faint: #8a8990;
+      --card: #ffffff;
+      --card-border: #e0dcd2;
+      --accent: #2a2a2e;
+      --accent-ink: #ffffff;
+      --good: #0a7a3e;
+      --bad: #b3261e;
+      --gold: #a86a00;
+      --focus: #1b5fd0;
+      --scrim: rgba(247, 244, 238, 0.84);
+      --shadow: rgba(0, 0, 0, 0.20);
+      color-scheme: light;
+    }
+    :root[data-appearance="dark"] {
+      --page-bg: #1d1b17;
+      --page-bg-2: #12110e;
+      --ink: #efe9dc;
+      --ink-soft: #bdb5a6;
+      --ink-faint: #8f887b;
+      --card: #2a2722;
+      --card-border: #45403a;
+      --accent: #e9dfc8;
+      --accent-ink: #1d1b17;
+      --good: #6fd39a;
+      --bad: #ff9a8f;
+      --gold: #f2c060;
+      --focus: #8ab4ff;
+      --scrim: rgba(18, 17, 14, 0.82);
+      --shadow: rgba(0, 0, 0, 0.55);
+      color-scheme: dark;
+    }
+
+    /* Until the desk is ready (src/desk.mjs), only a title card with a progress bar shows: no
+       flash of the field and its old HUD before the game menu, and no page of light paper in a
+       dark Hall (the frame's own background, the Hall's, shows round the card). */
+    :root.is-starting, :root.is-starting body { background: transparent; }
+    :root.is-starting body > * { visibility: hidden; }
+    .loading { display: none; }
+    :root.is-starting body > .loading {
+      visibility: visible;
+      position: fixed; inset: 0;
+      display: grid; place-content: center; justify-items: center; gap: 10px;
+    }
+    .loading-card {
+      display: grid; justify-items: center; gap: 10px;
+      padding: 26px 38px 24px; border-radius: 16px;
+      background: var(--card); color: var(--ink);
+      box-shadow: 0 0 0 1.5px var(--card-border), 0 24px 48px -26px var(--shadow);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+    .loading-title { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; }
+    .loading-note { font-size: 14px; color: var(--ink-soft); }
+    .loading-bar {
+      width: 220px; height: 6px; border-radius: 99px; overflow: hidden; background: var(--page-bg-2);
+    }
+    .loading-bar i {
+      display: block; height: 100%; width: 12%; border-radius: inherit;
+      background: linear-gradient(90deg, #5f9e2f, #8cc152, #5f9e2f);
+      background-size: 200% 100%;
+      transition: width 0.25s ease-out;
+      animation: loading-shimmer 1.1s linear infinite;
+    }
+    @keyframes loading-shimmer { to { background-position: -200% 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .loading-bar i { animation: none; transition: none; }
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 0%, var(--page-bg) 0%, var(--page-bg-2) 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 20px; gap: 8px; min-height: 100vh; overflow-y: auto;
+    }
+
+    .header { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .title {
+      font-family: 'JetBrains Mono', 'Fira Code', SF Mono, Monaco, Consolas, monospace;
+      font-size: 11px; letter-spacing: 0.28em;
+      color: var(--ink-soft); text-transform: uppercase;
+    }
+    .subtitle {
+      font-size: 19px; font-weight: 300; letter-spacing: -0.01em; color: var(--ink);
+      min-height: 28px; line-height: 28px; padding: 0 14px; border-radius: 999px;
+    }
+
+    /* The field and, beside it during a crawl, the orchard's ledger (src/desk.css). The canvas
+       keeps the port's 3:2 field and grows to whatever height the window leaves it. */
+    .stage {
+      display: flex; align-items: flex-start; justify-content: center; gap: 20px;
+      width: 100%; margin-top: 2px;
+    }
+    .field { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+    .canvas-wrap { position: relative; display: block; }
+    #c {
+      display: block;
+      width: min(calc((100vh - 112px) * 1.5), calc(100vw - 380px), 1500px);
+      min-width: min(100%, 540px);
+      aspect-ratio: 3 / 2;
+      height: auto;
+      box-shadow: 0 30px 60px -20px var(--shadow),
+                  0 12px 24px -8px rgba(0,0,0,0.10),
+                  0 0 0 1px rgba(0,0,0,0.06);
+      border-radius: 10px; background: #050a1a;
+    }
+    @media (max-width: 900px) {
+      .stage { flex-direction: column; align-items: center; }
+      #c { width: min(calc(100vw - 40px), calc((100vh - 112px) * 1.5)); min-width: 0; }
+    }
+    .game-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; pointer-events: none; opacity: 0;
+      transition: opacity 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
+      border-radius: 10px; color: white;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .game-overlay.visible { opacity: 1; }
+    .game-overlay .go-title {
+      font-size: 48px; font-weight: 300; letter-spacing: 0.15em;
+      text-shadow: 0 0 30px rgba(255,255,255,0.4), 0 4px 20px rgba(0,0,0,0.6);
+    }
+    .game-overlay .go-title.win { color: #a0f0d0; }
+    .game-overlay .go-title.dead { color: #ffa0a0; }
+    .game-overlay .go-sub {
+      font-size: 14px; letter-spacing: 0.2em; opacity: 0.85;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .game-overlay .go-instr {
+      font-size: 11px; letter-spacing: 0.28em; opacity: 0.65;
+      margin-top: 24px; text-transform: uppercase;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.35; } }
+
+    .meta-row {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; padding: 0 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; letter-spacing: 0.08em; color: var(--ink-soft); gap: 12px;
+    }
+    .meta-row .keys kbd {
+      display: inline-block; padding: 2px 6px;
+      background: var(--card); border: 1px solid var(--card-border);
+      border-bottom-width: 2px; border-radius: 4px;
+      font-family: inherit; font-size: 10px; color: var(--ink); margin: 0 1px;
+    }
+    .meta-row .stats { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+    .meta-row .stats .label { color: var(--ink-faint); }
+    .meta-row .stats .value {
+      color: var(--ink); font-weight: 700; font-size: 13px; letter-spacing: 0.1em;
+      min-width: 22px; display: inline-block;
+    }
+    .meta-row .stats .sep { color: var(--ink-faint); margin: 0 4px; }
+    .meta-row .tick {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .meta-row .tick .label { color: var(--ink-faint); }
+    .meta-row .tick .value {
+      color: var(--ink); font-weight: 700; min-width: 92px; text-align: left;
+    }
+  </style>
+  <link rel="stylesheet" href="src/desk.css">
+  <!-- Every module the desk needs, fetched at once rather than one import after another. -->
+  <link rel="modulepreload" href="src/desk.mjs">
+  <link rel="modulepreload" href="src/almanac.mjs">
+  <link rel="modulepreload" href="src/burrow.mjs">
+  <link rel="modulepreload" href="src/daily.mjs">
+  <link rel="modulepreload" href="src/hall.mjs">
+  <link rel="modulepreload" href="src/orchards.mjs">
+  <link rel="modulepreload" href="src/progress.mjs">
+  <link rel="modulepreload" href="src/sound.mjs">
+  <link rel="modulepreload" href="src/stars.mjs">
+  <link rel="modulepreload" href="src/store.mjs">
+</head>
+<body>
+  <!-- Shown from the first paint until the game menu is ready (see :root.is-starting). -->
+  <div class="loading" role="status" aria-live="polite">
+    <div class="loading-card">
+      <p class="loading-title">Orchard Crawl</p>
+      <p class="loading-note" id="loadingNote">Opening the orchard…</p>
+      <div class="loading-bar" aria-hidden="true"><i id="loadingBar"></i></div>
+    </div>
+  </div>
+  <script>
+    // How far the page has got, for the title card's bar; the desk takes it from here.
+    window.loadingAt = (fraction) => {
+      const bar = document.getElementById('loadingBar');
+      if (bar) bar.style.width = `${Math.round(Math.max(0.12, Math.min(1, fraction)) * 100)}%`;
+    };
+    // Should the menu never come (a module that failed to load), say so rather than seem to hang.
+    setTimeout(() => {
+      if (!document.documentElement.classList.contains('is-starting')) return;
+      const note = document.getElementById('loadingNote');
+      if (note) note.textContent = 'Still opening… if this lasts, reload the page.';
+    }, 8000);
+  </script>
+  <div class="header">
+    <div class="title">orchard crawl</div>
+    <div class="subtitle" id="deskSubtitle" role="status" aria-live="polite">A season in eight orchards</div>
+  </div>
+
+  <div class="stage">
+    <div class="field">
+      <div class="canvas-wrap">
+        <canvas id="c" width="900" height="600" role="img" aria-label="The orchard: a grid of numbered apples with your worm on it"></canvas>
+        <div class="game-overlay" id="gameOverlay"></div>
+        <div class="desk-report" id="deskReport" hidden></div>
+      </div>
+      <div class="meta-row">
+        <div class="keys">steer &nbsp; <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &nbsp; · &nbsp; <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div>
+        <div class="stats">
+          <span class="label">score</span><span class="value" id="scoreLabel">0</span>
+          <span class="sep">·</span>
+          <span class="label">length</span><span class="value" id="lengthLabel">5</span>
+          <span class="sep">·</span>
+          <span class="label">best</span><span class="value" id="bestLabel">0</span>
+        </div>
+        <div class="tick">
+          <span class="label">tick</span><span class="value" id="tickLabel">1.0s</span>
+        </div>
+      </div>
+    </div>
+    <aside class="desk-run" id="deskRun" aria-label="This crawl" hidden></aside>
+  </div>
+
+  <div class="desk-menu" id="deskMenu" hidden></div>
+
+  <!-- The Hall's bridge (absent when the page is opened on its own) -->
+  <script defer src="../../bridge/bridge.js"></script>
+
+  <script>
+  (() => {
+    const canvas = document.getElementById('c');
+    const fieldCtx = canvas.getContext('2d');
+    // Everything draws through `ctx`; the almanac borrows the drawing code for its portraits by
+    // pointing it at another canvas for a moment (OrchardGame.portrait).
+    let ctx = fieldCtx;
+    const scoreLabel = document.getElementById('scoreLabel');
+    const bestLabel = document.getElementById('bestLabel');
+    const lengthLabel = document.getElementById('lengthLabel');
+    const tickLabel = document.getElementById('tickLabel');
+    const gameOverlay = document.getElementById('gameOverlay');
+
+    // The canvas is drawn in the port's 900×600 units and holds as many pixels as it is shown
+    // with, so it stays sharp in a large window. The board (W×H, 30 units a cell) is the port's
+    // 30 by 20 unless a challenge asks for a smaller one, which is drawn scaled up to fit.
+    const VIEW_W = 900;
+    const VIEW_H = 600;
+    let W = VIEW_W;
+    let H = VIEW_H;
+    let backing = 1;
+    function fitBacking() {
+      const shown = canvas.getBoundingClientRect().width || VIEW_W;
+      const next = Math.max(1, Math.min(3, Math.round((shown * (window.devicePixelRatio || 1) / VIEW_W) * 4) / 4));
+      if (next === backing && canvas.width === Math.round(VIEW_W * next)) return;
+      backing = next;
+      canvas.width = Math.round(VIEW_W * backing);
+      canvas.height = Math.round(VIEW_H * backing);
+      invalidateStaticLayer();
+    }
+
+    // ================= GRID =================
+    const GRID = {
+      cellSize: 30,
+      cols: 30,     // 30 * 30 = 900
+      rows: 20,     // 20 * 30 = 600
+    };
+
+    // ================= THE DESK'S HOOKS =================
+    // The orchard desk (src/desk.mjs) starts each crawl with an orchard's rules and, for the
+    // Daily Orchard, seeded draws; it listens to what happens. Opened without the desk, the game
+    // plays as the port always did.
+    //
+    // The draws come from three streams, so the apples' numbers do not shift when a placement has
+    // to be drawn again: `value` for the numbers, `place` for where things appear, `creature` for
+    // when and how the creatures come and go.
+    let draw = { value: Math.random, place: Math.random, creature: Math.random };
+    let paused = false;
+    let reducedMotion = false;
+    const listeners = [];
+    const emit = (event) => { for (const listen of listeners) listen(event); };
+    const controlled = () => listeners.length > 0;
+    // The game's own clock: it stands still while paused, so every timer in the orchard (rot,
+    // frog, bird, wasps, gardener, rival) waits with it.
+    let clock = 0;
+    // The burrow (added in the collection): once the orchard's harvest is in, a burrow opens and
+    // crawling into it ends the crawl. Null while closed.
+    let burrow = null;
+    let burrowTimer = 0;
+
+    // ================= FENCE (static internal obstacles) =================
+    // Fence cells are deadly to player, rival, and gardener. Wasp and bird
+    // are airborne — unaffected. Apple/frog/rival spawns skip fence cells.
+    // Layouts are static, rebuilt on game start / restart / picker change.
+    function makeFenceH(cx, cy, hw, hh) {
+      const cells = [];
+      for (let y = cy - hh; y <= cy + hh; y++) {
+        cells.push({ x: cx - hw, y }); cells.push({ x: cx + hw, y });
+      }
+      for (let x = cx - hw + 1; x <= cx + hw - 1; x++) cells.push({ x, y: cy });
+      return cells;
+    }
+    function makeFenceCross(cx, cy, arm) {
+      const cells = [];
+      for (let y = cy - arm; y <= cy + arm; y++) cells.push({ x: cx, y });
+      for (let x = cx - arm; x <= cx + arm; x++) {
+        if (x !== cx) cells.push({ x, y: cy });
+      }
+      return cells;
+    }
+    function makeFenceBox(x0, y0, x1, y1, openings) {
+      const cells = [];
+      for (let x = x0; x <= x1; x++) { cells.push({ x, y: y0 }); cells.push({ x, y: y1 }); }
+      for (let y = y0 + 1; y <= y1 - 1; y++) { cells.push({ x: x0, y }); cells.push({ x: x1, y }); }
+      return cells.filter(c => !openings.some(o => o.x === c.x && o.y === c.y));
+    }
+    function makeFenceCorridors(topY, bottomY, x0, x1, gap) {
+      const cells = [];
+      for (let x = x0; x <= x1; x++) {
+        if (x < gap.x0 || x > gap.x1) {
+          cells.push({ x, y: topY });
+          cells.push({ x, y: bottomY });
+        }
+      }
+      return cells;
+    }
+    const FENCE_LAYOUTS = {
+      none:      { label: 'None',      build: () => [] },
+      h:         { label: 'H',         build: () => makeFenceH(15, 10, 3, 3) },
+      hh:        { label: 'HH',        build: () => [
+                     ...makeFenceH(11, 10, 2, 3),
+                     ...makeFenceH(19, 10, 2, 3),
+                   ] },
+      cross:     { label: '+',         build: () => makeFenceCross(15, 10, 3) },
+      box:       { label: '□',         build: () => makeFenceBox(11, 7, 19, 13, [
+                     { x: 15, y: 7 }, { x: 15, y: 13 },
+                     { x: 11, y: 10 }, { x: 19, y: 10 },
+                   ]) },
+      corridors: { label: '≡',         build: () => makeFenceCorridors(
+                     5, 14, 2, 27, { x0: 13, x1: 16 }
+                   ) },
+    };
+    let fences = [];      // array of {x, y} cells
+    const fenceLookup = new Set();   // "x,y" keys for O(1) contains
+    function rebuildFences() {
+      const layout = FENCE_LAYOUTS[settings.fence] || FENCE_LAYOUTS.none;
+      const cells = settings.fenceCells || layout.build();
+      fences = cells.filter(c =>
+        c.x >= 0 && c.x < GRID.cols && c.y >= 0 && c.y < GRID.rows
+      );
+      fenceLookup.clear();
+      for (const c of fences) fenceLookup.add(c.x + ',' + c.y);
+    }
+    function isCellFence(x, y) {
+      return fenceLookup.has(x + ',' + y);
+    }
+
+    // Wooden post-and-rail visual — warm brown across all themes.
+    // Each fence cell is drawn as a stylized wood post with vertical grain,
+    // top-lit and shadowed below. Adjacent cells' seams are softened by
+    // rounded caps and slight overlap.
+    function renderFences() {
+      if (fences.length === 0) return;
+      if (settings.fenceStyle === 'hedge') return renderHedgeCells();
+      const cs = GRID.cellSize;
+      const inset = cs * 0.10;
+
+      ctx.save();
+      ctx.shadowBlur = 0;
+
+      for (const c of fences) {
+        const x = c.x * cs + inset;
+        const y = c.y * cs + inset;
+        const w = cs - inset * 2;
+        const h = cs - inset * 2;
+
+        // Base wood — dark brown
+        ctx.fillStyle = '#5a3a1e';
+        ctx.fillRect(x, y, w, h);
+
+        // Wood grain — medium brown vertical stripes
+        ctx.fillStyle = '#7a4e28';
+        ctx.fillRect(x + w * 0.15, y, w * 0.14, h);
+        ctx.fillRect(x + w * 0.50, y, w * 0.10, h);
+        ctx.fillRect(x + w * 0.75, y, w * 0.14, h);
+
+        // Top highlight — warm light on the upper edge
+        ctx.fillStyle = 'rgba(255,200,140,0.35)';
+        ctx.fillRect(x, y, w, h * 0.16);
+
+        // Bottom shadow — depth
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.fillRect(x, y + h * 0.85, w, h * 0.15);
+
+        // Left/right edge shading
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(x, y, w * 0.10, h);
+        ctx.fillRect(x + w * 0.90, y, w * 0.10, h);
+
+        // Nail heads — two small dark dots on the upper third
+        ctx.fillStyle = '#2a1a08';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.30, y + h * 0.22, cs * 0.04, 0, Math.PI * 2);
+        ctx.arc(x + w * 0.70, y + h * 0.22, cs * 0.04, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    /**
+     * A hedge where a challenge walls off most of the orchard (added in the collection): one
+     * dark-green mass with a lighter top edge, rather than hundreds of wooden posts.
+     */
+    function renderHedgeCells() {
+      const cs = GRID.cellSize;
+      ctx.save();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#1c3818';
+      for (const c of fences) ctx.fillRect(c.x * cs, c.y * cs, cs, cs);
+      // Leaves: a few lighter dots per cell, the same every frame.
+      ctx.fillStyle = '#2f5726';
+      for (const c of fences) {
+        for (let i = 0; i < 3; i++) {
+          const lx = c.x * cs + ((c.x * 7 + c.y * 13 + i * 11) % 24) + 3;
+          const ly = c.y * cs + ((c.x * 5 + c.y * 3 + i * 17) % 24) + 3;
+          ctx.beginPath();
+          ctx.arc(lx, ly, cs * 0.12, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      // A sunlit edge wherever the hedge meets open ground above it.
+      const isHedge = (x, y) => fenceLookup.has(x + ',' + y);
+      ctx.fillStyle = 'rgba(160, 210, 120, 0.55)';
+      for (const c of fences) {
+        if (c.y > 0 && !isHedge(c.x, c.y - 1)) ctx.fillRect(c.x * cs, c.y * cs, cs, 3);
+      }
+      ctx.restore();
+    }
+
+    // ================= SETTINGS =================
+    // The port kept its pickers' choices in localStorage; in the collection the desk owns them
+    // (an orchard's rules, or the free orchard's choices) and hands them over with each crawl.
+    // These are the port's defaults.
+    const PORT_SETTINGS = {
+      speed: 'progressive',
+      fence: 'none',
+      mode: 'pure',              // 'pure' (single apple, BSD) | 'wild' (multi-apple + bonuses)
+      enemyBird: false,
+      enemyWasps: false,
+      enemyRival: false,
+      enemyGardener: false,
+      // Added in the collection: how many apples make the harvest that opens the burrow
+      // (none: the burrow never opens, as in the port) and how to find a spot for it.
+      harvest: Infinity,
+      placeBurrow: () => null,
+      // Added for the challenges (src/challenges.mjs); none of them changes the port's play.
+      board: null,            // { cols, rows }: a smaller board
+      fenceCells: null,       // [{ x, y }]: fences cell by cell, in place of a layout
+      start: null,            // { x, y, length }: where the worm starts, heading right
+      poolSize: null,         // apples on the board at once (Pure 1, Wild 10)
+      initialValues: null,    // the numbers of the first apples, in order
+      appleValue: null,       // (random) => the number of a new apple
+      respawn: 'always',      // 'never': an eaten apple does not come back
+      keepStolen: false,      // an apple the bird takes comes back with the same number
+      maxStraight: Infinity,  // the most moves in a row in one direction
+      turns: 'any',           // 'right': only clockwise turns
+      burrowAt: null,         // { x, y }: a burrow open from the start
+      fenceStyle: 'wood',     // 'hedge': fences drawn as a clipped hedge, for walls of many cells
+      evenApples: false,      // every apple drawn large, whatever its number
+    };
+    const settings = { ...PORT_SETTINGS };
+
+    // ================= WILD MODE CONSTANTS =================
+    const APPLE_POOL_SIZE = 10;      // Wild mode: apples on grid at once
+    const APPLE_RIPE_MS = 20000;      // Wild mode: 20s before apple rots
+    const APPLE_RESPAWN_MS = 2500;    // Wild mode: 2.5s delay between eat and new spawn
+
+    const FROG_SPAWN_MIN_MS = 30000;
+    const FROG_SPAWN_MAX_MS = 45000;
+    const FROG_LIFESPAN_MS = 14000;
+    // Frog jump cycle (state machine: sit → crouch → airborne → land → sit)
+    const FROG_SIT_MIN_MS = 2500;          // sits still 2.5-4s between jumps
+    const FROG_SIT_MAX_MS = 4000;
+    const FROG_CROUCH_MS = 220;             // pre-jump wind-up (body squishes)
+    const FROG_JUMP_MS = 460;               // airborne phase (body stretches)
+    const FROG_LAND_MS = 160;               // landing impact absorb
+    const FROG_JUMP_HEIGHT_CELLS = 0.75;    // parabolic peak height (relative to cellSize)
+    const FROG_SCORE = 50;
+
+    // ================= GAME STATE =================
+    const game = {
+      // 'menu' (the desk is open, the orchard idles behind it) | 'playing' | 'burrowing' (sliding
+      // into the burrow, out of every creature's reach) | 'home' | 'dead' | 'won'
+      state: 'menu',
+      score: 0,
+      // The best the line under the field shows: the desk's record for this orchard.
+      bestScore: 0,
+      overOffTime: 0,
+      canRestart: false,
+      // Added in the collection: apples the worm has eaten this crawl (the harvest) and the
+      // largest single bite.
+      harvested: 0,
+      bestBite: 0,
+    };
+
+    // ================= WORM =================
+    const worm = {
+      segments: [],                    // array of {x, y} grid cells; index 0 = head
+      direction: {dx: 1, dy: 0},       // current move direction
+      directionQueue: [],              // Nokia-snake input buffer (max 2)
+      growing: 0,                       // pending growth (BSD spec: tail stays N ticks after eat)
+      tickInterval: 1000,               // ms between ticks; set by speed setting
+      tickTimer: 0,                     // ms accumulator
+      interpolation: 0,                 // 0..1 through current tick (for smooth render)
+    };
+
+    function initWorm() {
+      worm.segments = [];
+      const startLen = settings.start ? settings.start.length : 5;
+      let startX = settings.start ? settings.start.x : 5;
+      let startY = settings.start ? settings.start.y : Math.floor(GRID.rows / 2);
+      // If fence overlaps the default start cells, fall back to scanning
+      // for a clear horizontal strip.
+      const stripClear = (sx, sy) => {
+        // Body cells
+        for (let i = 0; i < startLen; i++) {
+          if (isCellFence(sx - i, sy)) return false;
+        }
+        // Runway ahead — 3 cells so worm has time to react before first fence
+        for (let i = 1; i <= 3; i++) {
+          if (sx + i >= GRID.cols) return false;
+          if (isCellFence(sx + i, sy)) return false;
+        }
+        return true;
+      };
+      if (!settings.start && !stripClear(startX, startY)) {
+        outer:
+        for (const yOff of [0, -1, 1, -2, 2, -3, 3, -4, 4]) {
+          const y = startY + yOff;
+          if (y < 1 || y >= GRID.rows - 1) continue;
+          for (let sx = startLen; sx < GRID.cols - 1; sx++) {
+            if (stripClear(sx, y)) { startX = sx; startY = y; break outer; }
+          }
+        }
+      }
+      for (let i = 0; i < startLen; i++) {
+        worm.segments.push({ x: startX - i, y: startY });
+      }
+      worm.direction = { dx: 1, dy: 0 };
+      worm.directionQueue = [];
+      worm.growing = 0;
+      worm.tickTimer = 0;
+      worm.interpolation = 0;
+    }
+
+    // ================= APPLES (numbered 1-9) =================
+    // Unified array-based structure: length 1 in Pure mode, ~APPLE_POOL_SIZE in Wild.
+    // Each apple: { x, y, value, spin, bob, spawnTime, state:'ripe'|'rotten' }
+    const apples = [];
+    const pendingApples = [];   // Wild mode only: {spawnAt} entries waiting to spawn
+
+    function occupiedCells() {
+      const s = new Set(worm.segments.map(s => `${s.x},${s.y}`));
+      for (const a of apples) s.add(`${a.x},${a.y}`);
+      if (frog.active) s.add(`${frog.x},${frog.y}`);
+      if (rival.active) for (const r of rival.segments) s.add(`${r.x},${r.y}`);
+      for (const f of fences) s.add(`${f.x},${f.y}`);
+      if (burrow) s.add(`${burrow.x},${burrow.y}`);
+      return s;
+    }
+
+    /** A new apple, of `value` if given; null when the board has no free cell left. */
+    function newApple(value) {
+      const occupied = occupiedCells();
+      let x, y, attempts = 0;
+      if (value === undefined) value = settings.appleValue ? settings.appleValue(draw.value) : 1 + Math.floor(draw.value() * 9);
+      do {
+        x = Math.floor(draw.place() * GRID.cols);
+        y = Math.floor(draw.place() * GRID.rows);
+        attempts++;
+      } while (occupied.has(`${x},${y}`) && attempts < 200);
+      if (occupied.has(`${x},${y}`)) {
+        // A nearly full board: the port drew 200 times and could land on the worm; now the
+        // apple goes to one of the cells that are really free.
+        const free = [];
+        for (let fy = 0; fy < GRID.rows; fy++) {
+          for (let fx = 0; fx < GRID.cols; fx++) if (!occupied.has(`${fx},${fy}`)) free.push({ x: fx, y: fy });
+        }
+        if (!free.length) return null;
+        ({ x, y } = free[Math.floor(draw.place() * free.length)]);
+      }
+      return {
+        x, y,
+        value,
+        spin: 0,
+        bob: Math.random() * Math.PI * 2,
+        spawnTime: clock,
+        state: 'ripe',
+      };
+    }
+
+    function initApples() {
+      apples.length = 0;
+      pendingApples.length = 0;
+      const target = settings.poolSize ?? (settings.mode === 'wild' ? APPLE_POOL_SIZE : 1);
+      for (let i = 0; i < target; i++) {
+        const apple = newApple(settings.initialValues ? settings.initialValues[i] : undefined);
+        if (apple) apples.push(apple);
+      }
+    }
+
+    /** `value`: an apple that must come back as it was (one the bird took, in some challenges). */
+    function respawnAfterEat(value) {
+      if (settings.respawn === 'never' && value === undefined) return;
+      if (settings.mode === 'wild') {
+        pendingApples.push({ spawnAt: clock + APPLE_RESPAWN_MS, value });
+      } else {
+        const apple = newApple(value);   // Pure: instant respawn (BSD spec)
+        if (apple) apples.push(apple);
+      }
+    }
+
+    function updateApplesLifecycle(now) {
+      if (settings.mode !== 'wild') return;
+
+      // BALANCE: at most ONE rotten apple + ONE wasp in the world at a time.
+      // Multi-wasp swarms proved unwinnable in playtest; sequential single
+      // threats keep the tension high but the game beatable.
+      const hasActiveWasp   = wasps.length > 0;
+      const hasRottenApple  = apples.some(a => a.state === 'rotten');
+
+      // ---- Rot transition: only ONE apple at a time ----
+      // Pick the oldest ripe apple that has aged past its ripening time (timing.ripeMs).
+      // Skip if there's already a rotten apple or an active wasp.
+      if (!hasActiveWasp && !hasRottenApple) {
+        let oldest = null;
+        for (const a of apples) {
+          if (a.state === 'ripe' && (now - a.spawnTime > timing.ripeMs)) {
+            if (!oldest || a.spawnTime < oldest.spawnTime) oldest = a;
+          }
+        }
+        if (oldest) {
+          oldest.state = 'rotten';
+          oldest.rottenTime = now;
+          emit({ type: 'rotted', value: oldest.value });
+        }
+      }
+
+      // ---- Wasp emergence: a rotten apple left timing.hatchMs more ----
+      for (let i = apples.length - 1; i >= 0; i--) {
+        const a = apples[i];
+        if (settings.enemyWasps && a.state === 'rotten' &&
+            a.rottenTime && (now - a.rottenTime > timing.hatchMs)) {
+          spawnWasp(a.x, a.y, now);
+          spawnWaspEmergeBurst(a.x, a.y);
+          emit({ type: 'wasp-hatched', value: a.value });
+          apples.splice(i, 1);
+          respawnAfterEat();
+          break;   // one spawn per frame max (defensive)
+        }
+      }
+
+      // ---- Delayed apple respawn ----
+      for (let i = pendingApples.length - 1; i >= 0; i--) {
+        if (pendingApples[i].spawnAt <= now) {
+          const apple = newApple(pendingApples[i].value);
+          if (apple) apples.push(apple);
+          pendingApples.splice(i, 1);
+        }
+      }
+    }
+
+    // ================= FROG BONUS (Wild mode) =================
+    // State machine: 'sitting' → 'crouching' → 'airborne' → 'landing' → 'sitting'
+    // Sits still 2.5-4s between jumps (intermittent leaping, not continuous hop).
+    // Body deforms with squash-and-stretch during the jump cycle.
+    const frog = {
+      active: false,
+      x: 0, y: 0,                    // current cell (logical)
+      fromX: 0, fromY: 0,             // previous cell (for jump interpolation)
+      targetX: 0, targetY: 0,         // planned next cell (during crouch/airborne)
+      state: 'sitting',               // 'sitting' | 'crouching' | 'airborne' | 'landing'
+      stateStart: 0,                  // ms when current state began
+      sittingDuration: 3000,          // randomized 2.5-4s per sit
+      spawnTime: 0,
+      nextSpawnAt: 0,
+    };
+
+    function scheduleNextFrog(now, first = false) {
+      const [min, max] = first ? timing.frogFirst : timing.frogEvery;
+      frog.nextSpawnAt = now + min + draw.creature() * (max - min);
+    }
+
+    function spawnFrog(now) {
+      const occupied = occupiedCells();
+      let x, y, attempts = 0;
+      do {
+        x = Math.floor(draw.place() * GRID.cols);
+        y = Math.floor(draw.place() * GRID.rows);
+        attempts++;
+      } while (occupied.has(`${x},${y}`) && attempts < 100);
+      frog.x = x; frog.y = y;
+      frog.fromX = x; frog.fromY = y;
+      frog.targetX = x; frog.targetY = y;
+      frog.state = 'sitting';
+      frog.stateStart = now;
+      frog.sittingDuration = FROG_SIT_MIN_MS + draw.creature() * (FROG_SIT_MAX_MS - FROG_SIT_MIN_MS);
+      frog.spawnTime = now;
+      frog.active = true;
+      emit({ type: 'frog-arrived' });
+    }
+
+    function despawnFrog(now) {
+      frog.active = false;
+      scheduleNextFrog(now);
+    }
+
+    function pickFrogTarget() {
+      // Frog can jump 1-2 cells in any of 8 directions
+      const dirs = [
+        [1,0],[-1,0],[0,1],[0,-1],
+        [1,1],[1,-1],[-1,1],[-1,-1],
+        [2,0],[-2,0],[0,2],[0,-2],     // occasional longer hop
+      ];
+      const occupied = occupiedCells();
+      occupied.delete(`${frog.x},${frog.y}`);
+      const shuffled = dirs.slice().sort(() => draw.creature() - 0.5);
+      for (const [dx, dy] of shuffled) {
+        const nx = frog.x + dx, ny = frog.y + dy;
+        if (nx < 0 || nx >= GRID.cols || ny < 0 || ny >= GRID.rows) continue;
+        if (occupied.has(`${nx},${ny}`)) continue;
+        frog.targetX = nx;
+        frog.targetY = ny;
+        return true;
+      }
+      return false;   // no valid target
+    }
+
+    function updateFrog(now) {
+      if (settings.mode !== 'wild' || game.state !== 'playing') {
+        return;
+      }
+      if (!frog.active) {
+        if (now >= frog.nextSpawnAt) spawnFrog(now);
+        return;
+      }
+      if (now - frog.spawnTime > FROG_LIFESPAN_MS) {
+        despawnFrog(now);
+        return;
+      }
+
+      const age = now - frog.stateStart;
+      switch (frog.state) {
+        case 'sitting':
+          if (age >= frog.sittingDuration) {
+            if (pickFrogTarget()) {
+              frog.state = 'crouching';
+              frog.stateStart = now;
+            } else {
+              // No valid target — keep sitting, reset timer
+              frog.stateStart = now;
+              frog.sittingDuration = FROG_SIT_MIN_MS + draw.creature() * (FROG_SIT_MAX_MS - FROG_SIT_MIN_MS);
+            }
+          }
+          break;
+        case 'crouching':
+          if (age >= FROG_CROUCH_MS) {
+            frog.state = 'airborne';
+            frog.stateStart = now;
+            frog.fromX = frog.x;
+            frog.fromY = frog.y;
+            frog.x = frog.targetX;
+            frog.y = frog.targetY;
+          }
+          break;
+        case 'airborne':
+          if (age >= FROG_JUMP_MS) {
+            frog.state = 'landing';
+            frog.stateStart = now;
+          }
+          break;
+        case 'landing':
+          if (age >= FROG_LAND_MS) {
+            frog.state = 'sitting';
+            frog.stateStart = now;
+            frog.sittingDuration = FROG_SIT_MIN_MS + draw.creature() * (FROG_SIT_MAX_MS - FROG_SIT_MIN_MS);
+          }
+          break;
+      }
+    }
+
+    // ================= BIRD ENEMY (Phase 1) =================
+    // Thief — flies onto the grid, races the player to the highest-value apple,
+    // grabs it if fast enough (or gives up after 8s), and flies off. Non-lethal:
+    // does not collide with the player. Only its shadow projects to the ground.
+    const BIRD_SPAWN_MIN_MS = 15000;
+    const BIRD_SPAWN_MAX_MS = 25000;
+    const BIRD_APPROACH_TIMEOUT_MS = 8000;
+    const BIRD_SPEED_PX_PER_SEC = 210;
+    const BIRD_RETREAT_SPEED = 320;
+
+    const bird = {
+      active: false,
+      state: 'inactive',    // 'inactive' | 'approach' | 'grab' | 'retreat'
+      x: 0, y: 0,            // pixel coords (aerial layer)
+      vx: 0, vy: 0,          // computed per frame for orientation
+      altitude: 0.85,        // 0 = on ground, 1 = high
+      // The apple it is after. The port kept its place in the apple list, which pointed at
+      // another apple whenever one before it was eaten.
+      target: null,
+      stateStart: 0,
+      wingPhase: 0,
+      nextSpawnAt: 0,
+    };
+
+    function scheduleNextBird(now, first = false) {
+      const [min, max] = first ? timing.birdFirst : timing.birdEvery;
+      bird.nextSpawnAt = now + min + draw.creature() * (max - min);
+    }
+
+    function findRipeHighestApple() {
+      let best = -1, bestVal = 0;
+      for (let i = 0; i < apples.length; i++) {
+        const a = apples[i];
+        if (a.state === 'ripe' && a.value > bestVal) {
+          bestVal = a.value;
+          best = i;
+        }
+      }
+      return best;
+    }
+
+    function spawnBird(now) {
+      const idx = findRipeHighestApple();
+      if (idx < 0) { scheduleNextBird(now); return; }
+      const a = apples[idx];
+      const targetX = (a.x + 0.5) * GRID.cellSize;
+      // Enter from side opposite the target so it flies across the map
+      const fromLeft = targetX > W * 0.5;
+      bird.x = fromLeft ? -60 : W + 60;
+      bird.y = 60 + draw.creature() * (H * 0.55);
+      bird.altitude = 0.85;
+      bird.target = a;
+      bird.state = 'approach';
+      bird.stateStart = now;
+      bird.active = true;
+      bird.wingPhase = 0;
+      emit({ type: 'bird-arrived' });
+    }
+
+    function updateBird(dt, now) {
+      if (!settings.enemyBird || settings.mode !== 'wild' || game.state !== 'playing') {
+        if (bird.active && (settings.mode !== 'wild' || !settings.enemyBird)) {
+          bird.active = false;
+        }
+        return;
+      }
+      if (!bird.active) {
+        if (now >= bird.nextSpawnAt) spawnBird(now);
+        return;
+      }
+
+      const dtSec = dt / 1000;
+      bird.wingPhase += dt * 0.007;
+      const prevX = bird.x, prevY = bird.y;
+
+      switch (bird.state) {
+        case 'approach': {
+          // Target may have been eaten by player — retreat if so
+          if (!apples.includes(bird.target)) {
+            bird.state = 'retreat';
+            bird.stateStart = now;
+            bird.target = null;
+            break;
+          }
+          const a = bird.target;
+          const targetX = (a.x + 0.5) * GRID.cellSize;
+          const targetY = (a.y + 0.5) * GRID.cellSize - bird.altitude * 55;
+          const dx = targetX - bird.x, dy = targetY - bird.y;
+          const d = Math.hypot(dx, dy);
+          const speed = BIRD_SPEED_PX_PER_SEC;
+          if (d < Math.max(4, speed * dtSec * 0.6)) {
+            bird.state = 'grab';
+            bird.stateStart = now;
+          } else {
+            bird.x += (dx / d) * speed * dtSec;
+            bird.y += (dy / d) * speed * dtSec;
+            bird.altitude = Math.max(0.30, bird.altitude - 0.00035 * dt);
+          }
+          // Timeout: give up if too long
+          if (now - bird.stateStart > BIRD_APPROACH_TIMEOUT_MS) {
+            bird.state = 'retreat';
+            bird.stateStart = now;
+          }
+          break;
+        }
+        case 'grab': {
+          // Snatch the apple (if still present) and retreat
+          const at = apples.indexOf(bird.target);
+          if (at >= 0) {
+            const a = apples[at];
+            spawnBirdGrabBurst(a.x, a.y);
+            apples.splice(at, 1);
+            respawnAfterEat(settings.keepStolen ? a.value : undefined);   // 2.5s delayed respawn (Wild) — same pipeline
+            emit({ type: 'bird-stole', value: a.value });
+          }
+          bird.target = null;
+          bird.state = 'retreat';
+          bird.stateStart = now;
+          break;
+        }
+        case 'retreat': {
+          const outX = bird.x < W * 0.5 ? -200 : W + 200;
+          const outY = -100;
+          const dx = outX - bird.x, dy = outY - bird.y;
+          const d = Math.hypot(dx, dy) || 1;
+          bird.x += (dx / d) * BIRD_RETREAT_SPEED * dtSec;
+          bird.y += (dy / d) * BIRD_RETREAT_SPEED * dtSec;
+          bird.altitude = Math.min(0.95, bird.altitude + 0.001 * dt);
+          if (bird.x < -180 || bird.x > W + 180 || bird.y < -180) {
+            bird.active = false;
+            scheduleNextBird(now);
+          }
+          break;
+        }
+      }
+
+      // Compute velocity for orientation
+      bird.vx = bird.x - prevX;
+      bird.vy = bird.y - prevY;
+    }
+
+    function renderBird(now) {
+      if (!bird.active) return;
+      const cellSize = GRID.cellSize;
+
+      // Shadow projected on ground plane
+      const shadowX = bird.x;
+      const shadowY = bird.y + bird.altitude * 55;
+      const shadowScale = 0.5 + bird.altitude * 1.2;
+      const shadowAlpha = 0.18 + (1 - bird.altitude) * 0.45;
+      const grad = ctx.createRadialGradient(shadowX, shadowY, 0, shadowX, shadowY, 22 * shadowScale);
+      grad.addColorStop(0, `rgba(0,0,0,${shadowAlpha})`);
+      grad.addColorStop(0.7, `rgba(0,0,0,${shadowAlpha * 0.3})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(shadowX, shadowY, 22 * shadowScale, 11 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bird sprite (small, cute passerine)
+      const heading = Math.atan2(bird.vy || 0, bird.vx || (bird.x < W/2 ? 1 : -1));
+      // Half as big again as the port drew it (in the collection): at the port's size the thief was hard
+      // to pick out among the apples, and it is the one creature you have to race.
+      const scale = (0.9 + (1 - bird.altitude) * 0.3) * 1.5;
+
+      ctx.save();
+      ctx.translate(bird.x, bird.y);
+      ctx.rotate(heading);
+      ctx.scale(scale, scale);
+
+      // Wing flap
+      const wingF = Math.sin(bird.wingPhase * 8);
+      const wingAngle = wingF * 0.7;
+
+      // Body — brown / warm
+      const bodyGrad = ctx.createRadialGradient(-2, -2, 1, 0, 0, 10);
+      bodyGrad.addColorStop(0, '#a67242');
+      bodyGrad.addColorStop(1, '#5a3820');
+      ctx.fillStyle = bodyGrad;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(90,50,20,0.6)';
+
+      // Left wing
+      ctx.save();
+      ctx.rotate(-wingAngle);
+      ctx.beginPath();
+      ctx.moveTo(-1, -3);
+      ctx.quadraticCurveTo(-10, -14, -3, -16);
+      ctx.quadraticCurveTo(2, -12, 3, -5);
+      ctx.closePath();
+      ctx.fill();
+      // Wing tips (darker feather ends)
+      ctx.fillStyle = '#3a2410';
+      ctx.beginPath();
+      ctx.arc(-4, -15, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Right wing
+      ctx.save();
+      ctx.rotate(wingAngle);
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.moveTo(-1, 3);
+      ctx.quadraticCurveTo(-10, 14, -3, 16);
+      ctx.quadraticCurveTo(2, 12, 3, 5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#3a2410';
+      ctx.beginPath();
+      ctx.arc(-4, 15, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Body proper
+      ctx.fillStyle = bodyGrad;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 9, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly (lighter)
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#d8b090';
+      ctx.beginPath();
+      ctx.ellipse(0, 1.5, 5, 2.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#5a3820';
+      ctx.beginPath();
+      ctx.arc(8, 0, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Beak (orange, pointed)
+      ctx.fillStyle = '#ff9a1a';
+      ctx.beginPath();
+      ctx.moveTo(10.5, -1);
+      ctx.lineTo(14, 0);
+      ctx.lineTo(10.5, 1);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(9, -0.8, 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.beginPath();
+      ctx.arc(9.2, -1, 0.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tail
+      ctx.fillStyle = '#3a2410';
+      ctx.beginPath();
+      ctx.moveTo(-8, -2);
+      ctx.lineTo(-12, -3);
+      ctx.lineTo(-11, 0);
+      ctx.lineTo(-12, 3);
+      ctx.lineTo(-8, 2);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spawnBirdGrabBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * Math.PI * 2 + Math.random() * 0.4;
+        const s = 40 + Math.random() * 80;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s, vy: Math.sin(a) * s - 40,
+          life: 400, maxLife: 400,
+          color: i % 2 === 0 ? '#a67242' : '#e8c090',
+          size: 1.5 + Math.random() * 0.8,
+        });
+      }
+    }
+
+    // ================= WASP ENEMY (Phase 2) =================
+    // Spawns from apples that ripen → rot (20s) → sit rotten another 5s.
+    // Chases player head continuously at sub-cell smooth motion. Head-touch
+    // kills the player. Multiple wasps can co-exist (scaling difficulty).
+    const WASP_ROT_TO_SPAWN_MS = 5000;
+    const WASP_EMERGE_MS = 500;
+    const WASP_SPEED_PX_PER_SEC = 82;      // slower than Classic worm (~90px/s)
+    const WASP_KILL_RADIUS = 12;            // px from head cell center
+    const WASP_LIFESPAN_MS = 30000;
+    const WASP_HOVER_AMPLITUDE = 2.5;
+    const WASP_MAX_ACTIVE = 1;              // 1 wasp at a time (playtest balance)
+
+    const wasps = [];
+
+    function spawnWasp(gx, gy, now) {
+      if (wasps.length >= WASP_MAX_ACTIVE) return;
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      wasps.push({
+        x: cx, y: cy,
+        vx: 0, vy: 0,
+        state: 'emerging',
+        stateStart: now,
+        spawnTime: now,
+        wingPhase: 0,
+        hoverPhase: draw.creature() * Math.PI * 2,
+      });
+    }
+
+    function updateWasps(dt, now) {
+      if (game.state !== 'playing') return;
+      const dtSec = dt / 1000;
+
+      for (let i = wasps.length - 1; i >= 0; i--) {
+        const w = wasps[i];
+        w.wingPhase += dt * 0.05;
+        w.hoverPhase += dt * 0.014;
+
+        // Lifespan
+        if (now - w.spawnTime > timing.waspLives) {
+          wasps.splice(i, 1);
+          emit({ type: 'wasp-gone' });
+          continue;
+        }
+
+        const stateAge = now - w.stateStart;
+        switch (w.state) {
+          case 'emerging':
+            // Rise slightly (small y offset animated by hoverPhase, no chase yet)
+            if (stateAge >= WASP_EMERGE_MS) {
+              w.state = 'chasing';
+              w.stateStart = now;
+            }
+            break;
+          case 'chasing': {
+            const head = worm.segments[0];
+            const targetX = (head.x + 0.5) * GRID.cellSize;
+            const targetY = (head.y + 0.5) * GRID.cellSize;
+            const dx = targetX - w.x, dy = targetY - w.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 0.1) {
+              const speed = WASP_SPEED_PX_PER_SEC;
+              w.vx = (dx / d) * speed;
+              w.vy = (dy / d) * speed;
+              w.x += w.vx * dtSec;
+              w.y += w.vy * dtSec;
+            }
+            // Kill check
+            if (d < WASP_KILL_RADIUS) {
+              triggerDeath('wasp');
+              return;
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    function renderWasps(now) {
+      for (const w of wasps) renderWasp(w, now);
+    }
+
+    function renderWasp(w, now) {
+      const wingFlap = Math.sin(w.wingPhase * 25);
+      const hover = Math.sin(w.hoverPhase * 8) * WASP_HOVER_AMPLITUDE;
+      const heading = Math.atan2(w.vy || 0, w.vx || 1);
+      const stateAge = now - w.stateStart;
+
+      // Emergence fade-in
+      let emergeAlpha = 1;
+      let emergeScale = 1;
+      if (w.state === 'emerging') {
+        const t = Math.min(1, stateAge / WASP_EMERGE_MS);
+        emergeAlpha = t;
+        emergeScale = 0.5 + t * 0.5;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = emergeAlpha;
+      ctx.translate(w.x, w.y + hover);
+      ctx.rotate(heading + Math.PI / 2);   // wasp sprite drawn head-up locally
+      ctx.scale(emergeScale, emergeScale);
+
+      // A little larger than the port's 5.5 (in the collection), so a lethal wasp reads at a glance.
+      const r = 7;
+
+      // ---- Wings (blurred, transparent, drawn behind body) ----
+      ctx.save();
+      ctx.globalAlpha = 0.45 * emergeAlpha;
+      ctx.fillStyle = 'rgba(240,250,255,0.85)';
+      ctx.shadowBlur = 3;
+      ctx.shadowColor = 'rgba(200,220,255,0.5)';
+      // Left wing
+      ctx.save();
+      ctx.rotate(-0.35 + wingFlap * 0.25);
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.8, -r * 0.5, r * 1.5, r * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      // Right wing
+      ctx.save();
+      ctx.rotate(0.35 - wingFlap * 0.25);
+      ctx.beginPath();
+      ctx.ellipse(r * 0.8, -r * 0.5, r * 1.5, r * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      ctx.restore();
+
+      // ---- Body (striped yellow-black) ----
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = 'rgba(80,60,10,0.7)';
+
+      // Yellow base body (top-down oval)
+      ctx.fillStyle = '#ffd028';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, r * 0.75, r * 1.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Black stripes across body (2-3 dark bands)
+      ctx.fillStyle = '#1a1a1a';
+      ctx.shadowBlur = 0;
+      // Draw as horizontal bars clipped to body shape
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(0, 0, r * 0.75, r * 1.15, 0, 0, Math.PI * 2);
+      ctx.clip();
+      for (let i = 0; i < 3; i++) {
+        const by = -r * 0.7 + i * r * 0.55;
+        ctx.fillRect(-r * 0.85, by, r * 1.7, r * 0.22);
+      }
+      ctx.restore();
+
+      // ---- Head (small dark ellipse at front) ----
+      ctx.fillStyle = '#000';
+      ctx.shadowBlur = 3;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 1.25, r * 0.55, r * 0.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Compound eyes (dark red dots)
+      ctx.fillStyle = '#c02020';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(-r * 0.28, -r * 1.35, r * 0.12, 0, Math.PI * 2);
+      ctx.arc( r * 0.28, -r * 1.35, r * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ---- Antennae ----
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 0.8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.22, -r * 1.55);
+      ctx.quadraticCurveTo(-r * 0.5, -r * 2.2, -r * 0.35, -r * 2.5);
+      ctx.moveTo( r * 0.22, -r * 1.55);
+      ctx.quadraticCurveTo( r * 0.5, -r * 2.2,  r * 0.35, -r * 2.5);
+      ctx.stroke();
+      // Antenna tips (small dots)
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(-r * 0.35, -r * 2.5, 0.8, 0, Math.PI * 2);
+      ctx.arc( r * 0.35, -r * 2.5, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ---- Stinger (small pointed tail at back) ----
+      ctx.fillStyle = '#1a1a1a';
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.18, r * 1.15);
+      ctx.lineTo(0, r * 1.55);
+      ctx.lineTo(r * 0.18, r * 1.15);
+      ctx.closePath();
+      ctx.fill();
+
+      // Subtle warning glow around wasp
+      ctx.restore();
+    }
+
+    function spawnWaspEmergeBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      // Rotten fruit "splat" + dust burst
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 40 + Math.random() * 70;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+          life: 500, maxLife: 500,
+          color: i % 2 === 0 ? '#6a4a1a' : '#ffd028',
+          size: 1.6 + Math.random() * 1,
+        });
+      }
+      // Warning shockwave
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 450, maxLife: 450,
+        ring: true, radius: 3,
+        color: '#ffd028',
+      });
+    }
+
+    // ================= GARDENER ENEMY (Phase 4) =================
+    // Rare, high-stakes ground-walker. Enters at an edge cell, greedy-chases
+    // the worm's head at ~2.5 cells/sec, retreats and fades if it doesn't
+    // catch the worm within its lifespan. Adapted from the snake port's
+    // eagle state machine, translated to grid-aligned walking.
+    const GARDENER_SPAWN_MIN_MS   = 45000;
+    const GARDENER_SPAWN_MAX_MS   = 60000;
+    const GARDENER_ARRIVE_MS      = 600;
+    const GARDENER_LEAVE_MS       = 600;
+    const GARDENER_LIFESPAN_MS    = 25000;
+    const GARDENER_MOVE_MS        = 400;     // ms per grid step (2.5 cells/sec)
+    const GARDENER_KILL_RADIUS_PX = 14;
+
+    const gardener = {
+      active: false,
+      x: 0, y: 0,                  // grid cell (current)
+      prevX: 0, prevY: 0,          // grid cell (previous, for interp)
+      stepStart: 0,                // ms of last step-start
+      state: 'arriving',
+      stateStart: 0,
+      spawnTime: 0,
+      nextSpawnAt: 0,
+      armPhase: 0,
+    };
+
+    function scheduleNextGardener(now, first = false) {
+      const [min, max] = first ? timing.gardenerFirst : timing.gardenerEvery;
+      gardener.nextSpawnAt = now + min + draw.creature() * (max - min);
+    }
+
+    function pickEdgeSpawnCell() {
+      // Spawn opposite to worm head so the arrival is telegraphed and fair.
+      const head = worm.segments[0];
+      for (let tries = 0; tries < 30; tries++) {
+        const side = draw.creature() < 0.5 ? 'horizontal' : 'vertical';
+        let gx, gy;
+        if (side === 'horizontal') {
+          gx = head.x < GRID.cols / 2 ? GRID.cols - 1 : 0;
+          gy = Math.floor(draw.creature() * GRID.rows);
+        } else {
+          gx = Math.floor(draw.creature() * GRID.cols);
+          gy = head.y < GRID.rows / 2 ? GRID.rows - 1 : 0;
+        }
+        if (!isCellFence(gx, gy)) return { x: gx, y: gy };
+      }
+      return { x: 0, y: 0 };
+    }
+
+    function spawnGardener(now) {
+      const cell = pickEdgeSpawnCell();
+      gardener.active = true;
+      gardener.x = cell.x; gardener.y = cell.y;
+      gardener.prevX = cell.x; gardener.prevY = cell.y;
+      gardener.state = 'arriving';
+      gardener.stateStart = now;
+      gardener.stepStart = now;
+      gardener.spawnTime = now;
+      gardener.armPhase = 0;
+      spawnGardenerArriveBurst(cell.x, cell.y);
+      emit({ type: 'gardener-arrived' });
+    }
+
+    function despawnGardener(now) {
+      gardener.active = false;
+      scheduleNextGardener(now);
+      emit({ type: 'gardener-left' });
+    }
+
+    function pickGardenerTarget() {
+      // Fair chase — target whichever head is nearest by Manhattan distance.
+      const pHead = worm.segments[0];
+      let target = pHead;
+      let best = Math.abs(pHead.x - gardener.x) + Math.abs(pHead.y - gardener.y);
+      if (rival.active && rival.segments.length > 0) {
+        const rHead = rival.segments[0];
+        const rDist = Math.abs(rHead.x - gardener.x) + Math.abs(rHead.y - gardener.y);
+        if (rDist < best) { target = rHead; best = rDist; }
+      }
+      return target;
+    }
+
+    function greedyStep(now) {
+      // Greedy Manhattan step toward the nearest head (player or rival).
+      // Try preferred axis first; fall back to the other axis if blocked.
+      const target = pickGardenerTarget();
+      const dx = Math.sign(target.x - gardener.x);
+      const dy = Math.sign(target.y - gardener.y);
+      const absDX = Math.abs(target.x - gardener.x);
+      const absDY = Math.abs(target.y - gardener.y);
+
+      const candidates = [];
+      if (absDX >= absDY) {
+        if (dx !== 0) candidates.push({ x: gardener.x + dx, y: gardener.y });
+        if (dy !== 0) candidates.push({ x: gardener.x, y: gardener.y + dy });
+      } else {
+        if (dy !== 0) candidates.push({ x: gardener.x, y: gardener.y + dy });
+        if (dx !== 0) candidates.push({ x: gardener.x + dx, y: gardener.y });
+      }
+
+      for (const c of candidates) {
+        if (c.x >= 0 && c.x < GRID.cols && c.y >= 0 && c.y < GRID.rows &&
+            !isCellFence(c.x, c.y)) {
+          gardener.prevX = gardener.x;
+          gardener.prevY = gardener.y;
+          gardener.x = c.x;
+          gardener.y = c.y;
+          gardener.stepStart = now;
+          return;
+        }
+      }
+      // No valid step (already on head cell); stay put.
+      gardener.stepStart = now;
+    }
+
+    function updateGardener(dt, now) {
+      if (game.state !== 'playing') return;
+      if (!settings.enemyGardener) return;
+
+      if (!gardener.active) {
+        if (now >= gardener.nextSpawnAt) spawnGardener(now);
+        return;
+      }
+
+      gardener.armPhase += dt * 0.008;
+      const stateAge = now - gardener.stateStart;
+
+      switch (gardener.state) {
+        case 'arriving':
+          if (stateAge >= GARDENER_ARRIVE_MS) {
+            gardener.state = 'stalking';
+            gardener.stateStart = now;
+            gardener.stepStart = now;
+          }
+          break;
+        case 'stalking': {
+          if (now - gardener.stepStart >= GARDENER_MOVE_MS) greedyStep(now);
+          // Kill check — pixel-distance to each head cell center. Whichever
+          // is within kill radius dies (player triggerDeath; rival killRival).
+          const t = Math.min(1, (now - gardener.stepStart) / GARDENER_MOVE_MS);
+          const gPx = (gardener.prevX + (gardener.x - gardener.prevX) * t + 0.5) * GRID.cellSize;
+          const gPy = (gardener.prevY + (gardener.y - gardener.prevY) * t + 0.5) * GRID.cellSize;
+          const pHead = worm.segments[0];
+          const pDist = Math.hypot(
+            gPx - (pHead.x + 0.5) * GRID.cellSize,
+            gPy - (pHead.y + 0.5) * GRID.cellSize
+          );
+          if (pDist < GARDENER_KILL_RADIUS_PX) {
+            triggerDeath('gardener');
+            return;
+          }
+          if (rival.active && rival.segments.length > 0) {
+            const rHead = rival.segments[0];
+            const rDist = Math.hypot(
+              gPx - (rHead.x + 0.5) * GRID.cellSize,
+              gPy - (rHead.y + 0.5) * GRID.cellSize
+            );
+            if (rDist < GARDENER_KILL_RADIUS_PX) {
+              killRival(now, false, 'gardener');
+            }
+          }
+          if (now - gardener.spawnTime > timing.gardenerStays) {
+            gardener.state = 'leaving';
+            gardener.stateStart = now;
+          }
+          break;
+        }
+        case 'leaving':
+          if (stateAge >= GARDENER_LEAVE_MS) despawnGardener(now);
+          break;
+      }
+    }
+
+    function renderGardener(now) {
+      if (!gardener.active) return;
+      const stateAge = now - gardener.stateStart;
+
+      // Interp sub-cell position for smooth walking
+      const t = Math.min(1, (now - gardener.stepStart) / GARDENER_MOVE_MS);
+      const gx = gardener.prevX + (gardener.x - gardener.prevX) * t;
+      const gy = gardener.prevY + (gardener.y - gardener.prevY) * t;
+      const px = (gx + 0.5) * GRID.cellSize;
+      const py = (gy + 0.5) * GRID.cellSize;
+
+      let alpha = 1;
+      if (gardener.state === 'arriving') alpha = stateAge / GARDENER_ARRIVE_MS;
+      else if (gardener.state === 'leaving') alpha = 1 - stateAge / GARDENER_LEAVE_MS;
+      alpha = Math.max(0, Math.min(1, alpha));
+
+      const r = GRID.cellSize * 0.42;
+      const walkSway = Math.sin(gardener.armPhase * 6) * 0.15;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(px, py);
+
+      // Warning glow ring under gardener
+      ctx.fillStyle = 'rgba(200,60,60,0.15)';
+      ctx.beginPath();
+      ctx.arc(0, r * 0.9, r * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.beginPath();
+      ctx.ellipse(0, r * 0.75, r * 0.75, r * 0.22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+
+      // Body — olive-green shirt with slight arm-sway rotation
+      ctx.save();
+      ctx.rotate(walkSway * 0.35);
+      ctx.fillStyle = '#4d6a3a';
+      ctx.beginPath();
+      ctx.ellipse(0, r * 0.15, r * 0.55, r * 0.68, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Arms — brown gloves at sides
+      ctx.fillStyle = '#5a3d1f';
+      ctx.beginPath();
+      ctx.arc(-r * 0.6 + walkSway * r * 0.3, r * 0.25, r * 0.20, 0, Math.PI * 2);
+      ctx.arc( r * 0.6 - walkSway * r * 0.3, r * 0.25, r * 0.20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shears in right hand (small silver blades)
+      ctx.strokeStyle = '#c0d0d8';
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(r * 0.6 - walkSway * r * 0.3, r * 0.05);
+      ctx.lineTo(r * 0.85 - walkSway * r * 0.3, -r * 0.25);
+      ctx.moveTo(r * 0.62 - walkSway * r * 0.3, r * 0.10);
+      ctx.lineTo(r * 0.80 - walkSway * r * 0.3, -r * 0.22);
+      ctx.stroke();
+      ctx.restore();
+
+      // Head — skin-tone circle
+      ctx.fillStyle = '#e8c088';
+      ctx.beginPath();
+      ctx.arc(0, -r * 0.35, r * 0.32, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Straw sun hat — wide brim + crown
+      ctx.shadowBlur = 3;
+      ctx.fillStyle = '#e0b060';
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.55, r * 0.85, r * 0.24, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c89040';
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.7, r * 0.42, r * 0.20, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Hat band
+      ctx.fillStyle = '#8a5828';
+      ctx.fillRect(-r * 0.4, -r * 0.58, r * 0.8, r * 0.06);
+
+      // Eyes — small dark dots peeking from under hat brim
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(-r * 0.10, -r * 0.28, r * 0.05, 0, Math.PI * 2);
+      ctx.arc( r * 0.10, -r * 0.28, r * 0.05, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Feet — small brown dots that alternate with walkSway
+      ctx.fillStyle = '#3a2510';
+      ctx.beginPath();
+      ctx.arc(-r * 0.25, r * 0.75 + walkSway * r * 0.15, r * 0.10, 0, Math.PI * 2);
+      ctx.arc( r * 0.25, r * 0.75 - walkSway * r * 0.15, r * 0.10, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spawnGardenerArriveBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      // Dust puff — brown particles
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 50 + Math.random() * 80;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s, vy: Math.sin(a) * s - 30,
+          life: 500, maxLife: 500,
+          color: i % 2 === 0 ? '#8a6d3a' : '#c89968',
+          size: 1.8 + Math.random() * 1,
+        });
+      }
+      // Warning shockwave
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 550, maxLife: 550,
+        ring: true, radius: 4,
+        color: '#c04040',
+      });
+    }
+
+    // ================= RIVAL WORM ENEMY (Phase 3) =================
+    // AI competitor that follows the same rules (grow, chained bonus,
+    // self-collision-dies). Slither.io-style interaction:
+    //   player head → rival head = both die
+    //   player head → rival body = rival dies, player grows by remaining length
+    //   rival  head → player body = player dies
+    const RIVAL_INIT_LENGTH        = 4;
+    const RIVAL_INITIAL_SPAWN_MIN  = 15000;
+    const RIVAL_INITIAL_SPAWN_MAX  = 25000;
+    const RIVAL_RESPAWN_MIN_MS     = 15000;
+    const RIVAL_RESPAWN_MAX_MS     = 25000;
+
+    const rival = {
+      active: false,
+      segments: [],                    // head is segments[0]
+      direction: { dx: 1, dy: 0 },
+      growing: 0,
+      nextSpawnAt: 0,
+    };
+
+    function scheduleNextRival(now, isInitial) {
+      const [min, max] = isInitial ? timing.rivalFirst : timing.rivalEvery;
+      rival.nextSpawnAt = now + min + draw.creature() * (max - min);
+    }
+
+    function isCellOccupiedByPlayer(x, y) {
+      for (const s of worm.segments) if (s.x === x && s.y === y) return true;
+      return false;
+    }
+
+    function pickRivalSpawnCell() {
+      // Try a corner far from player. Fall back to any empty edge cell.
+      const head = worm.segments[0];
+      const corners = [
+        { x: 0,               y: 0 },
+        { x: GRID.cols - 1,   y: 0 },
+        { x: 0,               y: GRID.rows - 1 },
+        { x: GRID.cols - 1,   y: GRID.rows - 1 },
+      ];
+      corners.sort((a, b) =>
+        (Math.abs(b.x - head.x) + Math.abs(b.y - head.y))
+        - (Math.abs(a.x - head.x) + Math.abs(a.y - head.y))
+      );
+      const isBurrow = (c) => burrow && burrow.x === c.x && burrow.y === c.y;
+      for (const c of corners) {
+        if (!isCellOccupiedByPlayer(c.x, c.y) && !isCellFence(c.x, c.y) && !isBurrow(c)) return c;
+      }
+      // Fallback — pick any empty non-fence non-player cell scan
+      for (let y = 0; y < GRID.rows; y++) {
+        for (let x = 0; x < GRID.cols; x++) {
+          if (!isCellOccupiedByPlayer(x, y) && !isCellFence(x, y)) return { x, y };
+        }
+      }
+      return { x: Math.floor(GRID.cols / 2), y: Math.floor(GRID.rows / 2) };
+    }
+
+    function spawnRival(now) {
+      const cell = pickRivalSpawnCell();
+      // Face toward grid center so rival starts moving into play area
+      const cx = GRID.cols / 2, cy = GRID.rows / 2;
+      const dx = cell.x < cx ? 1 : -1;
+      const dy = cell.y < cy ? 1 : -1;
+      const initDir = Math.abs(cell.x - cx) > Math.abs(cell.y - cy)
+        ? { dx, dy: 0 } : { dx: 0, dy };
+
+      rival.segments = [];
+      for (let i = 0; i < RIVAL_INIT_LENGTH; i++) {
+        rival.segments.push({
+          x: cell.x - initDir.dx * i,
+          y: cell.y - initDir.dy * i,
+        });
+      }
+      rival.direction = initDir;
+      rival.growing = 0;
+      rival.active = true;
+      spawnRivalSpawnBurst(cell.x, cell.y);
+      emit({ type: 'rival-arrived' });
+    }
+
+    /** `cause` (added in the collection) says how it ended, for the almanac and the stars. */
+    function killRival(now, byPlayer, cause = 'crash') {
+      spawnRivalDeathBurst(rival.segments, byPlayer);
+      rival.active = false;
+      rival.segments = [];
+      scheduleNextRival(now, false);
+      emit({ type: 'rival-gone', cause });
+    }
+
+    function isCellRivalBody(x, y, skipHead) {
+      for (let i = skipHead ? 1 : 0; i < rival.segments.length; i++) {
+        if (rival.segments[i].x === x && rival.segments[i].y === y) return true;
+      }
+      return false;
+    }
+
+    // Greedy AI: pick a cardinal step that reduces Manhattan distance to
+    // the nearest apple while avoiding walls, own body, and player body.
+    // Never reverses. Falls back to any legal move if preferred blocked.
+    function computeRivalMove() {
+      const head = rival.segments[0];
+      // Find nearest apple
+      let target = null, best = Infinity;
+      for (const a of apples) {
+        const d = Math.abs(a.x - head.x) + Math.abs(a.y - head.y);
+        if (d < best) { best = d; target = a; }
+      }
+
+      const currDir = rival.direction;
+      // Candidate cardinal directions, no reverse of current
+      const options = [
+        { dx:  1, dy:  0 },
+        { dx: -1, dy:  0 },
+        { dx:  0, dy:  1 },
+        { dx:  0, dy: -1 },
+      ].filter(d => !(d.dx === -currDir.dx && d.dy === -currDir.dy));
+
+      // Score each option: lower is better
+      function scoreOption(d) {
+        const nx = head.x + d.dx, ny = head.y + d.dy;
+        if (nx < 0 || nx >= GRID.cols || ny < 0 || ny >= GRID.rows) return Infinity;
+        // Rival tail check (own body) — approximate: skip last segment which will move
+        for (let i = 0; i < rival.segments.length - 1; i++) {
+          if (rival.segments[i].x === nx && rival.segments[i].y === ny) return Infinity;
+        }
+        // Player body (avoid — collision kills rival now under Ruleset A)
+        for (const s of worm.segments) {
+          if (s.x === nx && s.y === ny) return Infinity;
+        }
+        // Fence — static obstacle
+        if (isCellFence(nx, ny)) return Infinity;
+        // The player's burrow (added in the collection) is no place for a rival.
+        if (burrow && burrow.x === nx && burrow.y === ny) return Infinity;
+        if (!target) return draw.creature();      // wander
+        return Math.abs(target.x - nx) + Math.abs(target.y - ny);
+      }
+
+      options.sort((a, b) => scoreOption(a) - scoreOption(b));
+      const best2 = options[0];
+      if (!best2 || scoreOption(best2) === Infinity) {
+        // Fully blocked — accept forced death direction
+        return options[0] || currDir;
+      }
+      return best2;
+    }
+
+    // Advance rival by one tick — mirrors doTick but for the AI.
+    // Returns 'killed-by-player' | 'died' | 'ok'.
+    function doRivalTick(now) {
+      if (!rival.active) return 'ok';
+
+      const dir = computeRivalMove();
+      const oldHead = rival.segments[0];
+      const newHead = { x: oldHead.x + dir.dx, y: oldHead.y + dir.dy };
+      rival.direction = dir;
+
+      // Wall death
+      if (newHead.x < 0 || newHead.x >= GRID.cols ||
+          newHead.y < 0 || newHead.y >= GRID.rows) {
+        killRival(now, false, 'wall');
+        return 'died';
+      }
+
+      // Self-collision (skip last segment if not growing)
+      const shrinkTail = rival.growing === 0;
+      const stopAt = shrinkTail ? rival.segments.length - 1 : rival.segments.length;
+      for (let i = 0; i < stopAt; i++) {
+        if (rival.segments[i].x === newHead.x && rival.segments[i].y === newHead.y) {
+          killRival(now, false, 'self');
+          return 'died';
+        }
+      }
+
+      // Rival head vs player segments.
+      // - Head cell (segments[0]): head-to-head, BOTH die (symmetric).
+      // - Any body segment: RIVAL dies (player's body is a solid obstacle to
+      //   the rival, just like a wall). This means if the player traps the
+      //   rival by wrapping their body around it, the player wins — the
+      //   rival is forced to crash into player's body and dies. Player is
+      //   never killed by the rival's head (the rival AI already scores
+      //   moves into player body as Infinity and only ever takes them under
+      //   forced-death conditions anyway).
+      for (let i = 0; i < worm.segments.length; i++) {
+        if (worm.segments[i].x === newHead.x && worm.segments[i].y === newHead.y) {
+          if (i === 0) {
+            killRival(now, false, 'head-on');
+            triggerDeath('rival-head');
+            return 'died';
+          }
+          killRival(now, false, 'your-body');
+          return 'died';
+        }
+      }
+
+      // A rival with nowhere else to go may be forced onto a fence; the port let it walk through.
+      if (isCellFence(newHead.x, newHead.y)) {
+        killRival(now, false, 'fence');
+        return 'died';
+      }
+
+      // Advance rival head
+      rival.segments.unshift(newHead);
+
+      // Eat apple?
+      for (let ai = 0; ai < apples.length; ai++) {
+        const a = apples[ai];
+        if (newHead.x === a.x && newHead.y === a.y) {
+          rival.growing += a.value;
+          spawnPickupBurst(a.x, a.y, a.value);
+          apples.splice(ai, 1);
+          respawnAfterEat();
+          emit({ type: 'rival-ate', value: a.value });
+          break;
+        }
+      }
+
+      // Tail resolution
+      if (rival.growing === 0) rival.segments.pop();
+      else rival.growing--;
+
+      return 'ok';
+    }
+
+    function renderRival(now) {
+      if (!rival.active || rival.segments.length === 0) return;
+      const cellSize = GRID.cellSize;
+      const t = worm.interpolation;
+
+      // Distinct amber palette
+      const bodyColor = '#e88030';
+      const headColor = '#ffb060';
+      const glowColor = '#ffa050';
+
+      ctx.save();
+      ctx.lineWidth = cellSize * 0.72;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = bodyColor;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = glowColor;
+
+      ctx.beginPath();
+      // Draw head with sub-cell interp
+      const head = rival.segments[0];
+      const headPx = (head.x + 0.5 + rival.direction.dx * t) * cellSize;
+      const headPy = (head.y + 0.5 + rival.direction.dy * t) * cellSize;
+      ctx.moveTo(headPx, headPy);
+      for (let i = 0; i < rival.segments.length; i++) {
+        const s = rival.segments[i];
+        ctx.lineTo((s.x + 0.5) * cellSize, (s.y + 0.5) * cellSize);
+      }
+      ctx.stroke();
+
+      // Head cap
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = headColor;
+      ctx.beginPath();
+      ctx.arc(headPx, headPy, cellSize * 0.36, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes (small, facing direction)
+      const eyeR = cellSize * 0.10;
+      const eyeOff = cellSize * 0.15;
+      const perpX = -rival.direction.dy, perpY = rival.direction.dx;
+      const eyeX1 = headPx + perpX * eyeOff + rival.direction.dx * cellSize * 0.08;
+      const eyeY1 = headPy + perpY * eyeOff + rival.direction.dy * cellSize * 0.08;
+      const eyeX2 = headPx - perpX * eyeOff + rival.direction.dx * cellSize * 0.08;
+      const eyeY2 = headPy - perpY * eyeOff + rival.direction.dy * cellSize * 0.08;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(eyeX1, eyeY1, eyeR, 0, Math.PI * 2);
+      ctx.arc(eyeX2, eyeY2, eyeR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1a0800';
+      ctx.beginPath();
+      ctx.arc(eyeX1, eyeY1, eyeR * 0.5, 0, Math.PI * 2);
+      ctx.arc(eyeX2, eyeY2, eyeR * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spawnRivalSpawnBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 50 + Math.random() * 70;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+          life: 500, maxLife: 500,
+          color: i % 2 === 0 ? '#e88030' : '#ffb060',
+          size: 1.6 + Math.random() * 1,
+        });
+      }
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 480, maxLife: 480,
+        ring: true, radius: 4,
+        color: '#ff9040',
+      });
+    }
+
+    function updateRivalSpawn(now) {
+      if (game.state !== 'playing') return;
+      if (!settings.enemyRival) return;
+      if (rival.active) return;
+      if (now >= rival.nextSpawnAt) spawnRival(now);
+    }
+
+    function spawnRivalDeathBurst(segments, byPlayer) {
+      const color1 = byPlayer ? '#ffe080' : '#8a4020';
+      const color2 = byPlayer ? '#ffa040' : '#5a2810';
+      for (const s of segments) {
+        const cx = (s.x + 0.5) * GRID.cellSize;
+        const cy = (s.y + 0.5) * GRID.cellSize;
+        for (let i = 0; i < 4; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const sp = 60 + Math.random() * 100;
+          particles.push({
+            x: cx, y: cy,
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+            life: 550, maxLife: 550,
+            color: i % 2 === 0 ? color1 : color2,
+            size: 1.4 + Math.random() * 1,
+          });
+        }
+      }
+    }
+
+    // ================= THEMES (reused from snake fancy-web) =================
+    const THEMES = {
+      'neon-grid': {
+        name: 'Neon Grid',
+        swatch: 'linear-gradient(135deg,#00ffff 0%,#ff00ff 100%)',
+        bg: '#050a1a',
+        bgGradient: null,
+        vignette: 'rgba(20,30,80,0.4)',
+        gridLine: 'rgba(30,80,180,0.35)',
+        gridDot: 'rgba(255,0,255,0.55)',
+        gridDotGlow: 4,
+        wormHead: '#00ffff',
+        wormBody: '#ff00ff',
+        wormGlow: '#00ffff',
+        wormGlowRadius: 22,
+        wormEyeWhite: '#ffffff',
+        wormEyeColor: '#08f018',
+        appleBase: '#c8e848',       // pale end of apple color scale
+        appleRipe: '#ff2266',        // ripe end
+        appleGlow: '#ff4488',
+        appleLeaf: '#22ff88',
+        appleStem: '#664422',
+        appleDigit: '#ffffff',
+        appleDigitShadow: 'rgba(0,0,0,0.6)',
+        driftColors: ['rgba(0,255,255,ALPHA)', 'rgba(255,0,255,ALPHA)'],
+        composite: 'lighter',
+        stars: false,
+      },
+      'savanna': {
+        name: 'Savanna',
+        swatch: 'linear-gradient(135deg,#a8d8f0 0%,#d0b448 50%,#5a7828 100%)',
+        bg: '#c8b048',
+        bgGradient: [
+          { pos: 0,    color: '#a8d8f0' },
+          { pos: 0.35, color: '#e5d478' },
+          { pos: 0.65, color: '#a8ac48' },
+          { pos: 1,    color: '#5a6828' },
+        ],
+        vignette: 'rgba(90,60,20,0.20)',
+        gridLine: 'rgba(80,90,30,0.25)',
+        gridDot: 'rgba(80,60,20,0.4)',
+        gridDotGlow: 0,
+        wormHead: '#7bb038',
+        wormBody: '#3a6a1a',
+        wormGlow: 'rgba(60,120,30,0.45)',
+        wormGlowRadius: 8,
+        wormEyeWhite: '#fff8dc',
+        wormEyeColor: '#000000',
+        appleBase: '#e5d478',
+        appleRipe: '#ff8a1a',
+        appleGlow: 'rgba(255,140,40,0.55)',
+        appleLeaf: '#4aab5a',
+        appleStem: '#5a3a20',
+        appleDigit: '#3a1a00',
+        appleDigitShadow: 'rgba(255,240,180,0.7)',
+        driftColors: ['rgba(240,220,140,ALPHA)', 'rgba(180,200,80,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+      },
+      'jungle': {
+        name: 'Jungle',
+        swatch: 'linear-gradient(135deg,#2a5028 0%,#68b048 100%)',
+        bg: '#1e3d1a',
+        bgGradient: [
+          { pos: 0,   color: '#0f2a0e' },
+          { pos: 0.5, color: '#2a5028' },
+          { pos: 1,   color: '#5a8a3a' },
+        ],
+        vignette: 'rgba(10,30,10,0.5)',
+        gridLine: 'rgba(150,220,120,0.10)',
+        gridDot: 'rgba(180,240,140,0.45)',
+        gridDotGlow: 2,
+        wormHead: '#48c268',
+        wormBody: '#0a3010',
+        wormGlow: 'rgba(80,220,80,0.5)',
+        wormGlowRadius: 12,
+        wormEyeWhite: '#fffee8',
+        wormEyeColor: '#c8a020',
+        appleBase: '#a8ec78',
+        appleRipe: '#f8b028',
+        appleGlow: 'rgba(255,180,40,0.6)',
+        appleLeaf: '#68d868',
+        appleStem: '#5a2a10',
+        appleDigit: '#3a1a00',
+        appleDigitShadow: 'rgba(255,240,180,0.6)',
+        driftColors: ['rgba(140,220,80,ALPHA)', 'rgba(80,180,120,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+      },
+      'desert': {
+        name: 'Desert',
+        swatch: 'linear-gradient(135deg,#f5d798 0%,#e8a848 60%,#8a5020 100%)',
+        bg: '#d59845',
+        bgGradient: [
+          { pos: 0,    color: '#f5d798' },
+          { pos: 0.5,  color: '#e8a848' },
+          { pos: 1,    color: '#8a5020' },
+        ],
+        vignette: 'rgba(100,50,10,0.30)',
+        gridLine: 'rgba(120,70,20,0.20)',
+        gridDot: 'rgba(100,50,10,0.4)',
+        gridDotGlow: 0,
+        wormHead: '#e5b268',
+        wormBody: '#8a5820',
+        wormGlow: 'rgba(160,100,30,0.4)',
+        wormGlowRadius: 6,
+        wormEyeWhite: '#fff8dc',
+        wormEyeColor: '#000000',
+        appleBase: '#f5d798',
+        appleRipe: '#e64570',
+        appleGlow: 'rgba(230,70,110,0.55)',
+        appleLeaf: '#6a9a3a',
+        appleStem: '#4a2a10',
+        appleDigit: '#ffffff',
+        appleDigitShadow: 'rgba(0,0,0,0.6)',
+        driftColors: ['rgba(255,220,140,ALPHA)', 'rgba(230,180,100,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+        sandBlow: true,
+      },
+      'river': {
+        name: 'River',
+        swatch: 'linear-gradient(135deg,#c0e0e8 0%,#3a8ab8 50%,#164560 100%)',
+        bg: '#3a8ab8',
+        bgGradient: [
+          { pos: 0,   color: '#c0e0e8' },
+          { pos: 0.3, color: '#7ac0d8' },
+          { pos: 0.7, color: '#2a7098' },
+          { pos: 1,   color: '#0f3a58' },
+        ],
+        vignette: 'rgba(30,80,120,0.35)',
+        gridLine: 'rgba(255,255,255,0.10)',
+        gridDot: 'rgba(200,240,255,0.55)',
+        gridDotGlow: 3,
+        wormHead: '#8ec8a8',
+        wormBody: '#2a5850',
+        wormGlow: 'rgba(120,200,180,0.5)',
+        wormGlowRadius: 10,
+        wormEyeWhite: '#f0f8ff',
+        wormEyeColor: '#c8a020',
+        appleBase: '#c8e8b0',
+        appleRipe: '#ff7050',
+        appleGlow: 'rgba(255,120,80,0.55)',
+        appleLeaf: '#5aa88a',
+        appleStem: '#5a3a20',
+        appleDigit: '#ffffff',
+        appleDigitShadow: 'rgba(0,0,0,0.6)',
+        driftColors: ['rgba(200,240,255,ALPHA)', 'rgba(150,220,240,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+        risingParticles: true,
+      },
+      'aztec': {
+        name: 'Aztec',
+        swatch: 'linear-gradient(135deg,#c8724a 0%,#e8b028 50%,#3cc0c8 100%)',
+        bg: '#3a2010',
+        bgGradient: [
+          { pos: 0,    color: '#5a2a10' },
+          { pos: 0.55, color: '#c8724a' },
+          { pos: 1,    color: '#4a1e08' },
+        ],
+        vignette: 'rgba(50,20,5,0.4)',
+        gridLine: 'rgba(232,176,40,0.28)',
+        gridDot: 'rgba(232,176,40,0.75)',
+        gridDotGlow: 4,
+        wormHead: '#3cc0c8',
+        wormBody: '#e8b028',
+        wormGlow: 'rgba(60,192,200,0.55)',
+        wormGlowRadius: 12,
+        wormEyeWhite: '#fff0c0',
+        wormEyeColor: '#c02020',
+        appleBase: '#e8b028',
+        appleRipe: '#c02036',
+        appleGlow: 'rgba(255,60,90,0.55)',
+        appleLeaf: '#4a7028',
+        appleStem: '#3a1a08',
+        appleDigit: '#fff0c0',
+        appleDigitShadow: 'rgba(0,0,0,0.6)',
+        driftColors: ['rgba(232,176,40,ALPHA)', 'rgba(60,192,200,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+      },
+      'origami': {
+        name: 'Origami',
+        swatch: 'linear-gradient(135deg,#ff8a95 0%,#74a8d1 100%)',
+        bg: '#faf7f2',
+        bgGradient: [
+          { pos: 0, color: '#ffffff' },
+          { pos: 1, color: '#f2ece0' },
+        ],
+        vignette: 'rgba(180,170,160,0.18)',
+        gridLine: 'rgba(180,170,160,0.45)',
+        gridDot: 'rgba(150,140,130,0.55)',
+        gridDotGlow: 0,
+        wormHead: '#ff8a95',
+        wormBody: '#b74250',
+        wormGlow: 'rgba(255,138,149,0.15)',
+        wormGlowRadius: 6,
+        wormEyeWhite: '#ffffff',
+        wormEyeColor: '#000000',
+        appleBase: '#ffd0c8',
+        appleRipe: '#e8515e',
+        appleGlow: 'rgba(232,81,94,0.2)',
+        appleLeaf: '#7ec585',
+        appleStem: '#8b5a2b',
+        appleDigit: '#ffffff',
+        appleDigitShadow: 'rgba(80,20,30,0.6)',
+        driftColors: ['rgba(255,180,190,ALPHA)', 'rgba(180,210,230,ALPHA)'],
+        composite: 'source-over',
+        stars: false,
+        paperFold: true,
+      },
+      'midnight': {
+        name: 'Midnight',
+        swatch: 'linear-gradient(135deg,#2a1a4a 0%,#d4d4f0 100%)',
+        bg: '#1a0d33',
+        bgGradient: [
+          { pos: 0,   color: '#2a1a4a' },
+          { pos: 0.6, color: '#160830' },
+          { pos: 1,   color: '#0a0418' },
+        ],
+        vignette: 'rgba(80,50,120,0.35)',
+        gridLine: 'rgba(140,100,200,0.14)',
+        gridDot: 'rgba(200,180,255,0.5)',
+        gridDotGlow: 3,
+        wormHead: '#e0d8ff',
+        wormBody: '#5b2c8a',
+        wormGlow: 'rgba(180,150,240,0.55)',
+        wormGlowRadius: 18,
+        wormEyeWhite: '#ffdd44',
+        wormEyeColor: '#1a0a2a',
+        appleBase: '#8878a8',
+        appleRipe: '#c02040',
+        appleGlow: 'rgba(255,60,100,0.7)',
+        appleLeaf: '#5a3a5a',
+        appleStem: '#3a2a1a',
+        appleDigit: '#fff0c0',
+        appleDigitShadow: 'rgba(0,0,0,0.7)',
+        driftColors: ['rgba(200,180,255,ALPHA)', 'rgba(255,220,120,ALPHA)'],
+        composite: 'lighter',
+        stars: true,
+      },
+    };
+
+    let currentTheme = 'neon-grid';
+    let T = THEMES[currentTheme];
+
+    // The port built a row of pickers here (look, mode, speed, fence, creatures); in the
+    // collection the desk offers those choices and hands them over with each crawl.
+    function setTheme(name) {
+      if (!THEMES[name]) return;
+      currentTheme = name;
+      T = THEMES[name];
+      invalidateStaticLayer();
+    }
+
+    // Steady pace (added in the collection, a setting of the desk): the worm keeps the port's
+    // Classic tick however long it grows, instead of speeding up with its length.
+    let steadyPace = false;
+
+    function updateTickInterval() {
+      const s = settings.speed;
+      let interval;
+      if (s === 'classic' || (s === 'progressive' && steadyPace)) {
+        interval = 333;                    // 3× — comfortable retro pace
+      } else if (s === 'fast') {
+        interval = 167;                    // 6× — modern arcade
+      } else {
+        // Progressive: 333ms at length 5 → 167ms at length 45+
+        // (starts at Classic, ramps to Fast as worm grows)
+        const len = worm.segments.length;
+        const t = Math.min(1, Math.max(0, (len - 5) / 40));
+        interval = Math.round(333 - t * 166);
+      }
+      worm.tickInterval = interval;
+      tickLabel.textContent = `${(interval / 1000).toFixed(2)}s`;
+    }
+
+    // ================= INPUT =================
+    document.addEventListener('keydown', (e) => {
+      if (paused || demo || e.ctrlKey || e.metaKey || e.altKey) return;
+      // With the desk, its report card handles what comes next.
+      if (game.state !== 'playing' && controlled()) return;
+      if (game.state !== 'playing') {
+        if (game.canRestart) { restartGame(); e.preventDefault(); }
+        return;
+      }
+
+      const k = e.key.toLowerCase();
+      let dx = 0, dy = 0, valid = false;
+      if (k === 'arrowright' || k === 'd') { dx = 1;  dy = 0;  valid = true; }
+      else if (k === 'arrowleft' || k === 'a') { dx = -1; dy = 0;  valid = true; }
+      else if (k === 'arrowup' || k === 'w') { dx = 0;  dy = -1; valid = true; }
+      else if (k === 'arrowdown' || k === 's') { dx = 0;  dy = 1;  valid = true; }
+      if (!valid) return;
+      e.preventDefault();
+
+      // Nokia-snake input buffer — queue up to 2 turns so rapid double-taps
+      // both register in sequence.
+      // Reverse/no-op checks are against the LAST INTENT (last queued if any,
+      // else the currently-committed direction), not the committed direction.
+      // This lets you press ↑ then ← quickly and both turns happen on
+      // successive ticks — instead of the ← being rejected as reverse of
+      // the pre-turn "right".
+      const lastIntent = worm.directionQueue.length > 0
+        ? worm.directionQueue[worm.directionQueue.length - 1]
+        : worm.direction;
+      if (dx === -lastIntent.dx && dy === -lastIntent.dy) return;   // 180° block
+      if (dx ===  lastIntent.dx && dy ===  lastIntent.dy) return;   // no-op
+      if (worm.directionQueue.length >= 2) return;                  // cap depth
+      if (!turnAllowed(lastIntent, dx, dy)) return;                 // a challenge's rule
+      worm.directionQueue.push({ dx, dy });
+    });
+
+    // ================= TICK LOGIC (BSD spec) =================
+    function doTick() {
+      if (game.state !== 'playing') return;
+
+      // TURN ACCURACY: move FIRST in current direction, then commit pending
+      // direction at end of tick. Turn visually happens at the cell the eye
+      // reached (not at the neck).
+      //
+      // INPUT RESCUE: if moving in current direction WOULD kill (wall or self)
+      // AND the pending direction differs, commit pending NOW instead. This
+      // preserves player intent when they press turn late — e.g. right after
+      // eating an apple at the edge — instead of dying on a stale direction.
+      // Rescue only fires in the death-adjacent case, so normal turns still
+      // land at the eye position.
+
+      const oldHead = worm.segments[0];
+
+      function isDeadly(cell) {
+        if (cell.x < 0 || cell.x >= GRID.cols ||
+            cell.y < 0 || cell.y >= GRID.rows) return true;
+        const willShrinkTail = worm.growing === 0;
+        const checkUntil = willShrinkTail
+          ? worm.segments.length - 1
+          : worm.segments.length;
+        for (let i = 0; i < checkUntil; i++) {
+          if (worm.segments[i].x === cell.x &&
+              worm.segments[i].y === cell.y) return true;
+        }
+        // Ruleset A (Snake, symmetric): rival body/head is a wall to player head
+        if (rival.active) {
+          for (const s of rival.segments) {
+            if (s.x === cell.x && s.y === cell.y) return true;
+          }
+        }
+        // Fence is a static wall to player head
+        if (isCellFence(cell.x, cell.y)) return true;
+        return false;
+      }
+
+      const currDir = worm.direction;
+      const pendDir = worm.directionQueue.length > 0
+        ? worm.directionQueue[0]
+        : currDir;
+      const pendingDiffers =
+        (pendDir.dx !== currDir.dx) || (pendDir.dy !== currDir.dy);
+
+      let newHead = { x: oldHead.x + currDir.dx, y: oldHead.y + currDir.dy };
+
+      if (pendingDiffers && isDeadly(newHead)) {
+        // Input rescue — pull the queued turn forward to honor player intent
+        worm.direction = pendDir;
+        worm.directionQueue.shift();
+        newHead = { x: oldHead.x + pendDir.dx, y: oldHead.y + pendDir.dy };
+      }
+
+      // Home: the head reaches the open burrow (added in the collection).
+      if (burrow && newHead.x === burrow.x && newHead.y === burrow.y) {
+        return enterBurrow(newHead);
+      }
+
+      // A limit on going straight (a challenge's rule): one move too many in one direction ends
+      // the crawl.
+      const moveDx = newHead.x - oldHead.x;
+      const moveDy = newHead.y - oldHead.y;
+      straightRun = moveDx === lastMove.dx && moveDy === lastMove.dy ? straightRun + 1 : 1;
+      lastMove = { dx: moveDx, dy: moveDy };
+      if (straightRun > settings.maxStraight) return triggerDeath('straight');
+
+      // Death: wall (may still fire if rescue direction is also deadly)
+      if (newHead.x < 0 || newHead.x >= GRID.cols ||
+          newHead.y < 0 || newHead.y >= GRID.rows) {
+        return triggerDeath('wall');
+      }
+
+      // Death: self collision (rescue direction re-checked here too)
+      {
+        const willShrinkTail = worm.growing === 0;
+        const checkUntil = willShrinkTail
+          ? worm.segments.length - 1
+          : worm.segments.length;
+        for (let i = 0; i < checkUntil; i++) {
+          if (worm.segments[i].x === newHead.x &&
+              worm.segments[i].y === newHead.y) {
+            return triggerDeath('self');
+          }
+        }
+      }
+
+      // Death: fence
+      if (isCellFence(newHead.x, newHead.y)) {
+        return triggerDeath('fence');
+      }
+
+      // ---- Rival interactions (before advancing player head) ----
+      // Ruleset A (Snake, symmetric):
+      //   player head → rival head = both die (mutual crash)
+      //   player head → rival body = PLAYER dies (rival body is a wall)
+      // No slither.io bonus. Attacking the rival's body kills you the same
+      // as running into a wall.
+      if (rival.active && rival.segments.length > 0) {
+        const rHead = rival.segments[0];
+        if (newHead.x === rHead.x && newHead.y === rHead.y) {
+          killRival(clock, false, 'head-on');
+          return triggerDeath('rival-head');
+        }
+        if (isCellRivalBody(newHead.x, newHead.y, true)) {
+          return triggerDeath('rival-body');
+        }
+      }
+
+      // Add new head
+      worm.segments.unshift(newHead);
+
+      // Eat apple? — check BEFORE tail resolution, matches BSD source
+      for (let ai = 0; ai < apples.length; ai++) {
+        const a = apples[ai];
+        if (newHead.x === a.x && newHead.y === a.y) {
+          worm.growing += a.value;                 // BSD: growing += ch - '0'
+          spawnPickupBurst(a.x, a.y, a.value);
+          game.score += worm.growing;               // BSD: score += growing (chained bonus!)
+          updateScoreDisplay();
+          apples.splice(ai, 1);
+          respawnAfterEat();                        // Pure=instant, Wild=delayed 2.5s
+          game.harvested++;
+          game.bestBite = Math.max(game.bestBite, worm.growing);
+          // The length to come: the new head is on, and this move's tail step (a cell of growth
+          // used up rather than the tail let go) has still to happen, hence the one less.
+          emit({ type: 'bite', value: a.value, points: worm.growing, rotten: a.state === 'rotten',
+            harvested: game.harvested, score: game.score, length: worm.segments.length + worm.growing - 1 });
+          if (!burrow && game.harvested >= settings.harvest) openBurrow();
+          break;
+        }
+      }
+
+      // Frog bonus?
+      if (frog.active && newHead.x === frog.x && newHead.y === frog.y) {
+        game.score += FROG_SCORE;
+        spawnFrogEatBurst(frog.x, frog.y);
+        updateScoreDisplay();
+        despawnFrog(clock);
+        emit({ type: 'frog-caught', points: FROG_SCORE, score: game.score });
+      }
+
+      // Tail resolution
+      if (worm.growing === 0) {
+        worm.segments.pop();
+      } else {
+        worm.growing--;
+      }
+
+      // Update progressive speed after growth
+      if (settings.speed === 'progressive') updateTickInterval();
+      updateLengthDisplay();
+
+      // Win check (fill entire grid; fences take cells away from it)
+      if (worm.segments.length >= freeCells() - 1) {
+        triggerWin();
+      }
+      emit({ type: 'moved', length: worm.segments.length, growing: worm.growing });
+
+      // Advance rival AI one tick (after player). Kills / collisions handled
+      // inside doRivalTick.
+      if (settings.enemyRival && rival.active) {
+        doRivalTick(clock);
+        if (game.state !== 'playing') return;
+      }
+
+      // A burrow that found no room when the harvest came in tries again every tick.
+      if (!burrow && game.harvested >= settings.harvest) openBurrow();
+
+      // Commit pending direction for NEXT tick (turn accuracy fix)
+      // Consume next queued turn (Nokia-snake buffer) — one per tick, so a
+      // double-tap plays back as two sequential turns.
+      if (worm.directionQueue.length > 0) {
+        worm.direction = worm.directionQueue.shift();
+      }
+    }
+
+    // ================= DEATH / WIN =================
+    function triggerDeath(reason) {
+      if (game.state !== 'playing') return;
+      game.state = 'dead';
+      game.overOffTime = 0;
+      game.canRestart = false;
+      const head = worm.segments[0];
+      spawnDeathBurst(head.x, head.y);
+      emit({ type: 'crash', reason });
+      if (controlled()) return;
+      if (game.score > game.bestScore) {
+        game.bestScore = game.score;
+        updateScoreDisplay();
+      }
+      let sub;
+      if (reason === 'wall')             sub = 'crashed into the wall';
+      else if (reason === 'wasp')        sub = 'stung by a wasp';
+      else if (reason === 'gardener')    sub = 'trampled by the gardener';
+      else if (reason === 'rival-head')  sub = 'head-on with the rival';
+      else if (reason === 'rival-body')  sub = 'crashed into the rival';
+      else if (reason === 'fence')       sub = 'crashed into the fence';
+      else                               sub = 'tangled with your own body';
+      showOverlay('dead', 'CAUGHT', sub, 'press any key');
+    }
+
+    function triggerWin() {
+      if (game.state !== 'playing') return;
+      game.state = 'won';
+      game.overOffTime = 0;
+      game.canRestart = false;
+      emit({ type: 'filled' });
+      if (controlled()) return;
+      if (game.score > game.bestScore) {
+        game.bestScore = game.score;
+        updateScoreDisplay();
+      }
+      showOverlay('win', 'GARDEN FILLED', `${game.score} chained points`, 'press any key');
+    }
+
+    function showOverlay(cls, title, sub, instr) {
+      gameOverlay.innerHTML = `
+        <div class="go-title ${cls}">${title}</div>
+        <div class="go-sub">${sub}</div>
+        <div class="go-instr">${instr}</div>
+      `;
+      setTimeout(() => gameOverlay.classList.add('visible'), 40);
+      setTimeout(() => { game.canRestart = true; }, 550);
+    }
+    function hideOverlay() {
+      gameOverlay.classList.remove('visible');
+      gameOverlay.innerHTML = '';
+    }
+
+    function updateScoreDisplay() {
+      scoreLabel.textContent = game.score;
+      bestLabel.textContent = game.bestScore;
+    }
+    function updateLengthDisplay() {
+      lengthLabel.textContent = worm.segments.length;
+    }
+
+    function restartGame() {
+      game.state = 'playing';
+      game.score = 0;
+      game.harvested = 0;
+      game.bestBite = 0;
+      burrow = null;
+      burrowTimer = 0;
+      straightRun = 0;
+      lastMove = { dx: 0, dy: 0 };
+      hideOverlay();
+      setBoard(settings.board ? settings.board.cols : 30, settings.board ? settings.board.rows : 20);
+      rebuildFences();
+      initWorm();
+      initApples();
+      frog.active = false;
+      bird.active = false;
+      wasps.length = 0;
+      gardener.active = false;
+      rival.active = false;
+      rival.segments = [];
+      scheduleNextFrog(clock, true);
+      scheduleNextBird(clock, true);
+      scheduleNextGardener(clock, true);
+      scheduleNextRival(clock, true);
+      particles.length = 0;
+      if (settings.burrowAt) burrow = { x: settings.burrowAt.x, y: settings.burrowAt.y, openedAt: clock };
+      updateScoreDisplay();
+      updateLengthDisplay();
+      updateTickInterval();
+    }
+
+    // ================= THE CHALLENGES' RULES (added in the collection) =================
+    let straightRun = 0;
+    let lastMove = { dx: 0, dy: 0 };
+
+    /** Right turns only: from heading (dx, dy) the one clockwise turn is (-dy, dx). */
+    function turnAllowed(from, dx, dy) {
+      return settings.turns !== 'right' || (dx === -from.dy && dy === from.dx);
+    }
+
+    function freeCells() {
+      return GRID.cols * GRID.rows - fences.length;
+    }
+
+    /** The board for a crawl: the port's 30 by 20, or a challenge's own size. */
+    function setBoard(cols, rows) {
+      if (GRID.cols === cols && GRID.rows === rows) return;
+      GRID.cols = cols;
+      GRID.rows = rows;
+      W = cols * GRID.cellSize;
+      H = rows * GRID.cellSize;
+      invalidateStaticLayer();
+      seedSky();
+    }
+
+    /** Where the board sits in the canvas: scaled to fit and centred. */
+    function boardFit() {
+      const scale = Math.min(VIEW_W / W, VIEW_H / H);
+      return { scale, x: (VIEW_W - W * scale) / 2, y: (VIEW_H - H * scale) / 2 };
+    }
+
+    /** Round a smaller board, a dark hedge in the colours of the look. */
+    function renderHedge(fit) {
+      const top = T.bgGradient ? T.bgGradient[0].color : T.bg;
+      const bottom = T.bgGradient ? T.bgGradient[T.bgGradient.length - 1].color : T.bg;
+      const g = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+      g.addColorStop(0, darkenColor(top, 0.62));
+      g.addColorStop(1, darkenColor(bottom, 0.7));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+      ctx.save();
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillStyle = darkenColor(bottom, 0.5);
+      ctx.fillRect(fit.x, fit.y, W * fit.scale, H * fit.scale);
+      ctx.restore();
+    }
+
+    // ================= THE BURROW (added in the collection) =================
+    // When the orchard's harvest is in, a burrow opens on a free cell the worm can reach (the
+    // desk's rules choose it). Crawling into it ends the crawl: the worm slides in, a cell at a
+    // time along its own path, and nothing in the orchard can touch it any more.
+    const BURROW_SLIDE_MS = 1800;     // about how long the whole worm takes to go in
+
+    function openBurrow() {
+      const head = worm.segments[0];
+      const walls = new Set(worm.segments.map((c) => `${c.x},${c.y}`));
+      for (const f of fences) walls.add(`${f.x},${f.y}`);
+      if (rival.active) for (const r of rival.segments) walls.add(`${r.x},${r.y}`);
+      const taken = new Set(apples.map((a) => `${a.x},${a.y}`));
+      if (frog.active) taken.add(`${frog.x},${frog.y}`);
+      const spot = settings.placeBurrow({
+        cols: GRID.cols, rows: GRID.rows, head: { x: head.x, y: head.y },
+        walls, taken, random: draw.place,
+      });
+      if (!spot) return;
+      burrow = { x: spot.x, y: spot.y, openedAt: clock };
+      spawnBurrowBurst(burrow.x, burrow.y);
+      emit({ type: 'burrow-open', x: burrow.x, y: burrow.y });
+    }
+
+    function enterBurrow(cell) {
+      worm.segments.unshift({ x: cell.x, y: cell.y });
+      worm.segments.pop();
+      worm.directionQueue = [];
+      // Whatever was still to grow no longer matters: the tail follows the body straight in.
+      worm.growing = 0;
+      worm.interpolation = 0;
+      game.state = 'burrowing';
+      burrowTimer = 0;
+      emit({ type: 'burrowing' });
+    }
+
+    /** A short worm goes in at a crawl, a long one quicker, so none keeps the player waiting. */
+    function burrowStepMs() {
+      return Math.max(25, Math.min(70, BURROW_SLIDE_MS / Math.max(1, worm.segments.length)));
+    }
+
+    function stepBurrowing(dt) {
+      const step = burrowStepMs();
+      burrowTimer += dt;
+      while (burrowTimer >= step && game.state === 'burrowing') {
+        burrowTimer -= step;
+        worm.segments.unshift({ x: burrow.x, y: burrow.y });
+        worm.segments.pop();
+        if (worm.segments.every((s) => s.x === burrow.x && s.y === burrow.y)) {
+          game.state = 'home';
+          game.overOffTime = 0;
+          emit({ type: 'home' });
+        }
+      }
+      // Between steps the body glides on, as it does while crawling, so the slide is smooth.
+      worm.interpolation = game.state === 'burrowing' ? burrowTimer / step : 0;
+    }
+
+    /** A small warm arrow just ahead of the head, pointing the way home while the burrow is far. */
+    function renderBurrowPointer(now) {
+      if (!burrow || game.state !== 'playing') return;
+      const head = worm.segments[0];
+      const cs = GRID.cellSize;
+      const hx = (head.x + 0.5 + worm.direction.dx * worm.interpolation) * cs;
+      const hy = (head.y + 0.5 + worm.direction.dy * worm.interpolation) * cs;
+      const bx = (burrow.x + 0.5) * cs;
+      const by = (burrow.y + 0.5) * cs;
+      const distance = Math.hypot(bx - hx, by - hy);
+      if (distance < cs * 3) return;
+      const angle = Math.atan2(by - hy, bx - hx);
+      const bob = reducedMotion ? 0 : Math.sin(now * 0.008) * 2;
+      ctx.save();
+      ctx.translate(hx + Math.cos(angle) * (cs * 0.95 + bob), hy + Math.sin(angle) * (cs * 0.95 + bob));
+      ctx.rotate(angle);
+      ctx.fillStyle = 'rgba(255, 232, 160, 0.95)';
+      ctx.strokeStyle = 'rgba(60, 36, 10, 0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(7, 0);
+      ctx.lineTo(-4, -6);
+      ctx.lineTo(-1.5, 0);
+      ctx.lineTo(-4, 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function spawnBurrowBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      const count = reducedMotion ? 0 : 16;
+      for (let i = 0; i < count; i++) {
+        const a = (i / count) * Math.PI * 2;
+        const s = 50 + Math.random() * 60;
+        particles.push({
+          x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 20,
+          life: 600, maxLife: 600,
+          color: i % 2 === 0 ? '#8a6a3a' : '#d8c08a',
+          size: 1.6 + Math.random(),
+        });
+      }
+      particles.push({ x: cx, y: cy, vx: 0, vy: 0, life: 700, maxLife: 700, ring: true, radius: 5, color: '#f4e2b0' });
+    }
+
+    /**
+     * The burrow's size and place. Its mouth is wider than the worm's body (0.72 of a cell), so
+     * the worm visibly goes into it rather than under it; it opens out over a third of a second.
+     */
+    function burrowShape(now) {
+      const cs = GRID.cellSize;
+      const open = Math.min(1, (now - burrow.openedAt) / 350);
+      const scale = 0.4 + 0.6 * open;
+      return {
+        cs,
+        cx: (burrow.x + 0.5) * cs,
+        cy: (burrow.y + 0.5) * cs,
+        rx: cs * 0.64 * scale,
+        ry: cs * 0.52 * scale,
+      };
+    }
+
+    /**
+     * The burrow under the worm: while it waits, a warm glow and two rings drifting outwards (it
+     * has to be found at a glance in a busy orchard); then a mound of turned soil and the mouth,
+     * its far inner wall catching the light and its depth going dark. The worm crawls over the
+     * soil and into the mouth.
+     */
+    function renderBurrowBelow(now) {
+      if (!burrow) return;
+      const { cs, cx, cy, rx, ry } = burrowShape(now);
+      const age = now - burrow.openedAt;
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      if (game.state === 'playing') {
+        const glow = ctx.createRadialGradient(cx, cy, rx * 0.6, cx, cy, cs * 2.2);
+        glow.addColorStop(0, 'rgba(255, 226, 140, 0.55)');
+        glow.addColorStop(1, 'rgba(255, 226, 140, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cs * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        for (const offset of [0, 0.5]) {
+          const pulse = reducedMotion ? 0.35 + offset : ((age / 1600) + offset) % 1;
+          ctx.strokeStyle = `rgba(255, 240, 190, ${0.9 * (1 - pulse)})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx + 6 + pulse * cs * 1.3, ry + 6 + pulse * cs * 1.3, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      // A mound of turned soil round the mouth, crumbs scattered on it.
+      const soil = ctx.createRadialGradient(cx, cy, rx * 0.8, cx, cy, rx * 1.6);
+      soil.addColorStop(0, '#7a5530');
+      soil.addColorStop(0.6, '#94693a');
+      soil.addColorStop(1, 'rgba(148, 105, 58, 0)');
+      ctx.fillStyle = soil;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + ry * 0.1, rx * 1.6, ry * 1.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Crumbs thrown up by the digging: uneven in place, size and colour (the same every time).
+      const CRUMB_COLOURS = ['#5a3d1e', '#6e4b25', '#3f2a14'];
+      for (let i = 0; i < 11; i++) {
+        const a = i * 0.61 + 0.3 + Math.sin(i * 12.9) * 0.3;
+        const reach = 1.12 + ((i * 7) % 5) * 0.08;
+        ctx.fillStyle = CRUMB_COLOURS[i % 3];
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * rx * reach, cy + Math.sin(a) * ry * reach, cs * (0.028 + ((i * 3) % 4) * 0.009), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // The mouth: the far inner wall in the light, the rest falling away into the dark.
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.fillStyle = '#5b3c1c';
+      ctx.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+      const depth = ctx.createRadialGradient(cx, cy + ry * 0.35, 1, cx, cy + ry * 0.35, rx);
+      depth.addColorStop(0, '#030201');
+      depth.addColorStop(0.7, '#120b05');
+      depth.addColorStop(1, '#2a1a0b');
+      ctx.fillStyle = depth;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + ry * 0.32, rx * 0.98, ry * 0.92, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      // The rim of the far edge, lit.
+      ctx.strokeStyle = 'rgba(255, 222, 170, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /**
+     * The burrow over the worm, once it is going in: the dark of the hole swallowing whatever has
+     * gone past the rim, and the near edge of the hole in front of the body, so it goes down and
+     * in rather than under. At home, a pair of eyes looks out of the dark.
+     */
+    function renderBurrowAbove(now) {
+      if (!burrow || (game.state !== 'burrowing' && game.state !== 'home')) return;
+      const { cs, cx, cy, rx, ry } = burrowShape(now);
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.clip();
+      const dark = ctx.createRadialGradient(cx, cy + ry * 0.25, 1, cx, cy + ry * 0.25, rx * 1.05);
+      dark.addColorStop(0, 'rgba(3, 2, 1, 1)');
+      dark.addColorStop(0.5, 'rgba(3, 2, 1, 0.94)');
+      dark.addColorStop(0.85, 'rgba(10, 6, 3, 0.55)');
+      dark.addColorStop(1, 'rgba(20, 12, 5, 0.2)');
+      ctx.fillStyle = dark;
+      ctx.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+      ctx.restore();
+      // The near edge of the hole: soil in front of the body.
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#7a5530';
+      ctx.lineWidth = cs * 0.16;
+      // Only the part facing the viewer: a worm going in from the side keeps its body clear.
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx * 1.02, ry * 1.04, 0, Math.PI * 0.2, Math.PI * 0.8);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 214, 150, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx * 1.1, ry * 1.17, 0, Math.PI * 0.25, Math.PI * 0.75);
+      ctx.stroke();
+      if (game.state === 'home' && game.overOffTime > 150) renderEyesInTheDark(cx, cy, ry, now);
+      ctx.restore();
+    }
+
+    /** The worm at home: two eyes in the colours of its look, blinking now and then. */
+    function renderEyesInTheDark(cx, cy, ry, now) {
+      const fadeIn = Math.min(1, (game.overOffTime - 150) / 300);
+      const blink = !reducedMotion && now % 2600 < 140;
+      const eyeR = GRID.cellSize * 0.095;
+      ctx.globalAlpha = fadeIn;
+      for (const side of [-1, 1]) {
+        const ex = cx + side * GRID.cellSize * 0.15;
+        const ey = cy + ry * 0.05;
+        ctx.fillStyle = T.wormEyeWhite;
+        ctx.beginPath();
+        ctx.ellipse(ex, ey, eyeR, blink ? eyeR * 0.15 : eyeR, 0, 0, Math.PI * 2);
+        ctx.fill();
+        if (!blink) {
+          ctx.fillStyle = T.wormEyeColor === '#000000' ? '#1a1a1a' : T.wormEyeColor;
+          ctx.beginPath();
+          ctx.arc(ex, ey + eyeR * 0.2, eyeR * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // ================= APPLE + PARTICLE UPDATES =================
+    function updateApples(dt) {
+      if (reducedMotion) return;
+      for (const a of apples) {
+        a.spin += dt * 0.003;
+        a.bob  += dt * 0.0022;
+      }
+    }
+
+    function spawnFrogEatBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      for (let i = 0; i < 40; i++) {
+        const a = (i / 40) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 120 + Math.random() * 200;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 850,
+          maxLife: 850,
+          color: i % 3 === 0 ? '#ffd044' : (i % 3 === 1 ? '#7cf248' : '#ffffff'),
+          size: 2 + Math.random() * 1.6,
+        });
+      }
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 700, maxLife: 700,
+        ring: true, radius: 5,
+        color: '#ffd044',
+      });
+    }
+
+    // ================= PARTICLES =================
+    const particles = [];
+    function spawnPickupBurst(gx, gy, value) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      const count = 10 + value * 2;                 // bigger apple → more particles
+      const bodyColor = appleColorForValue(value);
+      for (let i = 0; i < count; i++) {
+        const a = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+        const s = 60 + Math.random() * 120 + value * 8;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 550 + value * 30,
+          maxLife: 550 + value * 30,
+          color: i % 2 === 0 ? bodyColor : T.appleGlow,
+          size: 2 + Math.random() * 1.2,
+        });
+      }
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 400, maxLife: 400,
+        ring: true, radius: 4,
+        color: bodyColor,
+      });
+    }
+    function spawnDeathBurst(gx, gy) {
+      const cx = (gx + 0.5) * GRID.cellSize;
+      const cy = (gy + 0.5) * GRID.cellSize;
+      for (let i = 0; i < 30; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = 90 + Math.random() * 200;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          life: 900, maxLife: 900,
+          color: i % 3 === 0 ? '#ffffff' : (i % 3 === 1 ? T.wormHead : T.wormBody),
+          size: 2 + Math.random() * 2,
+        });
+      }
+      particles.push({
+        x: cx, y: cy, vx: 0, vy: 0,
+        life: 700, maxLife: 700,
+        ring: true, radius: 6,
+        color: '#ffffff',
+      });
+    }
+    function updateParticles(dt) {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= dt;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        const dtSec = dt / 1000;
+        if (p.ring) {
+          p.radius += 200 * dtSec;
+        } else {
+          p.x += p.vx * dtSec;
+          p.y += p.vy * dtSec;
+          p.vx *= Math.pow(0.05, dtSec);
+          p.vy *= Math.pow(0.05, dtSec);
+        }
+      }
+    }
+    function renderParticles() {
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      for (const p of particles) {
+        if (reducedMotion && !p.ring) continue;
+        const a = p.life / p.maxLife;
+        if (p.ring) {
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = a * 0.8;
+          ctx.lineWidth = 3 * a;
+          ctx.shadowBlur = 12; ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = a;
+          ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    // ================= AMBIENT DRIFT =================
+    const drift = [];
+    const stars = [];
+    /** Motes and stars scattered over the board (again whenever its size changes). */
+    function seedSky() {
+      drift.length = 0;
+      stars.length = 0;
+      for (let i = 0; i < 40; i++) {
+        drift.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: -6 - Math.random() * 12,
+          vy: (Math.random() - 0.5) * 4,
+          r: 0.6 + Math.random() * 1.2,
+          hueIdx: Math.random() < 0.6 ? 0 : 1,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+      for (let i = 0; i < 60; i++) {
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H * 0.9,
+          r: 0.5 + Math.random() * 1.4,
+          phase: Math.random() * Math.PI * 2,
+          twinkleSpeed: 0.001 + Math.random() * 0.003,
+        });
+      }
+    }
+    seedSky();
+
+    function updateDrift(dt) {
+      if (reducedMotion) return;
+      const dtSec = dt / 1000;
+      for (const d of drift) {
+        if (T.risingParticles) {
+          d.x += Math.sin(d.phase + clock * 0.001) * 8 * dtSec;
+          d.y -= (30 + d.r * 10) * dtSec;
+          if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+        } else if (T.sandBlow) {
+          d.x += d.vx * 2.2 * dtSec;
+          d.y += d.vy * 0.4 * dtSec;
+          if (d.x < -10) { d.x = W + 10; d.y = Math.random() * H; }
+        } else {
+          d.x += d.vx * dtSec;
+          d.y += d.vy * dtSec;
+          if (d.x < -10) { d.x = W + 10; d.y = Math.random() * H; }
+          if (d.y < -10) d.y = H + 10;
+          if (d.y > H + 10) d.y = -10;
+        }
+      }
+    }
+
+    // ================= OFFSCREEN STATIC LAYER =================
+    let staticLayer = null;
+    let staticLayerTheme = null;
+    function invalidateStaticLayer() {
+      staticLayer = null;
+      staticLayerTheme = null;
+    }
+    function ensureStaticLayer() {
+      if (staticLayer && staticLayerTheme === currentTheme) return;
+      const scale = boardFit().scale * backing;
+      staticLayer = document.createElement('canvas');
+      staticLayer.width = Math.round(W * scale);
+      staticLayer.height = Math.round(H * scale);
+      const sctx = staticLayer.getContext('2d');
+      sctx.scale(scale, scale);
+      renderStaticLayer(sctx);
+      staticLayerTheme = currentTheme;
+    }
+    function renderStaticLayer(sctx) {
+      // Base bg
+      if (T.bgGradient) {
+        const g = sctx.createLinearGradient(0, 0, 0, H);
+        for (const stop of T.bgGradient) g.addColorStop(stop.pos, stop.color);
+        sctx.fillStyle = g;
+      } else {
+        sctx.fillStyle = T.bg;
+      }
+      sctx.fillRect(0, 0, W, H);
+
+      // Vignette
+      const vg = sctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, W*0.7);
+      vg.addColorStop(0, T.vignette);
+      vg.addColorStop(1, 'rgba(0,0,0,0)');
+      sctx.fillStyle = vg;
+      sctx.fillRect(0, 0, W, H);
+
+      // Grid lines (aligned with GRID.cellSize)
+      sctx.strokeStyle = T.gridLine;
+      sctx.lineWidth = 1;
+      sctx.beginPath();
+      for (let x = GRID.cellSize; x < W; x += GRID.cellSize) {
+        sctx.moveTo(x + 0.5, 0);
+        sctx.lineTo(x + 0.5, H);
+      }
+      for (let y = GRID.cellSize; y < H; y += GRID.cellSize) {
+        sctx.moveTo(0, y + 0.5);
+        sctx.lineTo(W, y + 0.5);
+      }
+      sctx.stroke();
+
+      // Grid intersection dots
+      sctx.save();
+      if (T.composite === 'lighter') sctx.globalCompositeOperation = 'lighter';
+      sctx.fillStyle = T.gridDot;
+      if (T.gridDotGlow > 0) {
+        sctx.shadowBlur = T.gridDotGlow;
+        sctx.shadowColor = T.gridDot;
+      }
+      for (let x = GRID.cellSize; x < W; x += GRID.cellSize) {
+        for (let y = GRID.cellSize; y < H; y += GRID.cellSize) {
+          sctx.beginPath();
+          sctx.arc(x, y, 1.2, 0, Math.PI * 2);
+          sctx.fill();
+        }
+      }
+      sctx.restore();
+
+      // Wall frame — emphasize the deadly boundary with a strong border
+      sctx.save();
+      sctx.strokeStyle = T.gridDot;
+      sctx.lineWidth = 3;
+      if (T.gridDotGlow > 0) {
+        sctx.shadowBlur = T.gridDotGlow * 2;
+        sctx.shadowColor = T.gridDot;
+      }
+      sctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+      sctx.restore();
+
+      // Moon crescent for Midnight
+      if (T.stars) {
+        const moonX = W - 80, moonY = 80, moonR = 24;
+        const coverX = moonX + 10, coverY = moonY - 4, coverR = 22;
+        sctx.save();
+        sctx.beginPath();
+        sctx.rect(0, 0, W, H);
+        sctx.arc(coverX, coverY, coverR, 0, Math.PI * 2, true);
+        sctx.clip('evenodd');
+        sctx.shadowBlur = 30;
+        sctx.shadowColor = 'rgba(240,235,220,0.7)';
+        sctx.fillStyle = 'rgba(240,235,220,0.95)';
+        sctx.beginPath();
+        sctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+        sctx.fill();
+        sctx.restore();
+      }
+    }
+
+    // ================= APPLE COLOR =================
+    function appleColorForValue(v) {
+      const t = (v - 1) / 8;   // 0..1
+      return lerpColor(T.appleBase, T.appleRipe, t);
+    }
+
+    // ================= RENDERING =================
+    function renderBackground(time) {
+      ensureStaticLayer();
+      ctx.drawImage(staticLayer, 0, 0, W, H);
+
+      // Stars
+      if (T.stars) {
+        ctx.save();
+        for (const s of stars) {
+          const twinkle = reducedMotion ? 0.8 : 0.4 + 0.6 * Math.abs(Math.sin(time * s.twinkleSpeed + s.phase));
+          ctx.fillStyle = `rgba(255,255,220,${twinkle})`;
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = '#ffeecc';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * twinkle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Drift particles
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      for (const d of drift) {
+        const pulse = 0.5 + 0.5 * Math.sin(time * 0.002 + d.phase);
+        const color = T.driftColors[d.hueIdx].replace('ALPHA', (0.25 * pulse).toFixed(2));
+        ctx.fillStyle = color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = color;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function renderApples(time) {
+      for (const a of apples) renderApple(a, time);
+    }
+
+    function renderApple(apple, time) {
+      const cellSize = GRID.cellSize;
+      const cx = (apple.x + 0.5) * cellSize;
+      const cy = (apple.y + 0.5) * cellSize;
+      const bob = Math.sin(apple.bob) * 2;
+
+      // Size scales with value (0.55 to 1.0 of cellSize/2)
+      // Bigger numbers are bigger apples, as in the port; a challenge where the numbers must be
+      // read at a glance draws them all large and ripe.
+      const sizeFactor = settings.evenApples ? 0.95 : 0.55 + (apple.value / 9) * 0.45;
+      const r = (cellSize / 2 - 3) * sizeFactor;
+
+      let bodyColor = appleColorForValue(settings.evenApples ? 8 : apple.value);
+      // Rotten visual state: desaturated + darker
+      if (apple.state === 'rotten') {
+        bodyColor = darkenColor(bodyColor, 0.45);
+      }
+      const bodyLight = lightenColor(bodyColor, 0.35);
+      const bodyDark = darkenColor(bodyColor, 0.35);
+
+      ctx.save();
+      ctx.translate(cx, cy + bob);
+      const spin = Math.sin(apple.spin);
+
+      // Ground shadow (soft ellipse)
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.20)';
+      ctx.filter = 'blur(3px)';
+      ctx.beginPath();
+      ctx.ellipse(0, r + 4, r * 0.9, r * 0.25, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Apple body with radial gradient
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = T.appleGlow;
+
+      const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 1, 0, 0, r * 1.4);
+      bodyGrad.addColorStop(0, bodyLight);
+      bodyGrad.addColorStop(0.55, bodyColor);
+      bodyGrad.addColorStop(1, bodyDark);
+      ctx.fillStyle = bodyGrad;
+
+      // Proper apple silhouette (stem well + calyx)
+      const w = r * 1.02, h = r;
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.2, -h + 1);
+      ctx.quadraticCurveTo(-r * 0.1, -h + 2.5, 0, -h + 1.8);
+      ctx.quadraticCurveTo(r * 0.1, -h + 2.5, r * 0.2, -h + 1);
+      ctx.bezierCurveTo(r * 0.6, -h + 0.5, w * 0.95, -h * 0.55, w, -h * 0.15);
+      ctx.bezierCurveTo(w * 1.05, h * 0.4, w * 0.6, h * 0.95, w * 0.3, h * 0.92);
+      ctx.quadraticCurveTo(w * 0.1, h * 1.05, 0, h * 0.90);
+      ctx.quadraticCurveTo(-w * 0.1, h * 1.05, -w * 0.3, h * 0.92);
+      ctx.bezierCurveTo(-w * 0.6, h * 0.95, -w * 1.05, h * 0.4, -w, -h * 0.15);
+      ctx.bezierCurveTo(-w * 0.95, -h * 0.55, -r * 0.6, -h + 0.5, -r * 0.2, -h + 1);
+      ctx.closePath();
+      ctx.fill();
+
+      // Highlight
+      ctx.save();
+      ctx.shadowBlur = 0;
+      const hlGrad = ctx.createRadialGradient(-r * 0.35 + spin, -r * 0.4, 0, -r * 0.35 + spin, -r * 0.4, r * 0.5);
+      hlGrad.addColorStop(0, 'rgba(255,255,255,0.7)');
+      hlGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = hlGrad;
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.3 + spin, -r * 0.35, r * 0.25, r * 0.4, -0.35, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Specular dot
+      ctx.save();
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = 'rgba(255,255,255,0.9)';
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath();
+      ctx.arc(-r * 0.35 + spin, -r * 0.5, r * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Stem
+      ctx.save();
+      ctx.strokeStyle = T.appleStem;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -h + 1);
+      ctx.quadraticCurveTo(r * 0.15, -h - 2, r * 0.3, -h - 3);
+      ctx.stroke();
+      ctx.restore();
+
+      // Leaf
+      ctx.save();
+      ctx.translate(r * 0.3, -h - 3);
+      ctx.rotate(-0.5);
+      const leafGrad = ctx.createLinearGradient(0, -0.5, r * 0.5, 0.5);
+      leafGrad.addColorStop(0, lightenColor(T.appleLeaf, 0.2));
+      leafGrad.addColorStop(1, darkenColor(T.appleLeaf, 0.2));
+      ctx.fillStyle = leafGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 0.3);
+      ctx.quadraticCurveTo(r * 0.25, -r * 0.3, r * 0.55, -r * 0.1);
+      ctx.quadraticCurveTo(r * 0.65, 0, r * 0.5, r * 0.1);
+      ctx.quadraticCurveTo(r * 0.25, r * 0.2, 0, 0.3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,40,10,0.4)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(r * 0.5, -0.1);
+      ctx.stroke();
+      ctx.restore();
+
+      // The DIGIT — big centered, with glow
+      ctx.save();
+      ctx.shadowBlur = 0;
+      ctx.globalCompositeOperation = 'source-over';
+      const digitSize = r * 1.35;
+      ctx.font = `900 ${digitSize}px 'JetBrains Mono', 'Fira Code', monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // Text shadow for readability
+      ctx.fillStyle = T.appleDigitShadow;
+      ctx.fillText(String(apple.value), 1, 1);
+      ctx.fillStyle = T.appleDigit;
+      ctx.fillText(String(apple.value), 0, 0);
+      ctx.restore();
+
+      // Rot indicator: subtle dark stipple pattern on top
+      if (apple.state === 'rotten') {
+        ctx.save();
+        ctx.shadowBlur = 0;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = 'rgba(60,30,10,0.35)';
+        for (let i = 0; i < 5; i++) {
+          const ang = (i / 5) * Math.PI * 2 + Math.sin(apple.spin) * 0.2;
+          const rr = r * 0.55;
+          ctx.beginPath();
+          ctx.arc(Math.cos(ang) * rr, Math.sin(ang) * rr, r * 0.10, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // ================= FROG RENDER =================
+    function renderFrog(now) {
+      if (!frog.active) return;
+      const cellSize = GRID.cellSize;
+
+      // Compute position + arc + body transforms per state
+      let cx, cy, arc = 0;
+      let bodyScaleX = 1, bodyScaleY = 1;
+      let legExtend = 0;     // 0 = folded (sitting), 1 = fully extended (mid-jump)
+      let headTilt = 0;      // slight tilt during jump for expression
+      let facingDx = 0, facingDy = 0;
+      const age = now - frog.stateStart;
+
+      switch (frog.state) {
+        case 'sitting': {
+          cx = (frog.x + 0.5) * cellSize;
+          cy = (frog.y + 0.5) * cellSize;
+          // Subtle breathing: body scales +/- 3% over ~2s cycle
+          const breathe = Math.sin((now - frog.spawnTime) * 0.003);
+          bodyScaleY = 1 + breathe * 0.03;
+          bodyScaleX = 1 - breathe * 0.02;
+          legExtend = 0;
+          break;
+        }
+        case 'crouching': {
+          cx = (frog.x + 0.5) * cellSize;
+          cy = (frog.y + 0.5) * cellSize;
+          // Squish down: gathering power for jump
+          const ct = Math.min(1, age / FROG_CROUCH_MS);
+          bodyScaleY = 1 - ct * 0.30;
+          bodyScaleX = 1 + ct * 0.18;
+          legExtend = -ct * 0.3;   // legs fold further
+          facingDx = frog.targetX - frog.x;
+          facingDy = frog.targetY - frog.y;
+          break;
+        }
+        case 'airborne': {
+          const jt = Math.min(1, age / FROG_JUMP_MS);
+          cx = ((frog.fromX + 0.5) + (frog.x - frog.fromX) * jt) * cellSize;
+          cy = ((frog.fromY + 0.5) + (frog.y - frog.fromY) * jt) * cellSize;
+          arc = -Math.sin(jt * Math.PI) * cellSize * FROG_JUMP_HEIGHT_CELLS;
+          // Stretch during flight (peak in middle)
+          const stretch = Math.sin(jt * Math.PI);
+          bodyScaleY = 1 + stretch * 0.22;
+          bodyScaleX = 1 - stretch * 0.10;
+          legExtend = stretch;            // legs trail back and out
+          headTilt = -stretch * 0.15;     // head slightly up mid-jump
+          facingDx = frog.x - frog.fromX;
+          facingDy = frog.y - frog.fromY;
+          break;
+        }
+        case 'landing': {
+          cx = (frog.x + 0.5) * cellSize;
+          cy = (frog.y + 0.5) * cellSize;
+          // Impact absorb: brief triangular squish peaking mid-landing
+          const lt = Math.min(1, age / FROG_LAND_MS);
+          const squish = 1 - Math.abs(lt - 0.5) * 2;
+          bodyScaleY = 1 - squish * 0.25;
+          bodyScaleX = 1 + squish * 0.14;
+          legExtend = (1 - lt) * 0.6;   // legs still partly extended, folding back
+          break;
+        }
+      }
+
+      // Spawn/despawn fade
+      const totalAge = now - frog.spawnTime;
+      const spawnPulse = Math.max(0, 1 - totalAge / 400);
+      const despawnT = Math.max(0, (totalAge - (FROG_LIFESPAN_MS - 800)) / 800);
+      const fade = 1 - Math.min(1, despawnT);
+
+      // Facing rotation for the frog body (points in direction of last/next jump)
+      let facingAngle = 0;
+      if (facingDx !== 0 || facingDy !== 0) {
+        facingAngle = Math.atan2(facingDy, facingDx) + Math.PI / 2;   // frog faces "north" by default
+      }
+
+      // ---- Ground shadow (stays on ground plane, not on frog) ----
+      ctx.save();
+      ctx.globalAlpha = fade;
+      const heightRatio = Math.abs(arc) / (cellSize * FROG_JUMP_HEIGHT_CELLS + 0.01);
+      const sScale = 1 - heightRatio * 0.45;
+      const sAlpha = 0.30 - heightRatio * 0.18;
+      ctx.fillStyle = `rgba(0,0,0,${Math.max(0.05, sAlpha)})`;
+      ctx.filter = 'blur(4px)';
+      const cellSize2 = cellSize;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + cellSize2 * 0.30, cellSize2 * 0.36 * sScale, cellSize2 * 0.11 * sScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ---- Frog body (at cx, cy + arc, with facing rotation and scale) ----
+      ctx.save();
+      ctx.globalAlpha = fade * (1 + spawnPulse * 0.4);
+      ctx.translate(cx, cy + arc);
+      ctx.rotate(facingAngle);
+      ctx.scale(bodyScaleX, bodyScaleY);
+
+      drawFrogBody(cellSize * 0.36, legExtend, headTilt);
+      ctx.restore();
+    }
+
+    function drawFrogBody(r, legExtend, headTilt) {
+      // r = base radius; legExtend = 0 (folded) to 1 (fully extended, jump peak)
+      // Top-down view: head at top (-y direction in local frame after rotation).
+
+      // --- HIND LEGS (drawn first, behind body) ---
+      // Sitting: legs folded in "M" shape at sides
+      // Extended: legs kick back and outward
+      const legBaseX = r * 0.55;
+      const legBaseY = r * 0.10;
+      const kneeX = r * (0.85 + legExtend * 0.20);
+      const kneeY = r * (0.05 - legExtend * 0.15);
+      const footX = r * (0.55 + legExtend * 0.55);
+      const footY = r * (0.55 + legExtend * 0.30);
+
+      ctx.fillStyle = '#2a6a2a';
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#1e5a20';
+
+      // Left hind leg
+      ctx.beginPath();
+      ctx.moveTo(-legBaseX, legBaseY);
+      ctx.quadraticCurveTo(-kneeX, kneeY, -footX, footY);
+      ctx.quadraticCurveTo(-footX * 0.9, footY + r * 0.18, -footX * 0.6, footY + r * 0.14);
+      ctx.quadraticCurveTo(-r * 0.45, legBaseY + r * 0.25, -legBaseX, legBaseY);
+      ctx.closePath();
+      ctx.fill();
+      // Webbed foot toes (3 small circles at foot end)
+      ctx.fillStyle = '#4a8a3a';
+      ctx.shadowBlur = 0;
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.arc(-footX - r * 0.06, footY + i * r * 0.10, r * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Right hind leg (mirror)
+      ctx.fillStyle = '#2a6a2a';
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#1e5a20';
+      ctx.beginPath();
+      ctx.moveTo(legBaseX, legBaseY);
+      ctx.quadraticCurveTo(kneeX, kneeY, footX, footY);
+      ctx.quadraticCurveTo(footX * 0.9, footY + r * 0.18, footX * 0.6, footY + r * 0.14);
+      ctx.quadraticCurveTo(r * 0.45, legBaseY + r * 0.25, legBaseX, legBaseY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#4a8a3a';
+      ctx.shadowBlur = 0;
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.arc(footX + r * 0.06, footY + i * r * 0.10, r * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // --- BODY (squat oval, wider at back) ---
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(30,80,30,0.5)';
+      const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.3, 1, 0, 0, r * 1.15);
+      bodyGrad.addColorStop(0, '#98e068');
+      bodyGrad.addColorStop(0.55, '#4ec24a');
+      bodyGrad.addColorStop(1, '#1e6a28');
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      // Squat oval — slightly wider at back (positive y) than front (head area)
+      ctx.ellipse(0, r * 0.05, r * 0.85, r * 0.72, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dorsal stripe (subtle darker mid-line)
+      ctx.strokeStyle = 'rgba(20,60,20,0.5)';
+      ctx.lineWidth = 1;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 0.5);
+      ctx.lineTo(0, r * 0.6);
+      ctx.stroke();
+
+      // Back spots (few dark stipples for texture)
+      ctx.fillStyle = 'rgba(20,60,20,0.55)';
+      const spots = [
+        [-r*0.35, -r*0.15, r*0.10],
+        [r*0.30, -r*0.05, r*0.08],
+        [r*0.40,  r*0.30, r*0.09],
+        [-r*0.30, r*0.35, r*0.10],
+        [r*0.05,  r*0.20, r*0.07],
+        [-r*0.10, -r*0.05, r*0.06],
+      ];
+      for (const [sx, sy, sr] of spots) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // --- FRONT LEGS (small paws visible at front-sides) ---
+      ctx.fillStyle = '#4ec24a';
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = 'rgba(30,80,30,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.42, -r * 0.30, r * 0.14, r * 0.10, -0.3, 0, Math.PI * 2);
+      ctx.ellipse( r * 0.42, -r * 0.30, r * 0.14, r * 0.10,  0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- HEAD BASE (slight darker mound where eyes will sit) ---
+      ctx.fillStyle = '#3a8a3a';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(-r * 0.30, -r * 0.55 + headTilt * r * 0.1, r * 0.22, 0, Math.PI * 2);
+      ctx.arc( r * 0.30, -r * 0.55 + headTilt * r * 0.1, r * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- EYES (bulging orbs on top of head) ---
+      const eyeY = -r * 0.62 + headTilt * r * 0.1;
+      // Outer green orb
+      ctx.fillStyle = '#78d848';
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = 'rgba(120,216,72,0.5)';
+      ctx.beginPath();
+      ctx.arc(-r * 0.30, eyeY, r * 0.19, 0, Math.PI * 2);
+      ctx.arc( r * 0.30, eyeY, r * 0.19, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Iris — golden yellow
+      ctx.fillStyle = '#f2c840';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(-r * 0.30, eyeY, r * 0.13, 0, Math.PI * 2);
+      ctx.arc( r * 0.30, eyeY, r * 0.13, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Vertical slit pupils (frog signature)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(-r * 0.32, eyeY - r * 0.09, r * 0.04, r * 0.18);
+      ctx.fillRect( r * 0.28, eyeY - r * 0.09, r * 0.04, r * 0.18);
+
+      // Eye highlights (small white glints for life)
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath();
+      ctx.arc(-r * 0.26, eyeY - r * 0.10, r * 0.04, 0, Math.PI * 2);
+      ctx.arc( r * 0.34, eyeY - r * 0.10, r * 0.04, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- NOSTRILS (small dots below eyes, on front of head) ---
+      ctx.fillStyle = 'rgba(20,50,20,0.7)';
+      ctx.beginPath();
+      ctx.arc(-r * 0.10, -r * 0.42 + headTilt * r * 0.1, r * 0.035, 0, Math.PI * 2);
+      ctx.arc( r * 0.10, -r * 0.42 + headTilt * r * 0.1, r * 0.035, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- MOUTH (wide curved line across face) ---
+      ctx.strokeStyle = 'rgba(20,50,20,0.8)';
+      ctx.lineWidth = 1.3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.45, -r * 0.28 + headTilt * r * 0.1);
+      ctx.quadraticCurveTo(0, -r * 0.14 + headTilt * r * 0.1, r * 0.45, -r * 0.28 + headTilt * r * 0.1);
+      ctx.stroke();
+    }
+
+    function renderWorm(time) {
+      const cellSize = GRID.cellSize;
+      const bodyWidth = cellSize * 0.72;
+      const t = worm.interpolation;
+      const N = worm.segments.length;
+      if (N === 0) return;
+
+      // Build points array: interpolated head first, then all body cells,
+      // with tail retracted if not growing this tick.
+      const points = [];
+
+      // Head with forward interpolation
+      const head = worm.segments[0];
+      // In the burrow the head goes no further: only the body behind it glides on.
+      const headT = game.state === 'burrowing' ? 0 : t;
+      const headX = (head.x + 0.5 + worm.direction.dx * headT) * cellSize;
+      const headY = (head.y + 0.5 + worm.direction.dy * headT) * cellSize;
+      points.push({x: headX, y: headY, isHead: true});
+
+      // All body segments (cell centers)
+      for (let i = 0; i < N; i++) {
+        const s = worm.segments[i];
+        points.push({x: (s.x + 0.5) * cellSize, y: (s.y + 0.5) * cellSize});
+      }
+
+      // Tail retraction: if we're not growing, the tail moves toward the segment
+      // in front of it during the tick. Interpolate.
+      if (worm.growing === 0 && N > 1) {
+        const tail = worm.segments[N - 1];
+        const before = worm.segments[N - 2];
+        const tdx = before.x - tail.x;
+        const tdy = before.y - tail.y;
+        // Replace last point with interpolated position
+        points[points.length - 1] = {
+          x: (tail.x + 0.5 + tdx * t) * cellSize,
+          y: (tail.y + 0.5 + tdy * t) * cellSize,
+        };
+      }
+
+      // ---- Single-pass glow (whole body one stroke) ----
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      ctx.shadowBlur = T.wormGlowRadius;
+      ctx.shadowColor = T.wormGlow;
+      ctx.strokeStyle = T.wormBody;
+      ctx.lineWidth = bodyWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (let i = 0; i < points.length; i++) {
+        if (i === 0) ctx.moveTo(points[i].x, points[i].y);
+        else ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // ---- Body fill with head-to-tail gradient (no shadow, cheap) ----
+      // Draw with slightly smaller width so glow remains visible around edges.
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      // Multi-segment gradient stroke: use a linear gradient along the bounding box
+      // of the path. Approximation but reads correctly for typical worm shapes.
+      const bbox = getBBox(points);
+      const grad = ctx.createLinearGradient(points[0].x, points[0].y,
+        points[points.length-1].x, points[points.length-1].y);
+      grad.addColorStop(0, T.wormHead);
+      grad.addColorStop(1, T.wormBody);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = bodyWidth - 4;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (let i = 0; i < points.length; i++) {
+        if (i === 0) ctx.moveTo(points[i].x, points[i].y);
+        else ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // ---- Muscle pulse (subtle brightness ripple down body) ----
+      ctx.save();
+      if (T.composite === 'lighter') ctx.globalCompositeOperation = 'lighter';
+      for (let i = 1; i < points.length; i++) {
+        const p = points[i];
+        const pulse = 0.5 + 0.5 * Math.sin(time * 0.006 + i * 0.45);
+        ctx.fillStyle = `rgba(255,255,255,${pulse * 0.10})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, (bodyWidth - 4) * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // ---- Head details: eyes + tongue ----
+      const headPoint = points[0];
+      const dir = worm.direction;
+      ctx.save();
+      ctx.translate(headPoint.x, headPoint.y);
+      ctx.rotate(Math.atan2(dir.dy, dir.dx));
+
+      const eyeR = bodyWidth * 0.14;
+      // Eye whites
+      ctx.fillStyle = T.wormEyeWhite;
+      ctx.beginPath();
+      ctx.arc(bodyWidth * 0.10, -bodyWidth * 0.22, eyeR, 0, Math.PI * 2);
+      ctx.arc(bodyWidth * 0.10,  bodyWidth * 0.22, eyeR, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupils
+      ctx.fillStyle = T.wormEyeColor;
+      ctx.beginPath();
+      ctx.arc(bodyWidth * 0.13, -bodyWidth * 0.22, eyeR * 0.55, 0, Math.PI * 2);
+      ctx.arc(bodyWidth * 0.13,  bodyWidth * 0.22, eyeR * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+      // Slit if eye color is bright
+      if (T.wormEyeColor !== '#000000') {
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(bodyWidth * 0.13, -bodyWidth * 0.30);
+        ctx.lineTo(bodyWidth * 0.13, -bodyWidth * 0.14);
+        ctx.moveTo(bodyWidth * 0.13,  bodyWidth * 0.14);
+        ctx.lineTo(bodyWidth * 0.13,  bodyWidth * 0.30);
+        ctx.stroke();
+      }
+
+      // Tongue flick (occasional)
+      const flick = reducedMotion ? 0 : Math.sin(time * 0.0032);
+      if (flick > 0.7) {
+        const extend = (flick - 0.7) / 0.3;
+        ctx.strokeStyle = '#ff2266';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(bodyWidth * 0.45, 0);
+        ctx.lineTo(bodyWidth * 0.55 + extend * 6, -1.5);
+        ctx.moveTo(bodyWidth * 0.45, 0);
+        ctx.lineTo(bodyWidth * 0.55 + extend * 6,  1.5);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function getBBox(points) {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const p of points) {
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+      }
+      return { minX, minY, maxX, maxY };
+    }
+
+    // ================= COLOR UTILS =================
+    // parseColor handles both '#rrggbb' AND 'rgb(r,g,b)' formats,
+    // so lightenColor/darkenColor can safely take lerpColor's output.
+    function parseColor(str) {
+      if (str.startsWith('#')) {
+        return [
+          parseInt(str.slice(1,3),16),
+          parseInt(str.slice(3,5),16),
+          parseInt(str.slice(5,7),16),
+        ];
+      }
+      const m = str.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (m) return [parseInt(m[1],10), parseInt(m[2],10), parseInt(m[3],10)];
+      return [128, 128, 128];
+    }
+    function toRgb(r, g, b) {
+      return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+    }
+    function lerpColor(c1, c2, t) {
+      const [r1,g1,b1] = parseColor(c1);
+      const [r2,g2,b2] = parseColor(c2);
+      return toRgb(r1+(r2-r1)*t, g1+(g2-g1)*t, b1+(b2-b1)*t);
+    }
+    function lightenColor(color, factor) {
+      const [r, g, b] = parseColor(color);
+      return toRgb(r + (255-r)*factor, g + (255-g)*factor, b + (255-b)*factor);
+    }
+    function darkenColor(color, factor) {
+      const [r, g, b] = parseColor(color);
+      return toRgb(r*(1-factor), g*(1-factor), b*(1-factor));
+    }
+
+    // ================= WHEN THE CREATURES COME (added in the collection) =================
+    // The port's timings, as its constants above set them. The season's crawls last a minute or
+    // so, much shorter than a crawl in the port, so its orchards bring their creatures in sooner
+    // (src/orchards.mjs); the free orchard keeps these.
+    const PORT_TIMING = {
+      ripeMs: APPLE_RIPE_MS,
+      hatchMs: WASP_ROT_TO_SPAWN_MS,
+      waspLives: WASP_LIFESPAN_MS,
+      frogFirst: [FROG_SPAWN_MIN_MS, FROG_SPAWN_MAX_MS],
+      frogEvery: [FROG_SPAWN_MIN_MS, FROG_SPAWN_MAX_MS],
+      birdFirst: [BIRD_SPAWN_MIN_MS, BIRD_SPAWN_MAX_MS],
+      birdEvery: [BIRD_SPAWN_MIN_MS, BIRD_SPAWN_MAX_MS],
+      rivalFirst: [RIVAL_INITIAL_SPAWN_MIN, RIVAL_INITIAL_SPAWN_MAX],
+      rivalEvery: [RIVAL_RESPAWN_MIN_MS, RIVAL_RESPAWN_MAX_MS],
+      gardenerFirst: [GARDENER_SPAWN_MIN_MS, GARDENER_SPAWN_MAX_MS],
+      gardenerEvery: [GARDENER_SPAWN_MIN_MS, GARDENER_SPAWN_MAX_MS],
+      gardenerStays: GARDENER_LIFESPAN_MS,
+    };
+    let timing = { ...PORT_TIMING };
+
+    // ================= THE ORCHARD BEHIND THE DESK =================
+    // While the desk is open a worm crawls the orchard on its own, the way an attract mode would:
+    // it heads for the nearest apple it can reach and keeps clear of its own tail. Nothing it
+    // does is told to the desk, and when it does come to grief it simply starts again.
+    let demo = false;
+    const DIRS = [{ dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }, { dx: 0, dy: -1 }];
+
+    function startDemo() {
+      Object.assign(settings, PORT_SETTINGS, { mode: 'wild', speed: 'classic' });
+      // A frog soon, so the orchard behind the desk has some life in it.
+      timing = { ...PORT_TIMING, frogFirst: [3000, 6000], frogEvery: [12000, 18000] };
+      draw = { value: Math.random, place: Math.random, creature: Math.random };
+      demo = true;
+      restartGame();
+    }
+
+    /** Open cells reachable from `start` (walls, fences and the worm's body block the way). */
+    function reachableFrom(start, blocked) {
+      const seen = new Set([start.x + ',' + start.y]);
+      const queue = [start];
+      while (queue.length) {
+        const c = queue.shift();
+        for (const d of DIRS) {
+          const nx = c.x + d.dx, ny = c.y + d.dy, key = nx + ',' + ny;
+          if (nx < 0 || ny < 0 || nx >= GRID.cols || ny >= GRID.rows || seen.has(key) || blocked.has(key)) continue;
+          seen.add(key);
+          queue.push({ x: nx, y: ny });
+        }
+      }
+      return seen.size;
+    }
+
+    // A turn queued now applies from the cell after the next move (the port's turn accuracy), so
+    // the demo plans from there, or from the head when straight on is a wall (the input rescue).
+    function steerDemo() {
+      const head = worm.segments[0];
+      const blocked = new Set(worm.segments.slice(0, -1).map((c) => c.x + ',' + c.y));
+      for (const f of fences) blocked.add(f.x + ',' + f.y);
+      const outside = (c) => c.x < 0 || c.y < 0 || c.x >= GRID.cols || c.y >= GRID.rows;
+      const ahead = { x: head.x + worm.direction.dx, y: head.y + worm.direction.dy };
+      const origin = outside(ahead) || blocked.has(ahead.x + ',' + ahead.y) ? head : ahead;
+      if (origin === ahead) blocked.add(head.x + ',' + head.y);
+      const target = apples.reduce((best, a) => {
+        const d = Math.abs(a.x - origin.x) + Math.abs(a.y - origin.y);
+        return !best || d < best.d ? { a, d } : best;
+      }, null);
+      let choice = null;
+      for (const d of DIRS) {
+        if (d.dx === -worm.direction.dx && d.dy === -worm.direction.dy) continue;
+        const next = { x: origin.x + d.dx, y: origin.y + d.dy };
+        const key = next.x + ',' + next.y;
+        if (next.x < 0 || next.y < 0 || next.x >= GRID.cols || next.y >= GRID.rows || blocked.has(key)) continue;
+        // Room to live in matters more than the apple: never turn into a pocket smaller than the worm.
+        const room = Math.min(reachableFrom(next, blocked), worm.segments.length + 2);
+        const distance = target ? Math.abs(target.a.x - next.x) + Math.abs(target.a.y - next.y) : 0;
+        const score = room * 100 - distance;
+        if (!choice || score > choice.score) choice = { d, score };
+      }
+      if (choice) worm.directionQueue = [choice.d];
+    }
+
+    // ================= MAIN LOOP =================
+    /** One step of the orchard: every creature, the apples and the worm, but no drawing. */
+    function stepWorld(dt) {
+      clock += dt;
+      const now = clock;
+
+      if (game.state !== 'playing') game.overOffTime += dt;
+
+      updateApples(dt);
+      updateApplesLifecycle(now);      // Wild mode rot + delayed respawn
+      updateFrog(now);                  // Wild mode frog bonus
+      updateBird(dt, now);              // Wild mode enemy: Bird (Phase 1)
+      updateWasps(dt, now);             // Wild mode enemy: Wasps (Phase 2)
+      updateGardener(dt, now);          // Wild mode enemy: Gardener (Phase 4)
+      updateRivalSpawn(now);            // Wild mode enemy: Rival worm (Phase 3)
+      updateParticles(dt);
+
+      if (game.state === 'playing') {
+        worm.tickTimer += dt;
+        worm.interpolation = Math.min(1, worm.tickTimer / worm.tickInterval);
+        while (worm.tickTimer >= worm.tickInterval && game.state === 'playing') {
+          worm.tickTimer -= worm.tickInterval;
+          worm.interpolation = 0;
+          if (demo) steerDemo();
+          doTick();
+        }
+      } else if (game.state === 'burrowing') {
+        stepBurrowing(dt);
+      }
+      if (demo && game.state !== 'playing' && game.overOffTime > 900) startDemo();
+    }
+
+    function renderWorld(now) {
+      ctx.setTransform(backing, 0, 0, backing, 0, 0);
+      const fit = boardFit();
+      const framed = fit.x > 0.5 || fit.y > 0.5;
+      if (framed) renderHedge(fit);
+      ctx.save();
+      ctx.translate(fit.x, fit.y);
+      ctx.scale(fit.scale, fit.scale);
+      if (framed) {
+        ctx.beginPath();
+        ctx.rect(0, 0, W, H);
+        ctx.clip();
+      }
+      renderBackground(now);
+      renderFences();
+      renderApples(now);
+      renderFrog(now);
+      renderBird(now);
+      renderWasps(now);
+      renderGardener(now);
+      renderRival(now);
+      renderBurrowBelow(now);
+
+      if (game.state === 'dead') {
+        // Fade worm during death
+        const t = Math.min(1, game.overOffTime / 400);
+        ctx.save();
+        ctx.globalAlpha = 1 - t;
+        renderWorm(now);
+        ctx.restore();
+      } else if (game.state !== 'home') {
+        renderWorm(now);
+      }
+
+      renderBurrowAbove(now);
+      renderBurrowPointer(now);
+      renderParticles();
+      ctx.restore();
+    }
+
+    let lastTime = performance.now();
+    function loop(time) {
+      // Paused (the Hall's menu, a hidden tab, the game's own pause), the orchard holds still and
+      // its clock waits.
+      const dt = paused ? 0 : Math.min(50, time - lastTime);
+      lastTime = time;
+
+      updateDrift(dt);
+      stepWorld(dt);
+      renderWorld(clock);
+      emit({ type: 'frame', canvas });
+
+      requestAnimationFrame(loop);
+    }
+
+    // ================= INIT =================
+    fitBacking();
+    if (window.ResizeObserver) new ResizeObserver(fitBacking).observe(canvas);
+    else window.addEventListener('resize', fitBacking);
+    startDemo();
+    updateScoreDisplay();
+    updateLengthDisplay();
+    requestAnimationFrame(loop);
+
+    // ================= THE DESK'S HANDLE =================
+    /** Sets `patch` on `target` while `draw` runs, then puts everything back. */
+    function borrowing(target, patch, run) {
+      const saved = {};
+      for (const key of Object.keys(patch)) saved[key] = target[key];
+      Object.assign(target, patch);
+      try { run(); } finally { Object.assign(target, saved); }
+    }
+
+    /** The almanac's pictures: one of the orchard's own drawings, centred in a 160×120 frame. */
+    function drawPortrait(kind, now) {
+      const centre = (cells, zoom) => {
+        ctx.translate(80, 60);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-cells.x * GRID.cellSize, -cells.y * GRID.cellSize);
+      };
+      if (kind === 'apple' || kind === 'rotten') {
+        centre({ x: 0.5, y: 0.5 }, 2.4);
+        renderApple({ x: 0, y: 0, value: kind === 'apple' ? 7 : 4, spin: 0.6, bob: 0, state: kind === 'apple' ? 'ripe' : 'rotten' }, now);
+      } else if (kind === 'frog') {
+        ctx.translate(80, 64);
+        ctx.scale(2.6, 2.6);
+        drawFrogBody(GRID.cellSize * 0.36, 0, 0);
+      } else if (kind === 'wasp') {
+        ctx.translate(80, 60);
+        ctx.scale(4, 4);
+        renderWasp({ x: 0, y: 0, vx: 1, vy: -0.6, state: 'chasing', stateStart: now - 1000, wingPhase: 0.3, hoverPhase: 0 }, now);
+      } else if (kind === 'bird') {
+        ctx.translate(80, 52);
+        ctx.scale(2.6, 2.6);
+        borrowing(bird, { active: true, x: 0, y: 0, vx: 1, vy: -0.25, altitude: 0.75, wingPhase: 0.12 }, () => renderBird(now));
+      } else if (kind === 'gardener') {
+        centre({ x: 0.5, y: 0.5 }, 2.6);
+        borrowing(gardener, { active: true, x: 0, y: 0, prevX: 0, prevY: 0, stepStart: now - 1e6, state: 'stalking', stateStart: now - 1e6, armPhase: 0.2 }, () => renderGardener(now));
+      } else if (kind === 'rival') {
+        centre({ x: 2.5, y: 1.5 }, 0.95);
+        const segments = [{ x: 4, y: 1 }, { x: 3, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 2 }, { x: 1, y: 2 }, { x: 0, y: 2 }, { x: 0, y: 1 }];
+        borrowing(rival, { active: true, segments, direction: { dx: 1, dy: 0 } }, () =>
+          borrowing(worm, { interpolation: 0 }, () => renderRival(now)));
+      } else if (kind === 'worm') {
+        centre({ x: 2.5, y: 1.5 }, 0.95);
+        const segments = [{ x: 4, y: 2 }, { x: 3, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 2 }];
+        borrowing(worm, { segments, direction: { dx: 1, dy: 0 }, interpolation: 0, growing: 1 }, () => renderWorm(now));
+      } else if (kind === 'burrow') {
+        centre({ x: 0.5, y: 0.5 }, 2.6);
+        const wasState = game.state;
+        game.state = 'home';
+        burrowingPortrait(now);
+        game.state = wasState;
+      }
+    }
+
+    function burrowingPortrait(now) {
+      const saved = burrow;
+      burrow = { x: 0, y: 0, openedAt: now - 1000 };
+      try {
+        renderBurrowBelow(now);
+        borrowing(game, { overOffTime: 1000 }, () => renderBurrowAbove(now));
+      } finally { burrow = saved; }
+    }
+
+    window.OrchardGame = {
+      themes: Object.fromEntries(Object.entries(THEMES).map(([key, t]) => [key, { name: t.name, swatch: t.swatch }])),
+      fences: Object.keys(FENCE_LAYOUTS),
+      on(listen) { listeners.push(listen); },
+      /** The desk is open: an orchard's look behind it, with a worm crawling on its own. */
+      showMenu(theme) {
+        setTheme(theme);
+        startDemo();
+      },
+      /**
+       * A crawl: the look, the rules (`settings` as the port knew them, plus the harvest that
+       * opens the burrow and the way to place it), the three draw streams (seeded for the Daily
+       * Orchard) and the best the line under the field shows.
+       */
+      begin({ theme, rules, streams, best = 0 }) {
+        setTheme(theme);
+        const { timing: sooner, ...portRules } = rules;
+        Object.assign(settings, PORT_SETTINGS, portRules);
+        timing = { ...PORT_TIMING, ...sooner };
+        draw = streams || { value: Math.random, place: Math.random, creature: Math.random };
+        demo = false;
+        game.bestScore = best;
+        restartGame();
+        emit({ type: 'start' });
+      },
+      /** Leaves a crawl unfinished (the pause menu's way out): nothing is told to anyone. */
+      abandon(theme) {
+        this.showMenu(theme || currentTheme);
+      },
+      setPaused(value) { paused = value; },
+      setReducedMotion(value) { reducedMotion = value; },
+      setSteadyPace(value) { steadyPace = value; updateTickInterval(); },
+      get state() { return demo ? 'menu' : game.state; },
+      get score() { return game.score; },
+      get paused() { return paused; },
+      /** What is in the orchard, for the browser tests and the balance bot. */
+      peek() {
+        const head = worm.segments[0];
+        return {
+          state: demo ? 'menu' : game.state, clock, score: game.score, harvested: game.harvested,
+          bestBite: game.bestBite, growing: worm.growing, length: worm.segments.length,
+          head: { ...head }, heading: { ...worm.direction },
+          segments: worm.segments.map((c) => ({ x: c.x, y: c.y })),
+          apples: apples.map((a) => ({ x: a.x, y: a.y, value: a.value, rotten: a.state === 'rotten' })),
+          burrow: burrow ? { x: burrow.x, y: burrow.y } : null,
+          frog: frog.active ? { x: frog.x, y: frog.y } : null,
+          bird: bird.active ? { state: bird.state, x: bird.x, y: bird.y } : null,
+          wasps: wasps.map((w) => ({ x: w.x / GRID.cellSize - 0.5, y: w.y / GRID.cellSize - 0.5 })),
+          rival: rival.active ? { segments: rival.segments.map((c) => ({ x: c.x, y: c.y })) } : null,
+          gardener: gardener.active ? { x: gardener.x, y: gardener.y, state: gardener.state } : null,
+          fences: fences.map((c) => ({ x: c.x, y: c.y })),
+          cols: GRID.cols, rows: GRID.rows, tickMs: worm.tickInterval,
+          freeCells: freeCells(), straightRun, maxStraight: settings.maxStraight, turns: settings.turns,
+        };
+      },
+      /** Turns the worm as a key press would (no turning straight back, two turns queued at most). */
+      steer(dx, dy) {
+        const last = worm.directionQueue.length ? worm.directionQueue[worm.directionQueue.length - 1] : worm.direction;
+        if ((dx === -last.dx && dy === -last.dy) || (dx === last.dx && dy === last.dy)) return;
+        if (!turnAllowed(last, dx, dy)) return;
+        if (worm.directionQueue.length < 2) worm.directionQueue.push({ dx, dy });
+      },
+      /** A challenge met (the desk's judgement): the crawl ends there, in success. */
+      succeed(reason) {
+        if (game.state !== 'playing') return;
+        game.state = 'won';
+        game.overOffTime = 0;
+        emit({ type: 'success', reason });
+      },
+      /** A challenge's rule broken (the desk's judgement): the crawl ends as a crash would. */
+      fail(reason) {
+        triggerDeath(reason);
+      },
+      /** For the browser tests: an apple of `value` at a cell, as if it had grown there. */
+      plant(x, y, value) {
+        const at = apples.findIndex((a) => a.x === x && a.y === y);
+        if (at >= 0) apples.splice(at, 1);
+        apples.push({ x, y, value, spin: 0, bob: 0, spawnTime: clock, state: 'ripe' });
+      },
+      /**
+       * For the balance check and the browser tests: plays on without drawing, `stepMs` at a
+       * time, asking `steer(peek)` for a direction ({ dx, dy }, or nothing to keep on) before
+       * every step, until the crawl ends, `until(peek)` holds or `limitMs` has passed. Returns
+       * the state and the time played.
+       */
+      fastForward(limitMs, steer, stepMs = 16, until = null) {
+        let t = 0;
+        const going = () => game.state === 'playing' || game.state === 'burrowing';
+        for (; t < limitMs && going() && !(until && until(this.peek())); t += stepMs) {
+          const want = steer && game.state === 'playing' ? steer(this.peek()) : null;
+          if (want) { worm.directionQueue = [want]; }
+          stepWorld(stepMs);
+        }
+        return { state: game.state, ms: t };
+      },
+      /** Draws one of the orchard's creatures into a canvas for the almanac. */
+      portrait(kind, target, theme) {
+        const outer = { ctx, T };
+        const scale = target.width / 160;
+        ctx = target.getContext('2d');
+        if (theme && THEMES[theme]) T = THEMES[theme];
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.clearRect(0, 0, 160, 120);
+        ctx.save();
+        try { drawPortrait(kind, clock); } finally {
+          ctx.restore();
+          ctx = outer.ctx;
+          T = outer.T;
+        }
+      },
+    };
+    window.loadingAt?.(0.6);
+    document.dispatchEvent(new Event('orchard-ready'));
+  })();
+  </script>
+  <script type="module" src="src/desk.mjs"></script>
+</body>
+</html>
