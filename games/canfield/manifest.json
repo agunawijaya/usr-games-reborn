@@ -1,0 +1,127 @@
+{
+  "id": "canfield",
+  "title": "Thirteen Down",
+  "tagline": "Thirteen in reserve. Four to build. One bloom to finish.",
+  "teaser": "Canfield, the solitaire with a reputation: a tough reserve of thirteen, foundations that start wherever the deal decides, and every peek at the deck costing you points. Dealt on a deck of cards drawn entirely in code.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [5, 15],
+  "status": "shipped",
+  "accent": "#c44d68",
+  "emblem": "M14 21h20v23H14zM24 21c-4-7-3-13 0-17c3 4 4 10 0 17M24 21c-6-5-11-6-15-4c3 4 8 6 15 4M24 21c6-5 11-6 15-4c-3 4-8 6-15 4",
+  "inspiredBy": {
+    "program": "canfield",
+    "originalTitle": "canfield",
+    "uiTitle": "the Berkeley solitaire with a bank account",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "thirteen down — empty a reserve of thirteen and build four foundations up in suit from the deal's base card; every peek has its price.",
+    "description": "Steve Levine wrote Canfield for Berkeley's machines; Steve Feldman, Kirk McKusick, Mikey Olson and Eric Allman kept working on it, and Kirk McKusick gave it an account that charged for the deal, for every look at the cards and for every minute at the table, and kept everyone's balance in one shared file. Thirteen Down plays its rules exactly, keeps the price of information, and lets you choose points or the old account in play money.",
+    "seeAlso": ["cribbage", "fish"]
+  },
+  "howToPlay": [
+    "Build four foundations up in suit, starting from the deal's base card and turning the corner from king to ace.",
+    "Build the four tableau piles down in alternating colours; whole piles move together, and only the reserve fills a space.",
+    "Deal the hand to the talon three at a time. Insight shows the cards you have seen, at a price."
+  ],
+  "cronGoals": [
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} deals",
+      "min": 2,
+      "max": 8
+    },
+    {
+      "id": "cards-home",
+      "stat": "cardsHome",
+      "label": "Send {n} cards home",
+      "min": 60,
+      "max": 300
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-bloom",
+      "title": "First bloom",
+      "description": "Win a deal: all four lotuses in flower.",
+      "tier": "core"
+    },
+    {
+      "id": "reserve-cleared",
+      "title": "Thirteen down",
+      "description": "Empty the reserve before the talon turns over for the first time.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Play seven Daily Deals to the end.",
+      "tier": "core"
+    },
+    {
+      "id": "no-peeking",
+      "title": "No peeking",
+      "description": "Win a deal without ever turning Insight on.",
+      "tier": "extra"
+    },
+    {
+      "id": "speed-bloom",
+      "title": "Quick bloom",
+      "description": "Win a deal in under three minutes.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-ledger",
+      "title": "No take-backs",
+      "description": "Win a deal, all fifty-two home, without using undo.",
+      "tier": "extra"
+    },
+    {
+      "id": "lucky-seven",
+      "title": "Seventh heaven",
+      "description": "Win a deal whose foundations start at seven.",
+      "tier": "extra"
+    },
+    {
+      "id": "ten-wins",
+      "title": "Ten blooms",
+      "description": "Win ten deals.",
+      "tier": "extra"
+    },
+    {
+      "id": "in-the-black",
+      "title": "In the black",
+      "description": "Finish a Bank deal with your sitting ahead of where it began.",
+      "tier": "extra"
+    },
+    {
+      "id": "one-pass",
+      "title": "One pass",
+      "description": "Win a Standard deal without turning the talon over.",
+      "tier": "rare"
+    },
+    {
+      "id": "streak-5",
+      "title": "Five in a row",
+      "description": "Win five deals one after another.",
+      "tier": "rare"
+    },
+    {
+      "id": "challenge-12",
+      "title": "Half the garden",
+      "description": "Complete twelve of the challenges.",
+      "tier": "rare"
+    }
+  ]
+}

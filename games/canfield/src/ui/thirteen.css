@@ -1,0 +1,312 @@
+/*
+ * Thirteen Down. Every rule is scoped under .td-app (or the workbench's .td-table) and every
+ * class starts with td-, so nothing leaks into the Hall or another game.
+ * Two rooms, each with its own colours: Sunroom by day, Observatory by night.
+ */
+
+.td-app,
+.td-table {
+  --td-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --td-body: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --td-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.td-app,
+.td-app[data-look='sunroom'] {
+  --td-ink: #2b2214;
+  --td-ink-2: #5b4630;
+  --td-plaque: rgb(255 250 238 / 0.9);
+  --td-plaque-edge: #b8924e;
+  --td-button: rgb(255 248 232 / 0.94);
+  --td-button-hover: #fff3d6;
+  --td-button-edge: #a8823f;
+  --td-key: #efe2c4;
+  --td-pressed: #2f7d5b;
+  --td-pressed-ink: #ffffff;
+  --td-focus: #1d5fa8;
+  --td-shadow: 0 6px 18px rgb(80 52 20 / 0.18);
+}
+
+.td-app[data-look='observatory'] {
+  --td-ink: #f3e7cc;
+  --td-ink-2: #d2c09a;
+  --td-plaque: rgb(12 18 44 / 0.82);
+  --td-plaque-edge: #c49a45;
+  --td-button: rgb(20 28 62 / 0.9);
+  --td-button-hover: #24336c;
+  --td-button-edge: #b38a3e;
+  --td-key: #2b3770;
+  --td-pressed: #7fe0b0;
+  --td-pressed-ink: #0b1430;
+  --td-focus: #9cc8ff;
+  --td-shadow: 0 8px 22px rgb(0 0 10 / 0.5);
+}
+
+.td-app {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--td-ink);
+  font-family: var(--td-body);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.td-table {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.td-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* The room's light falls across the cards too: shade multiplies, warmth is laid on softly. */
+.td-layer--shade {
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.td-layer--light {
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+/* —— HUD —— */
+
+.td-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.td-hud__plaque {
+  position: absolute;
+  top: 14px;
+  pointer-events: auto;
+  background: var(--td-plaque);
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 12px;
+  box-shadow: var(--td-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.td-hud__plaque--title {
+  left: 20px;
+  padding: 8px 18px 9px;
+}
+
+.td-hud__title {
+  margin: 0;
+  font: 650 26px/1.1 var(--td-display);
+  letter-spacing: 0.01em;
+}
+
+.td-hud__mode {
+  margin: 2px 0 0;
+  font: 600 14px/1.3 var(--td-body);
+  color: var(--td-ink-2);
+  letter-spacing: 0.03em;
+}
+
+/* The score card stands under the reserve (placed from the table's layout), like a page of
+   an account book: the top right belongs to the Hall's Pause pill. */
+.td-hud__plaque--stats {
+  padding: 6px 12px;
+  box-sizing: border-box;
+}
+
+.td-hud__stats {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.td-hud__stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.td-hud__stat + .td-hud__stat {
+  border-top: 1px solid color-mix(in srgb, var(--td-plaque-edge) 45%, transparent);
+}
+
+.td-hud__stat dt {
+  font: 600 13px/1.2 var(--td-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-hud__stat dt,
+.td-hud__stat dd {
+  white-space: nowrap;
+}
+
+/* On a short screen the card is one row of figures, each label above its value. */
+.td-hud__plaque--stats.is-compact {
+  padding: 4px 12px;
+}
+
+.is-compact .td-hud__stats {
+  flex-direction: row;
+  gap: 14px;
+}
+
+.is-compact .td-hud__stat {
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 0;
+}
+
+.is-compact .td-hud__stat + .td-hud__stat {
+  border-top: none;
+}
+
+.is-compact .td-hud__stat dt {
+  font-size: 10px;
+}
+
+.is-compact .td-hud__stat dd {
+  font-size: 17px;
+}
+
+.td-hud__stat dd {
+  margin: 0;
+  font: 650 21px/1.1 var(--td-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.td-hud__bar {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  /* Centred by its own width, not squeezed into the half of the table right of `left: 50%`. */
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  pointer-events: auto;
+  background: var(--td-plaque);
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 14px;
+  box-shadow: var(--td-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.td-hud__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 10px 0 11px;
+  border: 1px solid var(--td-button-edge);
+  border-radius: 10px;
+  background: var(--td-button);
+  color: var(--td-ink);
+  font: 700 15px/1 var(--td-body);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.td-hud__button:hover:not(:disabled) {
+  background: var(--td-button-hover);
+}
+
+.td-hud__button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.td-hud__button[aria-pressed='true'] {
+  background: var(--td-pressed);
+  border-color: var(--td-pressed);
+  color: var(--td-pressed-ink);
+}
+
+.td-hud__button[hidden] {
+  display: none;
+}
+
+.td-hud__price {
+  font: 600 13px/1 var(--td-mono);
+  color: var(--td-ink-2);
+}
+
+.td-hud__price:empty {
+  display: none;
+}
+
+.td-hud__button[aria-pressed='true'] .td-hud__price {
+  color: inherit;
+}
+
+.td-hud__key {
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: var(--td-key);
+  color: var(--td-ink);
+  font: 600 12px/1 var(--td-mono);
+}
+
+.td-command {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  padding-left: 12px;
+  border-left: 1px solid color-mix(in srgb, var(--td-plaque-edge) 55%, transparent);
+}
+
+.td-command__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 14px/1 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-command__input {
+  width: 168px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--td-button-edge);
+  border-radius: 9px;
+  background: var(--td-button);
+  color: var(--td-ink);
+  font: 600 16px/1 var(--td-mono);
+}
+
+.td-command__input::placeholder {
+  color: var(--td-ink-2);
+  opacity: 0.8;
+}
+
+.td-app :focus {
+  outline: none;
+}
+
+.td-app :focus-visible {
+  outline: 3px solid var(--td-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .td-app * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

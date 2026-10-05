@@ -40,7 +40,7 @@ Status values: `coming-soon`, `adopting`, `in progress`, `hero frames` (waiting 
 | backgammon | Backgammon | native | coming-soon | brief pending | — |
 | monop | Property trading | native | coming-soon | brief pending | — |
 | cribbage | Cribbage | native | coming-soon | brief pending | — |
-| canfield | Solitaire | native | coming-soon | brief pending | — |
+| canfield | Thirteen Down | native | shipped | 10 | hero frames and the five checkpoint decisions approved 2026-10-05; the original's rules exactly in Standard (verified in canfield.c: spaces filled from the reserve by choice, whole-pile moves, the tableau's king-on-ace wrap, four idle turn-overs end a deal) and a Relaxed set; Points by default and the original's account in Bank with fictional play money (ADR 0003, the rule-11 exception: three stages, the cost table line for line, the $3 time cap per command, an account book in three columns, a lifetime balance, free reset); Insight as the original's card counter, priced in both scorings; a solver in a worker (60 % of random Standard deals proven winnable) for the Daily Deal, winnable-only deals, hints and the verdict after a loss; 24 proven challenges (one-pass deals built by hill-climbing), a 90-second tutorial, 12 packages; drag with magnetic snapping, click, keyboard cursor and the original's typed commands; a deck drawn in code with twelve Art Deco court figures, now `@usr-games/kit/cards`; lotus-fan blooms and a spiral finish, 60 fps at 1920×1080; Sunroom and Observatory designed |
 | fish | Go fish | native | coming-soon | brief pending | — |
 | mille | Road-trip card race | native | coming-soon | brief pending | — |
 | pig | Dice push-your-luck | native | coming-soon | brief pending | — |

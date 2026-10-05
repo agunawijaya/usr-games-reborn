@@ -50,6 +50,11 @@ const START: Record<string, (page: Page) => Promise<void>> = {
     await page.getByTestId('fh-make-sail').click();
     await page.getByTestId('fh-panel').waitFor();
   },
+  canfield: async (page) => {
+    await page.getByTestId('td-menu-new').click();
+    await page.getByTestId('td-deal-go').click();
+    await page.getByTestId('td-play').waitFor();
+  },
 };
 
 /**

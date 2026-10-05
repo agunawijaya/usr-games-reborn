@@ -70,7 +70,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Backgammon          | `/usr/games/board`    | backgammon (1980)                                 | coming soon | native |
 | Property trading    | `/usr/games/board`    | monop (1980)                                      | coming soon | native |
 | Cribbage            | `/usr/games/cards`    | cribbage (1980)                                   | coming soon | native |
-| Solitaire           | `/usr/games/cards`    | canfield (1983)                                   | coming soon | native |
+| Thirteen Down       | `/usr/games/cards`    | the Berkeley solitaire with a bank account (1980) | shipped     | native |
 | Go fish             | `/usr/games/cards`    | fish (1990)                                       | coming soon | native |
 | Road-trip card race | `/usr/games/cards`    | mille (1983)                                      | coming soon | native |
 | Dice push-your-luck | `/usr/games/cards`    | pig (1992)                                        | coming soon | native |

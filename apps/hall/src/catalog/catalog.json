@@ -27,7 +27,7 @@
     { "id": "backgammon", "source": "placeholder" },
     { "id": "monop", "source": "placeholder" },
     { "id": "cribbage", "source": "placeholder" },
-    { "id": "canfield", "source": "placeholder" },
+    { "id": "canfield", "source": "game" },
     { "id": "fish", "source": "placeholder" },
     { "id": "mille", "source": "placeholder" },
     { "id": "pig", "source": "placeholder" },

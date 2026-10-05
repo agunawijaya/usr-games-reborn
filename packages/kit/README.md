@@ -22,6 +22,7 @@ import { validateManifest } from '@usr-games/kit/manifest';
 | `@usr-games/kit/progression` | The progression engine, rules, ranks, cron jobs, streaks, cosmetics |
 | `@usr-games/kit/tokens`      | Palette definitions and token helpers                               |
 | `@usr-games/kit/manifest`    | Manifest types and validation                                       |
+| `@usr-games/kit/cards`       | A 52-card deck drawn in code, image caches, drag and motion helpers |
 
 Every module has unit tests next to it (`*.test.ts`); run them with `pnpm vitest run --project kit`.
 
@@ -326,3 +327,85 @@ The numbers and their reasons are in [ADR 0005](../../docs/adr/0005-progression-
 simulations live in `src/progression/sim/`: `pnpm sim [runs]` prints the balance report, and
 `sim/targets.test.ts` locks the targets (see
 [`docs/NOTES-progression.md`](../../docs/NOTES-progression.md)).
+
+## cards — a deck drawn in code
+
+`@usr-games/kit/cards` is the collection's card table kit, first used by Thirteen Down
+(`games/canfield`) and meant for every card game after it. Everything is drawn in code: indices,
+pips, original Art Deco aces and twelve court figures, two backs, at any size, in a day and a lamp
+look, with an optional four-colour suit palette. Nothing here touches the DOM except
+`attachCardPointer`.
+
+| Module    | Main exports                                                                                                                                   |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deck`    | `CardId`, `SUITS`, `cardId`, `suitOf`, `rankOf`, `isRed`, `cardLabel`, `cardName`, `parseCard`, `newDeck`, `shuffledDeck(rng)`, `isFullDeck`   |
+| `palette` | `DeckLook` (`'day'` · `'lamp'`), `deckPalette(look, fourColour)`, `suitColour`                                                                 |
+| `face`    | `drawCardFace(ctx, card, width, height, { palette, indexFont? })`, `drawCardStock`, `CARD_ASPECT` (1.4), `CORNER`, `roundedRect`               |
+| `backs`   | `BackStyle` (`'conservatory'` light · `'constellations'` dark), `drawCardBack(ctx, width, height, style, palette)`                             |
+| `pips`    | `PIP_PATHS` (one 100 × 100 SVG path per suit), `pipPath`, `drawPip`, `pipLayout(rank)`                                                         |
+| `courts`  | `COURTS`, `courtSpec(rank, suit)`, `drawCourtHalf` (the figures, mirrored head to foot like real court cards)                                  |
+| `sprites` | `CardSprites` (faces, back and a soft shadow painted once per size and look), `sizeForHeight`                                                  |
+| `drag`    | `attachCardPointer(element, handlers)` (taps, double taps and drags past `DRAG_THRESHOLD`), `DragTracker` (velocity), `snapTarget`, `snapPull` |
+| `motion`  | `ease`, `stepSpring`, `dragTilt(velocityX)`, `arcPoint(from, to, lift, t)`, `flip(t)`, `lerp`, `clamp`, `distance`                             |
+
+A card is a number, `CardId` 0–51 (suit index × 13 + rank − 1, clubs first); `cardLabel` writes
+it as `Q♥`, and `parseCard` reads `qh`, `10s` or `Q♥` back.
+
+A card table in a few lines: paint the deck once, copy images every frame, and let the pointer
+helper turn presses into taps and drags.
+
+```ts
+import { createRng } from '@usr-games/kit';
+import {
+  attachCardPointer,
+  CardSprites,
+  dragTilt,
+  shuffledDeck,
+  sizeForHeight,
+  snapTarget,
+  type CardId,
+  type DropTarget,
+} from '@usr-games/kit/cards';
+
+const { width, height } = sizeForHeight(140); // 100 × 140
+const sprites = new CardSprites({
+  width,
+  height,
+  scale: devicePixelRatio,
+  look: 'day',
+  fourColour: false,
+  back: 'conservatory',
+});
+const deck = shuffledDeck(createRng('my-game:42'));
+sprites.warmUp(deck); // paint the faces while the deal animates
+
+// Every frame: copy, never repaint.
+ctx.drawImage(sprites.face(deck[0]!), x, y, width, height);
+ctx.drawImage(sprites.back(), x2, y2, width, height);
+
+// Pointer: what a press picks up, and where it may land.
+const targetsFor = (card: CardId): DropTarget<number>[] =>
+  piles.map((pile, i) => ({ id: i, anchor: pile.centre, accepts: canPlace(card, i) }));
+
+attachCardPointer<CardId>(canvas, {
+  pick: (point) => cardAt(point), // null when the press hits no card
+  tap: (card) => sendToBestPlace(card),
+  doubleTap: (card) => sendHome(card),
+  dragMove: (_card, drag) => {
+    const lean = dragTilt(drag.velocity.x); // radians, for the card's draw
+    drawDragged(drag.corner(), lean);
+  },
+  dragEnd: (card, drag) => {
+    const corner = drag.corner();
+    const centre = { x: corner.x + width / 2, y: corner.y + height / 2 };
+    const target = snapTarget(centre, targetsFor(card), width * 0.9);
+    if (target) place(card, target.id);
+    else bounceBack(card);
+  },
+});
+```
+
+`shuffledDeck` is a Fisher–Yates shuffle over the kit's seeded `Rng`, so a seed gives the same
+deal on every machine (daily deals, challenges, tests). `CardSprites.matches(options)` tells a
+table when a resize or a change of look needs new sprites. The deck's tests are in
+`src/cards/deck.test.ts`.

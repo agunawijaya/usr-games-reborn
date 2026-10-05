@@ -1,0 +1,993 @@
+/*
+ * Thirteen Down: the screens around the table and the panels beside it. Scoped under .td-app,
+ * every class starting td-, each room's colours designed on their own.
+ */
+
+.td-app,
+.td-app[data-look='sunroom'] {
+  --td-page: rgb(255 251 242);
+  --td-accent: #b23a57;
+  --td-accent-ink: #ffffff;
+  --td-good: #24704f;
+  --td-paper: #fbf6e8;
+  --td-paper-rule: rgb(70 110 170 / 0.22);
+  --td-paper-margin: rgb(190 60 70 / 0.5);
+  --td-paper-ink: #2a2433;
+  --td-debit: #a3283a;
+  --td-dim: rgb(60 40 15 / 0.28);
+}
+
+.td-app[data-look='observatory'] {
+  --td-page: rgb(14 20 47);
+  --td-accent: #f08aa2;
+  --td-accent-ink: #1a0d14;
+  --td-good: #86e0b4;
+  --td-paper: #eee1c4;
+  --td-paper-rule: rgb(60 80 140 / 0.25);
+  --td-paper-margin: rgb(170 50 60 / 0.45);
+  --td-paper-ink: #251f2c;
+  --td-debit: #9a2233;
+  --td-dim: rgb(2 4 16 / 0.5);
+}
+
+.td-backdrop-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.td-app.is-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--td-dim);
+  pointer-events: none;
+}
+
+.td-app.is-page > .td-page {
+  z-index: 1;
+}
+
+.td-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--td-button-edge);
+  border-radius: 10px;
+  background: var(--td-button);
+  color: var(--td-ink);
+  font: 700 15px/1 var(--td-body);
+  cursor: pointer;
+}
+
+.td-button:hover {
+  background: var(--td-button-hover);
+}
+
+.td-button--primary {
+  background: var(--td-accent);
+  border-color: var(--td-accent);
+  color: var(--td-accent-ink);
+}
+
+.td-button--primary:hover {
+  background: var(--td-accent);
+  filter: brightness(1.06);
+}
+
+.td-button--large {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 17px;
+}
+
+.td-button kbd,
+.td-menu__key {
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: var(--td-key);
+  color: var(--td-ink);
+  font: 600 12px/1 var(--td-mono);
+}
+
+.td-button--primary kbd {
+  background: rgb(255 255 255 / 0.22);
+  color: inherit;
+}
+
+.td-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.td-shuffling {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: var(--td-page);
+  border: 1px solid var(--td-plaque-edge);
+  font: 600 18px/1.3 var(--td-display);
+  box-shadow: var(--td-shadow);
+}
+
+/* —— the game menu —— */
+
+.td-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 72px 48px 32px;
+  pointer-events: none;
+}
+
+.td-title__card {
+  pointer-events: auto;
+  width: min(440px, 46vw);
+  padding: 26px 26px 20px;
+  background: var(--td-page);
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 18px;
+  box-shadow: var(--td-shadow);
+}
+
+.td-title__kicker {
+  margin: 0;
+  font: 600 13px/1.3 var(--td-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-title__heading {
+  margin: 4px 0 2px;
+  font: 700 clamp(36px, 4.4vw, 56px) / 1 var(--td-display);
+  letter-spacing: 0.005em;
+}
+
+.td-title__tagline {
+  margin: 0 0 16px;
+  font: italic 500 17px/1.35 var(--td-display);
+  color: var(--td-ink-2);
+}
+
+.td-menu {
+  display: grid;
+  gap: 6px;
+}
+
+.td-menu__item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'label key' 'detail key';
+  align-items: center;
+  gap: 1px 12px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--td-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.td-menu__item:hover {
+  background: var(--td-button);
+  border-color: var(--td-button-edge);
+}
+
+.td-menu__item.is-primary {
+  background: var(--td-accent);
+  color: var(--td-accent-ink);
+}
+
+.td-menu__item.is-primary .td-menu__detail {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.td-menu__label {
+  grid-area: label;
+  font: 700 18px/1.2 var(--td-body);
+}
+
+.td-menu__detail {
+  grid-area: detail;
+  font: 400 14px/1.3 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-menu__key {
+  grid-area: key;
+}
+
+/* —— pages —— */
+
+.td-page {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, calc(100% - 48px));
+  max-height: calc(100% - 96px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 22px 26px 24px;
+  background: var(--td-page);
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 18px;
+  box-shadow: var(--td-shadow);
+}
+
+.td-page__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.td-page__title {
+  margin: 0;
+  font: 700 32px/1.1 var(--td-display);
+}
+
+.td-page__body {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.td-page__body--two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.td-page__kicker {
+  margin: 0;
+  font: 600 13px/1.3 var(--td-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-page__lead {
+  margin: 0;
+  font: 500 20px/1.45 var(--td-display);
+}
+
+.td-page__note {
+  margin: 0 0 12px;
+  font: 400 15px/1.45 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.td-choice {
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--td-button-edge);
+  border-radius: 12px;
+}
+
+.td-choice__legend {
+  padding: 0 6px;
+  font: 700 14px/1 var(--td-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-choice__option,
+.td-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'box label' '. detail';
+  gap: 2px 10px;
+  padding: 8px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.td-choice__option:hover,
+.td-toggle:hover {
+  background: var(--td-button);
+}
+
+.td-choice__option input,
+.td-toggle input {
+  grid-area: box;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--td-accent);
+}
+
+.td-choice__label,
+.td-toggle__label {
+  grid-area: label;
+  font: 700 17px/1.3 var(--td-body);
+}
+
+.td-choice__detail,
+.td-toggle__detail {
+  grid-area: detail;
+  font: 400 14px/1.4 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+/* —— challenges —— */
+
+.td-challenge-set__title {
+  margin: 14px 0 8px;
+  font: 700 20px/1.2 var(--td-display);
+}
+
+.td-challenge-set__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.td-challenge {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'number title done' 'number goal done';
+  gap: 2px 10px;
+  width: 100%;
+  height: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--td-button-edge);
+  border-radius: 10px;
+  background: var(--td-button);
+  color: var(--td-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.td-challenge:hover {
+  background: var(--td-button-hover);
+}
+
+.td-challenge.is-done {
+  border-color: var(--td-good);
+}
+
+.td-challenge__number {
+  grid-area: number;
+  align-self: center;
+  min-width: 2ch;
+  font: 700 22px/1 var(--td-display);
+  color: var(--td-ink-2);
+}
+
+.td-challenge__title {
+  grid-area: title;
+  font: 700 16px/1.25 var(--td-body);
+}
+
+.td-challenge__goal {
+  grid-area: goal;
+  font: 400 14px/1.35 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-challenge__done {
+  grid-area: done;
+  align-self: center;
+  font: 700 20px/1 var(--td-body);
+  color: var(--td-good);
+}
+
+/* —— help, records, the account card —— */
+
+.td-help h3 {
+  margin: 8px 0 0;
+  font: 700 19px/1.2 var(--td-display);
+}
+
+.td-help p {
+  margin: 0;
+  font: 400 16px/1.5 var(--td-body);
+}
+
+.td-help__table,
+.td-records__table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 15px/1.4 var(--td-body);
+}
+
+.td-help__table th,
+.td-help__table td,
+.td-records__table th,
+.td-records__table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--td-plaque-edge) 40%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+
+.td-help__table thead th,
+.td-records__table thead th {
+  font-weight: 700;
+  color: var(--td-ink-2);
+}
+
+/* The account book: ruled paper with a red margin, in both rooms. */
+.td-account {
+  color: var(--td-paper-ink);
+  background-color: var(--td-paper);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 30px,
+      var(--td-paper-margin) 30px,
+      var(--td-paper-margin) 31px,
+      transparent 31px
+    ),
+    repeating-linear-gradient(180deg, transparent 0 25px, var(--td-paper-rule) 25px 26px);
+}
+
+.td-account {
+  padding: 14px 18px 14px 44px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgb(40 25 10 / 0.18);
+}
+
+.td-account__title {
+  margin: 0 0 6px;
+  font: 700 20px/1.2 var(--td-display);
+}
+
+.td-account__table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 500 15px/26px var(--td-mono);
+}
+
+.td-account__table th {
+  text-align: left;
+  font: 600 15px/26px var(--td-body);
+}
+
+.td-account__table td {
+  text-align: right;
+}
+
+.td-account__table .is-total th,
+.td-account__table .is-total td {
+  font-weight: 700;
+}
+
+.td-account__balance {
+  margin: 6px 0 0;
+  font: 600 15px/1.4 var(--td-body);
+}
+
+/* —— beside the table: Insight and the account book —— */
+
+.td-play {
+  position: absolute;
+  inset: 0;
+  outline: none;
+}
+
+.td-side {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  pointer-events: none;
+}
+
+.td-side > * {
+  pointer-events: auto;
+}
+
+.td-panel {
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 12px;
+  background: var(--td-plaque);
+  box-shadow: var(--td-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.td-panel__title {
+  margin: 0;
+  font: 700 19px/1.2 var(--td-display);
+}
+
+.td-panel__heading {
+  margin: 8px 0 4px;
+  font: 700 13px/1.2 var(--td-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-panel__note {
+  margin: 2px 0 6px;
+  font: 400 13px/1.4 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-insight__counts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.td-insight__counts div {
+  text-align: center;
+}
+
+.td-insight__counts dt {
+  font: 600 11px/1.2 var(--td-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-insight__counts dd {
+  margin: 0;
+  font: 700 18px/1.2 var(--td-display);
+}
+
+.td-insight__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 0;
+}
+
+.td-insight__deals {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 4px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.td-insight__deal {
+  display: flex;
+  gap: 3px;
+}
+
+.td-chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 24px;
+  padding: 0 3px;
+  border-radius: 5px;
+  background: #fbf7ee;
+  border: 1px solid #c9b58c;
+  color: #1d1d2a;
+  font: 700 13px/1 var(--td-body);
+}
+
+.td-chip--red {
+  color: #b8243a;
+}
+
+.td-chip--shows {
+  outline: 2px solid var(--td-pressed);
+  outline-offset: 1px;
+}
+
+.td-chip--unseen {
+  background: repeating-linear-gradient(45deg, #1f5a46 0 4px, #2a6b55 4px 8px);
+  border-color: #c9a85a;
+  color: #f6efdc;
+}
+
+.td-app[data-look='observatory'] .td-chip--unseen {
+  background: repeating-linear-gradient(45deg, #16204a 0 4px, #1f2b5e 4px 8px);
+}
+
+/* Beside a short table: the explanation folds away (the button carries the price) and chips shrink. */
+.td-side.is-short .td-insight .td-panel__note {
+  display: none;
+}
+
+.td-side.is-short .td-insight__counts dd {
+  font-size: 16px;
+}
+
+.td-side.is-short .td-chip {
+  min-width: 26px;
+  height: 20px;
+  font-size: 12px;
+}
+
+.td-side.is-short .td-insight__deals {
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 3px 6px;
+}
+
+/* Beside the table the book is a narrow page: the margin, no rules to fight the rows. */
+.td-panel.td-ledger {
+  color: var(--td-paper-ink);
+  background-color: var(--td-paper);
+  background-image: linear-gradient(
+    90deg,
+    transparent 30px,
+    var(--td-paper-margin) 30px,
+    var(--td-paper-margin) 31px,
+    transparent 31px
+  );
+  padding: 12px 14px 12px 42px;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgb(20 10 0 / 0.25);
+}
+
+.td-ledger .td-panel__note {
+  color: var(--td-paper-ink);
+  opacity: 0.8;
+}
+
+.td-ledger__entries {
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+  font: 500 14px/26px var(--td-mono);
+}
+
+.td-ledger__entries li {
+  display: flex;
+  justify-content: space-between;
+}
+
+.td-ledger__entries .is-debit span:last-child {
+  color: var(--td-debit);
+}
+
+.td-ledger__statement {
+  width: 100%;
+  border-collapse: collapse;
+  font: 500 13px/22px var(--td-mono);
+}
+
+.td-ledger__statement th {
+  text-align: left;
+  font: 600 13px/22px var(--td-body);
+}
+
+.td-ledger__statement td,
+.td-ledger__statement thead th {
+  padding-left: 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* No room for every cost line by line: this deal's entries above carry them, the totals stay. */
+.td-side.is-short .td-ledger__cost {
+  display: none;
+}
+
+.td-side.is-short .td-ledger__entries {
+  line-height: 22px;
+}
+
+.td-ledger__total th,
+.td-ledger__total td {
+  font-weight: 700;
+}
+
+.td-ledger__balance {
+  margin: 8px 0 0;
+  font: 700 17px/1.2 var(--td-display);
+}
+
+/* —— the Bank's next stage, notices —— */
+
+.td-stage-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 86px;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 32px));
+}
+
+.td-stage {
+  padding: 14px 18px;
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 14px;
+  background: var(--td-page);
+  box-shadow: var(--td-shadow);
+}
+
+.td-stage.is-asking {
+  border-color: var(--td-accent);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--td-accent) 45%, transparent),
+    var(--td-shadow);
+}
+
+.td-stage__lead {
+  margin: 0;
+  font: 700 20px/1.25 var(--td-display);
+}
+
+.td-stage__body {
+  margin: 4px 0 10px;
+  font: 400 15px/1.45 var(--td-body);
+  color: var(--td-ink-2);
+}
+
+.td-stage__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.td-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 84px;
+  transform: translate(-50%, 8px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, calc(100% - 32px));
+  padding: 10px 16px;
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 12px;
+  background: var(--td-page);
+  box-shadow: var(--td-shadow);
+  font: 600 15px/1.4 var(--td-body);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.td-notice.is-shown {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+/* —— results —— */
+
+.td-results-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 72px 24px 24px;
+  background: var(--td-dim);
+  animation: td-fade 0.35s ease both;
+}
+
+.td-results {
+  width: min(580px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 22px 26px;
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 18px;
+  background: var(--td-page);
+  color: var(--td-ink);
+  box-shadow: var(--td-shadow);
+}
+
+.td-results--won {
+  border-color: var(--td-accent);
+}
+
+.td-results__kicker {
+  margin: 0;
+  font: 600 13px/1.3 var(--td-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-results__title {
+  margin: 4px 0;
+  font: 700 38px/1.1 var(--td-display);
+  outline: none;
+}
+
+.td-results__story,
+.td-results__verdict {
+  margin: 0 0 8px;
+  font: 400 16px/1.5 var(--td-body);
+}
+
+.td-results__verdict {
+  font-style: italic;
+  color: var(--td-ink-2);
+}
+
+.td-results__stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.td-results__stats div {
+  padding: 6px 4px;
+  border-radius: 8px;
+  background: var(--td-button);
+  text-align: center;
+}
+
+.td-results__stats dt {
+  font: 600 11px/1.2 var(--td-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-results__stats dd {
+  margin: 2px 0 0;
+  font: 700 18px/1.2 var(--td-display);
+}
+
+.td-results__breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  font: 500 15px/1.6 var(--td-body);
+}
+
+.td-results__breakdown th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.td-results__breakdown td {
+  text-align: right;
+  font-family: var(--td-mono);
+}
+
+.td-results__breakdown .is-total th,
+.td-results__breakdown .is-total td {
+  font-weight: 700;
+  border-top: 1px solid color-mix(in srgb, var(--td-plaque-edge) 60%, transparent);
+}
+
+.td-results__notes {
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+  font: 600 15px/1.5 var(--td-body);
+  color: var(--td-good);
+}
+
+.td-results__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* —— dialogs and the tutorial coach —— */
+
+.td-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: var(--td-dim);
+}
+
+.td-dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 20px 22px;
+  border: 1px solid var(--td-plaque-edge);
+  border-radius: 16px;
+  background: var(--td-page);
+  color: var(--td-ink);
+  box-shadow: var(--td-shadow);
+}
+
+.td-dialog__title {
+  margin: 0;
+  font: 700 24px/1.2 var(--td-display);
+}
+
+.td-dialog__body {
+  margin: 8px 0 16px;
+  font: 400 16px/1.45 var(--td-body);
+}
+
+.td-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.td-coach {
+  position: absolute;
+  z-index: 5;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 2px solid var(--td-accent);
+  border-radius: 14px;
+  background: var(--td-page);
+  color: var(--td-ink);
+  box-shadow: var(--td-shadow);
+  animation: td-rise 0.3s ease both;
+}
+
+.td-coach.is-still {
+  animation: none;
+}
+
+.td-coach__step {
+  margin: 0;
+  font: 600 12px/1.3 var(--td-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--td-ink-2);
+}
+
+.td-coach__text {
+  margin: 4px 0 10px;
+  font: 500 16px/1.45 var(--td-body);
+}
+
+.td-coach__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Headings take focus so screen readers start there; they need no ring. */
+.td-app [tabindex='-1']:focus-visible {
+  outline: none;
+}
+
+@keyframes td-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes td-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 760px) {
+  .td-page__body--two {
+    grid-template-columns: 1fr;
+  }
+
+  .td-title__card {
+    width: 100%;
+  }
+
+  .td-results__stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

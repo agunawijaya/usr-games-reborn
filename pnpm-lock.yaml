@@ -216,6 +216,12 @@ importers:
 
   games/blocks-classic/app: {}
 
+  games/canfield:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/dab:
     dependencies:
       '@usr-games/kit':
