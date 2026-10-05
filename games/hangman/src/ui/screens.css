@@ -1,0 +1,449 @@
+/*
+ * Before the Tide's screens beyond the play interface: buttons, cards between words and at the
+ * end, a Duel's privacy screens, choosing a deck, and the tutorial's coach. Same tokens and
+ * `--s` scale as styles.css; Midday and Moonlit Tide each set their own primary colours.
+ */
+.bt[data-look='midday'] {
+  --bt-primary: #0a6f83;
+  --bt-primary-ink: #ffffff;
+  --bt-privacy: #f2e3c4;
+  --bt-privacy-ripple: #e6d1a8;
+  --bt-privacy-light: rgba(255, 252, 240, 0.85);
+}
+
+.bt[data-look='moonlit'] {
+  --bt-primary: #5ef0ff;
+  --bt-primary-ink: #04202a;
+  --bt-privacy: #1a1830;
+  --bt-privacy-ripple: #24223e;
+  --bt-privacy-light: rgba(120, 150, 255, 0.12);
+}
+
+.bt-play,
+.bt-title-screen,
+.bt-setup {
+  position: absolute;
+  inset: 0;
+}
+
+.bt-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: max(9px, calc(12px * var(--s))) max(16px, calc(22px * var(--s)));
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--bt-ink) 22%, transparent);
+  background: color-mix(in srgb, var(--bt-ink) 6%, transparent);
+  color: var(--bt-ink);
+  font: 600 max(16px, calc(19px * var(--s))) / 1.2 var(--bt-body);
+  cursor: pointer;
+}
+
+.bt-button:hover {
+  background: color-mix(in srgb, var(--bt-primary) 16%, transparent);
+}
+
+.bt-button--primary {
+  background: var(--bt-primary);
+  border-color: transparent;
+  color: var(--bt-primary-ink);
+}
+
+.bt-button--primary:hover {
+  background: color-mix(in srgb, var(--bt-primary) 85%, #ffffff);
+}
+
+.bt-button--primary .bt-kbd {
+  color: var(--bt-primary-ink);
+  border-color: color-mix(in srgb, var(--bt-primary-ink) 40%, transparent);
+  background: color-mix(in srgb, var(--bt-primary-ink) 14%, transparent);
+}
+
+.bt-button:focus,
+.bt-chip:focus,
+.bt-deck:focus,
+.bt-input:focus {
+  outline: none;
+}
+
+.bt-button:focus-visible,
+.bt-chip:focus-visible,
+.bt-deck:focus-visible,
+.bt-input:focus-visible {
+  outline: 3px solid var(--bt-focus);
+  outline-offset: 3px;
+}
+
+/* ——— the status line and the tutorial's coach ——— */
+
+.bt-status {
+  position: absolute;
+  margin: 0;
+  transform: translate(-50%, -100%);
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--bt-panel);
+  border: 1px solid var(--bt-panel-edge);
+  color: var(--bt-ink);
+  font: 600 max(15px, calc(18px * var(--s))) / 1.3 var(--bt-body);
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+.bt-status[data-empty='true'] {
+  opacity: 0;
+}
+
+.bt-coach {
+  position: absolute;
+  left: 50%;
+  top: max(16px, calc(28px * var(--s)));
+  transform: translateX(-50%);
+  max-width: min(720px, 44vw);
+  margin: 0;
+  padding: max(12px, calc(16px * var(--s))) max(16px, calc(22px * var(--s)));
+  border-radius: max(14px, calc(20px * var(--s)));
+  background: var(--bt-panel);
+  border: 2px solid var(--bt-primary);
+  box-shadow: var(--bt-panel-shadow);
+  color: var(--bt-ink);
+  font: 500 max(16px, calc(20px * var(--s))) / 1.4 var(--bt-body);
+}
+
+/* ——— cards ——— */
+
+.bt-card {
+  position: absolute;
+  display: grid;
+  gap: max(8px, calc(12px * var(--s)));
+  padding: max(16px, calc(24px * var(--s))) max(18px, calc(30px * var(--s)));
+  border-radius: max(18px, calc(26px * var(--s)));
+  background: var(--bt-panel);
+  border: 1px solid var(--bt-panel-edge);
+  box-shadow: var(--bt-panel-shadow);
+  backdrop-filter: blur(12px);
+  color: var(--bt-ink);
+}
+
+.bt-card p {
+  margin: 0;
+}
+
+.bt-card--between {
+  transform: translateX(-50%);
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: max(12px, calc(24px * var(--s)));
+  padding: max(12px, calc(18px * var(--s))) max(16px, calc(26px * var(--s)));
+}
+
+.bt-card__text {
+  display: grid;
+  gap: 4px;
+}
+
+.bt-card--between .bt-card__headline {
+  font-size: max(20px, calc(28px * var(--s)));
+}
+
+.bt-card--between .bt-card__note {
+  font-size: max(15px, calc(17px * var(--s)));
+}
+
+.bt-card__eyebrow {
+  font: 600 max(13px, calc(16px * var(--s))) / 1.2 var(--bt-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bt-ink-soft);
+}
+
+.bt-card__title,
+.bt-card__headline {
+  margin: 0;
+  font: 600 max(24px, calc(38px * var(--s))) / 1.1 var(--bt-display);
+}
+
+.bt-card__headline {
+  font-size: max(22px, calc(32px * var(--s)));
+}
+
+.bt-card__word {
+  font-size: max(17px, calc(21px * var(--s)));
+  color: var(--bt-ink-soft);
+}
+
+.bt-card__word strong {
+  font: 600 max(20px, calc(26px * var(--s))) / 1.1 var(--bt-display);
+  letter-spacing: 0.06em;
+  color: var(--bt-ink);
+}
+
+.bt-card__note {
+  font-size: max(16px, calc(18px * var(--s)));
+  line-height: 1.45;
+  color: var(--bt-ink-soft);
+  max-width: 60ch;
+}
+
+.bt-card__problem {
+  min-height: 1.4em;
+  font-weight: 600;
+  color: var(--bt-warm);
+}
+
+.bt[data-look='midday'] .bt-card__problem {
+  color: #a33a12;
+}
+
+.bt-card__duel {
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+  font-size: max(16px, calc(19px * var(--s)));
+}
+
+.bt-card__hint {
+  color: var(--bt-ink-soft);
+  font-size: 0.9em;
+}
+
+.bt-card__rows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 24px;
+  margin: 0;
+  font-size: max(16px, calc(19px * var(--s)));
+}
+
+.bt-card__rows dt {
+  color: var(--bt-ink-soft);
+}
+
+.bt-card__rows dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bt-card__xp {
+  font: 600 max(18px, calc(22px * var(--s))) / 1.2 var(--bt-display);
+}
+
+.bt-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: max(8px, calc(12px * var(--s)));
+  margin-top: max(4px, calc(8px * var(--s)));
+}
+
+.bt-card--between .bt-card__actions {
+  margin-top: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bt-results-veil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bt-panel) 25%, transparent);
+}
+
+.bt-results-veil .bt-card {
+  position: relative;
+  width: min(92vw, max(560px, calc(680px * var(--s))));
+}
+
+.bt-setup .bt-card {
+  position: relative;
+  width: min(92vw, max(600px, calc(760px * var(--s))));
+}
+
+.bt-setup {
+  display: grid;
+  align-items: center;
+  justify-items: start;
+  padding-left: max(16px, calc(64px * var(--s)));
+}
+
+.bt-setup .bt-card {
+  max-height: calc(100% - 80px);
+  overflow: auto;
+  gap: max(8px, calc(12px * var(--s)));
+}
+
+.bt-share {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.bt-share__line {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bt-ink) 6%, transparent);
+  font-size: max(15px, calc(18px * var(--s)));
+}
+
+/* ——— a Duel's privacy screens: opaque, so the guesser cannot peek ——— */
+
+.bt-privacy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* Opaque on purpose, so the guesser cannot read the keys: wind ripples in dry sand instead. */
+  background:
+    radial-gradient(ellipse at 30% 20%, var(--bt-privacy-light), transparent 55%),
+    repeating-radial-gradient(
+      ellipse at 50% 130%,
+      var(--bt-privacy) 0 22px,
+      var(--bt-privacy-ripple) 24px 26px,
+      var(--bt-privacy) 28px 46px
+    );
+}
+
+.bt-privacy .bt-card {
+  position: relative;
+  width: min(92vw, max(440px, calc(620px * var(--s))));
+  backdrop-filter: none;
+}
+
+.bt-secret-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.bt-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid color-mix(in srgb, var(--bt-ink) 30%, transparent);
+  background: color-mix(in srgb, var(--bt-ink) 4%, transparent);
+  color: var(--bt-ink);
+  font: 600 max(18px, calc(22px * var(--s))) / 1.2 var(--bt-body);
+  letter-spacing: 0.08em;
+}
+
+.bt-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+/* ——— choosing a deck ——— */
+
+.bt-decks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: max(8px, calc(10px * var(--s)));
+}
+
+.bt-deck {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  text-align: left;
+  padding: max(10px, calc(14px * var(--s)));
+  border-radius: 14px;
+  border: 2px solid color-mix(in srgb, var(--bt-ink) 14%, transparent);
+  background: color-mix(in srgb, var(--bt-ink) 4%, transparent);
+  color: var(--bt-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bt-deck[aria-checked='true'] {
+  border-color: var(--bt-primary);
+  background: color-mix(in srgb, var(--bt-primary) 14%, transparent);
+}
+
+.bt-deck__title {
+  display: flex;
+  justify-content: space-between;
+  font: 600 max(17px, calc(21px * var(--s))) / 1.15 var(--bt-display);
+}
+
+.bt-deck__found {
+  color: var(--bt-right);
+}
+
+.bt-deck__blurb {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: max(14px, calc(15px * var(--s)));
+  line-height: 1.35;
+  color: var(--bt-ink-soft);
+}
+
+.bt-deck__count {
+  font-size: max(13px, calc(14px * var(--s)));
+  color: var(--bt-ink-soft);
+}
+
+.bt-setup-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.bt-setup-label {
+  font-weight: 600;
+}
+
+.bt-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bt-chip {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--bt-ink) 18%, transparent);
+  background: transparent;
+  color: var(--bt-ink);
+  font: 600 max(15px, calc(17px * var(--s))) / 1.2 var(--bt-body);
+  cursor: pointer;
+}
+
+.bt-chip[aria-checked='true'] {
+  border-color: var(--bt-primary);
+  background: var(--bt-primary);
+  color: var(--bt-primary-ink);
+}
+
+.bt-glance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: max(10px, calc(14px * var(--s))) 0 0;
+  padding: 0 max(6px, calc(10px * var(--s)));
+  font-size: max(14px, calc(16px * var(--s)));
+  color: var(--bt-ink-soft);
+}
+
+.bt-glance strong {
+  color: var(--bt-ink);
+}
+
+.bt-day {
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
+.bt[data-motion='reduce'] .bt-slot--fresh .bt-slot__letter {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+
+.bt[data-motion='reduce'] .bt-status {
+  transition: none;
+}

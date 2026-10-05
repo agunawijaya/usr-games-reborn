@@ -45,7 +45,7 @@ Status values: `coming-soon`, `adopting`, `in progress`, `hero frames` (waiting 
 | mille | Road-trip card race | native | coming-soon | brief pending | — |
 | pig | Dice push-your-luck | native | coming-soon | brief pending | — |
 | letters | Letter grid | native | coming-soon | brief pending | — |
-| hangman | Word guess | native | coming-soon | brief pending | — |
+| hangman | Before the Tide | native | shipped | 11 | hero frames approved 2026-10-05 after a redrawn castle that falls like sand (each section sinks into its own heap, outside in); the original's rules kept exactly (seven waves, nine for a lost word, the golf average) with its biased picker reproduced in tests only and a fair picker in play; nine decks written for the game (3 043 everyday words and eight themed decks of about 150, Computing history with a note per word), difficulty tiers fitted to a model player; Daily Word with share line, Beach day, Tide run (clean words mend the castle), Duel with privacy screens, Classic with the 1983 figures, tutorial; WebGL sea under a Canvas castle (ADR 0001), 60 fps at 1920×1080; Midday and Moonlit Tide designed |
 | quiz | Trivia | native | coming-soon | brief pending | — |
 | arithmetic | Number sprint | native | coming-soon | brief pending | — |
 | signal | Signal lab | native | coming-soon | brief pending | — |

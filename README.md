@@ -75,7 +75,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Road-trip card race | `/usr/games/cards`    | mille (1983)                                      | coming soon | native |
 | Dice push-your-luck | `/usr/games/cards`    | pig (1992)                                        | coming soon | native |
 | Letter grid         | `/usr/games/words`    | the BSD letter-grid program (1993)                | coming soon | native |
-| Word guess          | `/usr/games/words`    | hangman (1983)                                    | coming soon | native |
+| Before the Tide     | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | native |
 | Trivia              | `/usr/games/words`    | quiz (1991)                                       | coming soon | native |
 | Number sprint       | `/usr/games/numbers`  | arithmetic (1989)                                 | coming soon | native |
 | Signal lab          | `/usr/games/numbers`  | caesar, morse and friends (1980)                  | coming soon | native |

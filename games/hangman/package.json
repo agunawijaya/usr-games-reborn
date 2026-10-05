@@ -1,0 +1,14 @@
+{
+  "name": "@usr-games/game-hangman",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Before the Tide: guess the word before the sea takes the sandcastle. Inspired by hangman (BSD games, 1983).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5290 --strictPort"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

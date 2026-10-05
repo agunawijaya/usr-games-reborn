@@ -234,6 +234,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/hangman:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/hunt/app:
     devDependencies:
       playwright:

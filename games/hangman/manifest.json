@@ -1,0 +1,127 @@
+{
+  "id": "hangman",
+  "title": "Before the Tide",
+  "tagline": "Guess the word before the sea does.",
+  "teaser": "A sandcastle, an incoming tide and a hidden word. Every right letter carves a window; every wrong one sends a wave. Seven waves and the beach takes it back. The Berkeley word game, rebuilt on a beach drawn entirely in code.",
+  "category": "words",
+  "directory": "/usr/games/words",
+  "players": {
+    "min": 1,
+    "max": 2
+  },
+  "sessionMinutes": [2, 10],
+  "status": "shipped",
+  "accent": "#1aa6b8",
+  "emblem": "M4 41q5-4 10 0t10 0 10 0 10 0M8 34h32M11 34V20M18 34V20M11 20h7M11 20v-3M14.5 20v-3M18 20v-3M30 34V20M37 34V20M30 20h7M30 20v-3M33.5 20v-3M37 20v-3M18 26h12M21 26V14h6v12M24 14V6l6 2.5-6 2.5M22 34v-3a2 2 0 0 1 4 0v3",
+  "inspiredBy": {
+    "program": "hangman",
+    "originalTitle": "hangman",
+    "uiTitle": "the Berkeley word-guessing game",
+    "year": 1983
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "Before the Tide — guess the hidden word letter by letter before seven waves take the sandcastle.",
+    "description": "Ken Arnold's word-guessing game from the Berkeley distribution, reborn on a beach. Right letters write themselves into the wet sand and decorate a sandcastle; wrong ones send waves that wash it away a piece at a time. The original's golf-style average lives on as the tide average, with nine for a lost word, and Classic keeps its 1983 rules.",
+    "seeAlso": ["letters", "quiz"]
+  },
+  "howToPlay": [
+    "Guess the hidden word one letter at a time: type it, or click a shell.",
+    "Each wrong letter sends a wave that washes part of the castle away; seven waves and the tide wins.",
+    "Your tide average is the waves per word, golf-style: lower is better, and a lost word counts nine."
+  ],
+  "cronGoals": [
+    {
+      "id": "words",
+      "stat": "wordsFound",
+      "label": "Find {n} words in Before the Tide",
+      "min": 10,
+      "max": 40
+    },
+    {
+      "id": "clean",
+      "stat": "cleanWords",
+      "label": "Find {n} words without a wave in Before the Tide",
+      "min": 2,
+      "max": 8
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-castle",
+      "title": "Castle standing",
+      "description": "Find your first word before the tide does.",
+      "tier": "core"
+    },
+    {
+      "id": "clean-sweep",
+      "title": "Not a drop",
+      "description": "Find a word without a single wave reaching the castle.",
+      "tier": "core"
+    },
+    {
+      "id": "last-wave",
+      "title": "One wave short",
+      "description": "Find a word with six waves in, when the next would have taken the castle.",
+      "tier": "core"
+    },
+    {
+      "id": "long-word",
+      "title": "Long shoreline",
+      "description": "Find a word of twelve letters.",
+      "tier": "core"
+    },
+    {
+      "id": "duelist",
+      "title": "Sand duelist",
+      "description": "Finish a Duel with a friend.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Morning walker",
+      "description": "Play seven Daily Words.",
+      "tier": "core"
+    },
+    {
+      "id": "deck-explorer",
+      "title": "Beachcomber",
+      "description": "Find a word from every deck.",
+      "tier": "extra"
+    },
+    {
+      "id": "historian",
+      "title": "Punched in",
+      "description": "Find ten words from the Computing history deck.",
+      "tier": "extra"
+    },
+    {
+      "id": "no-lighthouse",
+      "title": "By starlight",
+      "description": "Play twenty words in a row without the Lighthouse.",
+      "tier": "extra"
+    },
+    {
+      "id": "classic-at-heart",
+      "title": "Berkeley sands",
+      "description": "Find five Classic words in a row.",
+      "tier": "extra"
+    },
+    {
+      "id": "par-golfer",
+      "title": "Under par",
+      "description": "Keep a tide average under 2 over a beach of ten words or more.",
+      "tier": "rare"
+    },
+    {
+      "id": "tide-runner",
+      "title": "Ten before the tide",
+      "description": "Find all ten words of a Tide run.",
+      "tier": "rare"
+    }
+  ]
+}

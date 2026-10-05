@@ -32,7 +32,7 @@
     { "id": "mille", "source": "placeholder" },
     { "id": "pig", "source": "placeholder" },
     { "id": "letters", "source": "placeholder" },
-    { "id": "hangman", "source": "placeholder" },
+    { "id": "hangman", "source": "game" },
     { "id": "quiz", "source": "placeholder" },
     { "id": "arithmetic", "source": "placeholder" },
     { "id": "signal", "source": "placeholder" },
