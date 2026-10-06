@@ -110,8 +110,12 @@ export function reportShift(outcome, summary, details) {
   });
 }
 
-/** Key art for the Hall: the well as the game menu left it drawn. */
-export function offerPoster(canvas) {
-  if (!hall?.hosted || !canvas) return;
-  hall.posterFromCanvas(canvas);
+/**
+ * Key art for the Hall: the old well in the earth, painted by src/underground.js in the look the
+ * Hall is showing, so its shelves, rail tiles and cards show the game rather than a blank well.
+ */
+export function offerPoster(appearance) {
+  const art = globalThis.BrokenWellArt;
+  if (!hall?.hosted || !art) return;
+  hall.posterFromCanvas(art.paintPoster(appearance === 'light' ? 'light' : 'dark'));
 }

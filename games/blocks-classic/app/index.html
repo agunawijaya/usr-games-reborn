@@ -62,7 +62,17 @@
     flex-direction: column;
   }
 
+  #earth-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
   #top-bar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -94,6 +104,8 @@
   .bw-pause-btn kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.7; }
 
   #play-area {
+    position: relative;
+    z-index: 1;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
@@ -103,11 +115,10 @@
     padding: 8px 24px 24px;
   }
 
+  /* The shaft, its wall stones and the falling stones are all drawn by src/underground.js; the
+     brick lining round the canvas belongs to the earth behind it. */
   #well-canvas {
-    background: var(--well-canvas-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5) inset;
+    display: block;
   }
 
   #side-panel {
@@ -143,6 +154,7 @@
 </head>
 <body data-desk="menu">
   <div id="game-container">
+    <canvas id="earth-canvas" aria-hidden="true"></canvas>
     <div id="top-bar">
       <div>
         <span class="bw-title">BROKEN WELL</span>
@@ -174,6 +186,7 @@
        settings) is built by src/desk.mjs; this page only draws the live well and its HUD. -->
   <script src="../../bridge/bridge.js"></script>
   <script src="src/engine.js"></script>
+  <script src="src/underground.js"></script>
 
   <script>
     const wellCanvas = document.getElementById('well-canvas');
@@ -208,6 +221,7 @@
       cellSize = Math.max(8, Math.min(34, w / game.width));
       wellCanvas.width = Math.round(cellSize * game.width);
       wellCanvas.height = Math.round(cellSize * game.height);
+      art.refresh(game, cellSize);
       draw();
     }
     window.addEventListener('resize', resize);
@@ -218,65 +232,11 @@
       document.getElementById('hud-score').textContent = game.score;
     }
 
-    function drawBlock(ctx, x, y, cs, color, alpha, outlineOnly) {
-      const px = x * cs;
-      const py = y * cs;
-      ctx.globalAlpha = alpha;
-      if (outlineOnly) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(px + 2, py + 2, cs - 4, cs - 4);
-      } else {
-        ctx.fillStyle = color;
-        ctx.fillRect(px + 1, py + 1, cs - 2, cs - 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.22)';
-        ctx.fillRect(px + 1, py + 1, cs - 2, cs * 0.22);
-        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(px + 1.5, py + 1.5, cs - 3, cs - 3);
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    function drawRock(ctx, x, y, cs) {
-      const px = x * cs;
-      const py = y * cs;
-      ctx.fillStyle = BrokenWellEngine.ROCK_COLOR;
-      ctx.fillRect(px, py, cs, cs);
-      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-      ctx.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1);
-    }
+    const art = window.BrokenWellArt;
+    const theme = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
 
     function drawWell() {
-      wellCtx.clearRect(0, 0, wellCanvas.width, wellCanvas.height);
-      const cs = cellSize;
-      // The open-cell grid reads as a faint light etching on dark stone, and a faint dark
-      // etching on the light look's pale stone — never the same colour inverted.
-      const gridLine = document.documentElement.dataset.theme === 'light' ? 'rgba(42,33,23,0.10)' : 'rgba(255,255,255,0.05)';
-      for (let y = 0; y < game.height; y++) {
-        for (let x = 0; x < game.width; x++) {
-          const cell = game.board[y][x];
-          if (cell.type === 'rock') drawRock(wellCtx, x, y, cs);
-          else if (cell.type === 'filled') drawBlock(wellCtx, x, y, cs, cell.color, 1, false);
-          else {
-            wellCtx.strokeStyle = gridLine;
-            wellCtx.lineWidth = 1;
-            wellCtx.strokeRect(x * cs + 0.5, y * cs + 0.5, cs - 1, cs - 1);
-          }
-        }
-      }
-      if (game.current) {
-        for (const c of game.current.cells) {
-          const x = game.current.x + c.x;
-          const y = game.ghostY + c.y;
-          if (y >= 0) drawBlock(wellCtx, x, y, cs, BrokenWellEngine.PIECE_COLORS[game.current.type], BrokenWellEngine.GHOST_ALPHA, true);
-        }
-        for (const c of game.current.cells) {
-          const x = game.current.x + c.x;
-          const y = game.current.y + c.y;
-          if (y >= 0) drawBlock(wellCtx, x, y, cs, BrokenWellEngine.PIECE_COLORS[game.current.type], 1, false);
-        }
-      }
+      art.drawWell(wellCtx, game, cellSize, theme());
       for (const p of particles) {
         wellCtx.globalAlpha = Math.max(0, p.life);
         wellCtx.fillStyle = p.color;
@@ -292,44 +252,15 @@
       if (!game || !game.nextType) return;
       // The next piece is always drawn in its spawn rotation.
       const shapeCells = (window.__brokenWellShapes || {})[game.nextType];
-      if (!shapeCells) return;
-      let minX = 0, maxX = 0, minY = 0, maxY = 0;
-      for (const c of shapeCells) {
-        minX = Math.min(minX, c.x);
-        maxX = Math.max(maxX, c.x);
-        minY = Math.min(minY, c.y);
-        maxY = Math.max(maxY, c.y);
-      }
-      const bw = maxX - minX + 1;
-      const bh = maxY - minY + 1;
-      const cs = Math.min(nextCanvas.width / (bw + 1), nextCanvas.height / (bh + 1));
-      const offX = (nextCanvas.width - cs * bw) / 2 - minX * cs;
-      const offY = (nextCanvas.height - cs * bh) / 2 - minY * cs;
-      nextCtx.fillStyle = BrokenWellEngine.PIECE_COLORS[game.nextType];
-      for (const c of shapeCells) {
-        nextCtx.fillRect(offX + c.x * cs + 1, offY + c.y * cs + 1, cs - 2, cs - 2);
-      }
+      if (shapeCells) art.drawNext(nextCtx, game.nextType, shapeCells, theme());
     }
 
+    /** A row of stones gives way: dust and pebbles fly, and the worms in the earth flinch. */
     function spawnClearParticles(rows) {
-      if (reducedMotion || rows.length === 0) return;
-      const cs = cellSize;
-      for (const y of rows) {
-        for (let x = 0; x < game.width; x++) {
-          for (let i = 0; i < 4; i++) {
-            particles.push({
-              x: (x + 0.5) * cs,
-              y: (y + 0.5) * cs,
-              vx: (Math.random() - 0.5) * 7,
-              vy: (Math.random() - 0.5) * 7 - 2,
-              life: 1,
-              decay: 0.025 + Math.random() * 0.03,
-              color: '#f5c242',
-              size: cs * (0.12 + Math.random() * 0.18),
-            });
-          }
-        }
-      }
+      if (rows.length === 0) return;
+      art.startle();
+      if (reducedMotion) return;
+      particles.push(...art.clearParticles(rows, game.width, cellSize));
     }
 
     function updateParticles() {
@@ -344,6 +275,7 @@
     }
 
     function draw() {
+      if (!game) return;
       drawWell();
       drawNext();
     }
@@ -411,7 +343,7 @@
       current: () => game,
       canvas: () => wellCanvas,
       setRunning(value) { running = value; if (value) { lastTime = performance.now(); requestAnimationFrame(loop); } },
-      setReducedMotion(value) { reducedMotion = value; },
+      setReducedMotion(value) { reducedMotion = value; art.setReducedMotion(value); },
       setSoundLevel(level) { masterLevel = level; },
       /** The side panel's reminder of this shift's contracts, from the briefing's own wording. */
       setContracts(texts) {
@@ -435,6 +367,14 @@
       J: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }],
       L: [{ x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: -1, y: 1 }],
     };
+
+    // The earth around the well follows the look the Hall chose (desk.mjs sets data-theme).
+    art.mountEarth(document.getElementById('earth-canvas'), document.getElementById('game-container'), wellCanvas);
+    art.setTheme(theme());
+    new MutationObserver(() => {
+      art.setTheme(theme());
+      draw();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     resize();
   </script>

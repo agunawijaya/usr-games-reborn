@@ -29,6 +29,7 @@ flowchart LR
 | ------------------------ | -------------------------------------------------------------------------------------------- |
 | `app/index.html`         | The adopted page: the well canvas, next-piece canvas, HUD, input, the animation loop         |
 | `app/src/engine.js`      | The adopted engine: wells, pieces, wall kicks, lock delay, rubble, the flood — no DOM         |
+| `app/src/underground.js` | The look (`window.BrokenWellArt`): the earth, the field-stone well, the stones, the key art   |
 | `app/src/desk.mjs`       | Every screen around a shift, and what the page tells it (`window.BrokenWellDesk`)            |
 | `app/src/career.mjs`     | The twelve shifts, ranks, unlocking, stars                                                   |
 | `app/src/quests.mjs`     | Contract kinds, their wording and their checks                                               |
@@ -81,9 +82,11 @@ does.
 
 | Visual                                   | Defined in                           | Change it by                                  |
 | ----------------------------------------- | ------------------------------------- | ---------------------------------------------- |
-| The well, pieces, ghost, rock             | `index.html` (`drawWell`, `drawBlock`, `drawRock`) | the adopted canvas drawing code  |
-| The rubble burst on a line clear          | `index.html` (`spawnClearParticles`, `updateParticles`) | particle count, colour, decay |
-| The next-piece preview                    | `index.html` (`drawNext`)             | the mirrored spawn-rotation shape table        |
+| The well: field-stone lining, open shaft, pieces as stones, ghost | `src/underground.js` (`drawWell`, `packRubble`, `paintStone`) | `STONE_COLORS`, `LOOKS`, the rubble lattice |
+| The earth round it: grass, strata, roots, worms, lantern | `src/underground.js` (`paintStatic`, `paintLiving`), drawn on `#earth-canvas` | the same file; it shares the well's stone lattice, so seams stay invisible |
+| The rubble burst on a line clear          | `index.html` (`spawnClearParticles`) with `BrokenWellArt.clearParticles`; worms flinch via `startle` | particle count, colour, decay |
+| The next-piece preview                    | `src/underground.js` (`drawNext`)     | the mirrored spawn-rotation shape table        |
+| The Hall's key art                        | `src/underground.js` (`paintPoster`)  | `posterGame`'s staged well; keep the well right of centre |
 | HUD, menu, briefing, pause, report        | `src/desk.mjs`, `src/desk.css`        | the desk                                       |
 | Light and dark looks                      | `index.html`'s `:root` custom properties, `:root[data-theme='light']` | both palettes designed, not inverted |
 
@@ -108,7 +111,10 @@ through `onHallSound`, ready for sound to be added later.
   `hello`/`appearance-changed` payloads (or the system preference, outside the Hall); outside the
   Hall this is the only place the look is chosen. `onHallReducedMotion` turns off the rubble burst.
   `pauseWhenHidden: true` folds a hidden tab into the same pause the Hall sends.
-- **Key art.** The well canvas, offered once a shift has drawn something worth showing.
+- **Key art.** `offerPoster` sends `BrokenWellArt.paintPoster` (the earth, the well, a stack of
+  stones and a falling piece, painted off-screen) when the Hall says hello and on every change of
+  look, so the Hall shows the game even before a shift is played. In the dev Hall it appears once
+  the game has been opened; `pnpm build` captures it for a first visit.
 - **Saves.** `usr-games:blocks-classic:` `career`, `logbook`, `daily`, each at version 1.
 - **Daily.** The number from the kit's epoch (2026-09-01), the seed from the date;
   `?date=YYYY-MM-DD` stands in for today when testing.

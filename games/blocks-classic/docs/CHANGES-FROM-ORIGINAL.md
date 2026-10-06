@@ -30,6 +30,9 @@ pressure and variety around that one decision loop, never replaces it.
 - **Our own gamification**, new to this adoption: a twelve-shift career with ranks, three
   contracts per shift, a logbook, Free Dig and a Daily Shift. None of it changes how a piece
   falls, rotates or locks.
+- **An underground look, drawn in code**, new to this adoption: the well is an old broken
+  field-stone well in a cross-section of earth (grass, strata, roots, worms, a lantern), and the
+  pieces are rough, chipped stones in seven colours rather than flat squares.
 - **The title and every UI string are ours.** The trademarked name never appears on screen; the
   original is credited only in `manifest.json`'s `inspiredBy.originalTitle` and in
   [`CREDITS.md`](../../CREDITS.md).

@@ -514,6 +514,7 @@ if (!hostedInHall && globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')
 }
 onHallAppearance((appearance) => {
   document.documentElement.dataset.theme = appearance === 'light' ? 'light' : 'dark';
+  offerPoster(appearance);
 });
 // Outside the Hall, the system's own light/dark preference picks the well's look.
 if (!hostedInHall && globalThis.matchMedia?.('(prefers-color-scheme: light)').matches) {
@@ -524,9 +525,3 @@ window.BrokenWellDesk = { checkShiftEnd, togglePause };
 
 showMenu();
 
-if (hostedInHall) {
-  // A still of the menu, for the Hall's key art. The canvas is empty on the menu itself, so this
-  // is a placeholder until a shift has drawn something worth showing.
-  const canvas = play.canvas();
-  if (canvas && canvas.width > 0) offerPoster(canvas);
-}
