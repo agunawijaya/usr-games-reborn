@@ -76,6 +76,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Dice push-your-luck | `/usr/games/cards`    | pig (1992)                                        | coming soon | native |
 | Letter grid         | `/usr/games/words`    | the BSD letter-grid program (1993)                | coming soon | native |
 | Before the Tide     | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | native |
+| Escape the Gallows  | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | hosted |
 | Trivia              | `/usr/games/words`    | quiz (1991)                                       | coming soon | native |
 | Number sprint       | `/usr/games/numbers`  | arithmetic (1989)                                 | coming soon | native |
 | Signal lab          | `/usr/games/numbers`  | caesar, morse and friends (1980)                  | coming soon | native |

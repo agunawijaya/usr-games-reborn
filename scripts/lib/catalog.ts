@@ -43,6 +43,8 @@ export const PLANNED_IDS = [
   'pig',
   'letters',
   'hangman',
+  // The owner's earlier hangman port, every picture redrawn in code (2026-10-06).
+  'hangman-classic',
   'quiz',
   'arithmetic',
   'signal',

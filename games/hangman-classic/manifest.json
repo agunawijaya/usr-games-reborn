@@ -1,0 +1,104 @@
+{
+  "id": "hangman-classic",
+  "title": "Escape the Gallows",
+  "tagline": "Five rooms, five ciphers, six mistakes before the room wins.",
+  "teaser": "The owner's earlier port of the Berkeley word-guessing game as an escape through five rooms: a flooding pirate hold, a gassed laboratory, a tomb filling with sand, a crypt where the Count draws near, a starship losing its air. Guess each door's cipher before the room wins. Every picture drawn in code.",
+  "category": "words",
+  "directory": "/usr/games/words",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 8],
+  "status": "shipped",
+  "accent": "#d9a44a",
+  "emblem": "M14 42V18a10 10 0 0 1 20 0v24zM24 25a3 3 0 1 0 .01 0M22.5 28h3v7h-3zM10 42h28",
+  "inspiredBy": {
+    "program": "hangman",
+    "originalTitle": "hangman",
+    "uiTitle": "the Berkeley word-guessing game",
+    "year": 1983
+  },
+  "daily": false,
+  "kind": "hosted",
+  "build": {
+    "kind": "hosted-static",
+    "source": "games/hangman-classic/app",
+    "output": "play/hangman-classic/"
+  },
+  "manPage": {
+    "synopsis": "escape the gallows — guess a door's cipher letter by letter before the room's trap closes; six mistakes and it wins.",
+    "description": "The owner's earlier fancy-web port of hangman, reframed as an escape through five themed rooms, each with its own cipher list, its own threat and its own end: the Pirate's Hold floods and Captain Blackrot comes apart on the water; poison gas fills the Alchemist's Laboratory and Doktor Formalin sinks a little with every miss; sand pours into the Pharaoh's Tomb while the mummy walks; Count Nachtvorn crosses the Vampire's Crypt towards his prisoner; the Void Vessel's air monitors go from nominal to danger as the oxygen runs out. Six mistakes end a room; solving a cipher opens the door and names the room's boss and the first letter of its weakness. Every picture is drawn in code. A second interpretation beside the collection's own Before the Tide.",
+    "seeAlso": ["hangman"]
+  },
+  "howToPlay": [
+    "Type a letter, or click it on the keyboard below the room, to guess it in the door's cipher.",
+    "Each wrong letter springs the room's trap a little further; the sixth ends the room.",
+    "Choose a room with the buttons at the top; Enter or the overlay's button starts the next cipher."
+  ],
+  "cronGoals": [
+    {
+      "id": "ciphers",
+      "stat": "ciphers",
+      "label": "Solve {n} ciphers in Escape the Gallows",
+      "min": 3,
+      "max": 12
+    }
+  ],
+  "packages": [
+    {
+      "id": "out-of-the-hold",
+      "title": "Dry land",
+      "description": "Escape the Pirate's Hold before it floods.",
+      "tier": "core"
+    },
+    {
+      "id": "out-of-the-lab",
+      "title": "Fresh air",
+      "description": "Escape the Alchemist's Laboratory before the gas wins.",
+      "tier": "core"
+    },
+    {
+      "id": "out-of-the-tomb",
+      "title": "Above the sand",
+      "description": "Escape the Pharaoh's Tomb before the sand fills it.",
+      "tier": "core"
+    },
+    {
+      "id": "out-of-the-crypt",
+      "title": "Before the cape closes",
+      "description": "Escape the Vampire's Crypt before the Count reaches his prisoner.",
+      "tier": "core"
+    },
+    {
+      "id": "out-of-the-void",
+      "title": "Air to spare",
+      "description": "Escape the Void Vessel before the oxygen runs out.",
+      "tier": "core"
+    },
+    {
+      "id": "clean-escape",
+      "title": "Not a scratch",
+      "description": "Solve a cipher without a single wrong letter.",
+      "tier": "extra"
+    },
+    {
+      "id": "by-a-thread",
+      "title": "By a thread",
+      "description": "Solve a cipher with only one mistake left.",
+      "tier": "extra"
+    },
+    {
+      "id": "long-cipher",
+      "title": "Long cipher",
+      "description": "Solve a cipher of nine letters or more.",
+      "tier": "extra"
+    },
+    {
+      "id": "every-door",
+      "title": "Every door",
+      "description": "Escape all five rooms.",
+      "tier": "rare"
+    }
+  ]
+}

@@ -246,6 +246,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/hangman-classic/app: {}
+
   games/hunt/app:
     devDependencies:
       playwright:

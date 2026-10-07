@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escape the Gallows</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --parchment: #d8c9a8;
+    --parchment-soft: #8a7f68;
+    --parchment-faint: #58513f;
+    --danger: #d4574a;
+    --success: #7ec48f;
+    --gold: #d4a44a;
+  }
+
+  [data-theme="pirate"] {
+    --bg-void: #060404;
+    --accent: #ff9a3d;
+    --accent-hot: #ffd08a;
+    --accent-glow: rgba(255, 154, 61, 0.35);
+    --trap-a: rgba(30, 58, 88, 0.35);
+    --trap-b: rgba(14, 35, 56, 0.85);
+    --trap-c: rgba(6, 18, 32, 0.98);
+  }
+  [data-theme="lab"] {
+    --bg-void: #04070a;
+    --accent: #8aff7e;
+    --accent-hot: #d0ffcc;
+    --accent-glow: rgba(138, 255, 126, 0.32);
+    --trap-a: rgba(80, 200, 100, 0.25);
+    --trap-b: rgba(50, 140, 70, 0.75);
+    --trap-c: rgba(20, 50, 30, 0.95);
+  }
+  [data-theme="temple"] {
+    --bg-void: #100804;
+    --accent: #f0b040;
+    --accent-hot: #ffdc90;
+    --accent-glow: rgba(240, 176, 64, 0.35);
+    --trap-a: rgba(220, 170, 90, 0.4);
+    --trap-b: rgba(160, 110, 40, 0.85);
+    --trap-c: rgba(80, 50, 20, 0.98);
+  }
+  [data-theme="crypt"] {
+    --bg-void: #08060e;
+    --accent: #b8d0e0;
+    --accent-hot: #e8ecf0;
+    --accent-glow: rgba(184, 208, 224, 0.32);
+    --trap-a: rgba(90, 100, 120, 0.25);
+    --trap-b: rgba(50, 55, 70, 0.75);
+    --trap-c: rgba(15, 15, 25, 0.98);
+  }
+  [data-theme="void"] {
+    --bg-void: #030512;
+    --accent: #6ae2ff;
+    --accent-hot: #baf0ff;
+    --accent-glow: rgba(106, 226, 255, 0.32);
+    --trap-a: rgba(140, 200, 255, 0.2);
+    --trap-b: rgba(60, 100, 180, 0.55);
+    --trap-c: rgba(10, 20, 50, 0.95);
+  }
+
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--bg-void, #050505);
+    color: var(--parchment);
+    font-family: 'Georgia', serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.7s ease;
+  }
+  body {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px 16px 24px; gap: 10px;
+  }
+
+  /* HEADER + PICKER */
+  .header { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.32em;
+    color: var(--parchment-faint); text-transform: uppercase;
+  }
+  .title { font-size: 24px; font-weight: 400; letter-spacing: 0.04em; color: var(--parchment); font-style: italic; }
+  .theme-picker { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .theme-btn {
+    padding: 6px 14px; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--parchment-faint); border-radius: 999px;
+    color: var(--parchment-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .theme-btn:hover { color: var(--parchment); border-color: var(--parchment-soft); }
+  .theme-btn.active {
+    color: var(--accent-hot); border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .theme-btn .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+  .hud {
+    display: flex; gap: 20px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--parchment-soft);
+  }
+  .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hud-label { color: var(--parchment-faint); font-size: 8px; letter-spacing: 0.3em; }
+  .hud-value { color: var(--parchment); font-size: 11px; }
+  .hud-value.danger { color: var(--danger); }
+  .hud-sep { color: var(--parchment-faint); }
+
+  /* STAGE */
+  .stage {
+    position: relative;
+    width: min(880px, 96vw);
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04),
+                inset 0 0 120px rgba(0,0,0,0.6);
+    background: var(--bg-void);
+    transition: box-shadow 0.6s ease;
+  }
+
+  .scene { position: absolute; inset: 0; display: none; }
+  .scene.active { display: block; }
+
+  .scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Absolute-positioned containers for the pictures drawn in code */
+  .asset {
+    position: absolute;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ─── PIRATE ─── */
+  .pirate-wall {
+    position: absolute; inset: 0;
+    background: #1a0e06;
+  }
+  /* Wood grain from reference — keep grain visible, only lightly tint/darken */
+  .pirate-planks-bg {
+    position: absolute; inset: 0;
+    filter: brightness(0.82);
+  }
+  [data-art] > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  /* Subtle darken vignette for depth — NOT crushing the grain */
+  .pirate-planks-tint {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(15,8,4,0.5) 100%),
+      linear-gradient(180deg, rgba(20,12,6,0.15) 0%, transparent 40%, rgba(10,6,3,0.4) 100%);
+    pointer-events: none;
+  }
+
+  /* Wall torch: the iron sconce (src/art/hold.mjs) under the animated SVG flame */
+  .pirate-torch {
+    position: absolute;
+    width: 82px; height: 220px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .pirate-torch-l { left: 6%; top: 10%; }
+  .pirate-torch-r { right: 6%; top: 12%; transform: scale(0.9); opacity: 0.92; }
+  .torch-base {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+  .torch-flame-svg {
+    position: absolute;
+    left: 50%; top: 2%;
+    transform: translateX(-50%);
+    width: 65%; height: 40%;
+    overflow: visible;
+    filter: drop-shadow(0 0 12px rgba(255, 154, 61, 0.7))
+            drop-shadow(0 0 24px rgba(255, 100, 30, 0.4));
+    animation: torchFlickerScale 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes torchFlickerScale {
+    0%   { transform: translateX(-50%) scale(1, 1); opacity: 1; }
+    50%  { transform: translateX(-50%) scale(0.94, 1.05); opacity: 0.95; }
+    100% { transform: translateX(-50%) scale(1.02, 0.98); opacity: 1; }
+  }
+
+  /* Treasure chest — fixed, sits on floor, does not float */
+  .pirate-chest {
+    position: absolute;
+    left: 6%; bottom: 0.5%;
+    width: 150px; height: 130px;
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0.75) saturate(1.05) drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+  }
+
+  /* Barrel container that follows the water surface */
+  .pirate-barrel {
+    position: absolute;
+    right: 22%; width: 110px; height: 140px;
+    transform-origin: 50% 72%;
+    animation: barrelBob 3.4s ease-in-out infinite;
+    transition: bottom 1.1s cubic-bezier(0.3, 0.7, 0.4, 1);
+    filter: brightness(0.82) saturate(1.05);
+    z-index: 2;
+  }
+  /* Afloat: it rides each small wave, rolls a little and drifts with the swell. */
+  @keyframes barrelBob {
+    0%   { transform: translate(0, 0)      rotate(-5deg); }
+    25%  { transform: translate(3px, -9px) rotate(1deg); }
+    50%  { transform: translate(5px, -3px) rotate(6deg); }
+    75%  { transform: translate(1px, -10px) rotate(0deg); }
+    100% { transform: translate(0, 0)      rotate(-5deg); }
+  }
+
+  /* Captain Blackrot (src/art/captain.mjs) */
+  .pirate-character {
+    position: absolute;
+    left: 40%; top: 30%;
+    height: 66%; aspect-ratio: 420 / 800;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ─── LAB ─── */
+  .lab-wall { position: absolute; inset: 0; }
+  .lab-tiles {
+    display: none;
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(90deg, rgba(6,10,14,0.5) 0px, rgba(6,10,14,0.5) 1px, transparent 1px, transparent 80px),
+      linear-gradient(180deg, rgba(6,10,14,0.5) 0px, rgba(6,10,14,0.5) 1px, transparent 1px, transparent 80px);
+  }
+  .lab-periodic {
+    position: absolute; top: 9%; left: 9%; width: 24%; height: 34%;
+    opacity: 0.92;
+    filter: drop-shadow(0 0 12px rgba(138, 255, 126, 0.3));
+  }
+
+  /* Vitruvian Man on upper right wall, aligned with periodic table */
+  .lab-vitruvian {
+    position: absolute; top: 9%; right: 9%; width: 20%; height: 40%;
+    opacity: 0.95;
+    z-index: 1;
+    filter: drop-shadow(0 0 12px rgba(138, 255, 126, 0.3));
+  }
+
+  /* Atom — spinning + glowing pulse */
+  .lab-atom {
+    position: absolute; top: 20%; left: 42%; width: 16%; height: 30%;
+    opacity: 0.95;
+    animation: atomSpin 8s linear infinite;
+  }
+  .lab-atom [data-art] { width: 100%; height: 100%; animation: atomGlow 2.4s ease-in-out infinite; }
+  @keyframes atomGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(138, 255, 126, 0.5)); }
+    50% { filter: brightness(1.3) drop-shadow(0 0 22px rgba(200, 255, 180, 0.9)); }
+  }
+  @keyframes atomSpin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Tesla coil — 2x size, glowing pulse (dimmer), feet on floor (slightly raised) */
+  .lab-tesla {
+    position: absolute; bottom: 3%; left: 3%;
+    width: 22%; height: 88%;
+    z-index: 2;
+    animation: teslaGlow 2.6s ease-in-out infinite;
+  }
+  @keyframes teslaGlow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(138, 255, 126, 0.3)); }
+    50% { filter: drop-shadow(0 0 22px rgba(203, 188, 255, 0.55)) drop-shadow(0 0 40px rgba(138, 255, 126, 0.3)); }
+  }
+
+  /* Lab tools now sit ON the drawn steel table (tabletop at ~22% from bottom) */
+  .lab-distillation {
+    position: absolute; bottom: 22%; right: 6%;
+    width: 14%; height: 40%;
+    z-index: 2;
+    filter: brightness(0.85) drop-shadow(0 0 10px rgba(138, 255, 126, 0.3));
+  }
+  .lab-labtool {
+    position: absolute; bottom: 22%; right: 24%;
+    width: 12%; height: 34%;
+    z-index: 2;
+    filter: brightness(0.85) drop-shadow(0 0 8px rgba(138, 255, 126, 0.25));
+  }
+
+  /* Doktor Formalin. His container's data-slump (the miss count) poses him; he sinks and finally
+     lies across the floor to the right, outside his box, so the box lets him overflow. */
+  .lab-character {
+    position: absolute;
+    left: 36%; bottom: 3%;
+    height: 50%; aspect-ratio: 320 / 560;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ─── TEMPLE ─── */
+  .temple-wall {
+    position: absolute; inset: 0;
+    background: #08040200;
+    background-image: radial-gradient(ellipse at 50% 40%, #1e1408 0%, #100804 60%, #050201 100%);
+  }
+  /* Irregular stone wall — SVG polygons drawn by JS */
+  .temple-stones-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* Temple torch: the gilded lotus sconce (src/art/tomb.mjs) under the same animated flame */
+  .temple-torch { position: absolute; width: 82px; height: 220px; z-index: 3; pointer-events: none; }
+  .temple-torch-l { left: 8%; top: 8%; }
+  .temple-torch-r { right: 8%; top: 8%; transform: scale(0.9); opacity: 0.92; }
+
+  /* Wall friezes — molumen_*.svg as flat wall paintings, muted gold-brown */
+  .temple-frieze {
+    position: absolute;
+    height: 22%;
+    width: 11%;
+    opacity: 0.82;
+    filter: saturate(0.85) drop-shadow(0 0 6px rgba(240, 176, 64, 0.25));
+    z-index: 1;
+    pointer-events: none;
+  }
+  /* Row 2 friezes (mid-wall, mirrored for variety) */
+  .temple-frieze-row2 { transform: scaleX(-1); opacity: 0.55; }
+
+  /* Sarcophagus — back-centre, behind the people of the tomb */
+  .temple-sarcophagus {
+    position: absolute;
+    left: 45%;
+    bottom: 12%;
+    height: 55%;
+    aspect-ratio: 120 / 380;
+    z-index: 1;
+    transform: translateX(-50%);
+    filter: brightness(0.85) drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+    pointer-events: none;
+  }
+
+  /* Sphinx — floor statue */
+  .temple-sphinx {
+    position: absolute;
+    right: 4%;
+    bottom: 2%;
+    height: 21%;
+    aspect-ratio: 360 / 240;
+    z-index: 3;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.7));
+    pointer-events: none;
+  }
+
+  /* Apis bull — floor statue */
+  .temple-apis {
+    position: absolute;
+    left: 20%;
+    bottom: 2%;
+    height: 21%;
+    aspect-ratio: 300 / 240;
+    z-index: 3;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.7));
+    pointer-events: none;
+  }
+
+  /* Mummy — standing floor object, far-left */
+  .temple-mummy {
+    position: absolute;
+    left: 1%;
+    bottom: 3%;
+    height: 44%;
+    aspect-ratio: 210 / 422;
+    z-index: 2;
+    filter: sepia(0.4) brightness(0.75) contrast(1.05)
+            drop-shadow(0 6px 10px rgba(0,0,0,0.6))
+            drop-shadow(0 0 10px rgba(240,176,64,0.2));
+    pointer-events: none;
+  }
+
+  /* The people of the tomb (src/art/court.mjs), feet on the sand */
+  .temple-worker {
+    position: absolute;
+    left: 28%;
+    bottom: 5%;
+    height: 52%;
+    aspect-ratio: 560 / 420;
+    z-index: 4;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    pointer-events: none;
+  }
+
+  /* Sand-rain particle + trap layer: front-most in temple only */
+  [data-theme="temple"] .trap { z-index: 30; }
+  .sand-drop {
+    position: absolute;
+    top: -20px;
+    width: 2px;
+    /* Inverted gradient: faded trail at top, bright head at bottom (like water droplet) */
+    background: linear-gradient(180deg,
+      rgba(140, 100, 40, 0.25) 0%,
+      rgba(200, 150, 70, 0.7) 55%,
+      rgba(255, 220, 150, 0.95) 100%);
+    border-radius: 1px;
+    pointer-events: none;
+    z-index: 31;
+    animation: sandDropFall linear forwards;
+    opacity: 0;
+  }
+  @keyframes sandDropFall {
+    0%   { transform: translateY(0);       opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { transform: translateY(700px);   opacity: 0.5; }
+  }
+
+  /* ─── CRYPT (Vampire) ─── */
+  .crypt-wall { position: absolute; inset: 0; }
+  .crypt-stones {
+    display: none;
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(180deg, rgba(4,4,10,0.6) 0px, rgba(4,4,10,0.6) 2px, transparent 2px, transparent 100px),
+      linear-gradient(90deg, rgba(4,4,10,0.5) 0px, rgba(4,4,10,0.5) 2px, transparent 2px, transparent 180px);
+  }
+  .crypt-moonlight {
+    position: absolute; top: 8%; left: 32%; width: 36%; height: 55%;
+    background: radial-gradient(ellipse at 50% 30%, rgba(240, 200, 100, 0.28) 0%, transparent 60%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: moonPulse 6s ease-in-out infinite;
+  }
+  @keyframes moonPulse {
+    0%, 100% { opacity: 0.8; }
+    50%      { opacity: 1.0; }
+  }
+
+  /* Count Nachtvorn (src/art/crypt.mjs) — faces left and moves closer with every wrong guess */
+  .vampire-count {
+    position: absolute;
+    bottom: 8%; right: 8%;
+    height: 60%; aspect-ratio: 380 / 520;
+    transition: right 1.1s cubic-bezier(0.3, 0.7, 0.4, 1);
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(160, 24, 32, 0.45));
+  }
+
+  /* The werewolf, the Count's prisoner, with a thin moonlight halo */
+  .crypt-werewolf {
+    position: absolute;
+    left: 30%; bottom: 8%;
+    height: 55%; aspect-ratio: 300 / 480;
+    z-index: 3;
+    filter: drop-shadow(0 0 4px rgba(240, 220, 150, 0.45)) drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    pointer-events: none;
+  }
+
+  /* Candelabrum — small, on a tall table; its candles carry the animated flames */
+  .crypt-candlestick {
+    position: absolute;
+    left: 10%; bottom: 36%;
+    height: 22%; aspect-ratio: 100 / 170;
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0.85) saturate(0.9)
+            drop-shadow(0 4px 8px rgba(0,0,0,0.6))
+            drop-shadow(0 0 18px rgba(240, 160, 60, 0.25));
+  }
+  /* SVG flame overlay + strong bloom halo */
+  .crypt-candlestick .candle-flames {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    filter: brightness(1.6)
+            drop-shadow(0 0 8px rgba(255, 220, 140, 0.95))
+            drop-shadow(0 0 18px rgba(255, 150, 60, 0.7))
+            drop-shadow(0 0 32px rgba(255, 90, 20, 0.4));
+  }
+
+  /* Bats: each flies its own looping path across the crypt, now near, now far. */
+  .crypt-bats { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+  .crypt-bat-fly { position: absolute; width: 4.2%; aspect-ratio: 60 / 36; left: -10%; top: 20%; }
+  .crypt-bat-fly > svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 2px rgba(240, 212, 136, 0.55)); }
+  .crypt-bat-fly.f1 { animation: batFlight1 11s ease-in-out infinite; }
+  .crypt-bat-fly.f2 { animation: batFlight2 14s ease-in-out infinite -3s; width: 3.2%; }
+  .crypt-bat-fly.f3 { animation: batFlight3 9s ease-in-out infinite -5s; width: 2.6%; }
+  .crypt-bat-fly.f4 { animation: batFlight4 16s ease-in-out infinite -8s; width: 5%; }
+  .crypt-bat-fly.f5 { animation: batFlight2 12s ease-in-out infinite -9s; width: 2.2%; }
+  .crypt-bat-fly.f6 { animation: batFlight3 13s ease-in-out infinite -1s; width: 3.6%; }
+  .crypt-bat-fly.f7 { animation: batFlight1 15s ease-in-out infinite -11s; width: 2%; }
+  @keyframes batFlight1 {
+    0% { left: -8%; top: 30%; transform: scale(0.7); } 18% { left: 22%; top: 12%; transform: scale(1); }
+    34% { left: 44%; top: 34%; transform: scale(0.85); } 52% { left: 58%; top: 18%; transform: scale(1.1); }
+    70% { left: 80%; top: 40%; transform: scale(0.9); } 86% { left: 66%; top: 8%; transform: scale(0.75); }
+    100% { left: 108%; top: 22%; transform: scale(0.7); }
+  }
+  @keyframes batFlight2 {
+    0% { left: 106%; top: 14%; transform: scale(0.8); } 20% { left: 70%; top: 30%; transform: scale(1); }
+    40% { left: 46%; top: 10%; transform: scale(0.9); } 60% { left: 30%; top: 42%; transform: scale(1.15); }
+    80% { left: 12%; top: 20%; transform: scale(0.85); } 100% { left: -10%; top: 36%; transform: scale(0.7); }
+  }
+  @keyframes batFlight3 {
+    0% { left: 40%; top: -8%; transform: scale(0.6); } 25% { left: 52%; top: 26%; transform: scale(1); }
+    45% { left: 36%; top: 44%; transform: scale(0.9); } 65% { left: 60%; top: 52%; transform: scale(1.05); }
+    85% { left: 74%; top: 24%; transform: scale(0.8); } 100% { left: 62%; top: -10%; transform: scale(0.6); }
+  }
+  @keyframes batFlight4 {
+    0% { left: -12%; top: 50%; transform: scale(0.9); } 15% { left: 14%; top: 26%; transform: scale(1.2); }
+    35% { left: 36%; top: 48%; transform: scale(1); } 50% { left: 50%; top: 22%; transform: scale(1.3); }
+    70% { left: 72%; top: 46%; transform: scale(1); } 85% { left: 90%; top: 16%; transform: scale(1.15); }
+    100% { left: 112%; top: 34%; transform: scale(0.9); }
+  }
+  /* The coil's streamers: a soft glow around bolts drawn afresh every few frames. */
+  .lab-arcs {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 3; overflow: visible;
+    filter: drop-shadow(0 0 3px rgba(203, 188, 255, 0.9)) drop-shadow(0 0 10px rgba(138, 255, 216, 0.55));
+  }
+
+  /* Lab: full-screen gas fog overlay (in front of all scene content, behind text overlay) */
+  [data-theme="lab"] .trap { display: none; }
+  .lab-gas-fog {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 60%,
+        rgba(120, 220, 130, 0.55) 0%,
+        rgba(50, 140, 70, 0.8) 100%);
+    opacity: 0;
+    transition: opacity 1.1s ease;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .lab-gas-fog::after {
+    /* Swirling wisps overlay for extra atmosphere */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 200px 60px at 20% 30%, rgba(180, 255, 180, 0.15), transparent),
+      radial-gradient(ellipse 260px 80px at 70% 60%, rgba(180, 255, 180, 0.12), transparent),
+      radial-gradient(ellipse 180px 50px at 45% 80%, rgba(180, 255, 180, 0.13), transparent);
+    animation: gasFogDrift 12s ease-in-out infinite alternate;
+  }
+  @keyframes gasFogDrift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(-30px, 20px); }
+  }
+
+  /* Temple: worker dead + mummy emerging (lose state) */
+  .temple-worker.dead { height: 22%; bottom: 5%; aspect-ratio: 670 / 214; }
+  .temple-mummy.emerging {
+    left: 4%;
+    z-index: 3;
+    filter: sepia(0.4) brightness(0.85) contrast(1.1)
+            drop-shadow(0 6px 10px rgba(0,0,0,0.7))
+            drop-shadow(0 0 14px rgba(240,176,64,0.35));
+  }
+
+  /* ─── LOSE STATE (per-theme death visuals) ─── */
+  .hidden { display: none !important; }
+
+  /* The Hall's pause (and a hidden tab) holds every animation where it is. */
+  .is-paused *, .is-paused *::before, .is-paused *::after { animation-play-state: paused !important; }
+  /* Reduced motion, the player's or the Hall's: the rooms keep still. */
+  .reduced-motion .stage *, .reduced-motion .stage *::before, .reduced-motion .stage *::after { animation: none !important; }
+  .reduced-motion .crypt-bats { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .stage *, .stage *::before, .stage *::after { animation: none !important; }
+    .crypt-bats { display: none; }
+  }
+
+  /* Pirate: scattered floating messy bodies */
+  .pirate-messy-container {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .pirate-messy-scattered {
+    position: absolute;
+    transform-origin: 50% 100%;
+    animation: barrelBob 3.5s ease-in-out infinite;
+    transition: bottom 1.1s cubic-bezier(0.3, 0.7, 0.4, 1);
+    pointer-events: none;
+  }
+  .pirate-messy-scattered > div { width: 100%; }
+  .pirate-messy-scattered svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+
+
+  /* Crypt: dracula killing werewolf, hidden by default */
+  .crypt-dracula-kill {
+    position: absolute;
+    left: 27%; bottom: 8%;
+    height: 64%; aspect-ratio: 440 / 520;
+    filter: brightness(0.6) drop-shadow(0 0 6px rgba(240, 220, 150, 0.45));
+    z-index: 5;
+    display: none;
+    pointer-events: none;
+  }
+  .crypt-dracula-kill.visible { display: block; }
+  /* The end in the crypt: the candles go out one by one and the room falls dark but for the moon. */
+  .crypt-candlestick.snuffed .candle-flames use { animation: candleSnuff 0.6s ease forwards; }
+  .crypt-candlestick.snuffed .candle-flames use:nth-of-type(2) { animation-delay: 0.45s; }
+  .crypt-candlestick.snuffed .candle-flames use:nth-of-type(3) { animation-delay: 0.9s; }
+  .crypt-candlestick.snuffed .candle-flames use:nth-of-type(4) { animation-delay: 1.35s; }
+  .crypt-candlestick.snuffed .candle-flames use:nth-of-type(5) { animation-delay: 1.8s; }
+  @keyframes candleSnuff { to { opacity: 0; } }
+  .crypt-dark {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 20% 32% at 50% 40%, transparent 0%, rgba(2, 1, 6, 0.55) 60%, rgba(2, 1, 6, 0.82) 100%);
+    opacity: 0;
+    transition: opacity 2.6s ease 0.6s;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .scene-crypt.darkened .crypt-dark { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .crypt-candlestick.snuffed .candle-flames use { animation-duration: 0.01s; animation-delay: 0s; }
+    .crypt-dark { transition: none; }
+  }
+
+  /* ─── VOID ─── */
+  [data-theme="void"] .trap { display: none; }
+
+  /* Deep space (src/art/void.mjs) — a slow drift: the ship is moving */
+  .void-background {
+    position: absolute; inset: -6%;
+    z-index: 0;
+    animation: voidBgDrift 90s ease-in-out infinite alternate;
+  }
+  @keyframes voidBgDrift {
+    0%   { transform: translate(-2%, -1%); }
+    50%  { transform: translate(0, 1%); }
+    100% { transform: translate(2%, 0); }
+  }
+
+  /* Cockpit window area — enlarged so objects have room to maneuver */
+  .void-viewport-inside {
+    position: absolute;
+    top: 5%; left: 12%; right: 12%; bottom: 20%;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* The bridge around the window — on top of everything except the HUD and the text overlay */
+  .void-cockpit-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+
+  /* Space animations (inside cockpit viewport) */
+  .void-shuttle {
+    position: absolute; width: 20%; height: 20%;
+    top: 45%; left: -25%;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+    /* JS assigns animation-name randomly per cycle */
+  }
+  /* Shuttle SVG naturally faces UP. Rotate matches travel direction. */
+  @keyframes shuttleFlyLTR {
+    0%   { left: -25%; top: 45%; transform: rotate(85deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { left: 40%; top: 50%; transform: rotate(90deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { left: 125%; top: 55%; transform: rotate(95deg) scale(1.3); opacity: 0; }
+  }
+  @keyframes shuttleFlyRTL {
+    0%   { left: 125%; top: 55%; transform: rotate(265deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { left: 40%; top: 50%; transform: rotate(270deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { left: -25%; top: 45%; transform: rotate(275deg) scale(1.3); opacity: 0; }
+  }
+  @keyframes shuttleFlyTTB {
+    0%   { top: -30%; left: 45%; transform: rotate(175deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { top: 40%; left: 50%; transform: rotate(180deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { top: 130%; left: 55%; transform: rotate(185deg) scale(1.3); opacity: 0; }
+  }
+  @keyframes shuttleFlyBTT {
+    0%   { top: 130%; left: 55%; transform: rotate(-5deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { top: 40%; left: 50%; transform: rotate(0deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { top: -30%; left: 45%; transform: rotate(5deg) scale(1.3); opacity: 0; }
+  }
+  @keyframes shuttleFlyDiag1 { /* top-left → bottom-right */
+    0%   { top: -20%; left: -20%; transform: rotate(130deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { top: 45%; left: 45%; transform: rotate(135deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { top: 120%; left: 120%; transform: rotate(140deg) scale(1.3); opacity: 0; }
+  }
+  @keyframes shuttleFlyDiag2 { /* bottom-right → top-left */
+    0%   { top: 120%; left: 120%; transform: rotate(310deg) scale(0.55); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { top: 45%; left: 45%; transform: rotate(315deg) scale(1); }
+    90%  { opacity: 1; }
+    100% { top: -20%; left: -20%; transform: rotate(320deg) scale(1.3); opacity: 0; }
+  }
+
+  /* Stations at middle-left and middle-right of viewport (vertically centered) */
+  .void-station {
+    position: absolute; width: 22%; height: 38%;
+    top: 30%; right: 9%;
+    animation: stationRotate 60s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(106, 226, 255, 0.5));
+  }
+  .void-station-2 {
+    position: absolute; width: 20%; height: 34%;
+    top: 22%; left: 9%;
+    animation: stationRotate 45s linear infinite reverse;
+    filter: drop-shadow(0 0 6px rgba(106, 226, 255, 0.4));
+  }
+  @keyframes stationRotate {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Cockpit glass shatter (lose state) — behind cockpit so opaque frame masks cracks outside window */
+  .void-cockpit-shatter {
+    position: absolute; inset: 0;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    filter: drop-shadow(0 0 3px rgba(220, 240, 255, 0.8));
+  }
+  .void-cockpit-shatter.visible { opacity: 1; }
+  .void-cockpit-shatter svg { width: 100%; height: 100%; display: block; }
+  .void-astronaut {
+    position: absolute; width: 18%; height: 40%;
+    top: 20%; right: -25%;
+    animation: astronautFloat 30s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+  }
+  /* Astronaut spins ~1.5 full rotations while drifting across the viewport */
+  @keyframes astronautFloat {
+    0%   { right: -25%; top: 25%; transform: rotate(0deg) scale(0.5); opacity: 0; }
+    15%  { opacity: 1; }
+    30%  { right: 12%; top: 50%; transform: rotate(140deg) scale(0.85); }
+    55%  { right: 45%; top: 30%; transform: rotate(300deg) scale(1); }
+    80%  { right: 78%; top: 55%; transform: rotate(440deg) scale(0.8); opacity: 1; }
+    100% { right: 125%; top: 65%; transform: rotate(560deg) scale(0.5); opacity: 0; }
+  }
+
+  /* Accent glow overlay for all themes */
+  .accent-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 55% 65% at 18% 32%, var(--accent-glow) 0%, color-mix(in srgb, var(--accent) 12%, transparent) 25%, transparent 60%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: flicker 2.4s ease-in-out infinite;
+    filter: blur(1px);
+  }
+  .accent-glow-2 {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 40% 50% at 84% 40%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 65%);
+    mix-blend-mode: screen; pointer-events: none;
+    animation: flicker 3.1s ease-in-out infinite reverse;
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 1.0; transform: scale(1.0); }
+    18%      { opacity: 0.82; transform: scale(0.98); }
+    52%      { opacity: 0.75; transform: scale(1.03); }
+    72%      { opacity: 0.9; }
+    88%      { opacity: 1.05; }
+  }
+
+  /* TRAP overlay */
+  .trap {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 10%; pointer-events: none;
+    transition: height 1.1s cubic-bezier(0.3, 0.7, 0.4, 1);
+    overflow: hidden;
+    z-index: 3;
+  }
+  .trap-fill {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, var(--trap-a) 0%, var(--trap-b) 40%, var(--trap-c) 100%);
+  }
+  .trap-waves { position: absolute; left: -8%; right: -8%; top: -8px; height: 40px; pointer-events: none; }
+  .trap-waves .water-surface { position: absolute; left: 0; top: -34px; width: 100%; height: 78px; display: block; }
+  /* The hold's waves are the top of the water (src/art/water.mjs): they rise above the flood's
+     box, and the flood's own colour fades in under them so it never shows a straight edge. */
+  [data-theme="pirate"] .trap { overflow: visible; }
+  [data-theme="pirate"] .trap-fill {
+    background: linear-gradient(180deg, transparent 0, var(--trap-a) 36px, var(--trap-b) 40%, var(--trap-c) 100%);
+  }
+  /* Light from the torches rippling across the flood. */
+  [data-theme="pirate"] .trap-fill::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(176deg, transparent 0 14px, rgba(220, 235, 255, 0.07) 14px 16px, transparent 16px 34px),
+      repeating-linear-gradient(4deg, transparent 0 22px, rgba(220, 235, 255, 0.05) 22px 24px, transparent 24px 46px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 44px);
+    mask-image: linear-gradient(180deg, transparent 0, #000 44px);
+    animation: floodRipple 7s linear infinite;
+  }
+  @keyframes floodRipple { from { background-position: 0 0, 0 0; } to { background-position: 120px 0, -90px 0; } }
+  .trap-waves svg { position: absolute; width: 116%; left: 0; }
+  .trap-waves .wave-1 { top: 0; opacity: 0.9; animation: waveDrift 6s ease-in-out infinite; }
+  .trap-waves .wave-2 { top: 8px; opacity: 0.6; animation: waveDrift 8s ease-in-out infinite reverse; }
+  .trap-waves .wave-3 { top: 16px; opacity: 0.35; animation: waveDrift 10s ease-in-out infinite; }
+  @keyframes waveDrift {
+    0%, 100% { transform: translateX(-4%); }
+    50%      { transform: translateX(4%); }
+  }
+  .gas-wisps {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 60px 20px at 20% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent),
+      radial-gradient(ellipse 40px 15px at 60% 25%, color-mix(in srgb, var(--accent) 20%, transparent), transparent),
+      radial-gradient(ellipse 50px 18px at 85% 15%, color-mix(in srgb, var(--accent) 25%, transparent), transparent);
+    animation: wispsRise 5s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes wispsRise {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50%      { transform: translateY(-16px); opacity: 0.95; }
+  }
+  .sand-fall {
+    position: absolute; inset: -800px 0 0 0; height: calc(100% + 800px); pointer-events: none;
+    background-image:
+      linear-gradient(180deg, color-mix(in srgb, var(--accent) 30%, transparent) 0%, transparent 30%),
+      radial-gradient(1px 20px at 10% 0%, color-mix(in srgb, var(--accent) 60%, transparent), transparent),
+      radial-gradient(1px 20px at 25% 0%, color-mix(in srgb, var(--accent) 60%, transparent), transparent),
+      radial-gradient(1px 20px at 45% 0%, color-mix(in srgb, var(--accent) 60%, transparent), transparent),
+      radial-gradient(1px 20px at 70% 0%, color-mix(in srgb, var(--accent) 60%, transparent), transparent),
+      radial-gradient(1px 20px at 85% 0%, color-mix(in srgb, var(--accent) 60%, transparent), transparent);
+    animation: sandFall 1.2s linear infinite;
+    opacity: 0.55;
+  }
+  @keyframes sandFall {
+    0%   { background-position: 0 -40px, 0 -20px, 0 -30px, 0 -10px, 0 -50px, 0 -25px; }
+    100% { background-position: 0 60px, 0 80px, 0 70px, 0 90px, 0 50px, 0 75px; }
+  }
+  .vacuum-lines {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(90deg,
+      transparent 0px, transparent 8px,
+      color-mix(in srgb, var(--accent) 40%, transparent) 8px,
+      color-mix(in srgb, var(--accent) 40%, transparent) 9px);
+    mix-blend-mode: screen; opacity: 0.6;
+    animation: vacuumPull 0.8s linear infinite;
+  }
+  @keyframes vacuumPull {
+    0%   { transform: translateX(0); opacity: 0.4; }
+    100% { transform: translateX(-20px); opacity: 0.7; }
+  }
+
+  .dust {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,220,170,0.35), transparent),
+      radial-gradient(1px 1px at 60% 20%, rgba(255,220,170,0.25), transparent),
+      radial-gradient(1px 1px at 80% 60%, rgba(255,220,170,0.2), transparent),
+      radial-gradient(1px 1px at 35% 75%, rgba(255,220,170,0.3), transparent),
+      radial-gradient(1px 1px at 70% 45%, rgba(255,220,170,0.15), transparent);
+    animation: dustDrift 22s linear infinite;
+    mix-blend-mode: screen; opacity: 0.5;
+  }
+  @keyframes dustDrift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(20px, -30px); }
+  }
+
+  .stage.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-3px); }
+    40%, 60% { transform: translateX(3px); }
+  }
+  .stage.perilous::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(80, 15, 15, 0.45) 100%);
+    animation: perilPulse 1.4s ease-in-out infinite;
+    z-index: 5;
+  }
+  @keyframes perilPulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 0.95; }
+  }
+
+  .story {
+    max-width: 640px; text-align: center;
+    font-size: 15px; font-style: italic;
+    color: var(--parchment-soft);
+    letter-spacing: 0.02em; line-height: 1.5;
+    min-height: 42px; padding: 0 8px;
+    transition: color 0.5s ease;
+  }
+
+  .word { display: flex; gap: 10px; justify-content: center; font-family: 'JetBrains Mono', monospace; padding: 4px 0; flex-wrap: wrap; }
+  .letter-slot {
+    width: 38px; height: 48px;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
+    font-size: 24px; font-weight: 600; color: var(--parchment);
+    border-bottom: 2px solid var(--parchment-faint);
+    transition: all 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .letter-slot.revealed {
+    color: var(--accent-hot);
+    text-shadow: 0 0 12px var(--accent-glow);
+    border-bottom-color: var(--accent);
+    animation: revealPulse 0.6s ease-out;
+  }
+  @keyframes revealPulse {
+    0%   { transform: translateY(6px); opacity: 0; }
+    60%  { transform: translateY(-4px); }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .keyboard { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .kb-row { display: flex; gap: 4px; }
+  .key {
+    width: 32px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    background: linear-gradient(180deg, rgba(30,25,20,0.9) 0%, rgba(10,8,6,0.9) 100%);
+    border: 1px solid rgba(80,70,55,0.4); border-radius: 4px;
+    color: var(--parchment); cursor: pointer; user-select: none;
+    transition: all 0.15s ease;
+  }
+  .key:hover:not(:disabled) {
+    border-color: var(--accent); color: var(--accent-hot);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  .key:active:not(:disabled) { transform: translateY(1px); }
+  .key.correct {
+    background: linear-gradient(180deg, rgba(40,60,40,0.9) 0%, rgba(20,32,26,0.9) 100%);
+    border-color: var(--success); color: var(--success); cursor: default;
+  }
+  .key.wrong {
+    background: linear-gradient(180deg, rgba(40,18,16,0.9) 0%, rgba(20,8,6,0.9) 100%);
+    border-color: var(--danger); color: var(--danger); opacity: 0.55; cursor: default;
+  }
+
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    gap: 10px;
+    background: transparent;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s ease;
+    z-index: 40; padding: 18px 20px 22px; text-align: center;
+  }
+  .overlay.visible { opacity: 1; pointer-events: auto; }
+  /* Win state: still needs a soft dim so victory feels celebratory */
+  .overlay.win-mode {
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.92) 100%);
+    justify-content: center;
+    gap: 16px;
+    padding: 20px;
+  }
+  .overlay-title {
+    font-size: 34px; font-style: italic; font-weight: 400; letter-spacing: 0.04em;
+    /* Strong readable shadow on any background — layered dark halo */
+    text-shadow:
+      0 0 6px rgba(0,0,0,0.95),
+      0 0 14px rgba(0,0,0,0.85),
+      0 2px 4px rgba(0,0,0,0.9);
+  }
+  .overlay-title.win { color: var(--gold); text-shadow: 0 0 30px rgba(212, 164, 74, 0.6); }
+  .overlay-title.lose {
+    color: var(--danger);
+    text-shadow:
+      0 0 6px rgba(0,0,0,0.95),
+      0 0 14px rgba(0,0,0,0.85),
+      0 2px 4px rgba(0,0,0,0.9),
+      0 0 24px rgba(212, 87, 74, 0.5);
+  }
+  .overlay-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--parchment-soft);
+    text-shadow: 0 0 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.9);
+  }
+  .overlay-boss {
+    max-width: 520px; font-size: 13px; font-style: italic;
+    color: var(--parchment); line-height: 1.5;
+    text-shadow: 0 0 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.85), 0 1px 2px rgba(0,0,0,0.9);
+  }
+  .overlay-boss .weakness { color: var(--gold); font-style: normal; letter-spacing: 0.15em; font-weight: 600; }
+  .overlay-btn {
+    padding: 10px 22px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: 1px solid var(--parchment-soft); border-radius: 2px;
+    color: var(--parchment);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+  .overlay-btn:hover { border-color: var(--accent); color: var(--accent-hot); background: rgba(0,0,0,0.7); }
+
+  .footnote {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--parchment-faint); text-align: center; padding-top: 8px;
+  }
+
+  /* A short window (the Hall's frame at 1280 × 720): the stage shrinks with the height and the
+     text around it tightens, so the cipher and the keyboard stay in view below the room. */
+  @media (max-height: 860px) {
+    body { padding: 8px 16px; gap: 6px; }
+    .header { gap: 0; }
+    .title { font-size: 20px; }
+    .stage { width: min(880px, 96vw, calc((100vh - 312px) * 16 / 9)); }
+    .story { font-size: 13px; line-height: 1.35; min-height: 18px; }
+    .word { padding: 0; gap: 8px; }
+    .letter-slot { width: 30px; height: 34px; font-size: 20px; padding-bottom: 3px; }
+    .keyboard, .kb-row { gap: 3px; }
+    .key { width: 28px; height: 30px; font-size: 11px; }
+    .footnote { display: none; }
+  }
+
+  /* Character silhouette shared */
+  .character { position: absolute; z-index: 2; pointer-events: none; }
+</style>
+</head>
+<body data-theme="pirate">
+
+<div class="header">
+  <div class="eyebrow" id="eyebrow">Level 1 of 5 · Pirate's Hold</div>
+  <div class="title">Escape the Gallows</div>
+</div>
+
+<div class="theme-picker" id="themePicker">
+  <button class="theme-btn active" data-set-theme="pirate"><span class="swatch" style="background:#ff9a3d"></span>Pirate's Hold</button>
+  <button class="theme-btn" data-set-theme="lab"><span class="swatch" style="background:#8aff7e"></span>Alchemist's Lab</button>
+  <button class="theme-btn" data-set-theme="temple"><span class="swatch" style="background:#f0b040"></span>Pharaoh's Tomb</button>
+  <button class="theme-btn" data-set-theme="crypt"><span class="swatch" style="background:#b8d0e0"></span>Vampire's Crypt</button>
+  <button class="theme-btn" data-set-theme="void"><span class="swatch" style="background:#6ae2ff"></span>Void Vessel</button>
+</div>
+
+<div class="hud">
+  <div class="hud-item"><div class="hud-label">Boss</div><div class="hud-value" id="hud-boss">Cpt. Blackrot</div></div>
+  <div class="hud-sep">·</div>
+  <div class="hud-item"><div class="hud-label">Trap</div><div class="hud-value danger" id="hud-trap">Rising Water</div></div>
+  <div class="hud-sep">·</div>
+  <div class="hud-item"><div class="hud-label">Errors</div><div class="hud-value" id="hud-errors">0 / 6</div></div>
+  <div class="hud-sep">·</div>
+  <div class="hud-item"><div class="hud-label">Word</div><div class="hud-value" id="hud-word">— letters</div></div>
+</div>
+
+<div class="stage" id="stage">
+
+  <!-- ═════════════════════════════ PIRATE ═════════════════════════════ -->
+  <div class="scene scene-pirate active">
+    <div class="pirate-wall"></div>
+    <div class="pirate-planks-bg" data-art="holdWall"></div>
+    <div class="pirate-planks-tint"></div>
+
+    <!-- SVG overlay for horizontal plank seams, rivets, and porthole -->
+    <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+
+      <!-- Porthole with animated stormy sea -->
+      <g id="p-porthole">
+        <circle cx="880" cy="340" r="96" fill="#0a1220"/>
+        <circle cx="880" cy="340" r="96" fill="none" stroke="#1a0e08" stroke-width="14"/>
+        <circle cx="880" cy="340" r="88" fill="none" stroke="#3a2410" stroke-width="3" opacity="0.6"/>
+        <g fill="#0a0503">
+          <circle cx="880" cy="232" r="4"/> <circle cx="955" cy="266" r="4"/>
+          <circle cx="988" cy="340" r="4"/> <circle cx="955" cy="414" r="4"/>
+          <circle cx="880" cy="448" r="4"/> <circle cx="805" cy="414" r="4"/>
+          <circle cx="772" cy="340" r="4"/> <circle cx="805" cy="266" r="4"/>
+        </g>
+        <clipPath id="portClip"><circle cx="880" cy="340" r="82"/></clipPath>
+        <g clip-path="url(#portClip)">
+          <rect x="798" y="258" width="164" height="90" fill="#0a1220"/>
+          <circle cx="920" cy="290" r="12" fill="#d8d0b0" opacity="0.6"/>
+          <circle cx="920" cy="290" r="20" fill="#d8d0b0" opacity="0.15"/>
+          <path fill="#1a2540" opacity="0.9">
+            <animate attributeName="d"
+              values="M 798,360 Q 830,352 862,358 T 926,354 T 990,358 L 990,422 L 798,422 Z;
+                      M 798,360 Q 830,362 862,354 T 926,358 T 990,354 L 990,422 L 798,422 Z;
+                      M 798,360 Q 830,352 862,358 T 926,354 T 990,358 L 990,422 L 798,422 Z"
+              dur="4s" repeatCount="indefinite"/>
+          </path>
+          <path fill="#2a3550" opacity="0.7">
+            <animate attributeName="d"
+              values="M 798,378 Q 832,370 864,376 T 928,372 T 992,376 L 992,422 L 798,422 Z;
+                      M 798,378 Q 832,382 864,372 T 928,378 T 992,372 L 992,422 L 798,422 Z;
+                      M 798,378 Q 832,370 864,376 T 928,372 T 992,376 L 992,422 L 798,422 Z"
+              dur="3.2s" repeatCount="indefinite"/>
+          </path>
+          <path fill="#3a4560" opacity="0.5">
+            <animate attributeName="d"
+              values="M 798,395 Q 832,388 864,394 T 928,390 T 992,394 L 992,422 L 798,422 Z;
+                      M 798,395 Q 832,400 864,390 T 928,396 T 992,390 L 992,422 L 798,422 Z;
+                      M 798,395 Q 832,388 864,394 T 928,390 T 992,394 L 992,422 L 798,422 Z"
+              dur="2.6s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 858,270 L 862,290 L 854,296 L 866,318" stroke="#e8ecff" stroke-width="1.8" fill="none" opacity="0">
+            <animate attributeName="opacity" values="0;0;0;0.9;0;0" dur="6s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 900,275 L 906,295 L 898,303 L 910,326" stroke="#e8ecff" stroke-width="1.3" fill="none" opacity="0">
+            <animate attributeName="opacity" values="0;0;0;0;0.75;0" dur="9s" repeatCount="indefinite"/>
+          </path>
+          <rect x="798" y="258" width="164" height="164" fill="#e8ecff" opacity="0">
+            <animate attributeName="opacity" values="0;0;0;0.35;0;0" dur="6s" repeatCount="indefinite"/>
+          </rect>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Torch (left) — iron sconce drawn in code + mirror-symmetric animated SVG flame overlay -->
+    <div class="pirate-torch pirate-torch-l">
+      <div class="torch-base" data-art="wallTorch"></div>
+      <svg class="torch-flame-svg" viewBox="-50 -100 100 100" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <radialGradient id="flameOuter1" cx="0.5" cy="0.85" r="0.6">
+            <stop offset="0%" stop-color="#ffb040" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#ff6020" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#c02020" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="flameMid1" cx="0.5" cy="0.9" r="0.5">
+            <stop offset="0%" stop-color="#ffdc80"/>
+            <stop offset="60%" stop-color="#ff9030"/>
+            <stop offset="100%" stop-color="#e04010" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="flameCore1" cx="0.5" cy="0.9" r="0.4">
+            <stop offset="0%" stop-color="#fff2c8"/>
+            <stop offset="70%" stop-color="#ffe090" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#ffc040" stop-opacity="0"/>
+          </radialGradient>
+          <!-- Mirror-symmetric flame half-paths (drawn from center outward) -->
+          <path id="flameOuterHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z;
+                      M 0,0 Q -18,-8 -28,-32 Q -36,-54 -22,-72 Q -12,-86 -4,-94 L 0,-98 L 0,0 Z;
+                      M 0,0 Q -24,-4 -30,-28 Q -34,-50 -26,-68 Q -16,-82 -8,-90 L 0,-95 L 0,0 Z;
+                      M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z"
+              dur="0.6s" repeatCount="indefinite"/>
+          </path>
+          <path id="flameMidHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -12,-6 -20,-32 Q -24,-52 -12,-66 Q -6,-76 0,-82 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -16,-10 -18,-28 Q -22,-48 -16,-62 Q -10,-72 -4,-78 L 0,-80 L 0,0 Z;
+                      M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z"
+              dur="0.5s" repeatCount="indefinite"/>
+          </path>
+          <path id="flameCoreHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -5,-8 -9,-26 Q -11,-42 -3,-54 Q -1,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -7,-12 -8,-22 Q -10,-38 -5,-50 Q -2,-56 0,-60 L 0,-60 L 0,0 Z;
+                      M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z"
+              dur="0.4s" repeatCount="indefinite"/>
+          </path>
+        </defs>
+
+        <!-- Outer flame: left half + mirrored right -->
+        <use href="#flameOuterHalf-1" fill="url(#flameOuter1)"/>
+        <use href="#flameOuterHalf-1" fill="url(#flameOuter1)" transform="scale(-1, 1)"/>
+        <!-- Middle flame -->
+        <use href="#flameMidHalf-1" fill="url(#flameMid1)"/>
+        <use href="#flameMidHalf-1" fill="url(#flameMid1)" transform="scale(-1, 1)"/>
+        <!-- Bright core -->
+        <use href="#flameCoreHalf-1" fill="url(#flameCore1)"/>
+        <use href="#flameCoreHalf-1" fill="url(#flameCore1)" transform="scale(-1, 1)"/>
+      </svg>
+    </div>
+
+    <!-- Torch (right) — dimmer -->
+    <div class="pirate-torch pirate-torch-r">
+      <div class="torch-base" data-art="wallTorch"></div>
+      <svg class="torch-flame-svg" viewBox="-50 -100 100 100" preserveAspectRatio="xMidYMax meet"
+           style="animation-duration: 1.1s;">
+        <defs>
+          <radialGradient id="flameOuter2" cx="0.5" cy="0.85" r="0.6">
+            <stop offset="0%" stop-color="#ffb040" stop-opacity="0.85"/>
+            <stop offset="60%" stop-color="#ff6020" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#c02020" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="flameMid2" cx="0.5" cy="0.9" r="0.5">
+            <stop offset="0%" stop-color="#ffdc80"/>
+            <stop offset="60%" stop-color="#ff9030"/>
+            <stop offset="100%" stop-color="#e04010" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="flameCore2" cx="0.5" cy="0.9" r="0.4">
+            <stop offset="0%" stop-color="#fff2c8"/>
+            <stop offset="70%" stop-color="#ffe090" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#ffc040" stop-opacity="0"/>
+          </radialGradient>
+          <path id="flameOuterHalf-2">
+            <animate attributeName="d"
+              values="M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z;
+                      M 0,0 Q -18,-8 -28,-32 Q -36,-54 -22,-72 Q -12,-86 -4,-94 L 0,-98 L 0,0 Z;
+                      M 0,0 Q -24,-4 -30,-28 Q -34,-50 -26,-68 Q -16,-82 -8,-90 L 0,-95 L 0,0 Z;
+                      M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z"
+              dur="0.75s" repeatCount="indefinite"/>
+          </path>
+          <path id="flameMidHalf-2">
+            <animate attributeName="d"
+              values="M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -12,-6 -20,-32 Q -24,-52 -12,-66 Q -6,-76 0,-82 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -16,-10 -18,-28 Q -22,-48 -16,-62 Q -10,-72 -4,-78 L 0,-80 L 0,0 Z;
+                      M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z"
+              dur="0.65s" repeatCount="indefinite"/>
+          </path>
+          <path id="flameCoreHalf-2">
+            <animate attributeName="d"
+              values="M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -5,-8 -9,-26 Q -11,-42 -3,-54 Q -1,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -7,-12 -8,-22 Q -10,-38 -5,-50 Q -2,-56 0,-60 L 0,-60 L 0,0 Z;
+                      M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z"
+              dur="0.5s" repeatCount="indefinite"/>
+          </path>
+        </defs>
+        <use href="#flameOuterHalf-2" fill="url(#flameOuter2)"/>
+        <use href="#flameOuterHalf-2" fill="url(#flameOuter2)" transform="scale(-1, 1)"/>
+        <use href="#flameMidHalf-2" fill="url(#flameMid2)"/>
+        <use href="#flameMidHalf-2" fill="url(#flameMid2)" transform="scale(-1, 1)"/>
+        <use href="#flameCoreHalf-2" fill="url(#flameCore2)"/>
+        <use href="#flameCoreHalf-2" fill="url(#flameCore2)" transform="scale(-1, 1)"/>
+      </svg>
+    </div>
+
+    <!-- Treasure chest (fixed, does not float) -->
+    <div class="pirate-chest">
+      <div data-art="chest" style="width:100%;height:100%"></div>
+    </div>
+
+    <!-- Pirate character (skeleton pirate, native colors, PNG w/ transparency) -->
+    <div class="pirate-character">
+      <div data-art="captain" style="width:100%;height:100%"></div>
+    </div>
+
+    <!-- Floating barrel (still on right side, bobs on water surface) -->
+    <div class="pirate-barrel" id="pirateBarrel" style="bottom: 10%;">
+      <div data-art="barrel" style="width:100%;height:100%"></div>
+    </div>
+
+    <!-- Container for scattered pirate bodies (spawned on lose state) -->
+    <div class="pirate-messy-container" id="pirateMessyContainer"></div>
+  </div>
+
+  <!-- ═════════════════════════════ LAB ═════════════════════════════ -->
+  <div class="scene scene-lab">
+    <div class="lab-wall" data-art="labWall"></div>
+    <div class="lab-tiles"></div>
+
+    <!-- Periodic table on wall (upper left) -->
+    <div class="asset lab-periodic"><div data-art="periodicChart" style="width:100%;height:100%"></div></div>
+
+    <!-- Vitruvian Man on wall (upper right, aligned with periodic table) -->
+    <div class="lab-vitruvian"><div data-art="proportions" style="width:100%;height:100%"></div></div>
+
+    <!-- Atom model (spinning + pulsing green glow) -->
+    <div class="asset lab-atom"><div data-art="atom"></div></div>
+
+    <!-- Tesla coil (2x, glowing pulse, feet on floor) -->
+    <div class="lab-tesla"><div data-art="teslaCoil" style="width:100%;height:100%"></div></div>
+
+    <!-- Distillation apparatus (on table) -->
+    <div class="lab-distillation"><div data-art="distillation" style="width:100%;height:100%"></div></div>
+
+    <!-- Additional lab tool (on table) -->
+    <div class="lab-labtool"><div data-art="droppingFunnel" style="width:100%;height:100%"></div></div>
+
+    <!-- Alchemist character -->
+    <div class="lab-character" data-art="alchemist"></div>
+
+    <!-- High-voltage streamers from the coil, redrawn many times a second by src/art/lightning.mjs -->
+    <svg class="lab-arcs" id="labArcs" aria-hidden="true"></svg>
+
+    <!-- Poison gas fog (opacity grows per wrong guess) -->
+    <div class="lab-gas-fog" id="labGasFog"></div>
+
+    <!-- SVG overlay: pipes, lab table, tesla sparks, floor -->
+    <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <filter id="lab-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Ceiling pipes -->
+      <g fill="#1a2830" stroke="#0a1218" stroke-width="1">
+        <rect x="0" y="60" width="1600" height="22"/>
+        <rect x="0" y="82" width="1600" height="3" fill="#2c4048"/>
+        <rect x="600" y="82" width="14" height="40"/>
+        <rect x="1360" y="82" width="14" height="50"/>
+        <circle cx="607" cy="132" r="18" fill="#0a1218" stroke="#2c4048" stroke-width="2"/>
+        <circle cx="607" cy="132" r="4" fill="#2c4048"/>
+      </g>
+
+      <!-- Steel lab table (right side) supports distillation + labtool -->
+      <g id="l-table" transform="translate(1200, 700)">
+        <rect x="-350" y="0" width="700" height="18" fill="#1a2830"/>
+        <rect x="-350" y="0" width="700" height="4" fill="#4a5560" opacity="0.55"/>
+        <rect x="-350" y="14" width="700" height="4" fill="#050a10" opacity="0.7"/>
+        <!-- Legs -->
+        <rect x="-320" y="18" width="14" height="102" fill="#1a2830"/>
+        <rect x="306" y="18" width="14" height="102" fill="#1a2830"/>
+        <!-- Cross brace -->
+        <rect x="-320" y="80" width="640" height="7" fill="#1a2830"/>
+        <rect x="-320" y="80" width="640" height="2" fill="#3a4048" opacity="0.6"/>
+        <!-- Bolts -->
+        <circle cx="-313" cy="35" r="2" fill="#050a10"/>
+        <circle cx="313" cy="35" r="2" fill="#050a10"/>
+        <circle cx="-313" cy="83.5" r="2" fill="#050a10"/>
+        <circle cx="313" cy="83.5" r="2" fill="#050a10"/>
+      </g>
+
+      <!-- Floor: metal grating -->
+      <rect x="0" y="820" width="1600" height="80" fill="#0a1218"/>
+      <g stroke="#2c4048" stroke-width="1">
+        <line x1="0" y1="828" x2="1600" y2="828"/>
+        <line x1="0" y1="848" x2="1600" y2="848"/>
+        <line x1="0" y1="868" x2="1600" y2="868"/>
+        <line x1="100" y1="820" x2="100" y2="900" stroke-width="2"/>
+        <line x1="300" y1="820" x2="300" y2="900" stroke-width="2"/>
+        <line x1="500" y1="820" x2="500" y2="900" stroke-width="2"/>
+        <line x1="700" y1="820" x2="700" y2="900" stroke-width="2"/>
+        <line x1="900" y1="820" x2="900" y2="900" stroke-width="2"/>
+        <line x1="1100" y1="820" x2="1100" y2="900" stroke-width="2"/>
+        <line x1="1300" y1="820" x2="1300" y2="900" stroke-width="2"/>
+        <line x1="1500" y1="820" x2="1500" y2="900" stroke-width="2"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ═════════════════════════════ TEMPLE ═════════════════════════════ -->
+  <div class="scene scene-temple">
+    <div class="temple-wall"></div>
+    <!-- Irregular stone wall — polygons generated by JS -->
+    <svg class="temple-stones-svg" id="t-stones" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+
+    <!-- Wall friezes ROW 1 (top row, 7 molumen_*.svg) -->
+    <div class="temple-frieze" style="top: 3%; left: 2.5%;"><div data-art="deity" data-kind="anubis" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 16%;"><div data-art="deity" data-kind="seth" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 29.5%;"><div data-art="deity" data-kind="thoth" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 43%;"><div data-art="deity" data-kind="khonsu" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 56.5%;"><div data-art="deity" data-kind="khnum" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 70%;"><div data-art="deity" data-kind="atum" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze" style="top: 3%; left: 83.5%;"><div data-art="deity" data-kind="amun" style="width:100%;height:100%"></div></div>
+
+    <!-- Wall friezes ROW 2 (mid-wall, reordered + mirrored for variety) -->
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 2.5%;"><div data-art="deity" data-kind="amun" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 16%;"><div data-art="deity" data-kind="khnum" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 29.5%;"><div data-art="deity" data-kind="atum" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 43%;"><div data-art="deity" data-kind="thoth" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 56.5%;"><div data-art="deity" data-kind="anubis" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 70%;"><div data-art="deity" data-kind="khonsu" style="width:100%;height:100%"></div></div>
+    <div class="temple-frieze temple-frieze-row2" style="top: 27%; left: 83.5%;"><div data-art="deity" data-kind="seth" style="width:100%;height:100%"></div></div>
+
+    <!-- Torch (left) — gilded lotus sconce + mirror-symmetric animated SVG flame -->
+    <div class="temple-torch temple-torch-l">
+      <div class="torch-base" data-art="lotusTorch"></div>
+      <svg class="torch-flame-svg" viewBox="-50 -100 100 100" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <radialGradient id="t-flameOuter1" cx="0.5" cy="0.85" r="0.6">
+            <stop offset="0%" stop-color="#ffb040" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#ff6020" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#c02020" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="t-flameMid1" cx="0.5" cy="0.9" r="0.5">
+            <stop offset="0%" stop-color="#ffdc80"/>
+            <stop offset="60%" stop-color="#ff9030"/>
+            <stop offset="100%" stop-color="#e04010" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="t-flameCore1" cx="0.5" cy="0.9" r="0.4">
+            <stop offset="0%" stop-color="#fff2c8"/>
+            <stop offset="70%" stop-color="#ffe090" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#ffc040" stop-opacity="0"/>
+          </radialGradient>
+          <path id="t-flameOuterHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z;
+                      M 0,0 Q -18,-8 -28,-32 Q -36,-54 -22,-72 Q -12,-86 -4,-94 L 0,-98 L 0,0 Z;
+                      M 0,0 Q -24,-4 -30,-28 Q -34,-50 -26,-68 Q -16,-82 -8,-90 L 0,-95 L 0,0 Z;
+                      M 0,0 Q -22,-6 -30,-30 Q -34,-52 -24,-70 Q -14,-84 -6,-92 L 0,-96 L 0,0 Z"
+              dur="0.6s" repeatCount="indefinite"/>
+          </path>
+          <path id="t-flameMidHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -12,-6 -20,-32 Q -24,-52 -12,-66 Q -6,-76 0,-82 L 0,-82 L 0,0 Z;
+                      M 0,0 Q -16,-10 -18,-28 Q -22,-48 -16,-62 Q -10,-72 -4,-78 L 0,-80 L 0,0 Z;
+                      M 0,0 Q -14,-8 -18,-30 Q -22,-50 -14,-64 Q -8,-74 -2,-80 L 0,-82 L 0,0 Z"
+              dur="0.5s" repeatCount="indefinite"/>
+          </path>
+          <path id="t-flameCoreHalf-1">
+            <animate attributeName="d"
+              values="M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -5,-8 -9,-26 Q -11,-42 -3,-54 Q -1,-58 0,-62 L 0,-62 L 0,0 Z;
+                      M 0,0 Q -7,-12 -8,-22 Q -10,-38 -5,-50 Q -2,-56 0,-60 L 0,-60 L 0,0 Z;
+                      M 0,0 Q -6,-10 -8,-24 Q -10,-40 -4,-52 Q -2,-58 0,-62 L 0,-62 L 0,0 Z"
+              dur="0.4s" repeatCount="indefinite"/>
+          </path>
+        </defs>
+        <use href="#t-flameOuterHalf-1" fill="url(#t-flameOuter1)"/>
+        <use href="#t-flameOuterHalf-1" fill="url(#t-flameOuter1)" transform="scale(-1, 1)"/>
+        <use href="#t-flameMidHalf-1" fill="url(#t-flameMid1)"/>
+        <use href="#t-flameMidHalf-1" fill="url(#t-flameMid1)" transform="scale(-1, 1)"/>
+        <use href="#t-flameCoreHalf-1" fill="url(#t-flameCore1)"/>
+        <use href="#t-flameCoreHalf-1" fill="url(#t-flameCore1)" transform="scale(-1, 1)"/>
+      </svg>
+    </div>
+    <!-- Torch (right) — dimmer copy -->
+    <div class="temple-torch temple-torch-r">
+      <div class="torch-base" data-art="lotusTorch"></div>
+      <svg class="torch-flame-svg" viewBox="-50 -100 100 100" preserveAspectRatio="xMidYMax meet" style="animation-duration:1.1s;">
+        <use href="#t-flameOuterHalf-1" fill="url(#t-flameOuter1)"/>
+        <use href="#t-flameOuterHalf-1" fill="url(#t-flameOuter1)" transform="scale(-1, 1)"/>
+        <use href="#t-flameMidHalf-1" fill="url(#t-flameMid1)"/>
+        <use href="#t-flameMidHalf-1" fill="url(#t-flameMid1)" transform="scale(-1, 1)"/>
+        <use href="#t-flameCoreHalf-1" fill="url(#t-flameCore1)"/>
+        <use href="#t-flameCoreHalf-1" fill="url(#t-flameCore1)" transform="scale(-1, 1)"/>
+      </svg>
+    </div>
+
+    <!-- Sarcophagus — back centre, behind the people of the tomb -->
+    <div class="temple-sarcophagus"><div data-art="sarcophagus" style="width:100%;height:100%"></div></div>
+
+    <!-- Sphinx statue (right foreground) -->
+    <div class="temple-sphinx"><div data-art="sphinx" style="width:100%;height:100%"></div></div>
+
+    <!-- Apis bull statue (left foreground) -->
+    <div class="temple-apis"><div data-art="apis" style="width:100%;height:100%"></div></div>
+
+    <!-- Mummy — standing floor object (not on wall) -->
+    <div class="temple-mummy"><div data-art="mummy" style="width:100%;height:100%"></div></div>
+
+    <!-- The people of the tomb: two priestesses, a scribe and a kneeling noble -->
+    <div class="temple-worker" data-art="templeCourt"></div>
+
+    <!-- SVG overlay: braziers only (the statues and friezes are pictures drawn in code) -->
+    <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="t-brazier">
+          <stop offset="0%" stop-color="#ffdc90"/>
+          <stop offset="50%" stop-color="#f0b040"/>
+          <stop offset="100%" stop-color="#c07020" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Braziers (small, decorative) -->
+      <g transform="translate(320, 760)" opacity="0.9">
+        <line x1="0" y1="0" x2="-20" y2="60" stroke="#0a0503" stroke-width="3"/>
+        <line x1="0" y1="0" x2="20" y2="60" stroke="#0a0503" stroke-width="3"/>
+        <ellipse cx="0" cy="0" rx="28" ry="8" fill="#0a0503"/>
+        <path d="M -28,0 Q -24,16 -16,16 L 16,16 Q 24,16 28,0 Z" fill="#1a0e04"/>
+        <ellipse cx="0" cy="-22" rx="20" ry="32" fill="url(#t-brazier)">
+          <animate attributeName="ry" values="32;38;28;34;32" dur="1.9s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="0" cy="-18" rx="10" ry="18" fill="#ffdc90" opacity="0.85">
+          <animate attributeName="ry" values="18;22;14;20;18" dur="1.6s" repeatCount="indefinite"/>
+        </ellipse>
+      </g>
+      <g transform="translate(1280, 760)" opacity="0.85">
+        <line x1="0" y1="0" x2="-20" y2="60" stroke="#0a0503" stroke-width="3"/>
+        <line x1="0" y1="0" x2="20" y2="60" stroke="#0a0503" stroke-width="3"/>
+        <ellipse cx="0" cy="0" rx="28" ry="8" fill="#0a0503"/>
+        <path d="M -28,0 Q -24,16 -16,16 L 16,16 Q 24,16 28,0 Z" fill="#1a0e04"/>
+        <ellipse cx="0" cy="-20" rx="18" ry="28" fill="url(#t-brazier)" opacity="0.9">
+          <animate attributeName="ry" values="28;34;24;30;28" dur="2.2s" repeatCount="indefinite"/>
+        </ellipse>
+      </g>
+
+      <!-- Floor: sandy stone -->
+      <rect x="0" y="820" width="1600" height="80" fill="#1a0e04"/>
+      <g stroke="#0a0503" stroke-width="1" opacity="0.6">
+        <line x1="0" y1="836" x2="1600" y2="836"/>
+        <line x1="0" y1="864" x2="1600" y2="862"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ═════════════════════════════ CRYPT (Vampire) ═════════════════════════════ -->
+  <div class="scene scene-crypt">
+    <div class="crypt-wall" data-art="cryptWall"></div>
+    <div class="crypt-stones"></div>
+    <div class="crypt-moonlight"></div>
+
+    <!-- Bats: wings beating (SMIL in the picture), flying all over the crypt (CSS flight paths) -->
+    <div class="crypt-bats" aria-hidden="true">
+      <div class="crypt-bat-fly f1" data-art="bat" data-phase="0"></div>
+      <div class="crypt-bat-fly f2" data-art="bat" data-phase="0.07"></div>
+      <div class="crypt-bat-fly f3" data-art="bat" data-phase="0.15"></div>
+      <div class="crypt-bat-fly f4" data-art="bat" data-phase="0.21"></div>
+      <div class="crypt-bat-fly f5" data-art="bat" data-phase="0.11"></div>
+      <div class="crypt-bat-fly f6" data-art="bat" data-phase="0.04"></div>
+      <div class="crypt-bat-fly f7" data-art="bat" data-phase="0.18"></div>
+    </div>
+
+    <!-- Count Nachtvorn — moves closer with every wrong guess -->
+    <div class="vampire-count" id="vampireCount">
+      <div data-art="count" style="width:100%;height:100%"></div>
+    </div>
+
+    <!-- The werewolf, the Count's prisoner -->
+    <div class="crypt-werewolf">
+      <div data-art="werewolf" style="width:100%;height:100%"></div>
+    </div>
+
+    <!-- Dracula killing werewolf (shown on lose state) -->
+    <div class="crypt-dracula-kill">
+      <div data-art="cloaked" style="width:100%;height:100%"></div>
+    </div>
+    <div class="crypt-dark"></div>
+
+    <!-- Candelabrum + 5 animated SVG candle flames -->
+    <div class="crypt-candlestick">
+      <div data-art="candelabrum" style="position:absolute;inset:0"></div>
+      <svg class="candle-flames" viewBox="0 0 100 170" preserveAspectRatio="none">
+        <defs>
+          <radialGradient id="candle-halo" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ffd090" stop-opacity="0.7"/>
+            <stop offset="35%" stop-color="#ff8030" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#c04010" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="candle-outer" cx="0.5" cy="0.85" r="0.6">
+            <stop offset="0%" stop-color="#ffc070" stop-opacity="0.95"/>
+            <stop offset="55%" stop-color="#ff7028" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#c02020" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="candle-inner" cx="0.5" cy="0.9" r="0.4">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="40%" stop-color="#fff2c8"/>
+            <stop offset="80%" stop-color="#ffe090" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#ffc040" stop-opacity="0"/>
+          </radialGradient>
+          <g id="candleFlame">
+            <!-- Soft radial halo (bloom around flame) -->
+            <circle cx="0" cy="-9" r="18" fill="url(#candle-halo)">
+              <animate attributeName="r" values="18;22;15;20;18" dur="0.55s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;1;0.75;0.95;0.9" dur="0.5s" repeatCount="indefinite"/>
+            </circle>
+            <!-- Outer flame (larger, teardrop) -->
+            <path fill="url(#candle-outer)">
+              <animate attributeName="d"
+                values="M 0,0 Q -4.8,-5 -3.4,-11 Q -2,-15.5 0,-17.5 Q 2,-15.5 3.4,-11 Q 4.8,-5 0,0 Z;
+                        M 0,0 Q -5.4,-5 -3.6,-11 Q -2,-17 0,-19.5 Q 2,-17 3.6,-11 Q 5.4,-5 0,0 Z;
+                        M 0,0 Q -4.4,-5 -3.2,-11 Q -2,-14.5 0,-16.5 Q 2,-14.5 3.2,-11 Q 4.4,-5 0,0 Z;
+                        M 0,0 Q -4.8,-5 -3.4,-11 Q -2,-15.5 0,-17.5 Q 2,-15.5 3.4,-11 Q 4.8,-5 0,0 Z"
+                dur="0.45s" repeatCount="indefinite"/>
+            </path>
+            <!-- Inner bright core -->
+            <ellipse cx="0" cy="-9" rx="1.2" ry="4" fill="url(#candle-inner)">
+              <animate attributeName="ry" values="4;5;3;4.5;4" dur="0.32s" repeatCount="indefinite"/>
+              <animate attributeName="rx" values="1.2;1.4;1;1.3;1.2" dur="0.28s" repeatCount="indefinite"/>
+            </ellipse>
+          </g>
+        </defs>
+        <!-- 5 flames placed over each candle tip -->
+        <use href="#candleFlame" transform="translate(12, 14)"/>
+        <use href="#candleFlame" transform="translate(32, 6)"/>
+        <use href="#candleFlame" transform="translate(50, 10)"/>
+        <use href="#candleFlame" transform="translate(68, 6)"/>
+        <use href="#candleFlame" transform="translate(88, 14)"/>
+      </svg>
+    </div>
+
+    <!-- SVG overlay: gothic architecture, moon, candelabra, coffin, prisoner -->
+    <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="c-moon" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stop-color="#fff8d0"/>
+          <stop offset="40%" stop-color="#f0d488"/>
+          <stop offset="80%" stop-color="#c48a30"/>
+          <stop offset="100%" stop-color="#5a3010" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="c-candle">
+          <stop offset="0%" stop-color="#fff2c8"/>
+          <stop offset="50%" stop-color="#f0a040"/>
+          <stop offset="100%" stop-color="#a04010" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="cobweb-blur"><feGaussianBlur stdDeviation="0.4"/></filter>
+      </defs>
+
+      <!-- Gothic pointed arch (large center window) -->
+      <g id="c-arch">
+        <!-- Arch outer frame (stone) -->
+        <path d="M 560,720 L 560,340 Q 560,180 800,180 Q 1040,180 1040,340 L 1040,720 Z"
+              fill="none" stroke="#1a1a24" stroke-width="16"/>
+        <!-- Inner window sky (moonlit) -->
+        <path d="M 580,720 L 580,340 Q 580,200 800,200 Q 1020,200 1020,340 L 1020,720 Z"
+              fill="#0a0f1a"/>
+        <!-- Full moon — golden yellow -->
+        <circle cx="800" cy="350" r="85" fill="url(#c-moon)"/>
+        <circle cx="800" cy="350" r="55" fill="#f8dc90" opacity="0.9"/>
+        <!-- Moon craters -->
+        <ellipse cx="785" cy="340" rx="6" ry="4" fill="#c09040" opacity="0.5"/>
+        <ellipse cx="812" cy="358" rx="4" ry="3" fill="#c09040" opacity="0.5"/>
+        <ellipse cx="795" cy="368" rx="3" ry="2" fill="#c09040" opacity="0.4"/>
+        <!-- Stars around -->
+        <g fill="#e8ecf0">
+          <circle cx="640" cy="280" r="1.5"/>
+          <circle cx="690" cy="240" r="1"/>
+          <circle cx="720" cy="290" r="1.2"/>
+          <circle cx="890" cy="240" r="1"/>
+          <circle cx="940" cy="290" r="1.5"/>
+          <circle cx="970" cy="360" r="1"/>
+        </g>
+        <!-- Distant hills silhouette -->
+        <path d="M 580,540 L 620,510 L 660,540 L 700,500 L 760,530 L 820,490 L 880,520 L 940,500 L 1000,530 L 1020,540 L 1020,720 L 580,720 Z"
+              fill="#050308"/>
+        <!-- Window cross-bars -->
+        <line x1="800" y1="200" x2="800" y2="720" stroke="#1a1a24" stroke-width="6"/>
+        <line x1="580" y1="450" x2="1020" y2="450" stroke="#1a1a24" stroke-width="6"/>
+      </g>
+
+      <!-- Cobwebs top corners -->
+      <g stroke="#5a5a6a" stroke-width="1" fill="none" opacity="0.5" filter="url(#cobweb-blur)">
+        <!-- Top left -->
+        <path d="M 0,0 L 120,120 M 0,60 L 100,120 M 60,0 L 120,80"/>
+        <path d="M 20,30 Q 60,30 80,60 Q 100,90 80,110"/>
+        <path d="M 40,10 Q 80,50 110,90"/>
+        <!-- Top right -->
+        <path d="M 1600,0 L 1480,120 M 1600,60 L 1500,120 M 1540,0 L 1480,80"/>
+        <path d="M 1580,30 Q 1540,30 1520,60 Q 1500,90 1520,110"/>
+      </g>
+
+
+      <!-- Open coffin (right, foreground — vampire's origin) -->
+      <g transform="translate(1300, 620)" opacity="0.9">
+        <!-- Coffin outline (hexagonal) -->
+        <path d="M -60,0 L -50,-160 Q -48,-180 -30,-180 L 30,-180 Q 48,-180 50,-160 L 60,0 Z"
+              fill="#1a0e08"/>
+        <path d="M -56,-4 L -46,-158 Q -44,-176 -28,-176 L 28,-176 Q 44,-176 46,-158 L 56,-4 Z"
+              fill="none" stroke="#3a2416" stroke-width="1.5"/>
+        <!-- Lid (open, tilted) -->
+        <g transform="translate(-30, -50) rotate(-18)">
+          <path d="M -50,0 L -40,-140 Q -38,-156 -24,-156 L 24,-156 Q 38,-156 40,-140 L 50,0 Z"
+                fill="#0a0503"/>
+          <!-- Cross/crest on lid -->
+          <line x1="0" y1="-100" x2="0" y2="-60" stroke="#8a6820" stroke-width="2" opacity="0.6"/>
+          <line x1="-10" y1="-84" x2="10" y2="-84" stroke="#8a6820" stroke-width="2" opacity="0.6"/>
+        </g>
+        <!-- Interior red velvet glow -->
+        <path d="M -50,-6 L -42,-152 Q -40,-168 -26,-168 L 26,-168 Q 40,-168 42,-152 L 50,-6 Z"
+              fill="#2a0a10" opacity="0.85"/>
+      </g>
+
+
+      <!-- Wooden table (slim + tall) supports the candlestick at werewolf head height -->
+      <g id="c-table" transform="translate(215, 570)">
+        <!-- Tabletop (narrower) -->
+        <rect x="-65" y="0" width="130" height="14" fill="#1a0e08"/>
+        <rect x="-65" y="0" width="130" height="3" fill="#3a2416" opacity="0.7"/>
+        <line x1="-58" y1="7" x2="58" y2="7" stroke="#0a0503" stroke-width="0.6" opacity="0.5"/>
+        <line x1="-50" y1="11" x2="50" y2="11" stroke="#0a0503" stroke-width="0.5" opacity="0.4"/>
+        <!-- Front edge shadow -->
+        <rect x="-65" y="14" width="130" height="3" fill="#050201" opacity="0.7"/>
+        <!-- Legs (long, thin) -->
+        <path d="M -55,17 L -45,17 L -40,250 L -50,250 Z" fill="#1a0e08"/>
+        <path d="M -55,17 L -52,17 L -47,250 L -50,250 Z" fill="#3a2416" opacity="0.4"/>
+        <path d="M 45,17 L 55,17 L 50,250 L 40,250 Z" fill="#1a0e08"/>
+        <path d="M 52,17 L 55,17 L 50,250 L 47,250 Z" fill="#3a2416" opacity="0.4"/>
+        <!-- Cross braces (2 for stability on tall legs) -->
+        <rect x="-48" y="120" width="96" height="7" fill="#1a0e08"/>
+        <rect x="-48" y="120" width="96" height="2" fill="#3a2416" opacity="0.6"/>
+        <rect x="-46" y="210" width="92" height="6" fill="#1a0e08"/>
+        <rect x="-46" y="210" width="92" height="2" fill="#3a2416" opacity="0.6"/>
+        <!-- Iron bosses on brace-leg junctions -->
+        <circle cx="-46" cy="123.5" r="2.5" fill="#0a0503"/>
+        <circle cx="46" cy="123.5" r="2.5" fill="#0a0503"/>
+        <circle cx="-44" cy="213" r="2" fill="#0a0503"/>
+        <circle cx="44" cy="213" r="2" fill="#0a0503"/>
+      </g>
+
+      <!-- Stone floor -->
+      <rect x="0" y="820" width="1600" height="80" fill="#0a0812"/>
+      <g stroke="#050308" stroke-width="1.5" opacity="0.7">
+        <line x1="0" y1="830" x2="1600" y2="830"/>
+        <line x1="0" y1="864" x2="1600" y2="864"/>
+        <line x1="180" y1="820" x2="180" y2="900"/>
+        <line x1="480" y1="820" x2="480" y2="900"/>
+        <line x1="780" y1="820" x2="780" y2="900"/>
+        <line x1="1080" y1="820" x2="1080" y2="900"/>
+        <line x1="1380" y1="820" x2="1380" y2="900"/>
+      </g>
+
+      <!-- Floor fog (atmospheric, does not rise) -->
+      <ellipse cx="800" cy="820" rx="900" ry="30" fill="#4a4e5e" opacity="0.35"/>
+      <ellipse cx="400" cy="830" rx="400" ry="18" fill="#4a4e5e" opacity="0.25"/>
+      <ellipse cx="1200" cy="828" rx="400" ry="20" fill="#4a4e5e" opacity="0.25"/>
+    </svg>
+  </div>
+
+  <!-- ═════════════════════════════ VOID ═════════════════════════════ -->
+  <div class="scene scene-void">
+    <!-- Deep space, drawn in code -->
+    <div class="void-background" data-art="spaceBackdrop"></div>
+
+    <!-- Space objects animating IN the cockpit window area (behind cockpit frame) -->
+    <div class="void-viewport-inside">
+      <div class="void-station"><div data-art="trussStation" style="width:100%;height:100%"></div></div>
+      <div class="void-station-2"><div data-art="wheelStation" style="width:100%;height:100%"></div></div>
+      <div class="void-shuttle"><div data-art="spaceplane" style="width:100%;height:100%"></div></div>
+      <div class="void-astronaut"><div data-art="astronaut" style="width:100%;height:100%"></div></div>
+    </div>
+
+    <!-- Shattered cockpit glass (behind cockpit — cracks generated procedurally in JS for randomness) -->
+    <div class="void-cockpit-shatter" id="voidShatter">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" id="voidShatterSvg"></svg>
+    </div>
+
+    <!-- The bridge — on top; its opaque frame hides the cracks outside the open window, and its
+         life-support monitors read the cabin's air after every miss (src/art/void.mjs) -->
+    <div class="void-cockpit-overlay" data-art="bridge"></div>
+
+  </div>
+
+  <div class="accent-glow"></div>
+  <div class="accent-glow-2"></div>
+  <div class="dust"></div>
+
+  <div class="trap" id="trap">
+    <div class="trap-fill"></div>
+    <div class="trap-waves" id="trapWaves"></div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="overlay-title" id="overlay-title">·</div>
+    <div class="overlay-sub" id="overlay-sub">·</div>
+    <div class="overlay-boss" id="overlay-boss"></div>
+    <button class="overlay-btn" id="overlay-btn">Try Again</button>
+  </div>
+</div>
+
+<div class="story" id="story">
+  You wake in the belly of the <em>Blackrot's</em> galleon. The door bears an old cipher —
+  guess it before the tide floods the hold.
+</div>
+
+<div class="word" id="word"></div>
+
+<div class="keyboard" id="keyboard"></div>
+
+<div class="footnote">
+  Five rooms, every picture drawn in code · switch rooms above
+</div>
+
+<script>
+  const THEMES = {
+    pirate: {
+      eyebrow: "Level 1 of 5 · Pirate's Hold",
+      boss: "Cpt. Blackrot", trapName: "Rising Water", trapType: "water",
+      bossWeakness: "PARDON",
+      bossTaunt: "Cpt. Blackrot cannot be slain by steel. What he fears is a word: a king's _______.",
+      words: [
+        { word: 'CUTLASS',   clue: 'A curved blade of the sea rogue.' },
+        { word: 'DOUBLOON',  clue: 'Spanish gold, the pirate\'s prize.' },
+        { word: 'MUTINY',    clue: 'The crew\'s uprising against captain.' },
+        { word: 'GALLEON',   clue: 'The great ship of treasure fleets.' },
+        { word: 'KRAKEN',    clue: 'Deep-sea beast of sailor\'s dread.' },
+        { word: 'ANCHOR',    clue: 'What holds a ship against the tide.' },
+        { word: 'PARLEY',    clue: 'The old pirate\'s truce-word.' },
+        { word: 'SCHOONER',  clue: 'A swift two-masted rigged ship.' },
+        { word: 'FRIGATE',   clue: 'A fast warship of the age of sail.' },
+        { word: 'CORSAIR',   clue: 'Barbary privateer of the Mediterranean.' },
+        { word: 'BUCCANEER', clue: 'Caribbean pirate of the 1600s.' },
+        { word: 'FLINTLOCK', clue: 'A muzzle-loading firearm mechanism.' },
+        { word: 'BROADSIDE', clue: 'All cannons of one flank fired at once.' },
+        { word: 'HORNPIPE',  clue: 'A sailor\'s solo dance and its tune.' },
+        { word: 'PLUNDER',   clue: 'Goods taken by force at sea.' },
+        { word: 'TREASURE',  clue: 'Buried gold, marked X on the chart.' },
+        { word: 'MAROONED',  clue: 'Abandoned alone on a distant shore.' },
+        { word: 'YARDARM',   clue: 'The end of a horizontal mast beam.' },
+        { word: 'CROWSNEST', clue: 'The lookout perch atop the mainmast.' },
+        { word: 'STARBOARD', clue: 'The right side of a ship, facing bow.' },
+        { word: 'BOWSPRIT',  clue: 'The spar projecting from a ship\'s bow.' },
+        { word: 'HARDTACK',  clue: 'The sailor\'s biscuit, hard as stone.' },
+        { word: 'TANKARD',   clue: 'The pewter mug for the pirate\'s grog.' },
+        { word: 'SCURVY',    clue: 'The sailor\'s curse for want of citrus.' },
+        { word: 'PILLAGE',   clue: 'To rob and ravage a captured town.' },
+        { word: 'SHACKLE',   clue: 'The iron cuff of the prisoner.' },
+        { word: 'MUSKET',    clue: 'The long gun of the age of sail.' },
+        { word: 'CANNON',    clue: 'The great gun of the ship\'s deck.' },
+        { word: 'HARPOON',   clue: 'The spear thrown at leviathan.' },
+        { word: 'MERMAID',   clue: 'The siren of the deep, half fish.' },
+        { word: 'BARNACLE',  clue: 'The crustacean that clings to hulls.' },
+        { word: 'RIGGING',   clue: 'The ropes and pulleys of the mast.' },
+        { word: 'HELMSMAN',  clue: 'The one who steers the great wheel.' },
+        { word: 'TEMPEST',   clue: 'The violent storm at sea.' },
+        { word: 'MAELSTROM', clue: 'The great swirling whirlpool.' },
+        { word: 'JOLLYROGER',clue: 'The skull-and-crossbones black flag.' },
+        { word: 'ADMIRAL',   clue: 'The highest rank of the fleet.' },
+        { word: 'GANGWAY',   clue: 'The bridge from ship to shore.' },
+        { word: 'RUDDER',    clue: 'The stern blade that turns the ship.' },
+        { word: 'GALLOWS',   clue: 'Where the caught pirate meets his end.' },
+      ],
+      intro: 'You wake in the belly of the <em>Blackrot\'s</em> galleon. The door bears an old cipher — guess it before the tide floods the hold.',
+      onCorrect: 'A stone slides. The tumbler holds.',
+      onWrong: ['A wrong turn of the wheel. The tide creeps up.', 'Water climbs your knees. Choose carefully.', 'One more mistake. You can taste the salt.'],
+      onLose: 'The water takes you.',
+    },
+    lab: {
+      eyebrow: "Level 2 of 5 · The Alchemist's Laboratory",
+      boss: "Doktor Formalin", trapName: "Poison Gas", trapType: "gas",
+      bossWeakness: "ANTIDOTE",
+      bossTaunt: "The Doktor drank of his own experiment. His flesh is proof against every blade. What he fears is a word: an _______.",
+      words: [
+        { word: 'VITRIOL',    clue: 'The alchemist\'s corrosive spirit.' },
+        { word: 'MERCURY',    clue: 'Quicksilver, the shape-shifting metal.' },
+        { word: 'REAGENT',    clue: 'Substance that triggers a reaction.' },
+        { word: 'CATALYST',   clue: 'Speeds the change, unchanged itself.' },
+        { word: 'CRUCIBLE',   clue: 'Vessel where metals meet the fire.' },
+        { word: 'ELIXIR',     clue: 'A draught said to heal or transmute.' },
+        { word: 'ALCHEMY',    clue: 'The old craft of transformation.' },
+        { word: 'PHILOSOPHER',clue: 'The stone that turns lead to gold.' },
+        { word: 'SULFUR',     clue: 'The yellow, brimstone element.' },
+        { word: 'PHOSPHORUS', clue: 'The element that glows in the dark.' },
+        { word: 'DISTILL',    clue: 'To separate by heat and vapour.' },
+        { word: 'RETORT',     clue: 'The bulbous flask with a long neck.' },
+        { word: 'ALEMBIC',    clue: 'The still-head of the alchemist.' },
+        { word: 'BEAKER',     clue: 'The cylindrical glass vessel.' },
+        { word: 'PIPETTE',    clue: 'The slender tube that meters a drop.' },
+        { word: 'BUNSEN',     clue: 'The burner in every laboratory.' },
+        { word: 'ELECTRODE',  clue: 'The conductor into the reaction.' },
+        { word: 'GALVANIC',   clue: 'Named for the frog-leg experimenter.' },
+        { word: 'TESLA',      clue: 'The lightning-tamer of Colorado Springs.' },
+        { word: 'ARC',        clue: 'The spark that leaps the electrode gap.' },
+        { word: 'HOMUNCULUS', clue: 'The tiny man of alchemical legend.' },
+        { word: 'CHIMERA',    clue: 'A creature of impossible parts.' },
+        { word: 'MUTATION',   clue: 'The change that breeds the monster.' },
+        { word: 'GRAFT',      clue: 'To join living tissue to another.' },
+        { word: 'SPECIMEN',   clue: 'The subject preserved in the jar.' },
+        { word: 'FORMULA',    clue: 'The recipe of the transformation.' },
+        { word: 'COMPOUND',   clue: 'Two elements bound as one.' },
+        { word: 'REACTION',   clue: 'The moment the chemicals meet.' },
+        { word: 'CENTRIFUGE', clue: 'The spinning tube that sorts by weight.' },
+        { word: 'MICROSCOPE', clue: 'The eye that sees the very small.' },
+        { word: 'ANTIDOTE',   clue: 'The counter-brew to any poison.' },
+        { word: 'VENOM',      clue: 'The serpent\'s gift, distilled and pure.' },
+        { word: 'MORPHINE',   clue: 'The dream drawn from the poppy.' },
+        { word: 'ETHER',      clue: 'The volatile solvent that puts you under.' },
+        { word: 'OXYGEN',     clue: 'The gas that feeds every fire.' },
+        { word: 'HYDROGEN',   clue: 'The lightest of all elements.' },
+        { word: 'NITROGEN',   clue: 'Three quarters of the very air.' },
+        { word: 'PHOSPHENE',  clue: 'The light seen when eyes are pressed.' },
+        { word: 'ALKALINE',   clue: 'The counter-pole to acid.' },
+        { word: 'CHLORINE',   clue: 'The pale green gas of the trenches.' },
+      ],
+      intro: 'The straps hold you tight against cold metal. Green vapours seep from the floor grates. Solve the formula before your lungs give out.',
+      onCorrect: 'The equation balances. The valve closes — briefly.',
+      onWrong: ['A hiss from below. More gas escapes.', 'Your eyes water. The tiles blur.', 'Your chest burns. One more breath, one more chance.'],
+      onLose: 'You choke on the fumes.',
+    },
+    temple: {
+      eyebrow: "Level 3 of 5 · The Pharaoh's Tomb",
+      boss: "Amun-Rekh, the Undying", trapName: "Pouring Sand", trapType: "sand",
+      bossWeakness: "SUNLIGHT",
+      bossTaunt: "Amun-Rekh has slept ten thousand years. No blade harms wrapped flesh. What he fears is a word: pure _______.",
+      words: [
+        { word: 'PHARAOH',   clue: 'The god-king of the two lands.' },
+        { word: 'PAPYRUS',   clue: 'Reed of the Nile, page of scribes.' },
+        { word: 'SCARAB',    clue: 'Sacred beetle, sign of rebirth.' },
+        { word: 'OBELISK',   clue: 'Tall stone finger raised to the sun.' },
+        { word: 'ANUBIS',    clue: 'Jackal-headed guide of the dead.' },
+        { word: 'CARTOUCHE', clue: 'The oval that names a king.' },
+        { word: 'MUMMY',     clue: 'What sleeps in linen and myrrh.' },
+        { word: 'OSIRIS',    clue: 'The green god of the afterlife.' },
+        { word: 'HORUS',     clue: 'The falcon-headed son of Isis.' },
+        { word: 'THOTH',     clue: 'The ibis-headed god of writing.' },
+        { word: 'SEKHMET',   clue: 'The lion-headed goddess of war.' },
+        { word: 'BASTET',    clue: 'The cat-goddess of Bubastis.' },
+        { word: 'HATHOR',    clue: 'The cow-goddess of joy.' },
+        { word: 'PYRAMID',   clue: 'The great tomb of stacked stone.' },
+        { word: 'SPHINX',    clue: 'Lion-body, human head, guarding Giza.' },
+        { word: 'NEFERTITI', clue: 'The beautiful queen of Amenhotep.' },
+        { word: 'CLEOPATRA', clue: 'The last of the Ptolemaic line.' },
+        { word: 'RAMSES',    clue: 'The pharaoh of a hundred statues.' },
+        { word: 'TUTANKHAMUN',clue: 'The boy-king of the golden mask.' },
+        { word: 'AMULET',    clue: 'The charm that guards the wearer.' },
+        { word: 'ANKH',      clue: 'The looped cross, sign of life.' },
+        { word: 'PLAGUE',    clue: 'The tenth of the biblical curses.' },
+        { word: 'PRIEST',    clue: 'Who tends the temple flame.' },
+        { word: 'ORACLE',    clue: 'Who reads the will of the gods.' },
+        { word: 'SANDSTORM', clue: 'The howling wall of desert sand.' },
+        { word: 'MIRAGE',    clue: 'The pool that vanishes on approach.' },
+        { word: 'CARAVAN',   clue: 'The line of camels across the dunes.' },
+        { word: 'HIEROGLYPH',clue: 'The picture-writing of the ancients.' },
+        { word: 'CANOPIC',   clue: 'The jar that holds the mummy\'s organs.' },
+        { word: 'SARCOPHAGUS',clue: 'The stone coffin of the noble dead.' },
+        { word: 'NECROPOLIS',clue: 'The city of tombs.' },
+        { word: 'BEDOUIN',   clue: 'The nomad of the sands.' },
+        { word: 'CATACOMB',  clue: 'The underground burial passage.' },
+        { word: 'DYNASTY',   clue: 'A line of rulers, blood to blood.' },
+        { word: 'BAZAAR',    clue: 'The eastern marketplace.' },
+        { word: 'ORACLE',    clue: 'The one who speaks for the gods.' },
+        { word: 'JACKAL',    clue: 'The desert dog of Anubis.' },
+        { word: 'MEMPHIS',   clue: 'The old capital of Lower Egypt.' },
+        { word: 'THEBES',    clue: 'The old capital of Upper Egypt.' },
+        { word: 'ROSETTA',   clue: 'The stone that unlocked the glyphs.' },
+      ],
+      intro: 'The tomb\'s door will not open without the priest\'s word. Sand pours from the ceiling glyphs — you have moments.',
+      onCorrect: 'A glyph glows. The Ka watches, and waits.',
+      onWrong: ['Sand hisses at your ankles.', 'The glyphs dim. Anubis stirs.', 'Sand rises past your waist. Speak, mortal.'],
+      onLose: 'The sands claim you.',
+    },
+    crypt: {
+      eyebrow: "Level 4 of 5 · The Vampire's Crypt",
+      boss: "Count Nachtvorn", trapName: "Count Approaches", trapType: "approach",
+      bossWeakness: "GARLIC",
+      bossTaunt: "The Count is deathless. Cross, silver, sunlight — he laughs at all. What the peasants whisper is a word: common _______.",
+      words: [
+        { word: 'COFFIN',     clue: 'The bed of the undead.' },
+        { word: 'CRYPT',      clue: 'Stone hall of the buried nobles.' },
+        { word: 'CARPATHIA',  clue: 'The mountain range of his childhood.' },
+        { word: 'NIGHTFALL',  clue: 'The hour that gives him breath again.' },
+        { word: 'CHALICE',    clue: 'The cup he raises to his lips.' },
+        { word: 'GARGOYLE',   clue: 'The stone watcher on the tower.' },
+        { word: 'REQUIEM',    clue: 'The mass sung for the dead.' },
+        { word: 'CATHEDRAL',  clue: 'The great church of pointed arches.' },
+        { word: 'CATACOMB',   clue: 'The underground hall of the dead.' },
+        { word: 'CASTLE',     clue: 'The fortress on the ridge.' },
+        { word: 'TRANSYLVANIA',clue: 'The Count\'s old country.' },
+        { word: 'MIDNIGHT',   clue: 'The witching hour.' },
+        { word: 'ECLIPSE',    clue: 'When the moon covers the sun.' },
+        { word: 'FANGS',      clue: 'The teeth that draw the blood.' },
+        { word: 'BAT',        clue: 'The winged form he takes at will.' },
+        { word: 'WOLF',       clue: 'The beast whose shape he wears.' },
+        { word: 'HOWL',       clue: 'The cry that carries across the moor.' },
+        { word: 'MOONLIGHT',  clue: 'The pale glow through the crypt window.' },
+        { word: 'BELFRY',     clue: 'The bell tower where bats roost.' },
+        { word: 'HEARSE',     clue: 'The carriage of the dead.' },
+        { word: 'GRAVEYARD',  clue: 'The garden of stones.' },
+        { word: 'TOMBSTONE',  clue: 'The marker of the resting.' },
+        { word: 'MAUSOLEUM',  clue: 'The grand tomb of the noble line.' },
+        { word: 'REVENANT',   clue: 'One who returns from the grave.' },
+        { word: 'NECROMANCY', clue: 'The art of summoning the dead.' },
+        { word: 'CURSE',      clue: 'The spoken doom that lingers.' },
+        { word: 'SPECTRE',    clue: 'The ghost that walks the hall.' },
+        { word: 'PHANTOM',    clue: 'The shape half-seen at midnight.' },
+        { word: 'HAUNT',      clue: 'What a spirit does to a place.' },
+        { word: 'GHOUL',      clue: 'The corpse-eater of the graveyard.' },
+        { word: 'WRAITH',     clue: 'A shade too thin to touch.' },
+        { word: 'BANSHEE',    clue: 'The keening woman of Irish lore.' },
+        { word: 'INCUBUS',    clue: 'The night-fiend who visits sleepers.' },
+        { word: 'CHUPACABRA', clue: 'The blood-drinker of the south.' },
+        { word: 'STAKE',      clue: 'The wooden point through the heart.' },
+        { word: 'SILVER',     clue: 'The metal the werewolf fears.' },
+        { word: 'CRUCIFIX',   clue: 'The cross held up at the door.' },
+        { word: 'HOLYWATER',  clue: 'What the priest sprinkles on evil.' },
+        { word: 'SUNRISE',    clue: 'The hour the Count fears most.' },
+        { word: 'VELVET',     clue: 'The cloth of the interior cape.' },
+      ],
+      intro: 'The crypt door is sealed with an old family cipher. From the coffin behind you, the <em>Count</em> stirs. Solve it — before he crosses the room.',
+      onCorrect: 'A tumbler falls. The Count pauses, curious.',
+      onWrong: ['The Count takes a step closer. His cape catches the moonlight.', 'Fangs bare. The distance halves.', 'His breath is on your neck. Speak the word, mortal.'],
+      onLose: 'The cape closes. The candles die.',
+    },
+    void: {
+      eyebrow: "Level 5 of 5 · The Void Vessel",
+      boss: "The Warden — an AI", trapName: "Airlock Decompression", trapType: "vacuum",
+      bossWeakness: "OVERRIDE",
+      bossTaunt: "The Warden has purged three crews. Its cortex resists every intrusion. What ends it is a word: root-access _______.",
+      words: [
+        { word: 'AIRLOCK',    clue: 'The door between here and the void.' },
+        { word: 'REACTOR',    clue: 'The heart that keeps the ship warm.' },
+        { word: 'THRUSTER',   clue: 'What pushes the hull through night.' },
+        { word: 'BULKHEAD',   clue: 'A wall built to save the whole ship.' },
+        { word: 'BEACON',     clue: 'The light that says: come, or beware.' },
+        { word: 'QUANTUM',    clue: 'The smallest thing that carries meaning.' },
+        { word: 'AXIOM',      clue: 'What the machine takes without proof.' },
+        { word: 'ORBIT',      clue: 'The path around a heavier thing.' },
+        { word: 'GRAVITY',    clue: 'The pull of every mass on every other.' },
+        { word: 'VACUUM',     clue: 'What lies beyond the airlock.' },
+        { word: 'NEBULA',     clue: 'The cloud where new stars are born.' },
+        { word: 'PULSAR',     clue: 'The rotating beam of a dead star.' },
+        { word: 'QUASAR',     clue: 'The brightest engine in the sky.' },
+        { word: 'GALAXY',     clue: 'A hundred billion stars, more or less.' },
+        { word: 'PLASMA',     clue: 'The fourth state of matter.' },
+        { word: 'FUSION',     clue: 'What powers the sun and this reactor.' },
+        { word: 'FISSION',    clue: 'The splitting of the heavy nucleus.' },
+        { word: 'PARSEC',     clue: 'Three-and-a-quarter light years.' },
+        { word: 'LIGHTYEAR',  clue: 'The distance light travels in a year.' },
+        { word: 'ASTEROID',   clue: 'The stone drifting between worlds.' },
+        { word: 'COMET',      clue: 'The dirty snowball with a tail.' },
+        { word: 'METEOR',     clue: 'The streak that crosses the sky.' },
+        { word: 'CRYOSLEEP', clue: 'The long freeze for the long voyage.' },
+        { word: 'ARTIFICIAL', clue: 'What the mind on this ship is.' },
+        { word: 'SINGULARITY',clue: 'Where physics gives up.' },
+        { word: 'HORIZON',    clue: 'The event beyond which no light escapes.' },
+        { word: 'TERRAFORM',  clue: 'To make a dead world breathe.' },
+        { word: 'ANDROID',    clue: 'A machine built to look like us.' },
+        { word: 'CYBORG',     clue: 'Where flesh and circuit meet.' },
+        { word: 'CORTEX',     clue: 'The thinking layer of the mind.' },
+        { word: 'FIREWALL',   clue: 'The wall between you and the intrusion.' },
+        { word: 'ENCRYPTION', clue: 'The lock that only the key opens.' },
+        { word: 'PROTOCOL',   clue: 'The rules two systems agree on.' },
+        { word: 'ALGORITHM',  clue: 'The recipe the machine follows.' },
+        { word: 'DIAGNOSTIC', clue: 'What the console runs on itself.' },
+        { word: 'TELEMETRY',  clue: 'The stream of numbers from the sensors.' },
+        { word: 'MANIFOLD',   clue: 'A shape that curves in more directions.' },
+        { word: 'HYPERSPACE', clue: 'The layer beyond the map.' },
+        { word: 'STARSHIP',   clue: 'The vessel that crosses the deep.' },
+        { word: 'COSMONAUT',  clue: 'The eastern name for spacefarer.' },
+      ],
+      intro: 'The Warden has voided the crew and locked the bridge. You breathe on borrowed air. Hack the console before the airlock cycles.',
+      onCorrect: 'The console chirps green. One system reroutes.',
+      onWrong: ['Klaxon. Pressure drops one notch.', 'Frost crawls up the panels. Your ears pop.', 'Red lights everywhere. Your visor cracks a hair wider.'],
+      onLose: 'The airlock opens. Silence.',
+    },
+  };
+
+  const MAX_ERRORS = 6;
+  const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  let currentTheme = 'pirate';
+  let target = '', clue = '', guessed = new Set(), errors = 0, gameOver = false;
+
+  const body = document.body;
+  const stageEl = document.getElementById('stage');
+  const wordEl = document.getElementById('word');
+  const keyboardEl = document.getElementById('keyboard');
+  const storyEl = document.getElementById('story');
+  const hudBoss = document.getElementById('hud-boss');
+  const hudTrap = document.getElementById('hud-trap');
+  const hudErrors = document.getElementById('hud-errors');
+  const hudWord = document.getElementById('hud-word');
+  const eyebrowEl = document.getElementById('eyebrow');
+  const trapEl = document.getElementById('trap');
+  const trapWavesEl = document.getElementById('trapWaves');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlay-title');
+  const overlaySub = document.getElementById('overlay-sub');
+  const overlayBoss = document.getElementById('overlay-boss');
+  const overlayBtn = document.getElementById('overlay-btn');
+  const pirateBarrel = document.getElementById('pirateBarrel');
+  const vampireCount = document.getElementById('vampireCount');
+
+  // ─── Procedural wavy plank seams (weathered ship wood) ─────
+  function buildPirateSeams() {
+    const seamGroup = document.getElementById('p-seams');
+    const hiGroup = document.getElementById('p-seams-hi');
+    if (!seamGroup || !hiGroup) return;
+    seamGroup.innerHTML = '';
+    hiGroup.innerHTML = '';
+
+    const seededRandom = (seed) => {
+      let s = seed;
+      return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    };
+
+    const yPositions = [126, 252, 378, 504, 630, 756];
+    yPositions.forEach((baseY, idx) => {
+      const rand = seededRandom(1000 + idx * 137);
+      const step = 50;
+      const topPts = [], botPts = [];
+      for (let x = 0; x <= 1600; x += step) {
+        topPts.push({ x, y: baseY - 1 + (rand() - 0.5) * 5 });
+        botPts.push({ x, y: baseY + 4.5 + (rand() - 0.5) * 5 });
+      }
+      // Ribbon fill: top edge → right edge → bottom edge (reversed) → close
+      let d = `M ${topPts[0].x},${topPts[0].y} `;
+      for (let i = 1; i < topPts.length; i++) {
+        const cx = (topPts[i - 1].x + topPts[i].x) / 2;
+        const cy = (topPts[i - 1].y + topPts[i].y) / 2 - 0.6;
+        d += `Q ${cx},${cy} ${topPts[i].x},${topPts[i].y} `;
+      }
+      d += `L ${botPts[botPts.length - 1].x},${botPts[botPts.length - 1].y} `;
+      for (let i = botPts.length - 2; i >= 0; i--) {
+        const cx = (botPts[i + 1].x + botPts[i].x) / 2;
+        const cy = (botPts[i + 1].y + botPts[i].y) / 2 + 0.6;
+        d += `Q ${cx},${cy} ${botPts[i].x},${botPts[i].y} `;
+      }
+      d += 'Z';
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      seamGroup.appendChild(path);
+
+      // Highlight — thin wavy stroke below the seam
+      const rand2 = seededRandom(2000 + idx * 173);
+      let dHi = `M 0,${baseY + 6 + (rand2() - 0.5) * 2} `;
+      for (let x = step; x <= 1600; x += step) {
+        const cx = x - step / 2;
+        const cy = baseY + 5.5 + (rand2() - 0.5) * 3;
+        const ey = baseY + 6 + (rand2() - 0.5) * 2;
+        dHi += `Q ${cx},${cy} ${x},${ey} `;
+      }
+      const hi = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hi.setAttribute('d', dHi);
+      hiGroup.appendChild(hi);
+    });
+  }
+  buildPirateSeams();
+
+  // ─── Temple wall: large brick blocks, hand-drawn (wavy) seams ─────
+  function buildTempleStones() {
+    const svg = document.getElementById('t-stones');
+    if (!svg) return;
+    svg.innerHTML = '';
+    const seededRandom = (seed) => {
+      let s = seed;
+      return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    };
+    const rand = seededRandom(4242);
+
+    // Base wall color — dark sandstone
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('width', 1600); bg.setAttribute('height', 900);
+    bg.setAttribute('fill', '#3a2510');
+    svg.appendChild(bg);
+
+    // Subtle color variance rects (per block area) for texture — light tint
+    const rowH = 225;
+    const rows = 4;
+    // Column edges per row (staggered brick pattern)
+    const colsPerRow = [
+      [0, 400, 800, 1200, 1600],       // row 0
+      [0, 200, 600, 1000, 1400, 1600], // row 1 (staggered)
+      [0, 400, 800, 1200, 1600],       // row 2
+      [0, 200, 600, 1000, 1400, 1600], // row 3 (staggered)
+    ];
+
+    // Draw block tint variance
+    for (let r = 0; r < rows; r++) {
+      const cols = colsPerRow[r];
+      for (let c = 0; c < cols.length - 1; c++) {
+        const x = cols[c], w = cols[c + 1] - cols[c];
+        const y = r * rowH, h = rowH;
+        const hue = 22 + rand() * 10;
+        const light = 12 + rand() * 8;
+        const sat = 32 + rand() * 12;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', y);
+        rect.setAttribute('width', w); rect.setAttribute('height', h);
+        rect.setAttribute('fill', `hsl(${hue.toFixed(0)}, ${sat.toFixed(0)}%, ${light.toFixed(0)}%)`);
+        svg.appendChild(rect);
+      }
+    }
+
+    // Hand-drawn wavy HORIZONTAL seams (between row boundaries)
+    const drawWavyLine = (points, strokeColor, strokeW, opacity) => {
+      let d = `M ${points[0][0]},${points[0][1]} `;
+      for (let i = 1; i < points.length; i++) {
+        const [x, y] = points[i];
+        const [px, py] = points[i - 1];
+        const cx = (px + x) / 2 + (rand() - 0.5) * 6;
+        const cy = (py + y) / 2 + (rand() - 0.5) * 6;
+        d += `Q ${cx.toFixed(1)},${cy.toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)} `;
+      }
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', strokeColor);
+      path.setAttribute('stroke-width', strokeW);
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('opacity', opacity);
+      svg.appendChild(path);
+    };
+
+    // Horizontal seams at y = 225, 450, 675
+    for (let r = 1; r < rows; r++) {
+      const baseY = r * rowH;
+      const pts = [];
+      for (let x = -20; x <= 1620; x += 45) {
+        pts.push([x, baseY + (rand() - 0.5) * 7]);
+      }
+      // Dark seam (main mortar)
+      drawWavyLine(pts, '#0a0503', 5, 0.95);
+      // Subtle highlight below seam
+      const ptsHi = pts.map(([x, y]) => [x, y + 4 + (rand() - 0.5) * 2]);
+      drawWavyLine(ptsHi, '#6a4820', 1.2, 0.4);
+    }
+
+    // Vertical seams (per row, staggered) — only span one row height
+    for (let r = 0; r < rows; r++) {
+      const cols = colsPerRow[r];
+      const yTop = r * rowH;
+      const yBot = (r + 1) * rowH;
+      for (let c = 1; c < cols.length - 1; c++) {
+        const baseX = cols[c];
+        const pts = [];
+        for (let y = yTop; y <= yBot; y += 30) {
+          pts.push([baseX + (rand() - 0.5) * 6, y]);
+        }
+        drawWavyLine(pts, '#0a0503', 5, 0.95);
+        const ptsHi = pts.map(([x, y]) => [x + 3 + (rand() - 0.5) * 1.5, y]);
+        drawWavyLine(ptsHi, '#6a4820', 1.2, 0.35);
+      }
+    }
+  }
+  buildTempleStones();
+
+  // ─── Cinematic sand rain (temple, per wrong guess) ─────
+  // Append to .stage (not .scene-temple) so drops render ABOVE the .trap layer
+  function spawnSandRain() {
+    const stage = document.getElementById('stage');
+    if (!stage || document.documentElement.classList.contains('reduced-motion')) return;
+    const dropCount = 90;
+    for (let i = 0; i < dropCount; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'sand-drop';
+      const x = Math.random() * 100;
+      const heightPx = 6 + Math.random() * 22;
+      const durationMs = 1400 + Math.random() * 2200;
+      const delayMs = Math.random() * 1400;
+      drop.style.left = `${x}%`;
+      drop.style.height = `${heightPx}px`;
+      drop.style.animationDuration = `${durationMs}ms`;
+      drop.style.animationDelay = `${delayMs}ms`;
+      drop.addEventListener('animationend', () => drop.remove());
+      stage.appendChild(drop);
+    }
+  }
+
+  function setTheme(name) {
+    currentTheme = name;
+    body.setAttribute('data-theme', name);
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.scene-${name}`).classList.add('active');
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.setTheme === name);
+    });
+    buildTrap(THEMES[name].trapType);
+    hudBoss.textContent = THEMES[name].boss;
+    hudTrap.textContent = THEMES[name].trapName;
+    eyebrowEl.textContent = THEMES[name].eyebrow;
+    newGame();
+  }
+
+  function buildTrap(type) {
+    trapWavesEl.innerHTML = '';
+    if (type === 'water' && window.HoldArt?.waterSurface) {
+      trapWavesEl.innerHTML = window.HoldArt.waterSurface();
+      trapWavesEl.firstElementChild.classList.add('water-surface');
+    } else if (type === 'water') {
+      const waves = [
+        { cls: 'wave-1', h: 22, color: 'rgba(212, 220, 232, 0.6)' },
+        { cls: 'wave-2', h: 16, color: 'rgba(160, 190, 210, 0.4)' },
+        { cls: 'wave-3', h: 12, color: 'rgba(120, 150, 180, 0.25)' },
+      ];
+      for (const w of waves) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 1200 40');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('class', w.cls);
+        svg.style.height = w.h + 'px';
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let d = 'M 0,20 ';
+        for (let x = 0; x <= 1200; x += 40) {
+          const y = 20 + Math.sin(x * 0.05 + Math.random() * 0.5) * 8;
+          d += `Q ${x + 20},${y - 6} ${x + 40},20 `;
+        }
+        d += 'L 1200,40 L 0,40 Z';
+        path.setAttribute('d', d);
+        path.setAttribute('fill', w.color);
+        svg.appendChild(path);
+        trapWavesEl.appendChild(svg);
+      }
+    } else if (type === 'gas') {
+      const wisps = document.createElement('div');
+      wisps.className = 'gas-wisps';
+      trapWavesEl.appendChild(wisps);
+    } else if (type === 'sand') {
+      // No continuous animation — sand rain is triggered per wrong guess via spawnSandRain()
+      // Base trap fill (static sand color) shows accumulated pile at bottom
+    } else if (type === 'vacuum') {
+      const lines = document.createElement('div');
+      lines.className = 'vacuum-lines';
+      trapWavesEl.appendChild(lines);
+    }
+    // 'approach' has no rising overlay — the vampire IS the threat
+    if (type === 'approach') {
+      trapEl.style.display = 'none';
+    } else {
+      trapEl.style.display = '';
+    }
+  }
+
+  function updateVampirePosition(errorCount) {
+    if (!vampireCount) return;
+    // Vampire_02 natural orientation faces LEFT (hand extends left, ~10% of image width)
+    // End at right: 28% so vampire's hand tip lands on werewolf's neck (~41% from stage left)
+    const pct = 5 + (errorCount / MAX_ERRORS) * 23;
+    vampireCount.style.right = `${pct}%`;
+  }
+
+  function updateBarrelPosition(trapPct) {
+    // Barrel floats on water surface — sit its bottom edge at the water level
+    if (pirateBarrel) pirateBarrel.style.bottom = `calc(${trapPct}% - 20px)`;
+  }
+
+  function pickWord() {
+    const words = THEMES[currentTheme].words;
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
+  function newGame() {
+    document.dispatchEvent(new CustomEvent('gallows:start', { detail: { theme: currentTheme } }));
+    const pick = pickWord();
+    target = pick.word;
+    clue = pick.clue;
+    guessed = new Set();
+    errors = 0;
+    gameOver = false;
+    hudWord.textContent = `${target.length} letters`;
+    storyEl.innerHTML = THEMES[currentTheme].intro;
+    stageEl.classList.remove('perilous');
+    trapEl.style.height = '10%';
+    updateBarrelPosition(10);
+    updateVampirePosition(0);
+    resetSceneVisuals();
+    updateAirMonitors();
+    overlay.classList.remove('visible', 'win-mode');
+    renderWord(); renderKeyboard(); renderHUD();
+  }
+
+  // ─── Lose-state scene visuals (per theme) ────────────
+  function spawnMessyPirates() {
+    const container = document.getElementById('pirateMessyContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    // Water max for pirate = 10 + 40 = 50% at lose (matches onWrong)
+    const trapPct = 10 + (errors / MAX_ERRORS) * 40;
+    void trapPct;
+    const currentTrapPct = parseFloat(trapEl.style.height) || trapPct;
+    const art = window.HoldArt;
+    if (!art) return;
+    // Flotsam and the captain's own bones, scattered over the whole surface.
+    const pieces = [...art.FLOTSAM.map((k) => ['flotsam', k]), ...art.REMAINS.map((k) => ['remains', k])];
+    const widths = {
+      hat: 120, spar: 190, bottle: 76, crate: 70, rope: 84, lantern: 50,
+      skull: 74, coat: 150, ribs: 86, femur: 100, jaw: 52, pelvis: 76, arm: 92, hand: 54, spine: 92, boot: 76, peg: 92,
+    };
+    const slots = pieces.map((_, i) => i).sort(() => Math.random() - 0.5);
+    pieces.forEach(([set, kind], i) => {
+      const div = document.createElement('div');
+      div.className = 'pirate-messy-scattered';
+      div.style.left = `${1 + (slots[i] / pieces.length) * 88 + Math.random() * 4}%`;
+      // Bodies sit AT the water surface (partially submerged: bottom edge below water line)
+      const submergeOffset = 16 + Math.floor(Math.random() * 16); // half under the surface
+      div.style.bottom = `calc(${currentTrapPct}% - ${submergeOffset}px)`;
+      div.style.width = `${widths[kind]}px`;
+      div.style.zIndex = 2 + Math.floor(Math.random() * 3);
+      div.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+      div.style.animationDuration = `${(4.5 + Math.random() * 2.5).toFixed(2)}s`; // slower — dead bodies drift
+      const tilt = Math.round((Math.random() - 0.5) * 40);
+      div.innerHTML = `<div style="transform: rotate(${tilt}deg)">${art[set](kind, { id: `lose-${i}-${kind}` })}</div>`;
+      container.appendChild(div);
+    });
+  }
+
+  function enterLoseState() {
+    if (currentTheme === 'pirate') {
+      const character = document.querySelector('.pirate-character');
+      if (character) character.classList.add('hidden');
+      spawnMessyPirates();
+    } else if (currentTheme === 'temple') {
+      const court = document.querySelector('.temple-worker');
+      if (court && window.TombArt) court.innerHTML = window.TombArt.templeCourtBowed({ id: 'court-bowed' });
+      document.querySelector('.temple-worker')?.classList.add('dead');
+      document.querySelector('.temple-mummy')?.classList.add('emerging');
+    } else if (currentTheme === 'crypt') {
+      document.querySelector('.vampire-count')?.classList.add('hidden');
+      document.querySelector('.crypt-werewolf')?.classList.add('hidden');
+      document.querySelector('.crypt-dracula-kill')?.classList.add('visible');
+      document.querySelector('.crypt-candlestick')?.classList.add('snuffed');
+      document.querySelector('.scene-crypt')?.classList.add('darkened');
+    } else if (currentTheme === 'void') {
+      buildCockpitShatter(); // regenerate fresh random cracks each lose
+      document.getElementById('voidShatter')?.classList.add('visible');
+    }
+  }
+
+  // Procedural cockpit glass shatter (called on lose state in void theme)
+  function buildCockpitShatter() {
+    const svg = document.getElementById('voidShatterSvg');
+    if (!svg) return;
+    svg.innerHTML = '';
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const impact = { x: 800, y: 360 }; // lower than window vertical center
+    // Cracks span the full background panel width, extending down to 20% from bottom (y=720)
+    const windowBounds = { xMin: 20, xMax: 1580, yMin: 20, yMax: 720 };
+
+    const addPath = (parent, d, stroke, sw, opacity) => {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      p.setAttribute('stroke', stroke);
+      p.setAttribute('stroke-width', sw);
+      p.setAttribute('fill', 'none');
+      p.setAttribute('opacity', opacity);
+      p.setAttribute('stroke-linecap', 'round');
+      parent.appendChild(p);
+    };
+
+    // Ray from impact at given angle, stopping at window bounds
+    const maxDistAtAngle = (angle) => {
+      const dx = Math.cos(angle), dy = Math.sin(angle);
+      const distances = [];
+      if (dx > 0.001) distances.push((windowBounds.xMax - impact.x) / dx);
+      if (dx < -0.001) distances.push((windowBounds.xMin - impact.x) / dx);
+      if (dy > 0.001) distances.push((windowBounds.yMax - impact.y) / dy);
+      if (dy < -0.001) distances.push((windowBounds.yMin - impact.y) / dy);
+      return Math.min(...distances.filter(d => d > 0));
+    };
+
+    // Zigzag path from A to B with N segments and perpendicular jitter
+    const zigzag = (ax, ay, bx, by, segments, jitterAmt) => {
+      let d = `M ${ax.toFixed(1)},${ay.toFixed(1)}`;
+      const dx = bx - ax, dy = by - ay;
+      const perpX = -dy, perpY = dx;
+      const perpLen = Math.hypot(perpX, perpY) || 1;
+      const points = [];
+      for (let i = 1; i <= segments; i++) {
+        const t = i / segments;
+        // Fade jitter near start (impact) and end (endpoint) for cleaner tips
+        const jitterScale = jitterAmt * (Math.sin(t * Math.PI));
+        const jitter = (Math.random() - 0.5) * jitterScale * 2;
+        const x = ax + dx * t + (perpX / perpLen) * jitter;
+        const y = ay + dy * t + (perpY / perpLen) * jitter;
+        d += ` L ${x.toFixed(1)},${y.toFixed(1)}`;
+        points.push({ x, y });
+      }
+      return { d, points };
+    };
+
+    // ── Primary radial cracks (18 rays with zigzag) ──
+    const primaryGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(primaryGroup);
+    const numPrimary = 18;
+    const outerEndpoints = [];
+    const midpoints = []; // mid-radial points for branches
+
+    for (let i = 0; i < numPrimary; i++) {
+      const angle = (i / numPrimary) * Math.PI * 2 + (Math.random() - 0.5) * 0.18;
+      const maxDist = maxDistAtAngle(angle);
+      const endDist = maxDist * (0.75 + Math.random() * 0.22);
+      const endX = impact.x + Math.cos(angle) * endDist;
+      const endY = impact.y + Math.sin(angle) * endDist;
+      const segCount = 5 + Math.floor(Math.random() * 4);
+      const { d, points } = zigzag(impact.x, impact.y, endX, endY, segCount, 22);
+      addPath(primaryGroup, d, '#f0faff', 2, 0.92);
+      outerEndpoints.push({ x: endX, y: endY });
+      midpoints.push(points[Math.floor(points.length / 2)]);
+    }
+
+    // ── Secondary branch fractures (splits off each primary crack) ──
+    const branchGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(branchGroup);
+    for (let i = 0; i < numPrimary; i++) {
+      if (Math.random() > 0.65) continue; // only some radials get branches
+      const from = midpoints[i];
+      const branchAngle = Math.atan2(from.y - impact.y, from.x - impact.x)
+                        + (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
+      const branchLen = 30 + Math.random() * 60;
+      const endX = from.x + Math.cos(branchAngle) * branchLen;
+      const endY = from.y + Math.sin(branchAngle) * branchLen;
+      // Clamp to window
+      const cx = Math.max(windowBounds.xMin, Math.min(windowBounds.xMax, endX));
+      const cy = Math.max(windowBounds.yMin, Math.min(windowBounds.yMax, endY));
+      const { d } = zigzag(from.x, from.y, cx, cy, 3 + Math.floor(Math.random() * 3), 8);
+      addPath(branchGroup, d, '#e8f4ff', 1.3, 0.72);
+    }
+
+    // ── Concentric secondary cracks (connect outer endpoints in a jagged ring) ──
+    const concentricGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(concentricGroup);
+    for (let i = 0; i < outerEndpoints.length; i++) {
+      const a = outerEndpoints[i];
+      const b = outerEndpoints[(i + 1) % outerEndpoints.length];
+      const segs = 3 + Math.floor(Math.random() * 3);
+      const { d } = zigzag(a.x, a.y, b.x, b.y, segs, 14);
+      addPath(concentricGroup, d, '#dcecff', 1.1, 0.62);
+    }
+
+    // ── Inner concentric ring (halfway out) ──
+    const innerRingGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(innerRingGroup);
+    for (let i = 0; i < numPrimary; i++) {
+      if (Math.random() > 0.8) continue; // sparse
+      const angleA = (i / numPrimary) * Math.PI * 2;
+      const angleB = ((i + 1) / numPrimary) * Math.PI * 2;
+      const rA = 60 + Math.random() * 40;
+      const rB = 60 + Math.random() * 40;
+      const ax = impact.x + Math.cos(angleA) * rA;
+      const ay = impact.y + Math.sin(angleA) * rA;
+      const bx = impact.x + Math.cos(angleB) * rB;
+      const by = impact.y + Math.sin(angleB) * rB;
+      const { d } = zigzag(ax, ay, bx, by, 2 + Math.floor(Math.random() * 2), 5);
+      addPath(innerRingGroup, d, '#d0e0f0', 0.9, 0.55);
+    }
+
+    // ── Micro fragment cracks (30 small random cracks scattered across window) ──
+    const microGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(microGroup);
+    for (let i = 0; i < 30; i++) {
+      const cx = windowBounds.xMin + 40 + Math.random() * (windowBounds.xMax - windowBounds.xMin - 80);
+      const cy = windowBounds.yMin + 30 + Math.random() * (windowBounds.yMax - windowBounds.yMin - 60);
+      // Skip if too close to impact hole
+      const dist = Math.hypot(cx - impact.x, cy - impact.y);
+      if (dist < 30) continue;
+      const angle = Math.random() * Math.PI * 2;
+      const len = 12 + Math.random() * 45;
+      const ex = cx + Math.cos(angle) * len;
+      const ey = cy + Math.sin(angle) * len;
+      const { d } = zigzag(cx, cy, ex, ey, 2 + Math.floor(Math.random() * 3), 3);
+      addPath(microGroup, d, '#c8dcf0', 0.7, 0.42);
+    }
+
+    // ── Tiny fragment cracks near impact point (dense debris) ──
+    const debrisGroup = document.createElementNS(SVG_NS, 'g');
+    svg.appendChild(debrisGroup);
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = 22 + Math.random() * 60;
+      const sx = impact.x + Math.cos(angle) * r;
+      const sy = impact.y + Math.sin(angle) * r;
+      const dirAngle = angle + (Math.random() - 0.5) * 1.2;
+      const len = 8 + Math.random() * 25;
+      const ex = sx + Math.cos(dirAngle) * len;
+      const ey = sy + Math.sin(dirAngle) * len;
+      const { d } = zigzag(sx, sy, ex, ey, 2, 2);
+      addPath(debrisGroup, d, '#e0eef8', 0.8, 0.6);
+    }
+
+    // ── Impact hole (dark center) ──
+    const holeOuter = document.createElementNS(SVG_NS, 'circle');
+    holeOuter.setAttribute('cx', impact.x);
+    holeOuter.setAttribute('cy', impact.y);
+    holeOuter.setAttribute('r', 18);
+    holeOuter.setAttribute('fill', 'rgba(0,0,0,0.7)');
+    svg.appendChild(holeOuter);
+    const holeInner = document.createElementNS(SVG_NS, 'circle');
+    holeInner.setAttribute('cx', impact.x);
+    holeInner.setAttribute('cy', impact.y);
+    holeInner.setAttribute('r', 11);
+    holeInner.setAttribute('fill', '#000');
+    svg.appendChild(holeInner);
+  }
+  buildCockpitShatter();
+
+  // Randomize shuttle flight path per cycle (6 direction variants)
+  const SHUTTLE_DIRS = ['LTR', 'RTL', 'TTB', 'BTT', 'Diag1', 'Diag2'];
+  function pickShuttlePath() {
+    const shuttle = document.querySelector('.void-shuttle');
+    if (!shuttle) return;
+    const dir = SHUTTLE_DIRS[Math.floor(Math.random() * SHUTTLE_DIRS.length)];
+    const duration = 14 + Math.random() * 8;
+    shuttle.style.animation = 'none';
+    void shuttle.offsetWidth; // force reflow to restart animation
+    shuttle.style.animation = `shuttleFly${dir} ${duration}s linear`;
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const shuttle = document.querySelector('.void-shuttle');
+    if (shuttle) {
+      shuttle.addEventListener('animationend', pickShuttlePath);
+      pickShuttlePath();
+    }
+  });
+  // Also start immediately in case DOMContentLoaded already fired
+  setTimeout(() => {
+    const shuttle = document.querySelector('.void-shuttle');
+    if (shuttle && !shuttle.style.animation) {
+      shuttle.addEventListener('animationend', pickShuttlePath);
+      pickShuttlePath();
+    }
+  }, 100);
+
+  // The bridge's life-support monitors: oxygen falls, three poisons rise (void theme death indicator)
+  function updateAirMonitors() {
+    window.VoidArt?.showGasLevels(document.querySelector('.void-cockpit-overlay'), errors);
+  }
+
+  function resetSceneVisuals() {
+    // Pirate
+    document.querySelector('.pirate-character')?.classList.remove('hidden');
+    const messyContainer = document.getElementById('pirateMessyContainer');
+    if (messyContainer) messyContainer.innerHTML = '';
+    // Temple
+    const court = document.querySelector('.temple-worker');
+    if (court && court.classList.contains('dead') && window.TombArt) court.innerHTML = window.TombArt.templeCourt({ id: 'court-standing' });
+    document.querySelector('.temple-worker')?.classList.remove('dead');
+    document.querySelector('.temple-mummy')?.classList.remove('emerging');
+    // Lab
+    const labFog = document.getElementById('labGasFog');
+    if (labFog) labFog.style.opacity = 0;
+    // Crypt
+    document.querySelector('.vampire-count')?.classList.remove('hidden');
+    document.querySelector('.crypt-werewolf')?.classList.remove('hidden');
+    document.querySelector('.crypt-dracula-kill')?.classList.remove('visible');
+    document.querySelector('.crypt-candlestick')?.classList.remove('snuffed');
+    document.querySelector('.scene-crypt')?.classList.remove('darkened');
+    // Void: reset shattered glass
+    document.getElementById('voidShatter')?.classList.remove('visible');
+  }
+
+  function renderWord() {
+    wordEl.innerHTML = '';
+    for (const ch of target) {
+      const slot = document.createElement('div');
+      slot.className = 'letter-slot';
+      if (guessed.has(ch)) { slot.textContent = ch; slot.classList.add('revealed'); }
+      wordEl.appendChild(slot);
+    }
+  }
+
+  function renderKeyboard() {
+    keyboardEl.innerHTML = '';
+    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    for (const row of rows) {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'kb-row';
+      for (const ch of row) {
+        const key = document.createElement('button');
+        key.className = 'key';
+        key.textContent = ch;
+        if (guessed.has(ch)) {
+          key.disabled = true;
+          key.classList.add(target.includes(ch) ? 'correct' : 'wrong');
+        }
+        key.addEventListener('click', () => guess(ch));
+        rowEl.appendChild(key);
+      }
+      keyboardEl.appendChild(rowEl);
+    }
+  }
+
+  function renderHUD() {
+    hudErrors.textContent = `${errors} / ${MAX_ERRORS}`;
+    // The doktor gives a little more to the gas with every miss (src/art/alchemist.mjs).
+    document.querySelector('.lab-character')?.setAttribute('data-slump', String(errors));
+  }
+
+  function guess(letter) {
+    if (gameOver || guessed.has(letter)) return;
+    guessed.add(letter);
+    if (target.includes(letter)) onCorrect();
+    else onWrong();
+    renderWord(); renderKeyboard(); renderHUD();
+    checkEnd();
+  }
+
+  function onCorrect() {
+    storyEl.innerHTML = THEMES[currentTheme].onCorrect;
+    storyEl.style.color = 'var(--success)';
+    setTimeout(() => storyEl.style.color = '', 900);
+  }
+
+  function onWrong() {
+    errors++;
+    // Per-theme trap intensity:
+    //  pirate: max ~50% (bodies stay visible on water)
+    //  temple: max ~50% (sand up to worker head)
+    //  void:   max ~88% (vacuum airlock fills full scene)
+    const trapDelta = (currentTheme === 'pirate' || currentTheme === 'temple') ? 40 : 78;
+    const pct = 10 + (errors / MAX_ERRORS) * trapDelta;
+    trapEl.style.height = `${pct}%`;
+    updateBarrelPosition(pct);
+    updateVampirePosition(errors);
+
+    // Lab: full-screen gas fog opacity grows per wrong.
+    // Non-linear ramp (pow 0.7) makes fog visible early instead of jumping at the end.
+    if (currentTheme === 'lab') {
+      const fog = document.getElementById('labGasFog');
+      if (fog) fog.style.opacity = Math.pow(errors / MAX_ERRORS, 0.7) * 0.62;
+    }
+
+    // Void: the air monitors go from nominal to caution to danger
+    if (currentTheme === 'void') updateAirMonitors();
+
+    // Cinematic sand rain per wrong guess (temple only)
+    if (currentTheme === 'temple') spawnSandRain();
+    stageEl.classList.remove('shake');
+    void stageEl.offsetWidth;
+    stageEl.classList.add('shake');
+
+    const t = THEMES[currentTheme];
+    const remaining = MAX_ERRORS - errors;
+    if (remaining <= 2) stageEl.classList.add('perilous');
+    if (remaining === 0) storyEl.innerHTML = t.onLose;
+    else if (remaining === 1) storyEl.innerHTML = t.onWrong[2];
+    else if (remaining <= 3) storyEl.innerHTML = t.onWrong[1];
+    else storyEl.innerHTML = t.onWrong[0];
+    storyEl.style.color = 'var(--danger)';
+    setTimeout(() => storyEl.style.color = '', 1200);
+  }
+
+  function checkEnd() {
+    const won = [...target].every(ch => guessed.has(ch));
+    if (won) { gameOver = true; setTimeout(showWin, 700); return; }
+    if (errors >= MAX_ERRORS) { gameOver = true; setTimeout(showLose, 500); }
+  }
+
+  function announceEnd(outcome) {
+    document.dispatchEvent(new CustomEvent('gallows:end', {
+      detail: { outcome, theme: currentTheme, word: target, errors },
+    }));
+  }
+
+  function showWin() {
+    announceEnd('win');
+    const t = THEMES[currentTheme];
+    overlayTitle.textContent = 'The door opens.';
+    overlayTitle.className = 'overlay-title win';
+    overlaySub.textContent = `Cipher solved: ${target}`;
+    overlayBoss.innerHTML = `<em>${t.bossTaunt}</em><br><br>
+      <span class="weakness">Boss weakness: ${t.bossWeakness.length} letters, starts with ${t.bossWeakness[0]}.</span>`;
+    overlayBtn.textContent = 'Next Cipher';
+    overlay.classList.add('visible', 'win-mode');
+  }
+
+  function showLose() {
+    announceEnd('loss');
+    enterLoseState();
+    overlayTitle.textContent = THEMES[currentTheme].onLose;
+    overlayTitle.className = 'overlay-title lose';
+    overlaySub.textContent = `The word was: ${target}`;
+    overlayBoss.innerHTML = `<em>${clue}</em>`;
+    overlayBtn.textContent = 'Try Again';
+    overlay.classList.add('visible');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (overlay.classList.contains('visible') && e.key === 'Enter') { newGame(); return; }
+    const ch = e.key.toUpperCase();
+    if (ALPHABET.includes(ch)) guess(ch);
+  });
+  overlayBtn.addEventListener('click', newGame);
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => setTheme(btn.dataset.setTheme));
+  });
+
+  // Redraw the rising water once the code-drawn art is in (src/main.mjs).
+  document.addEventListener('gallows:art-ready', () => {
+    buildTrap(THEMES[currentTheme].trapType);
+    updateAirMonitors();
+  });
+
+  // For the tests: the cipher, the room and the misses, and the game's own moves.
+  window.__gallows = {
+    get theme() { return currentTheme; },
+    get target() { return target; },
+    get errors() { return errors; },
+    get over() { return gameOver; },
+    guess: (letter) => guess(letter.toUpperCase()),
+    setTheme: (name) => setTheme(name),
+    newGame: () => newGame(),
+  };
+
+  setTheme('pirate');
+</script>
+
+<!-- The Hall's bridge, then the art drawn in code and the Hall adapter -->
+<script src="../../bridge/bridge.js"></script>
+<script type="module" src="./src/main.mjs"></script>
+</body>
+</html>

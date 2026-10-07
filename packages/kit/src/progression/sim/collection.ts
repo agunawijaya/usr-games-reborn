@@ -50,6 +50,7 @@ const ROWS: Row[] = [
   ['pig', 'cards', 2, 5, true],
   ['letters', 'words', 3, 6, true],
   ['hangman', 'words', 2, 5, true],
+  ['hangman-classic', 'words', 2, 8, false],
   ['quiz', 'words', 3, 8, true],
   ['arithmetic', 'numbers', 2, 5, true],
   ['signal', 'numbers', 3, 10, true],
