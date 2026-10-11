@@ -19,6 +19,8 @@ Our own code, art and copy are MIT-licensed. Anything we derive from the origina
 | [`BSD-Fenlason-hack.txt`](BSD-Fenlason-hack.txt)             | `COPYING`, lines 348–371               | The second notice on `hack` (Jay Fenlason).                                                                                                              |
 | [`phantasia-public-domain.txt`](phantasia-public-domain.txt) | `phantasia/COPYRIGHT`                  | `phantasia`, which is explicitly not copyrighted.                                                                                                        |
 | [`BSD-Myers-bsd-games.txt`](BSD-Myers-bsd-games.txt)         | `COPYING`, lines 390–414               | Files added by the Linux bsd-games collection (`include/`, `lib/`, packaging).                                                                           |
+| [`SCOWL-2020.12.07.txt`](SCOWL-2020.12.07.txt)               | SCOWL 2020.12.07, `Copyright`          | Chain Letter's dictionary (`games/letters`): the SCOWL word lists up to size 60 (Kevin Atkinson and the sources he names).                               |
+| [`ENABLE2K-public-domain.txt`](ENABLE2K-public-domain.txt)   | ENABLE2K `README.1ST`, `README`        | Chain Letter's dictionary: ENABLE2K's public-domain release (Alan Beale, Mendel Cooper).                                                                 |
 | [`OFL-1.1.txt`](OFL-1.1.txt)                                 | the fonts' `LICENSE` files             | Every self-hosted typeface; see [`FONTS.md`](FONTS.md).                                                                                                  |
 
 The `.txt` notices are exact copies: do not reformat, re-wrap or "fix" them.

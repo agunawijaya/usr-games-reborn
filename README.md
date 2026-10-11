@@ -74,7 +74,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Go fish             | `/usr/games/cards`    | fish (1990)                                       | coming soon | native |
 | Road-trip card race | `/usr/games/cards`    | mille (1983)                                      | coming soon | native |
 | Dice push-your-luck | `/usr/games/cards`    | pig (1992)                                        | coming soon | native |
-| Letter grid         | `/usr/games/words`    | the BSD letter-grid program (1993)                | coming soon | native |
+| Chain Letter        | `/usr/games/words`    | the 1988 letter-cube word hunt (1988)             | shipped     | native |
 | Before the Tide     | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | native |
 | Escape the Gallows  | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | hosted |
 | Trivia              | `/usr/games/words`    | quiz (1991)                                       | coming soon | native |

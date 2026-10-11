@@ -1,0 +1,139 @@
+{
+  "id": "signal",
+  "title": "Dits & Daws",
+  "tagline": "Tap it. Punch it. Crack it.",
+  "teaser": "Messages are arriving on machines from computing's past: a clicking telegraph, punched cards, paper tape, a printer banner, a scrambled cipher. Listen, decode, crack — and send your own. Six little Unix tools, rebuilt as a codebreaker's desk.",
+  "category": "numbers",
+  "directory": "/usr/games/numbers",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 15],
+  "status": "shipped",
+  "accent": "#c0703a",
+  "emblem": "M10 42V8M10 8h14v12H10M10 20L24 8M30 28h3M37 28h8M30 37h8M42 37h3",
+  "inspiredBy": {
+    "program": "caesar",
+    "originalTitle": "caesar, rot13, morse, bcd, ppt, banner",
+    "uiTitle": "six Unix tools for codes and signals",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "Dits & Daws — read and send messages on a telegraph, a cipher wheel, punch cards, paper tape, a banner printer and flags.",
+    "description": "Six little Unix tools for codes and signals, rebuilt as a codebreaker's desk. caesar's automatic codebreaker becomes a cipher wheel with a frequency scope; morse, bcd and ppt become a telegraph, a card punch and a tape reader; Mark Horton's banner prints sideways again; and a signaller on the roof sends flag semaphore. Seven chapters, a Daily Signal and a desk for making codes of your own.",
+    "seeAlso": ["arithmetic", "letters"]
+  },
+  "howToPlay": [
+    "Messages arrive on six machines: read what they say and type it, or send them back.",
+    "Turn the cipher wheel, punch cards and tape, read banners early and set the flags in time.",
+    "Three stars a message: every letter right, inside the par time, and without hints."
+  ],
+  "cronGoals": [
+    {
+      "id": "messages",
+      "stat": "messagesRead",
+      "label": "Read {n} messages at the Dits & Daws desk",
+      "min": 4,
+      "max": 16
+    },
+    {
+      "id": "stars",
+      "stat": "stars",
+      "label": "Earn {n} stars at the Dits & Daws desk",
+      "min": 6,
+      "max": 30
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-dit",
+      "title": "First dit",
+      "description": "Tap the telegraph key for one short mark.",
+      "tier": "core"
+    },
+    {
+      "id": "first-daw",
+      "title": "First daw",
+      "description": "Hold the key for a long mark: the old program called it a daw.",
+      "tier": "core"
+    },
+    {
+      "id": "morse-20wpm",
+      "title": "Twenty a minute",
+      "description": "Key a whole message at twenty words a minute or faster, every letter right.",
+      "tier": "rare"
+    },
+    {
+      "id": "frequency-sleuth",
+      "title": "Frequency sleuth",
+      "description": "Crack a turned message with the scope and no other help.",
+      "tier": "core"
+    },
+    {
+      "id": "beat-the-machine",
+      "title": "Beat the machine",
+      "description": "Crack a message that fools the automatic codebreaker.",
+      "tier": "extra"
+    },
+    {
+      "id": "card-reader",
+      "title": "Card reader",
+      "description": "Read a card of ten characters or more without the code chart.",
+      "tier": "extra"
+    },
+    {
+      "id": "tape-weaver",
+      "title": "Tape weaver",
+      "description": "Punch a tape of eight rows or more without a slip.",
+      "tier": "extra"
+    },
+    {
+      "id": "banner-day",
+      "title": "Banner day",
+      "description": "Read a banner before half of it has printed.",
+      "tier": "core"
+    },
+    {
+      "id": "squint",
+      "title": "Squint",
+      "description": "Read a grainy banner printed thirty-three columns wide or narrower.",
+      "tier": "extra"
+    },
+    {
+      "id": "flag-reader",
+      "title": "Flag reader",
+      "description": "Read a message of twenty letters or more from the roof.",
+      "tier": "extra"
+    },
+    {
+      "id": "flag-sender",
+      "title": "Flag sender",
+      "description": "Send a word by flag with no late or wrong letters.",
+      "tier": "core"
+    },
+    {
+      "id": "chain-reaction",
+      "title": "Chain reaction",
+      "description": "Solve a message that runs through more than one machine.",
+      "tier": "core"
+    },
+    {
+      "id": "signal-room",
+      "title": "The Signal Room",
+      "description": "Read every message in all seven chapters.",
+      "tier": "rare"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily regular",
+      "description": "Play seven Daily Signals.",
+      "tier": "core"
+    }
+  ]
+}

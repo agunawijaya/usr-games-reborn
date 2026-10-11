@@ -31,7 +31,7 @@
     { "id": "fish", "source": "placeholder" },
     { "id": "mille", "source": "placeholder" },
     { "id": "pig", "source": "placeholder" },
-    { "id": "letters", "source": "placeholder" },
+    { "id": "letters", "source": "game" },
     { "id": "hangman", "source": "game" },
     { "id": "hangman-classic", "source": "game" },
     { "id": "quiz", "source": "placeholder" },

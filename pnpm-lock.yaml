@@ -254,6 +254,12 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
 
+  games/letters:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/lightkeeper:
     dependencies:
       '@usr-games/kit':

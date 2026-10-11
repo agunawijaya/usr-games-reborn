@@ -1,0 +1,127 @@
+{
+  "id": "arithmetic",
+  "title": "Number Sprint",
+  "tagline": "Fast sums. Prime splits. Beat your own time.",
+  "teaser": "Fire off sums against the clock, split numbers into their primes, sweep a board clean of everything that isn't prime, and spell big numbers out in words. Four little Unix number tools, turned into one fast, good-looking game, on a running track or in a glowing atom lab: your pick.",
+  "category": "numbers",
+  "directory": "/usr/games/numbers",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [2, 10],
+  "status": "shipped",
+  "accent": "#14b8a6",
+  "emblem": "M14 9v11M8.5 14.5h11M28.5 14.5h11M9 29l10 10M19 29L9 39M28.5 34h11M34 29h.01M34 39h.01",
+  "inspiredBy": {
+    "program": "arithmetic",
+    "originalTitle": "arithmetic, factor, primes, number",
+    "uiTitle": "four Unix number tools",
+    "year": 1989
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "Number Sprint — sums with a forgiving tutor, prime splits, a sieve and numbers in words, against the clock or calm.",
+    "description": "Four small BSD number tools in one game: Eamonn McManus's arithmetic drill, whose tutor brings back the numbers you miss until it forgives them; Landon Curt Noll's factor and primes, as splits and a sieve; and number, which spells numerals out in English. Run it on a floodlit track or in an atom lab.",
+    "seeAlso": ["signal", "quiz"]
+  },
+  "howToPlay": [
+    "Quick Sums: type each answer; a wrong one stays until you get it, and the numbers you miss come back for practice.",
+    "Split numbers into primes, sweep a board clean of everything that is not prime, and turn numbers into words and back.",
+    "Rush races the clock and your own best; Calm counts accuracy only. Play the Daily, the campaign or free play."
+  ],
+  "cronGoals": [
+    {
+      "id": "sums",
+      "stat": "sumsSolved",
+      "label": "Solve {n} sums in Number Sprint",
+      "min": 40,
+      "max": 200
+    },
+    {
+      "id": "splits",
+      "stat": "numbersSplit",
+      "label": "Split {n} numbers into primes in Number Sprint",
+      "min": 5,
+      "max": 30
+    }
+  ],
+  "packages": [
+    {
+      "id": "perfect-block",
+      "title": "Clean twenty",
+      "description": "Answer all twenty sums of a block right the first time.",
+      "tier": "extra"
+    },
+    {
+      "id": "forgiven",
+      "title": "All is forgiven",
+      "description": "Practise a number the tutor kept bringing back until it lets it go.",
+      "tier": "core"
+    },
+    {
+      "id": "lightning",
+      "title": "Lightning",
+      "description": "Finish a block in Rush at 1.5 seconds a problem or faster.",
+      "tier": "rare"
+    },
+    {
+      "id": "first-split",
+      "title": "First split",
+      "description": "Break a number all the way down into its primes.",
+      "tier": "core"
+    },
+    {
+      "id": "big-split",
+      "title": "Six figures",
+      "description": "Split a six-digit number.",
+      "tier": "core"
+    },
+    {
+      "id": "most-wanted",
+      "title": "Most wanted",
+      "description": "Split a number from the Most wanted rung.",
+      "tier": "rare"
+    },
+    {
+      "id": "clean-sweep",
+      "title": "Clean sweep",
+      "description": "Clear a sieve without choosing a single number that is not prime.",
+      "tier": "core"
+    },
+    {
+      "id": "twin-primes",
+      "title": "Twins",
+      "description": "Collect ten pairs of twin primes in the album.",
+      "tier": "extra"
+    },
+    {
+      "id": "wordsmith",
+      "title": "Wordsmith",
+      "description": "Spell or read a nine-digit number right.",
+      "tier": "extra"
+    },
+    {
+      "id": "fraction-fluent",
+      "title": "Fraction fluent",
+      "description": "Get five fractions right the first time in Spell It.",
+      "tier": "extra"
+    },
+    {
+      "id": "calm-and-collected",
+      "title": "Calm and collected",
+      "description": "Earn three stars on a chapter played in Calm.",
+      "tier": "extra"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Regular",
+      "description": "Play seven Dailies.",
+      "tier": "core"
+    }
+  ]
+}

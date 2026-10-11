@@ -1,0 +1,15 @@
+{
+  "name": "@usr-games/game-arithmetic",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Number Sprint: fast sums, prime splits, a sieve and numbers in words, on a running track or in an atom lab. Inspired by arithmetic, factor, primes and number (BSD games).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5292 --strictPort",
+    "hero": "playwright test -c . --grep @hero"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

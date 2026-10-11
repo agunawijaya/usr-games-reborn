@@ -1,0 +1,798 @@
+/*
+ * Number Sprint's interface. Everything sits under .ns, themed by data-theme (sprint | atom) and
+ * data-look (day | night). Sizes follow --s, the 1920 × 1080 design scale, but text never drops
+ * below 16 px. Colours are tokens per theme and look; each pair is checked for AA contrast in
+ * src/ui/contrast.test.ts.
+ */
+
+.ns {
+  --s: 1;
+  --ns-text: max(16px, calc(var(--s) * 22px));
+  --ns-small: max(16px, calc(var(--s) * 18px));
+  --ns-radius: calc(var(--s) * 16px);
+  --ns-font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--ns-font-body);
+  font-size: var(--ns-text);
+  color: var(--ns-ink);
+  background: var(--ns-bg);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.ns[data-theme='sprint'] {
+  --ns-font-display:
+    'Bricolage Grotesque Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --ns-font-number:
+    'Bricolage Grotesque Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --ns-display-weight: 800;
+  --ns-number-weight: 800;
+  --ns-label-spacing: 0.08em;
+  --ns-radius: calc(var(--s) * 12px);
+}
+
+.ns[data-theme='atom'] {
+  --ns-font-display: 'Fredoka Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --ns-font-number: 'IBM Plex Mono', ui-monospace, monospace;
+  --ns-display-weight: 600;
+  --ns-number-weight: 600;
+  --ns-label-spacing: 0.04em;
+  --ns-radius: calc(var(--s) * 22px);
+}
+
+.ns[data-theme='sprint'][data-look='day'] {
+  --ns-bg: #86c4f2;
+  --ns-ink: #142033;
+  --ns-ink-2: #4a5568;
+  --ns-panel: rgba(255, 255, 255, 0.93);
+  --ns-panel-solid: #ffffff;
+  --ns-panel-rim: rgba(20, 32, 51, 0.12);
+  --ns-panel-shadow: 0 calc(var(--s) * 10px) calc(var(--s) * 30px) rgba(20, 40, 70, 0.22);
+  --ns-accent: #c2410c;
+  --ns-accent-fill: #c2410c;
+  --ns-accent-ink: #ffffff;
+  --ns-accent-soft: rgba(194, 65, 12, 0.12);
+  --ns-second: #1f4e8c;
+  --ns-board-ink: #ffd25a;
+  --ns-board-ink-2: #f4efe2;
+  --ns-board-dim: rgba(255, 210, 90, 0.5);
+  --ns-typed: #ffffff;
+  --ns-key: #ffffff;
+  --ns-key-ink: #142033;
+  --ns-key-rim: rgba(20, 32, 51, 0.16);
+  --ns-good: #13804d;
+  --ns-warm: #b45309;
+  --ns-focus: #1f4e8c;
+  --ns-pip: rgba(20, 32, 51, 0.16);
+  --ns-glow: none;
+}
+
+.ns[data-theme='sprint'][data-look='night'] {
+  --ns-bg: #081630;
+  --ns-ink: #eef3ff;
+  --ns-ink-2: #a9b8d4;
+  --ns-panel: rgba(14, 24, 40, 0.88);
+  --ns-panel-solid: #0e1828;
+  --ns-panel-rim: rgba(160, 190, 240, 0.28);
+  --ns-panel-shadow: 0 calc(var(--s) * 10px) calc(var(--s) * 34px) rgba(0, 0, 0, 0.5);
+  --ns-accent: #ff9a5c;
+  --ns-accent-fill: #ff8a4c;
+  --ns-accent-ink: #1a0d05;
+  --ns-accent-soft: rgba(255, 138, 76, 0.16);
+  --ns-second: #47d1ff;
+  --ns-board-ink: #ffcf4a;
+  --ns-board-ink-2: #f4efe2;
+  --ns-board-dim: rgba(255, 207, 74, 0.5);
+  --ns-typed: #ffffff;
+  --ns-key: rgba(22, 34, 56, 0.94);
+  --ns-key-ink: #eef3ff;
+  --ns-key-rim: rgba(160, 190, 240, 0.32);
+  --ns-good: #5cf0a0;
+  --ns-warm: #ffc266;
+  --ns-focus: #47d1ff;
+  --ns-pip: rgba(238, 243, 255, 0.2);
+  --ns-glow: 0 0 calc(var(--s) * 18px) rgba(255, 190, 80, 0.45);
+}
+
+.ns[data-theme='atom'][data-look='day'] {
+  --ns-bg: #dff1ea;
+  --ns-ink: #10302a;
+  --ns-ink-2: #3f6159;
+  --ns-panel: rgba(255, 255, 255, 0.86);
+  --ns-panel-solid: #f7fcfa;
+  --ns-panel-rim: rgba(24, 132, 108, 0.32);
+  --ns-panel-shadow: 0 calc(var(--s) * 12px) calc(var(--s) * 34px) rgba(30, 90, 75, 0.16);
+  --ns-accent: #0b7a60;
+  --ns-accent-fill: #0b7a60;
+  --ns-accent-ink: #ffffff;
+  --ns-accent-soft: rgba(11, 122, 96, 0.1);
+  --ns-second: #6a4fc9;
+  --ns-board-ink: #10302a;
+  --ns-board-ink-2: #3f6159;
+  --ns-board-dim: rgba(16, 48, 42, 0.45);
+  --ns-typed: #0b7a60;
+  --ns-key: rgba(255, 255, 255, 0.9);
+  --ns-key-ink: #10302a;
+  --ns-key-rim: rgba(24, 132, 108, 0.35);
+  --ns-good: #0b7a60;
+  --ns-warm: #9a5b00;
+  --ns-focus: #6a4fc9;
+  --ns-pip: rgba(16, 48, 42, 0.14);
+  --ns-glow: none;
+}
+
+.ns[data-theme='atom'][data-look='night'] {
+  --ns-bg: #0d0a2a;
+  --ns-ink: #f2f0ff;
+  --ns-ink-2: #b9b3e6;
+  --ns-panel: rgba(22, 18, 58, 0.86);
+  --ns-panel-solid: #161238;
+  --ns-panel-rim: rgba(150, 140, 255, 0.36);
+  --ns-panel-shadow: 0 0 calc(var(--s) * 30px) rgba(110, 100, 255, 0.18);
+  --ns-accent: #b3a6ff;
+  --ns-accent-fill: #a99bff;
+  --ns-accent-ink: #120d33;
+  --ns-accent-soft: rgba(169, 155, 255, 0.14);
+  --ns-second: #5ce1e6;
+  --ns-board-ink: #f2f0ff;
+  --ns-board-ink-2: #b9b3e6;
+  --ns-board-dim: rgba(242, 240, 255, 0.45);
+  --ns-typed: #6ff0c4;
+  --ns-key: rgba(26, 21, 70, 0.92);
+  --ns-key-ink: #f2f0ff;
+  --ns-key-rim: rgba(150, 140, 255, 0.4);
+  --ns-good: #6ff0c4;
+  --ns-warm: #ffc266;
+  --ns-focus: #5ce1e6;
+  --ns-pip: rgba(242, 240, 255, 0.18);
+  --ns-glow: 0 0 calc(var(--s) * 22px) rgba(150, 140, 255, 0.5);
+}
+
+.ns [hidden] {
+  display: none !important;
+}
+
+.ns-stage {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.ns-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.ns :focus {
+  outline: none;
+}
+
+.ns :focus-visible {
+  outline: max(3px, calc(var(--s) * 3px)) solid var(--ns-focus);
+  outline-offset: max(2px, calc(var(--s) * 3px));
+}
+
+.ns-panel {
+  position: absolute;
+  box-sizing: border-box;
+  background: var(--ns-panel);
+  border: 1px solid var(--ns-panel-rim);
+  border-radius: var(--ns-radius);
+  box-shadow: var(--ns-panel-shadow);
+  backdrop-filter: blur(calc(var(--s) * 10px));
+}
+
+.ns-label {
+  font-family: var(--ns-font-display);
+  font-weight: 700;
+  font-size: var(--ns-small);
+  letter-spacing: var(--ns-label-spacing);
+  text-transform: uppercase;
+  color: var(--ns-accent);
+}
+
+.ns-muted {
+  color: var(--ns-ink-2);
+}
+
+/* Status at the top left. */
+.ns-hud {
+  padding: calc(var(--s) * 18px) calc(var(--s) * 22px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 10px);
+}
+
+.ns-hud__title {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--s) * 12px);
+  flex-wrap: wrap;
+}
+
+.ns-hud__level {
+  font-weight: 700;
+}
+
+.ns-hud__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--s) * 14px);
+}
+
+.ns-pips {
+  display: flex;
+  gap: calc(var(--s) * 4px);
+  flex: 1;
+}
+
+.ns-pip {
+  flex: 1;
+  height: max(6px, calc(var(--s) * 10px));
+  border-radius: 99px;
+  background: var(--ns-pip);
+}
+
+.ns-pip--done {
+  background: var(--ns-accent-fill);
+}
+
+.ns-pip--clean {
+  background: var(--ns-good);
+}
+
+.ns-pip--now {
+  background: transparent;
+  box-shadow: inset 0 0 0 max(2px, calc(var(--s) * 2.5px)) var(--ns-accent);
+}
+
+.ns-count {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ns-clock {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(22px, calc(var(--s) * 40px));
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ns-streak {
+  font-family: var(--ns-font-display);
+  font-weight: 700;
+  color: var(--ns-accent);
+  white-space: nowrap;
+}
+
+/* The problem, on the scoreboard or the lab display. */
+.ns-board {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--ns-board-ink);
+  text-align: center;
+  pointer-events: none;
+}
+
+.ns-board__top {
+  font-family: var(--ns-font-display);
+  font-weight: 700;
+  font-size: max(16px, calc(var(--s) * 22px));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ns-board-ink-2);
+  opacity: 0.85;
+}
+
+.ns-board__problem {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(64px, calc(var(--s) * 150px));
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-shadow: var(--ns-glow);
+  display: flex;
+  align-items: baseline;
+  gap: 0.22em;
+}
+
+.ns[data-theme='atom'] .ns-board__problem {
+  font-size: max(56px, calc(var(--s) * 126px));
+  letter-spacing: -0.02em;
+}
+
+.ns-board__answer {
+  min-width: 1.4em;
+  padding: 0 0.12em;
+  border-bottom: max(3px, calc(var(--s) * 6px)) solid var(--ns-board-dim);
+  text-align: left;
+  color: var(--ns-board-ink-2);
+}
+
+.ns-board__answer--typing {
+  color: var(--ns-typed);
+}
+
+.ns-board__caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.8em;
+  margin-left: 0.04em;
+  background: currentColor;
+  vertical-align: -0.04em;
+  animation: ns-blink 1s steps(2, start) infinite;
+}
+
+.ns[data-motion='reduce'] .ns-board__caret {
+  animation: none;
+}
+
+@keyframes ns-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.ns-board__rule {
+  font-size: var(--ns-small);
+  color: var(--ns-board-ink-2);
+  opacity: 0.85;
+}
+
+.ns-board__chain {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(18px, calc(var(--s) * 30px));
+  font-variant-numeric: tabular-nums;
+  color: var(--ns-board-ink-2);
+}
+
+.ns-board__power {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(52px, calc(var(--s) * 112px));
+  line-height: 1.05;
+  white-space: nowrap;
+  text-shadow: var(--ns-glow);
+}
+
+.ns[data-theme='atom'] .ns-board__power {
+  font-size: max(46px, calc(var(--s) * 96px));
+}
+
+/* Numbers in training: the forgiving tutor, made visible. */
+.ns-training {
+  padding: calc(var(--s) * 18px) calc(var(--s) * 20px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 10px);
+}
+
+.ns-training__note {
+  font-size: var(--ns-small);
+  color: var(--ns-ink-2);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.ns-training__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 8px);
+}
+
+.ns-training__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--s) * 10px);
+}
+
+.ns-training__fact {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(18px, calc(var(--s) * 28px));
+  font-variant-numeric: tabular-nums;
+}
+
+.ns-training__blank {
+  color: var(--ns-ink-2);
+}
+
+.ns-chances {
+  display: flex;
+  gap: calc(var(--s) * 5px);
+}
+
+.ns-chance {
+  width: max(9px, calc(var(--s) * 13px));
+  height: max(9px, calc(var(--s) * 13px));
+  border-radius: 50%;
+  background: var(--ns-accent-fill);
+}
+
+.ns-chance--spent {
+  background: transparent;
+  box-shadow: inset 0 0 0 max(1.5px, calc(var(--s) * 2px)) var(--ns-pip);
+}
+
+/* The on-screen keys along the bottom. */
+.ns-keys {
+  position: absolute;
+  display: flex;
+  gap: calc(var(--s) * 8px);
+  align-items: stretch;
+}
+
+.ns-key {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--ns-key-rim);
+  border-radius: var(--ns-radius);
+  background: var(--ns-key);
+  color: var(--ns-key-ink);
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(20px, calc(var(--s) * 34px));
+  box-shadow: 0 calc(var(--s) * 4px) 0 var(--ns-key-rim);
+  cursor: pointer;
+  transition: transform 80ms ease;
+}
+
+.ns-key:active,
+.ns-key--pressed {
+  transform: translateY(calc(var(--s) * 3px));
+  box-shadow: 0 calc(var(--s) * 1px) 0 var(--ns-key-rim);
+}
+
+.ns-key--wide {
+  flex: 1.7;
+  font-family: var(--ns-font-display);
+  font-size: max(17px, calc(var(--s) * 24px));
+  font-weight: 700;
+}
+
+.ns-key--go {
+  flex: 2.2;
+  background: var(--ns-accent-fill);
+  color: var(--ns-accent-ink);
+  border-color: transparent;
+  font-family: var(--ns-font-display);
+  font-size: max(18px, calc(var(--s) * 26px));
+  font-weight: 800;
+}
+
+.ns-key small {
+  display: block;
+  font-family: var(--ns-font-body);
+  font-weight: 400;
+  font-size: max(12px, calc(var(--s) * 15px));
+  opacity: 0.8;
+}
+
+.ns-key--prime {
+  font-size: max(20px, calc(var(--s) * 32px));
+}
+
+/* Buttons and cards on the menus. */
+.ns-button {
+  border: 1px solid var(--ns-key-rim);
+  border-radius: calc(var(--ns-radius) * 0.8);
+  background: var(--ns-key);
+  color: var(--ns-key-ink);
+  font: inherit;
+  font-weight: 700;
+  padding: calc(var(--s) * 12px) calc(var(--s) * 22px);
+  cursor: pointer;
+}
+
+.ns-button--primary {
+  background: var(--ns-accent-fill);
+  border-color: transparent;
+  color: var(--ns-accent-ink);
+  font-family: var(--ns-font-display);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ns-menu {
+  position: absolute;
+  inset: 0;
+}
+
+.ns-menu__column {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: max(10px, calc(var(--s) * 18px));
+}
+
+.ns-menu__eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: var(--ns-small);
+  letter-spacing: 0.04em;
+  color: var(--ns-ink-2);
+}
+
+.ns-menu__title {
+  margin: 0;
+  font-family: var(--ns-font-display);
+  font-weight: var(--ns-display-weight);
+  font-size: max(54px, calc(var(--s) * 112px));
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--ns-ink);
+}
+
+.ns[data-theme='sprint'] .ns-menu__title {
+  font-style: italic;
+  font-variation-settings: 'wdth' 90;
+}
+
+.ns-menu__title-mark {
+  color: var(--ns-accent);
+}
+
+.ns-menu__tagline {
+  margin: 0;
+  font-size: max(18px, calc(var(--s) * 28px));
+  color: var(--ns-ink-2);
+}
+
+.ns-menu__title-plate {
+  padding: calc(var(--s) * 24px) calc(var(--s) * 30px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 8px);
+}
+
+.ns-card {
+  position: relative;
+  box-sizing: border-box;
+  background: var(--ns-panel);
+  border: 1px solid var(--ns-panel-rim);
+  border-radius: var(--ns-radius);
+  box-shadow: var(--ns-panel-shadow);
+  backdrop-filter: blur(calc(var(--s) * 10px));
+  padding: calc(var(--s) * 22px) calc(var(--s) * 26px);
+}
+
+.ns-card--daily {
+  border-width: max(2px, calc(var(--s) * 2px));
+  border-color: var(--ns-accent);
+}
+
+.ns-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--s) * 16px);
+}
+
+.ns-card__title {
+  margin: 0;
+  font-family: var(--ns-font-display);
+  font-weight: var(--ns-display-weight);
+  font-size: max(22px, calc(var(--s) * 38px));
+  line-height: 1.05;
+}
+
+.ns-card__body {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 18px);
+  margin-top: calc(var(--s) * 16px);
+}
+
+.ns-events {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: calc(var(--s) * 10px);
+  flex: 1;
+}
+
+.ns-event {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 4px);
+  padding: calc(var(--s) * 10px) calc(var(--s) * 12px);
+  border-radius: calc(var(--ns-radius) * 0.7);
+  background: var(--ns-accent-soft);
+}
+
+.ns-event__icon {
+  width: max(22px, calc(var(--s) * 34px));
+  height: max(22px, calc(var(--s) * 34px));
+  color: var(--ns-accent);
+}
+
+.ns-event__name {
+  font-weight: 700;
+  font-size: var(--ns-small);
+}
+
+.ns-event__detail {
+  font-size: var(--ns-small);
+  color: var(--ns-ink-2);
+}
+
+.ns-start {
+  font-size: max(20px, calc(var(--s) * 30px));
+  padding: calc(var(--s) * 22px) calc(var(--s) * 34px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--s) * 4px);
+}
+
+.ns-start small {
+  font-family: var(--ns-font-body);
+  font-weight: 400;
+  font-size: var(--ns-small);
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+.ns-chapters {
+  display: flex;
+  gap: calc(var(--s) * 8px);
+  flex: 1;
+}
+
+.ns-chapter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--s) * 6px);
+}
+
+.ns-chapter__dot {
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: calc(var(--s) * 42px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  font-size: max(14px, calc(var(--s) * 18px));
+  background: var(--ns-pip);
+  color: var(--ns-ink-2);
+}
+
+.ns-chapter--done .ns-chapter__dot {
+  background: var(--ns-accent-fill);
+  color: var(--ns-accent-ink);
+}
+
+.ns-chapter--next .ns-chapter__dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 max(2px, calc(var(--s) * 3px)) var(--ns-accent);
+  color: var(--ns-accent);
+}
+
+.ns-stars {
+  display: flex;
+  gap: 1px;
+  font-size: max(10px, calc(var(--s) * 13px));
+  line-height: 1;
+  color: var(--ns-warm);
+}
+
+.ns-stars .ns-star--off {
+  color: var(--ns-pip);
+}
+
+.ns-modes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: calc(var(--s) * 12px);
+}
+
+.ns-mode {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: calc(var(--s) * 12px);
+  align-items: center;
+  text-align: left;
+  padding: calc(var(--s) * 14px) calc(var(--s) * 16px);
+}
+
+.ns-mode__icon {
+  grid-row: span 2;
+  width: max(24px, calc(var(--s) * 38px));
+  height: max(24px, calc(var(--s) * 38px));
+  color: var(--ns-accent);
+}
+
+.ns-link .ns-mode__icon {
+  grid-row: auto;
+  width: max(20px, calc(var(--s) * 28px));
+  height: max(20px, calc(var(--s) * 28px));
+}
+
+.ns-mode__name {
+  font-family: var(--ns-font-display);
+  font-weight: var(--ns-display-weight);
+  font-size: max(17px, calc(var(--s) * 25px));
+  line-height: 1.1;
+}
+
+.ns-mode__from {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: max(13px, calc(var(--s) * 16px));
+  color: var(--ns-ink-2);
+}
+
+.ns-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--s) * 10px);
+}
+
+.ns-link {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--s) * 10px);
+  font-weight: 700;
+}
+
+.ns-link__count {
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  padding: 0 calc(var(--s) * 8px);
+  border-radius: 99px;
+  background: var(--ns-accent-soft);
+  color: var(--ns-accent);
+}
+
+/* A caption under the featured molecule or on the menu scoreboard. */
+.ns-caption {
+  position: absolute;
+  text-align: center;
+  font-family: var(--ns-font-number);
+  font-weight: var(--ns-number-weight);
+  color: var(--ns-ink);
+  pointer-events: none;
+}
+
+.ns-caption__small {
+  font-family: var(--ns-font-display);
+  font-weight: 700;
+  font-size: var(--ns-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ns-ink-2);
+}
+
+.ns-caption__big {
+  font-size: max(30px, calc(var(--s) * 54px));
+  line-height: 1.1;
+}
+
+.ns-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
