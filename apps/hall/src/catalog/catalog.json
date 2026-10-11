@@ -35,7 +35,7 @@
     { "id": "hangman", "source": "game" },
     { "id": "hangman-classic", "source": "game" },
     { "id": "quiz", "source": "placeholder" },
-    { "id": "arithmetic", "source": "placeholder" },
+    { "id": "arithmetic", "source": "game" },
     { "id": "signal", "source": "game" },
     { "id": "adventure", "source": "placeholder" },
     { "id": "hack", "source": "placeholder" },

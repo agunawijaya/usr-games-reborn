@@ -185,6 +185,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/arithmetic:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/atc:
     dependencies:
       '@fontsource-variable/fraunces':
