@@ -79,7 +79,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Escape the Gallows  | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | hosted |
 | Trivia              | `/usr/games/words`    | quiz (1991)                                       | coming soon | native |
 | Number sprint       | `/usr/games/numbers`  | arithmetic (1989)                                 | coming soon | native |
-| Signal lab          | `/usr/games/numbers`  | caesar, morse and friends (1980)                  | coming soon | native |
+| Dits & Daws         | `/usr/games/numbers`  | six Unix tools for codes and signals (1980)       | shipped     | native |
 | Colossal cave       | `/usr/games/stories`  | adventure (1991)                                  | coming soon | native |
 | Dungeon descent     | `/usr/games/stories`  | hack (1982)                                       | coming soon | native |
 | Fantasy realm       | `/usr/games/stories`  | phantasia (1986)                                  | coming soon | native |
