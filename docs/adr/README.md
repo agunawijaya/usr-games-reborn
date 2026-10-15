@@ -17,5 +17,6 @@ edited to change a decision; a new ADR supersedes the old one and both link to e
 | [0010](0010-hall-styles-and-palettes.md)     | Hall styles and palettes                                               | Accepted           |
 | [0011](0011-adopting-finished-games.md)      | Adopting finished games                                                | Accepted           |
 | [0012](0012-bridge-1-1-strip-and-posters.md) | Bridge revision 1.1, a strip beside the game, and posters that last    | Accepted           |
+| [0013](0013-shared-word-source.md)           | One agreed word source for the word games                              | Proposed           |
 
 To add one, copy the shape of an existing ADR, take the next number, and add a row here.

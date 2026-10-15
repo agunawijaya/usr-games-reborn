@@ -30,10 +30,13 @@ Tide keeps that score as its heart: the **tide average**.
   scuttle, gulls glide, a lighthouse turns, and a seven-section sandcastle falls like real sand
   does.
 - **No gallows.** Mistakes are waves against a castle, kind enough for every age.
-- **Words written for the game.** An everyday deck of over three thousand words, plus eight
-  themed decks of about 150 each: Ocean, Space, Food, Animals, Music, Weather, Sports and
+- **Words chosen for the game.** An everyday deck of nearly three thousand words (2,952), plus
+  eight themed decks of about 150 each: Ocean, Space, Food, Animals, Music, Weather, Sports and
   Computing history. Computing history comes with a one-line story for every word. Difficulty
   tiers are measured, not guessed.
+- **Words you can trust.** Every hidden word is one that two independent word lists agree on,
+  SCOWL (2020.12.07) and ENABLE (ENABLE2K), and a common one: SCOWL's sizes up to 50. All 3,606
+  words in the decks pass that check, the same source Chain Letter uses.
 - **A fair word picker.** The original preferred words that followed long lines in its word file,
   and could never choose the first word at all. Here every word has the same chance.
 - **New ways to play:**

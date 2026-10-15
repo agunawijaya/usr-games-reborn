@@ -1,4 +1,5 @@
 import { brushes, f1, grain, linear, paint, radial, ragged, rod, seeded, svg } from './kit.mjs';
+import { feature, part, rigStyles } from './rig.mjs';
 
 /**
  * Captain Blackrot: a drowned captain risen in his own hold. A skeleton in a sea-rotted navy
@@ -361,16 +362,25 @@ export function captain({ id = 'cap' } = {}) {
     <circle cx="133" cy="456" r="5.4" fill="${url('gold')}" stroke="${ink}" stroke-width="1.6"/>
   </g>`;
 
-  // —— his right arm hangs, the hand on the hilt ——
-  const armR = paint(p, 'armR', 'M130,288 C110,294 98,318 96,352 C94,388 98,422 104,446 L150,442 C148,416 150,378 152,342 C154,310 148,292 130,288 Z', {
+  // —— his right arm hangs, the hand on the hilt; jointed at the elbow so fright can raise it ——
+  const upperR = paint(p, 'upperR', 'M130,288 C110,294 98,318 96,352 C95,368 96,382 99,394 C110,404 140,404 150,394 C150,376 151,358 152,342 C154,310 148,292 130,288 Z', {
     fill: url('coat'),
     ink,
     filter: url('cloth'),
     strokes: [
-      { d: 'M108,320 C104,360 104,400 108,440', c: C.navyHi, w: 12, o: 0.5, b: 7 },
-      { d: 'M146,320 C146,360 144,400 146,440', c: C.navyDeep, w: 14, o: 0.6, b: 7 },
-      { d: 'M114,388 C124,394 136,394 146,388', c: C.navyDeep, w: 3, o: 0.7, b: 2 },
+      { d: 'M108,320 C104,350 104,376 106,396', c: C.navyHi, w: 12, o: 0.5, b: 7 },
+      { d: 'M146,320 C146,350 146,376 146,396', c: C.navyDeep, w: 14, o: 0.6, b: 7 },
       { d: 'M110,336 C118,340 126,342 134,340', c: C.navyDeep, w: 2.4, o: 0.6, b: 1 },
+      { d: 'M104,390 C118,396 134,396 148,390', c: C.navyDeep, w: 3, o: 0.7, b: 2 },
+    ],
+  });
+  const foreR = paint(p, 'foreR', 'M100,386 C100,362 148,362 149,386 C148,406 148,424 150,442 L104,446 C100,426 98,406 100,386 Z', {
+    fill: url('coat'),
+    ink,
+    filter: url('cloth'),
+    strokes: [
+      { d: 'M108,392 C105,410 105,426 108,442', c: C.navyHi, w: 12, o: 0.5, b: 7 },
+      { d: 'M146,392 C145,410 144,426 146,442', c: C.navyDeep, w: 14, o: 0.6, b: 7 },
     ],
   });
   const cuffR = `${paint(p, 'cuffR', 'M100,426 C116,420 138,418 152,420 C156,434 158,450 160,466 C140,474 114,474 92,468 C94,454 96,440 100,426 Z', {
@@ -484,14 +494,17 @@ export function captain({ id = 'cap' } = {}) {
       ],
     })}
     <path d="M172,138 L178,150 L174,158 M224,128 L220,140" fill="none" stroke="${C.boneDeep}" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M170,176 C172,162 192,160 196,172 C198,186 190,194 180,193 C172,192 168,186 170,176 Z" fill="${url('socket')}" stroke="${ink}" stroke-width="2"/>
-    <path d="M172,170 C178,163 190,163 195,170" fill="none" stroke="${C.boneDeep}" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
-    <circle cx="184" cy="179" r="13" fill="${url('ember')}" opacity="0.9"/>
-    <circle cx="184" cy="179" r="3.6" fill="#fff6c8"/>
+    ${part(p, 'eye', `<path d="M170,176 C172,162 192,160 196,172 C198,186 190,194 180,193 C172,192 168,186 170,176 Z" fill="${url('socket')}" stroke="${ink}" stroke-width="2"/>
+      ${feature(p, 'ember', `<circle cx="184" cy="179" r="13" fill="${url('ember')}" opacity="0.9"/>
+        ${part(p, 'pupil', '<circle cx="184" cy="179" r="3.6" fill="#fff6c8"/>')}`)}
+      ${feature(p, 'happy', `<path d="M173,183 C178,174 190,174 195,183" fill="none" stroke="${C.ember}" stroke-width="7" stroke-linecap="round" opacity="0.55" filter="url(#${p}-b2)"/>
+        <path d="M173,183 C178,174 190,174 195,183" fill="none" stroke="#fff3b0" stroke-width="2.8" stroke-linecap="round"/>`)}`)}
+    ${part(p, 'brow', `<path d="M170,170 C177,161 190,161 196,169" fill="none" stroke="${C.boneDeep}" stroke-width="3.6" stroke-linecap="round" opacity="0.9"/>`)}
     <path d="M201,194 C196,202 193,210 197,214 L201,211 L205,214 C209,210 206,202 201,194 Z" fill="${C.void}" stroke="${ink}" stroke-width="1.8"/>
+    <path d="M182,229 C194,233 210,233 221,229 C222,246 214,261 202,261 C190,261 182,246 182,229 Z" fill="#0d0604"/>
     <path d="M180,218 C190,214 212,214 222,218 L220,232 C208,236 194,236 182,232 Z" fill="${C.boneLo}" stroke="${ink}" stroke-width="1.6"/>
     ${teeth(ink, 182, 218, 8, 4.9, 13, 2)}
-    ${paint(p, 'jaw', 'M172,222 C172,242 186,262 202,262 C218,262 232,242 232,222 L226,232 C216,244 188,244 178,232 Z', {
+    ${part(p, 'jaw', `${paint(p, 'jaw', 'M172,222 C172,242 186,262 202,262 C218,262 232,242 232,222 L226,232 C216,244 188,244 178,232 Z', {
       fill: url('bone'),
       ink,
       strokes: [
@@ -499,7 +512,7 @@ export function captain({ id = 'cap' } = {}) {
         { d: 'M178,238 C182,250 190,256 198,258', c: C.boneHi, w: 5, o: 0.7, b: 2 },
       ],
     })}
-    ${teeth(ink, 184, 233, 7, 4.9, 8, -1)}
+    ${teeth(ink, 184, 233, 7, 4.9, 8, -1)}`)}
     ${paint(p, 'patch', 'M206,166 C214,156 234,158 238,170 C242,184 232,194 220,194 C210,194 204,182 206,166 Z', {
       fill: url('felt'),
       ink,
@@ -559,49 +572,164 @@ export function captain({ id = 'cap' } = {}) {
 
   const shadow = `<ellipse cx="200" cy="790" rx="122" ry="13" fill="#000" opacity="0.55" filter="url(#${p}-b7)"/>`;
 
-  const body = [
-    defs,
-    shadow,
-    plume,
-    coatBack,
-    liningBack,
-    breechL,
-    breechR,
-    boot,
-    peg,
-    torso,
-    spine,
-    ribs,
-    sternum,
-    shirt,
-    panelL,
-    panelR,
-    holes,
-    embroidery,
-    pockets,
-    buttons,
-    lapelL,
-    lapelR,
-    glow,
-    sash,
-    belt,
-    cutlass,
-    armR,
-    cuffR,
-    handR,
-    upperL,
-    foreL,
-    cuffL,
-    handL,
-    lantern,
-    neck,
-    collar,
-    weed,
-    skull,
-    bandana,
-    hat,
-  ].join('\n');
+  // —— the rig: the plume and the lantern's glow sit far back in the drawing, so each has its
+  // own copy of the joints it hangs from ——
+  const lanternArm = (upper, fore) => part(p, 'upperL', `${upper}${part(p, 'foreL', fore)}`);
+  const behind = part(p, 'torso', `${part(p, 'head', part(p, 'hat', plume))}${coatBack}${liningBack}`);
+  const front = part(
+    p,
+    'torso',
+    [
+      torso, spine, ribs, sternum, shirt, panelL, panelR, holes, embroidery, pockets, buttons, lapelL, lapelR,
+      lanternArm('', part(p, 'lantern', glow)),
+      sash, belt, cutlass,
+      part(p, 'upperR', `${part(p, 'foreR', `${foreR}${cuffR}${handR}`)}${upperR}`),
+      lanternArm(upperL, `${foreL}${cuffL}${handL}${part(p, 'lantern', lantern)}`),
+      neck, collar, weed,
+      part(p, 'head', `${skull}${bandana}${feature(p, 'drops', drops(ink))}${part(p, 'hat', hat)}`),
+    ].join('\n'),
+  );
+  const legs = [breechL, breechR, boot, peg].join('\n');
+
+  const body = [defs, panicStyles(p), shadow, part(p, 'root', `${behind}${legs}${front}`)].join('\n');
   return svg('0 0 420 800', body, { label: 'Captain Blackrot' });
+}
+
+/**
+ * The captain's fear, stage by stage, as the water climbs his hold: calm with the lantern up;
+ * a glance down at the water; fidgeting with a worried brow; the eye blazing wide and the jaw
+ * chattering as he backs off with the lantern high and a hand at his chest; his hat jumping off
+ * his skull; then both arms flailing. When the door opens he sags with relief and raises the
+ * lantern. The lantern always hangs plumb: its turn undoes the arm's.
+ */
+const RIG = {
+  bones: {
+    root: [200, 790],
+    torso: [200, 500],
+    head: [200, 252],
+    hat: [204, 150],
+    eye: [183, 178],
+    pupil: [184, 179],
+    brow: [183, 166],
+    jaw: [202, 236],
+    upperR: [127, 304],
+    foreR: [124, 386],
+    upperL: [266, 300],
+    foreL: [331, 360],
+    lantern: [376, 206],
+  },
+  poses: {
+    1: {
+      head: { r: -5, y: 3 },
+      pupil: { x: -1, y: 4.5 },
+      brow: { y: 1.5 },
+      upperL: { r: 14 },
+      foreL: { r: 26 },
+      lantern: { r: -40 },
+    },
+    2: {
+      head: { r: 4, y: 4 },
+      eye: { s: 1.14 },
+      pupil: { x: 2.5, y: 4 },
+      brow: { r: -14, y: -3 },
+      jaw: { y: 4 },
+      upperL: { r: 30, y: -4 },
+      foreL: { r: -32 },
+      lantern: { r: 2 },
+      upperR: { y: -5 },
+    },
+    3: {
+      torso: { r: -2 },
+      head: { r: -3, y: 1 },
+      eye: { s: 1.32 },
+      pupil: { s: 0.62, y: 2 },
+      brow: { r: -16, y: -6 },
+      jaw: { y: 10 },
+      upperL: { r: -38 },
+      foreL: { r: 26 },
+      lantern: { r: 14 },
+      upperR: { r: -24 },
+      foreR: { r: -100 },
+    },
+    4: {
+      torso: { r: -3, y: 2 },
+      head: { y: 4 },
+      hat: { y: -26, r: -6 },
+      eye: { s: 1.46 },
+      pupil: { s: 0.5 },
+      brow: { r: -18, y: -9 },
+      jaw: { y: 16 },
+      upperL: { r: -70 },
+      foreL: { r: 48 },
+      lantern: { r: 25 },
+      upperR: { r: 130 },
+      foreR: { r: 40 },
+    },
+    5: {
+      head: { y: 2 },
+      hat: { y: -40, r: 8 },
+      eye: { s: 1.56 },
+      pupil: { s: 0.38 },
+      brow: { r: -10, y: -12 },
+      jaw: { y: 22 },
+      upperL: { r: -110 },
+      foreL: { r: 93 },
+      lantern: { r: 17 },
+      upperR: { r: 150 },
+      foreR: { r: 10 },
+    },
+    relief: {
+      head: { r: -4, y: -3 },
+      jaw: { y: 5 },
+      upperL: { r: -62 },
+      foreL: { r: 45 },
+      lantern: { r: 17 },
+    },
+  },
+  features: {
+    ember: ['0', '1', '2', '3', '4', '5'],
+    happy: ['relief'],
+    drops: ['3', '4', '5'],
+  },
+  motions: {
+    breathe: { seconds: 4.2, keyframes: '0%, 100% { transform: none; } 50% { transform: translate(0px, -1.6px); }' },
+    sway: { seconds: 3.4, keyframes: '0%, 100% { transform: none; } 25% { transform: rotate(3deg); } 75% { transform: rotate(-3deg); }' },
+    glance: { seconds: 3.6, keyframes: '0%, 55%, 100% { transform: none; } 66%, 86% { transform: translate(0px, 3px) rotate(-5deg); }' },
+    fidget: { seconds: 1.9, keyframes: '0%, 100% { transform: none; } 25% { transform: translate(-3px, 0px) rotate(-1deg); } 75% { transform: translate(3px, 0px) rotate(1deg); }' },
+    jitter: { seconds: 0.9, keyframes: '0%, 100% { transform: none; } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); }' },
+    tremble: { seconds: 0.16, easing: 'linear', keyframes: '0%, 100% { transform: none; } 25% { transform: translate(-1.4px, 0.6px); } 50% { transform: translate(1.2px, -0.6px); } 75% { transform: translate(-0.6px, 0.9px); }' },
+    shake: { seconds: 0.12, easing: 'linear', keyframes: '0%, 100% { transform: none; } 25% { transform: translate(-2.4px, 1px); } 50% { transform: translate(2px, -1px); } 75% { transform: translate(-1px, 1.4px); }' },
+    chatter: { seconds: 0.2, easing: 'linear', keyframes: '0%, 100% { transform: none; } 50% { transform: translate(0px, 4px); }' },
+    hatHop: { seconds: 0.5, keyframes: '0%, 100% { transform: none; } 50% { transform: translate(0px, -7px) rotate(-3deg); }' },
+    hatSpin: { seconds: 0.55, keyframes: '0%, 100% { transform: none; } 50% { transform: translate(0px, -9px) rotate(12deg); }' },
+    flailL: { seconds: 0.7, keyframes: '0%, 100% { transform: none; } 25% { transform: rotate(-22deg); } 75% { transform: rotate(14deg); }' },
+    flailR: { seconds: 0.62, keyframes: '0%, 100% { transform: none; } 25% { transform: rotate(20deg); } 75% { transform: rotate(-14deg); }' },
+    search: { seconds: 0.9, keyframes: '0%, 100% { transform: none; } 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); }' },
+    hop: { seconds: 0.45, keyframes: '0%, 100% { transform: none; } 40% { transform: translate(0px, -9px); }' },
+    exhale: { seconds: 1.4, once: true, keyframes: '0% { transform: none; } 30% { transform: translate(0px, 9px) scale(1.03, 0.97); } 65% { transform: translate(0px, -6px); } 100% { transform: none; }' },
+  },
+  idles: {
+    0: { torso: 'breathe', lantern: 'sway' },
+    1: { head: 'glance', lantern: 'sway' },
+    2: { root: 'fidget', lantern: 'jitter' },
+    3: { root: 'tremble', jaw: 'chatter', lantern: 'jitter' },
+    4: { root: 'shake', jaw: 'chatter', hat: 'hatHop', lantern: 'jitter' },
+    5: { root: 'hop', head: 'search', jaw: 'chatter', hat: 'hatSpin', upperL: 'flailL', upperR: 'flailR' },
+    relief: { torso: 'exhale', lantern: 'sway' },
+  },
+};
+
+function panicStyles(p) {
+  return rigStyles(p, RIG);
+}
+
+/** Drops flung off his skull when the fright takes him: comic, all of them sea water. */
+function drops(ink) {
+  const drop = (x, y, r, s) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})">
+    <path d="M0,-10 C4,-3 6,1 6,4 C6,8 3,10 0,10 C-3,10 -6,8 -6,4 C-6,1 -4,-3 0,-10 Z" fill="#bfe4ff" stroke="${ink}" stroke-width="1.3"/>
+    <path d="M-2.4,3 C-2.4,0 -1.4,-2 0,-4" stroke="#ffffff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  </g>`;
+  return `${drop(150, 176, -30, 1.4)}${drop(140, 150, -48, 1.1)}${drop(254, 196, 34, 1.3)}`;
 }
 
 function teeth(ink, x0, y, count, w, h, gold) {

@@ -14,5 +14,8 @@
     "word-game"
   ],
   "author": "Agun Wijaya",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@usr-games/words": "workspace:*"
+  }
 }

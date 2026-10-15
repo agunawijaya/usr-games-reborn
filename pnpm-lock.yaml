@@ -251,8 +251,16 @@ importers:
       '@usr-games/kit':
         specifier: workspace:*
         version: link:../../packages/kit
+    devDependencies:
+      '@usr-games/words':
+        specifier: workspace:*
+        version: link:../../packages/words
 
-  games/hangman-classic/app: {}
+  games/hangman-classic/app:
+    devDependencies:
+      '@usr-games/words':
+        specifier: workspace:*
+        version: link:../../../packages/words
 
   games/hunt/app:
     devDependencies:
@@ -411,6 +419,8 @@ importers:
         version: link:..
 
   packages/kit: {}
+
+  packages/words: {}
 
 packages:
 

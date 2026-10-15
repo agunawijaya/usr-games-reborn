@@ -7,7 +7,8 @@ mistakes; the sixth ends the room.
 
 ## Rules
 
-1. The cipher is one word from the room's own list; the line under the room shows its clue.
+1. The cipher is one word from the room's own list, so the room tells you its subject; the line
+   under the room tells the story as you play, and a lost cipher shows the word's clue.
 2. Guess a letter. Every place it appears in the word is filled in. A letter you have tried
    before costs nothing.
 3. A letter that is not in the word is a mistake, and the room's trap moves on.
@@ -19,9 +20,9 @@ mistakes; the sixth ends the room.
 
 | Room                   | Boss                   | The trap                                    | The ending                                   |
 | ---------------------- | ---------------------- | ------------------------------------------- | -------------------------------------------- |
-| Pirate's Hold          | Cpt. Blackrot          | The water rises                             | The captain comes apart on the flood         |
+| Pirate's Hold          | Cpt. Blackrot          | The water rises and the captain panics      | The captain comes apart on the flood         |
 | Alchemist's Laboratory | Doktor Formalin        | Green gas thickens and the doktor sinks     | The doktor lies flat out on the floor        |
-| Pharaoh's Tomb         | Amun-Rekh, the Undying | Sand pours from the ceiling                 | The court bows to the floor; the mummy walks |
+| Pharaoh's Tomb         | Amun-Rekh, the Undying | Sand pours and the court panics             | The court bows to the floor; the mummy walks |
 | Vampire's Crypt        | Count Nachtvorn        | The Count crosses the room to his prisoner  | The cape closes; the candles die             |
 | Void Vessel            | The Warden             | The air monitors go to caution, then danger | The window cracks                            |
 
@@ -37,8 +38,8 @@ mistakes; the sixth ends the room.
 ## Settings
 
 The game follows the Hall's settings: reduced motion keeps every room still (no bats, streamers
-or falling sand), and the Hall's pause holds every animation where it is. The game has no
-sound.
+or falling sand; the captain and the court still show how afraid they are, standing still in
+each pose), and the Hall's pause holds every animation where it is. The game has no sound.
 
 ## Scoring
 
@@ -65,5 +66,7 @@ Hall's own XP for sessions and first wins. The weekly cron goal counts ciphers s
 
 ## Tips
 
-- Vowels first, then the common consonants: the clue tells you the room's subject.
-- A word you have half filled in is often a word from the clue's own world. Say it aloud.
+- Vowels first, then the common consonants: every cipher belongs to the room's own world.
+- A word you have half filled in is often a word you would expect in that room. Say it aloud.
+- In the hold and the tomb, the people tell you how close the trap is: a glance down is one
+  miss; everyone waving their arms means one mistake left.

@@ -81,13 +81,15 @@ The original picker lives only in this harness; play always uses the fair picker
 ## Word decks
 
 Written for this game by a writing pass on 2026-10-05, from scratch: no word list, dictionary
-or data file was opened, on this machine or elsewhere.
+or data file was opened, on this machine or elsewhere. On 2026-10-15 every deck was checked
+against the collection's agreed word list (below) and the words outside it were taken out or
+replaced by hand.
 
 | Deck              | Words | Notes                                 |
 | ----------------- | ----: | ------------------------------------- |
-| Everyday (core)   | 3 043 | 19 % 4–5 letters, 50 % 6–8, 30 % 9–12 |
+| Everyday (core)   | 2 952 | 19 % 4–5 letters, 50 % 6–8, 30 % 9–12 |
 | Ocean             |   154 |                                       |
-| Space             |   148 | includes planet names                 |
+| Space             |   148 | planets only as words: mars, mercury  |
 | Food              |   155 |                                       |
 | Animals           |   154 |                                       |
 | Music             |   148 |                                       |
@@ -112,8 +114,26 @@ or data file was opened, on this machine or elsewhere.
    a cocktail, body descriptors and doubtful items. It also cut pairs within a theme that give
    each other away (drum and drummer). Every date and person in the computing notes was checked.
 
-**Raised for the owner:** `unix`, `fortran` and `cobol` are in Computing history (the prompt
-named them); "Unix" is a trademark of The Open Group, not on the collection's trademark list.
+**Word source (2026-10-15, backlog item BL-003).** Every deck word must now be a _common_ word
+that SCOWL 2020.12.07 and ENABLE2K both accept: the shared list in `packages/words`
+([README](../../../packages/words/README.md),
+[ADR 0013](../../../docs/adr/0013-shared-word-source.md)), built from the same sources,
+versions and content deny-list as Chain Letter's dictionary, at SCOWL sizes up to 50
+(SCOWL's "small" and "medium" levels). `decks.test.ts` fails on any word outside it and says
+why (rarer size, or not in both lists).
+
+- **Core:** 91 of 3 043 words fell outside: mostly compounds only one list has (_sandcastle_,
+  _treehouse_, _lightbulb_, _rainforest_, _pinecone_) and words at SCOWL sizes 55–60
+  (_beanie_, _sleepover_, _zookeeper_). They were removed, not replaced: 2 952 words remain.
+- **Themed decks:** 132 words fell outside and each was replaced by hand with an on-theme
+  common word, so every themed deck keeps its size. Space lost the planets that are only names
+  and its coinages (_jupiter_, _exoplanet_, _moondust_); Computing history lost its people and
+  acronyms (_babbage_, _lovelace_, _turing_, _ascii_, _unix_, _cobol_) and gained words such as
+  _loom_, _keypunch_, _valve_, _logarithm_ and _enigma_, each with a new checked note.
+- **Replacements avoid give-away pairs** with words already in the deck (no _drumstick_ beside
+  _drum_, no _orbital_ beside _orbit_), and the Sports deck still has no contact-fight sports.
+- The former note that `unix`, `fortran` and `cobol` were in Computing history no longer
+  applies: none of them is in both lists.
 
 ## Difficulty tiers and balance
 
@@ -124,34 +144,44 @@ Tiers come from length and letter rarity, computed (`src/engine/difficulty.ts`):
 
 Two model players (`src/bots/solver.ts`) measured every word:
 
-- the **well-read** player knows all 3 725 deck words and tries the letter found in the most
+- the **well-read** player knows all 3 606 deck words and tries the letter found in the most
   words still possible;
 - the **letter-order** player knows no words and tries letters from commonest to rarest.
 
-A least-squares fit of the well-read player's misses on the core deck
+A least-squares fit of the well-read player's misses on the core deck as it was on 2026-10-05
 (`scripts/difficulty.ts`) gives
 
 > misses ≈ 2.505 − 0.455 · distinct + 1.304 · rarity (r = 0.60)
 
-and the score's core-deck tertiles give the cut-offs: easy below 1.056, hard from 1.816.
+and the score's core-deck tertiles give the cut-offs: easy below 1.056, hard from 1.816. The
+formula and cut-offs were kept when the decks changed on 2026-10-15; the tables below are
+re-measured on the new decks (the 2026-10-05 figures in brackets where they moved).
 
-| Tier   | Core words     | Well-read mean waves | Examples                    |
-| ------ | -------------- | -------------------: | --------------------------- |
-| Easy   | 1 016 (33.4 %) |                 0.56 | accident, accordion, action |
-| Medium | 1 016 (33.4 %) |                 1.39 | absent, accent, account     |
-| Hard   | 1 011 (33.2 %) |                 2.53 | abroad, absorb, academy     |
+| Tier   | Core words   | Well-read mean waves | Examples                        |
+| ------ | ------------ | -------------------: | ------------------------------- |
+| Easy   | 960 (32.5 %) |          0.55 (0.56) | accident, accomplish, accordion |
+| Medium | 995 (33.7 %) |          1.38 (1.39) | absent, accent, accept          |
+| Hard   | 997 (33.8 %) |                 2.53 | abroad, absorb, academy         |
 
 | Deck      | Well-read mean waves (lost) | Letter-order mean waves (lost) |
 | --------- | --------------------------: | -----------------------------: |
-| core      |                1.49 (0.5 %) |                 11.43 (87.2 %) |
-| ocean     |                1.53 (0.0 %) |                 10.72 (85.7 %) |
-| space     |                1.21 (0.0 %) |                 11.00 (86.5 %) |
-| food      |                1.79 (1.3 %) |                 11.63 (91.0 %) |
-| animals   |                1.76 (1.3 %) |                 12.21 (88.3 %) |
-| music     |                1.66 (1.4 %) |                 11.29 (85.1 %) |
-| weather   |                1.88 (1.3 %) |                 10.64 (88.6 %) |
-| sports    |                1.58 (0.7 %) |                 11.59 (90.1 %) |
-| computing |                1.45 (0.0 %) |                 12.01 (89.8 %) |
+| core      |                1.50 (0.5 %) |                 11.43 (87.0 %) |
+| ocean     |                1.64 (0.0 %) |                 10.90 (86.4 %) |
+| space     |                1.25 (0.0 %) |                 10.86 (82.4 %) |
+| food      |                1.80 (1.3 %) |                 11.70 (91.6 %) |
+| animals   |                1.81 (1.3 %) |                 12.23 (88.3 %) |
+| music     |                1.62 (1.4 %) |                 11.24 (84.5 %) |
+| weather   |                1.81 (1.3 %) |                 10.67 (87.9 %) |
+| sports    |                1.57 (0.7 %) |                 11.51 (89.5 %) |
+| computing |                1.46 (0.6 %) |                 11.59 (90.4 %) |
+
+On the 2026-10-05 decks the same players scored: core 1.49 (0.5 %) and 11.43 (87.2 %); ocean
+1.53 (0.0 %) and 10.72 (85.7 %); space 1.21 (0.0 %) and 11.00 (86.5 %); food 1.79 (1.3 %) and
+11.63 (91.0 %); animals 1.76 (1.3 %) and 12.21 (88.3 %); music 1.66 (1.4 %) and 11.29 (85.1 %);
+weather 1.88 (1.3 %) and 10.64 (88.6 %); sports 1.58 (0.7 %) and 11.59 (90.1 %); computing 1.45
+(0.0 %) and 12.01 (89.8 %). Two first choices of replacement (_hazy_ in Weather, _fife_ in
+Music) pushed their deck's well-read losses just past the locked 2 % and were swapped for
+_torrential_ and _snare_; the tolerance was not changed.
 
 The two players bracket a person. Knowing words is what wins: a perfect vocabulary keeps 99 %
 of castles, while letter order alone keeps 13 %. Locked in `src/bots/balance.test.ts`: tiers
@@ -192,6 +222,7 @@ The water canvas renders at a pixel ratio of at most 1.5.
 | 2026-10-05 | The Daily share puts everything on one line                                                                                                                                                                        | It matches the prompt's sample; built from the kit's daily number and emoji grid, because `composeShare` puts the grid on its own line                                                                                        |
 | 2026-10-05 | The play column slides right of centre on narrow screens                                                                                                                                                           | Keeps the word and the keyboard clear of the Hall's 400 px toast corner at 1280 × 720                                                                                                                                         |
 | 2026-10-05 | The word screen is stored ROT13                                                                                                                                                                                    | No unsuitable word as plain text in the source or bundle; the repository's word guard also scans `games/*/src`                                                                                                                |
+| 2026-10-15 | Deck words must be common words that SCOWL and ENABLE both accept (sizes up to 50); 91 core words removed, 132 themed words replaced                                                                               | Owner's backlog item BL-003: every word game rests on the same agreed source as Chain Letter; common sizes keep hidden words guessable                                                                                        |
 
 ## Open questions for the owner
 

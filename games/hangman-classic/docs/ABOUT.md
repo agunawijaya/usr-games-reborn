@@ -25,16 +25,25 @@ budget of mistakes) and rebuilt everything around it as an escape through five t
 - **Five rooms, five threats**: a pirate hold filling with water, an alchemist's laboratory
   filling with gas, a pharaoh's tomb filling with sand, a crypt where a vampire count closes in
   on his prisoner, a starship losing its air.
-- **A cipher list for every room**, about forty words each, with a clue for every word.
+- **A cipher list for every room**, forty words each, with a clue for every word. All 200 are
+  common words that two independent word lists agree on: SCOWL (2020.12.07) and ENABLE
+  (ENABLE2K), the same source as the collection's other word games.
 - **An ending for every room**: the captain's bones adrift among the flotsam, the doktor flat
   out on his laboratory floor, the court bowed to the floor before the mummy, the cape closing in
   the dark, the bridge window cracking open.
 - **Rooms that answer every miss**: the doktor gives a little more to the gas each time (head
   bowed, knees buckling, kneeling, bowed to the floor), and the bridge's life-support monitors
   track the oxygen falling while carbon dioxide, ammonia and hydrogen sulphide rise.
+- **Fear you can watch climb**: Captain Blackrot eyes the water, hugs his lantern, clutches his
+  chest with his ember eye blazing, loses his hat to fright and ends up waving both arms; in the
+  tomb the court looks down at the sand, huddles in pairs, the noble scrambles to his feet and
+  everyone hops above the sand. Open the door and they breathe out: the captain lifts his
+  lantern, the noble kneels again in thanks.
 - **Every picture drawn in code**: characters, rooms and props, with a living scene in each
   (torches, waves rolling across the flood, streamers from a Tesla coil, bats, a walking mummy,
   a turning sky).
+
+![Four misses into the Pharaoh's Tomb: the court huddles above the sand](media/tomb-panic-1280.webp)
 
 ## At a glance
 

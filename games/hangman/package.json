@@ -10,5 +10,8 @@
   },
   "dependencies": {
     "@usr-games/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@usr-games/words": "workspace:*"
   }
 }

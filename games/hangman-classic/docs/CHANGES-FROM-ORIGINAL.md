@@ -35,10 +35,18 @@ once, a fixed budget of mistakes, and the tension of the last one.
 | Short screens         | The keyboard below the fold at 1280 × 720                             | The stage shrinks with the window's height so the cipher and keyboard stay in view                   |
 | The Hall              | —                                                                     | Results, packages, the Hall's pause and reduced motion, a poster                                     |
 
+## Changes since adoption
+
+| Date       | Area                  | Before                                                       | Now                                                                                                                                                |
+| ---------- | --------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-15 | The hold and the tomb | The captain and the court stood unmoved until the room's end | They grow more afraid with every miss, in six stages from calm to frantic, and show their relief when the door opens (owner's backlog item BL-002) |
+| 2026-10-15 | The ciphers           | The port's own lists, with names, compounds and rare words   | The same rooms and clues style, every cipher a common word that SCOWL and ENABLE both accept; 42 replaced (owner's backlog item BL-003)            |
+
 ## Derived logic or data
 
 None. The port did not copy code or data from the original; it re-implements the loop in its own
-words. Word lists and clues are the port's own.
+words. Word lists and clues are the port's own, with 42 ciphers and their clues written for
+the collection when the lists moved to SCOWL and ENABLE.
 
 ## Names
 

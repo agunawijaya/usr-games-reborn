@@ -1,3 +1,4 @@
+import { uncommonReason } from '@usr-games/words';
 import { describe, expect, it } from 'vitest';
 import { isPlainWord } from '../engine/letters';
 import { ALL_DECKS, CORE_DECK, THEMED_DECKS, WORD_MAX_LENGTH, WORD_MIN_LENGTH } from './decks';
@@ -30,6 +31,14 @@ describe.each(ALL_DECKS.map((deck) => [deck.id, deck] as const))('deck %s', (_id
 
   it('passes the all-ages word screen', () => {
     expect(deck.words.filter(isUnsuitable)).toEqual([]);
+  });
+
+  it('holds only common words that SCOWL and ENABLE both accept', () => {
+    const outside = deck.words
+      .map((word) => [word, uncommonReason(word)] as const)
+      .filter(([, reason]) => reason !== null)
+      .map(([word, reason]) => `${word}: ${reason}`);
+    expect(outside).toEqual([]);
   });
 });
 

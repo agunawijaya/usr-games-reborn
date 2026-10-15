@@ -108,6 +108,36 @@ test.describe('Escape the Gallows in the Hall', () => {
     await expect(frame.locator('.lab-character[data-slump="0"]')).toBeVisible();
   });
 
+  test('the captain and the people of the tomb panic with every miss, and breathe out when the door opens', async ({
+    page,
+  }) => {
+    const frame = await openGame(page);
+    const captain = frame.locator('.pirate-character');
+    await expect(captain).toHaveAttribute('data-panic', '0');
+    const target = await inGame<string>(page, 'window.__gallows.target');
+    const wrong = [...'QZXJKVWYBFGPMHUDCLSNTOIRAE'].filter((letter) => !target.includes(letter));
+    for (const [miss, letter] of wrong.slice(0, 5).entries()) {
+      await inGame(page, `window.__gallows.guess(${JSON.stringify(letter)})`);
+      await expect(captain).toHaveAttribute('data-panic', String(miss + 1));
+    }
+    // By the fifth miss his hat has jumped off his skull: its pose lifts it well clear.
+    const hatLift = () =>
+      inGame<number>(
+        page,
+        `new DOMMatrix(getComputedStyle(document.querySelector('.pirate-character g[class$="-hat"]')).transform).m42`,
+      );
+    await expect.poll(hatLift).toBeLessThan(-20);
+
+    await enterRoom(page, 'temple');
+    const court = frame.locator('.temple-worker');
+    await expect(court).toHaveAttribute('data-panic', '0');
+    await solveCipher(page);
+    await expect(court).toHaveAttribute('data-panic', 'relief');
+    await expect(frame.locator('#overlay.visible.win-mode')).toBeVisible();
+    await inGame(page, 'window.__gallows.newGame()');
+    await expect(court).toHaveAttribute('data-panic', '0');
+  });
+
   test('the Tesla coil throws its streamers while the lab is open', async ({ page }) => {
     const frame = await openGame(page);
     await enterRoom(page, 'lab');
@@ -125,6 +155,17 @@ test.describe('Escape the Gallows in the Hall', () => {
     expect(await inGame<number>(page, "document.querySelectorAll('#labArcs path').length")).toBe(0);
     await enterRoom(page, 'crypt');
     await expect(frame.locator('.crypt-bats')).toBeHidden();
+    // The captain still shows his fear, as a still pose with no idle motion.
+    await enterRoom(page, 'pirate');
+    const target = await inGame<string>(page, 'window.__gallows.target');
+    for (const letter of [...'QZXJKVWYB'].filter((l) => !target.includes(l)).slice(0, 4))
+      await inGame(page, `window.__gallows.guess(${JSON.stringify(letter)})`);
+    await expect(frame.locator('.pirate-character')).toHaveAttribute('data-panic', '4');
+    const idle = await inGame<string>(
+      page,
+      `getComputedStyle(document.querySelector('.pirate-character g[class$="-root-idle"]')).animationName`,
+    );
+    expect(idle).toBe('none');
   });
 
   test('the Hall’s pause holds every animation, and resume lets them go', async ({ page }) => {

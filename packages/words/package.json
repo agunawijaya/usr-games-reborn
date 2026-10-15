@@ -1,0 +1,18 @@
+{
+  "name": "@usr-games/words",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The collection's agreed English word list (SCOWL and ENABLE both accept the word), for checking word games' answer words at build time.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsx scripts/build.ts"
+  }
+}
