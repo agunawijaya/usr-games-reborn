@@ -1,0 +1,16 @@
+{
+  "name": "@usr-games/game-fish",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gone Fishing: Go Fish by a quiet pond, with three animal rivals whose memories differ. Inspired by fish (BSD games).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5295 --strictPort",
+    "hero": "playwright test -c . --grep @hero",
+    "simulate": "tsx scripts/simulate.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

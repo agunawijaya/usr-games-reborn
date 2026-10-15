@@ -28,7 +28,7 @@
     { "id": "monop", "source": "placeholder" },
     { "id": "cribbage", "source": "placeholder" },
     { "id": "canfield", "source": "game" },
-    { "id": "fish", "source": "placeholder" },
+    { "id": "fish", "source": "game" },
     { "id": "mille", "source": "placeholder" },
     { "id": "pig", "source": "placeholder" },
     { "id": "letters", "source": "game" },

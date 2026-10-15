@@ -1,0 +1,134 @@
+{
+  "id": "fish",
+  "title": "Gone Fishing",
+  "tagline": "Ask. Remember. Reel them in.",
+  "teaser": "The classic children's card game by a quiet pond. Ask your rivals for cards, remember what they asked for, and when someone says 'Go Fish!', cast your line and see what bites. Four of a kind becomes a fish in your bucket.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [3, 8],
+  "status": "shipped",
+  "accent": "#2f9fb3",
+  "emblem": "M7 28c6-9 19-10 27 0-8 10-21 9-27 0zM34 28l8-6v12zM14 26h.01M24 4v9c0 4 5 4 5 0",
+  "inspiredBy": {
+    "program": "fish",
+    "originalTitle": "go-fish",
+    "uiTitle": "the Berkeley Go Fish",
+    "year": 1990
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "gone fishing — ask your rivals for ranks you hold, cast for a card when told “Go Fish!”, and turn every book into a fish.",
+    "description": "Muffy Barkocy wrote Go Fish for Berkeley's machines, with a computer of two minds: one that asks for its ranks in turn, and one that remembers what you asked for and asks it back. Its manual's only bug says the computer cheats only rarely, and it does: one time in a thousand-odd it peeks. Gone Fishing plays its rules exactly in Classic 1993 and adds a pond, three animal rivals with different memories, a notebook, a tournament and a fish for every book.",
+    "seeAlso": ["canfield", "cribbage"]
+  },
+  "howToPlay": [
+    "Ask one rival for a rank you hold. If they have any, they hand them all over and you ask again.",
+    "If not, they say “Go Fish!”: cast for a card. Catch the rank you asked for and you ask again.",
+    "Four of a rank make a book, and every book leaps into your bucket as a fish. Most books wins."
+  ],
+  "cronGoals": [
+    {
+      "id": "books",
+      "stat": "books",
+      "label": "Catch {n} fish",
+      "min": 10,
+      "max": 40
+    },
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} games at the pond",
+      "min": 2,
+      "max": 8
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-book",
+      "title": "First fish",
+      "description": "Make a book of four and watch it leap into your bucket.",
+      "tier": "core"
+    },
+    {
+      "id": "beat-otto",
+      "title": "Outfoxed an otter",
+      "description": "Win a game with Otto at the pond.",
+      "tier": "core"
+    },
+    {
+      "id": "lucky-cast",
+      "title": "Lucky line",
+      "description": "Fish up the very rank you asked for three times in one game.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Morning regular",
+      "description": "Fish the Daily Pond on seven different days.",
+      "tier": "core"
+    },
+    {
+      "id": "three-books-one-turn",
+      "title": "Hat trick",
+      "description": "Make three books in a single turn.",
+      "tier": "extra"
+    },
+    {
+      "id": "beat-hazel",
+      "title": "Sharper than a monocle",
+      "description": "Win a game with Hazel at the pond.",
+      "tier": "extra"
+    },
+    {
+      "id": "no-notebook-win",
+      "title": "From memory",
+      "description": "Win a game with the notebook closed the whole way through.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-house",
+      "title": "Every book made",
+      "description": "Win a game of All 13 books.",
+      "tier": "extra"
+    },
+    {
+      "id": "classic-1993",
+      "title": "Berkeley, 1993",
+      "description": "Win a game of Classic 1993, the original rules.",
+      "tier": "extra"
+    },
+    {
+      "id": "golden-catch",
+      "title": "Golden catch",
+      "description": "Make a book that turns into a golden fish.",
+      "tier": "extra"
+    },
+    {
+      "id": "beat-miso",
+      "title": "Cat’s whiskers",
+      "description": "Win a game with Miso at the pond.",
+      "tier": "rare"
+    },
+    {
+      "id": "tournament-cup",
+      "title": "Cup of the pond",
+      "description": "Win three rounds of a Tournament.",
+      "tier": "rare"
+    },
+    {
+      "id": "rare-taunt",
+      "title": "Once in a thousand",
+      "description": "Hear the rare parting line the original kept for one game in 1024.",
+      "tier": "rare",
+      "hidden": true
+    }
+  ]
+}

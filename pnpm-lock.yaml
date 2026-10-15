@@ -240,6 +240,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/fish:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/gomoku:
     dependencies:
       '@usr-games/kit':
