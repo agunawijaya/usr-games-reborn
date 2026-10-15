@@ -1,0 +1,16 @@
+{
+  "name": "@usr-games/game-mille",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Detour: the Berkeley road-race card game on a road you can see, with its own deck drawn in code. Inspired by mille (BSD games).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5296 --strictPort",
+    "hero": "playwright test -c . --grep @hero",
+    "balance": "tsx scripts/balance.ts"
+  },
+  "dependencies": {
+    "@usr-games/kit": "workspace:*"
+  }
+}

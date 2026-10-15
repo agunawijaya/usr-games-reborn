@@ -1,0 +1,347 @@
+/*
+ * Detour's page chrome over the canvas. Colours come from the look (Day Drive or Night Drive)
+ * through custom properties on .dt-app; sizes scale with the design grid through --dt-scale.
+ */
+
+.dt-app {
+  --dt-scale: 1;
+  --dt-bar: rgba(251, 243, 225, 0.92);
+  --dt-ink: #1d2838;
+  --dt-soft: #5a5244;
+  --dt-accent: #c4531f;
+  --dt-accent-ink: #fff8ee;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #efe5cf;
+  color: var(--dt-ink);
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+}
+
+.dt-app[data-look='night'] {
+  --dt-bar: rgba(16, 24, 40, 0.88);
+  --dt-ink: #f3e8cf;
+  --dt-soft: #aab3c4;
+  --dt-accent: #ff9a5a;
+  --dt-accent-ink: #1a0f06;
+  background: #141d2c;
+}
+
+.dt-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.dt-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dt-hud__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(40px * var(--dt-scale));
+  /* The Hall's pause pill keeps the top-right 220 px. */
+  padding: 0 calc(236px) 0 calc(28px * var(--dt-scale));
+  box-sizing: border-box;
+}
+
+.dt-hud__brand {
+  display: flex;
+  align-items: baseline;
+  gap: calc(16px * var(--dt-scale));
+  white-space: nowrap;
+}
+
+.dt-hud__mark {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: calc(30px * var(--dt-scale));
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--dt-accent);
+}
+
+.dt-hud__route {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: calc(19px * var(--dt-scale));
+}
+
+.dt-hud__progress {
+  font-size: calc(16px * var(--dt-scale));
+  color: var(--dt-soft);
+}
+
+.dt-hud__scores {
+  display: flex;
+  gap: calc(14px * var(--dt-scale));
+  margin-left: auto;
+}
+
+.dt-score {
+  display: flex;
+  align-items: baseline;
+  gap: calc(9px * var(--dt-scale));
+  padding: calc(6px * var(--dt-scale)) calc(16px * var(--dt-scale));
+  border-radius: 999px;
+  background: var(--dt-car);
+  color: #fff;
+  white-space: nowrap;
+}
+
+.dt-score__name {
+  font-weight: 700;
+  font-size: calc(16px * var(--dt-scale));
+}
+
+.dt-score__total {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: calc(24px * var(--dt-scale));
+}
+
+.dt-score__hand {
+  font-size: calc(14px * var(--dt-scale));
+  opacity: 0.9;
+}
+
+.dt-status {
+  position: absolute;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: calc(21px * var(--dt-scale));
+  color: var(--dt-ink);
+  text-align: center;
+  transition: opacity 120ms ease-out;
+}
+
+.dt-status.is-quiet {
+  opacity: 0;
+}
+
+.dt-key {
+  position: absolute;
+  transform: translateX(-50%);
+  min-width: calc(26px * var(--dt-scale));
+  padding: calc(2px * var(--dt-scale)) calc(6px * var(--dt-scale));
+  border-radius: calc(6px * var(--dt-scale));
+  border: 1.5px solid color-mix(in srgb, var(--dt-ink) 45%, transparent);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
+  font-size: calc(15px * var(--dt-scale));
+  text-align: center;
+  color: var(--dt-ink);
+  box-sizing: border-box;
+}
+
+/* —— the table in play —— */
+
+.dt-table {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  outline: none;
+}
+
+.dt-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dt-card {
+  position: absolute;
+  pointer-events: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: calc(10px * var(--dt-scale));
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.dt-card:focus {
+  outline: none;
+}
+
+.dt-card:focus-visible {
+  outline: 3px solid var(--dt-accent);
+  outline-offset: calc(6px * var(--dt-scale));
+}
+
+.dt-table[data-mode='thinking'] .dt-card,
+.dt-table[data-mode='idle'] .dt-card,
+.dt-table[data-mode='over'] .dt-card {
+  cursor: default;
+}
+
+.dt-tip {
+  position: absolute;
+  z-index: 3;
+  max-width: calc(330px * var(--dt-scale) + 80px);
+  margin: 0;
+  padding: calc(8px * var(--dt-scale) + 2px) calc(12px * var(--dt-scale) + 4px);
+  border-radius: 10px;
+  background: var(--dt-ink);
+  color: var(--dt-tip-ink, #fbf3e1);
+  font-size: calc(15px * var(--dt-scale) + 3px);
+  line-height: 1.3;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.dt-app[data-look='night'] .dt-tip {
+  --dt-tip-ink: #141d2c;
+}
+
+.dt-tip[data-blocked='true'] {
+  background: var(--dt-bad, #b3311d);
+  color: #fff;
+}
+
+.dt-actions,
+.dt-prompt {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  transform: translate(-50%, -100%);
+}
+
+.dt-prompt {
+  transform: translate(-50%, -100%);
+}
+
+.dt-action,
+.dt-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: calc(7px * var(--dt-scale) + 3px) calc(14px * var(--dt-scale) + 4px);
+  border: 2px solid var(--dt-ink);
+  border-radius: 999px;
+  background: var(--dt-bar);
+  color: var(--dt-ink);
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 750;
+  font-size: calc(15px * var(--dt-scale) + 4px);
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.dt-action--go,
+.dt-button--primary {
+  border-color: var(--dt-accent);
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+
+.dt-action:focus-visible,
+.dt-button:focus-visible {
+  outline: 3px solid var(--dt-ink);
+  outline-offset: 3px;
+}
+
+.dt-action kbd,
+.dt-button kbd {
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1.5px solid currentColor;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.82em;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.dt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dt-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 14, 24, 0.45);
+}
+
+.dt-dialog {
+  width: min(560px, calc(100% - 32px));
+  box-sizing: border-box;
+  padding: 26px 28px;
+  border-radius: 18px;
+  background: var(--dt-bar);
+  color: var(--dt-ink);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.dt-app[data-look='day'] .dt-dialog {
+  background: #fbf3e1;
+}
+
+.dt-app[data-look='night'] .dt-dialog {
+  background: #18233a;
+}
+
+.dt-dialog__title {
+  margin: 0 0 10px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+.dt-dialog__body {
+  margin: 0 0 20px;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--dt-soft);
+}
+
+.dt-dialog__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dt-actions,
+  .dt-prompt {
+    animation: dt-rise 160ms ease-out;
+  }
+}
+
+@keyframes dt-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% + 8px));
+  }
+}
+
+.dt-actions[hidden],
+.dt-prompt[hidden],
+.dt-tip[hidden] {
+  display: none;
+}

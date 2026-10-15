@@ -1,0 +1,491 @@
+/*
+ * The pages around the table (game menu, set-up, Daily Road, journal, how to play, options),
+ * the score sheet after each hand and the results card. Colours come from .dt-app's look.
+ */
+
+.dt-backdrop-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dt-app.is-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--dt-veil, #efe5cf) 55%, transparent);
+  pointer-events: none;
+}
+
+.dt-app[data-look='night'] {
+  --dt-veil: #0b1220;
+}
+
+.dt-page {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 84px 24px 96px;
+}
+
+.dt-page:not(.dt-title) {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+}
+
+.dt-title {
+  display: flex;
+  align-items: flex-end;
+  padding: 84px clamp(16px, 4vw, 72px) clamp(24px, 6vh, 72px);
+}
+
+.dt-title__card,
+.dt-panel {
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--dt-panel, #fbf3e1) 94%, transparent);
+  color: var(--dt-ink);
+  box-shadow: 0 18px 50px rgba(30, 20, 5, 0.22);
+}
+
+.dt-app[data-look='night'] .dt-title__card,
+.dt-app[data-look='night'] .dt-panel {
+  --dt-panel: #142036;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+.dt-title__card {
+  width: min(520px, 100%);
+  padding: 28px 30px 22px;
+}
+
+.dt-title__name {
+  margin: 0;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--dt-accent);
+}
+
+.dt-title__tag {
+  margin: 10px 0 18px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+}
+
+.dt-menu {
+  display: grid;
+  gap: 8px;
+}
+
+.dt-menu__item {
+  display: grid;
+  gap: 2px;
+  padding: 11px 16px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--dt-ink) 6%, transparent);
+  color: var(--dt-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dt-menu__item:hover {
+  border-color: color-mix(in srgb, var(--dt-accent) 60%, transparent);
+}
+
+.dt-menu__item:focus-visible {
+  outline: 3px solid var(--dt-accent);
+  outline-offset: 2px;
+}
+
+.dt-menu__title {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+}
+
+.dt-menu__detail {
+  font-size: 16px;
+  color: var(--dt-soft);
+}
+
+.dt-title__small {
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.dt-link {
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--dt-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.dt-link:focus-visible {
+  outline: 3px solid var(--dt-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dt-title__record {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--dt-soft);
+}
+
+.dt-panel {
+  width: min(780px, 100%);
+  padding: 30px 34px 26px;
+}
+
+.dt-panel__kicker {
+  margin: 0 0 4px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dt-soft);
+}
+
+.dt-panel__title {
+  margin: 0 0 8px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.05;
+}
+
+.dt-panel__lead {
+  margin: 0 0 18px;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--dt-soft);
+}
+
+.dt-panel__note {
+  margin: 14px 0 0;
+  font-size: 15px;
+  color: var(--dt-soft);
+}
+
+.dt-panel__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.dt-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+.dt-choices__legend {
+  grid-column: 1 / -1;
+  margin-bottom: 8px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.dt-choice {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 2px solid color-mix(in srgb, var(--dt-ink) 18%, transparent);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.dt-choice:has(input:checked) {
+  border-color: var(--dt-accent);
+  background: color-mix(in srgb, var(--dt-accent) 12%, transparent);
+}
+
+.dt-choice:has(input:focus-visible) {
+  outline: 3px solid var(--dt-accent);
+  outline-offset: 2px;
+}
+
+.dt-choice__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dt-choice__title {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+}
+
+.dt-choice__line {
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--dt-soft);
+}
+
+.dt-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.dt-switch__input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--dt-accent);
+}
+
+.dt-switch__input:focus-visible {
+  outline: 3px solid var(--dt-accent);
+  outline-offset: 2px;
+}
+
+.dt-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.dt-stats div {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--dt-ink) 6%, transparent);
+}
+
+.dt-stats dt {
+  font-size: 14px;
+  color: var(--dt-soft);
+}
+
+.dt-stats dd {
+  margin: 2px 0 0;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.dt-help__section h2 {
+  margin: 18px 0 6px;
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+}
+
+.dt-help__section p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.dt-journal {
+  width: min(1080px, 100%);
+}
+
+.dt-journal__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.dt-journal__map {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.dt-stops {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dt-stop {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--dt-ink) 6%, transparent);
+}
+
+.dt-stop.is-locked {
+  opacity: 0.75;
+}
+
+.dt-stop__name {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.dt-stop__line {
+  font-size: 15px;
+  color: var(--dt-soft);
+}
+
+@media (max-width: 760px) {
+  .dt-journal__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dt-sheet-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 72px 16px 80px;
+  background: color-mix(in srgb, var(--dt-veil, #efe5cf) 50%, transparent);
+}
+
+.dt-sheet {
+  width: min(720px, 100%);
+}
+
+.dt-sheet__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+
+.dt-sheet__table th,
+.dt-sheet__table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--dt-ink) 14%, transparent);
+  text-align: right;
+}
+
+.dt-sheet__table th[scope='row'],
+.dt-sheet__table thead th:first-child {
+  text-align: left;
+}
+
+.dt-sheet__table thead th {
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.dt-sheet__table td {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dt-sheet__label {
+  display: block;
+  font-weight: 700;
+}
+
+.dt-sheet__why {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--dt-soft);
+}
+
+.dt-sheet__total th,
+.dt-sheet__total td {
+  border-bottom: 0;
+  font-weight: 800;
+}
+
+.dt-sheet__total td {
+  font-size: 19px;
+}
+
+.dt-notes {
+  margin: 14px 0 0;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.dt-results {
+  width: min(640px, 100%);
+}
+
+.dt-results.is-won .dt-results__title {
+  color: var(--dt-accent);
+}
+
+/* On short windows the game menu tightens so it never rides up under the Hall's corner. */
+@media (max-height: 860px) {
+  .dt-title {
+    padding-top: 72px;
+    padding-bottom: 20px;
+  }
+
+  .dt-title__card {
+    padding: 18px 22px 14px;
+  }
+
+  .dt-title__name {
+    font-size: clamp(42px, 8.5vh, 76px);
+  }
+
+  .dt-title__tag {
+    margin: 6px 0 10px;
+    font-size: 17px;
+  }
+
+  .dt-menu {
+    gap: 6px;
+  }
+
+  .dt-menu__item {
+    padding: 7px 14px;
+  }
+
+  .dt-menu__title {
+    font-size: 18px;
+  }
+
+  .dt-menu__detail {
+    font-size: 14px;
+  }
+
+  .dt-title__small {
+    margin-top: 8px;
+  }
+
+  .dt-title__record {
+    margin-top: 6px;
+    font-size: 14px;
+  }
+}

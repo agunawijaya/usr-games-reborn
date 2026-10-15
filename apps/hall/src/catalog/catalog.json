@@ -29,7 +29,7 @@
     { "id": "cribbage", "source": "placeholder" },
     { "id": "canfield", "source": "game" },
     { "id": "fish", "source": "game" },
-    { "id": "mille", "source": "placeholder" },
+    { "id": "mille", "source": "game" },
     { "id": "pig", "source": "placeholder" },
     { "id": "letters", "source": "game" },
     { "id": "hangman", "source": "game" },

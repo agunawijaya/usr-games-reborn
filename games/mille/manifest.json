@@ -1,0 +1,134 @@
+{
+  "id": "mille",
+  "title": "Detour",
+  "tagline": "Race to 700 miles. Block. Repair. Counter.",
+  "teaser": "A card road race: lay down miles to reach exactly 700 before your rival, throw flat tyres and red lights in their way, and save your immunities for the perfect counter. Watch every mile happen on the road, from coastal highways to night-time cities.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 2,
+    "max": 4
+  },
+  "sessionMinutes": [5, 45],
+  "status": "shipped",
+  "accent": "#ee6a32",
+  "emblem": "M8 44C14 32 28 32 24 18S26 6 32 4M22 44C28 32 42 32 38 18S40 6 46 4M16 38l2-3M22 26l1-3M26 12l2-2",
+  "inspiredBy": {
+    "program": "mille",
+    "originalTitle": "mille",
+    "uiTitle": "the Berkeley road-race card game",
+    "year": 1982
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "detour — race to exactly 700 miles: lay distance, stop your rival with hazards, fix your own trouble, parry with a coup fourré.",
+    "description": "Ken Arnold wrote mille for Berkeley Unix in 1982: a two-handed road-race card game against a computer that, as its source says in capitals, never discards a safety. Detour plays its rules and scoring exactly, ports that computer move for move as Classic, adds Rookie and Sly, a team game, and puts the race on a road you can watch, from the coast to the city.",
+    "seeAlso": ["monop", "cribbage", "canfield"]
+  },
+  "howToPlay": [
+    "Draw, then lay a card: miles to move (after a green light), a hazard to stop your rival, or a remedy for your own.",
+    "Exactly 700 ends the hand. Safeties guard you for the hand; lay one as its hazard hits for a coup fourré.",
+    "Keys: 1–6 or P pick a card, U uses it, D throws it away, C parries. Scores add up over hands to 5000."
+  ],
+  "cronGoals": [
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} games of Detour",
+      "min": 2,
+      "max": 6
+    },
+    {
+      "id": "coups",
+      "stat": "coups",
+      "label": "Make {n} coups fourrés",
+      "min": 1,
+      "max": 4
+    },
+    {
+      "id": "miles",
+      "stat": "miles",
+      "label": "Drive {n} miles",
+      "min": 1500,
+      "max": 6000
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-coup",
+      "title": "Counter-thrust",
+      "description": "Parry a hazard the moment it lands: your first coup fourré.",
+      "tier": "core"
+    },
+    {
+      "id": "safe-trip",
+      "title": "Safe trip",
+      "description": "Win a hand without a single 200.",
+      "tier": "core"
+    },
+    {
+      "id": "shut-out",
+      "title": "Left at the lights",
+      "description": "Finish the trip before your rival has moved a mile.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily driver",
+      "description": "Drive the Daily Road on seven different days.",
+      "tier": "core"
+    },
+    {
+      "id": "all-four-safeties",
+      "title": "Fully covered",
+      "description": "Lay all four safeties in one hand.",
+      "tier": "extra"
+    },
+    {
+      "id": "extension",
+      "title": "The long way",
+      "description": "Extend a trip to 1000 and finish it.",
+      "tier": "extra"
+    },
+    {
+      "id": "delayed-action",
+      "title": "Last of the deck",
+      "description": "Finish the trip after the deck has run out.",
+      "tier": "extra"
+    },
+    {
+      "id": "team-player",
+      "title": "Co-driver",
+      "description": "Win a team game with your partner.",
+      "tier": "extra"
+    },
+    {
+      "id": "double-coup",
+      "title": "Twice parried",
+      "description": "Two coups fourrés in a single hand.",
+      "tier": "extra"
+    },
+    {
+      "id": "full-game",
+      "title": "Five thousand",
+      "description": "Win a full game to 5000.",
+      "tier": "extra"
+    },
+    {
+      "id": "beat-sly",
+      "title": "Outfoxed",
+      "description": "Beat Sly in a game to 2500 or 5000.",
+      "tier": "rare"
+    },
+    {
+      "id": "world-tour",
+      "title": "World tour",
+      "description": "Drive every route in the journal.",
+      "tier": "rare"
+    }
+  ]
+}

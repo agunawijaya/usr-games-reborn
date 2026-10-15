@@ -72,7 +72,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Cribbage            | `/usr/games/cards`    | cribbage (1980)                                   | coming soon | native |
 | Thirteen Down       | `/usr/games/cards`    | the Berkeley solitaire with a bank account (1980) | shipped     | native |
 | Gone Fishing        | `/usr/games/cards`    | the Berkeley Go Fish (1990)                       | shipped     | native |
-| Road-trip card race | `/usr/games/cards`    | mille (1983)                                      | coming soon | native |
+| Detour              | `/usr/games/cards`    | the Berkeley road-race card game (1982)           | shipped     | native |
 | Dice push-your-luck | `/usr/games/cards`    | pig (1992)                                        | coming soon | native |
 | Chain Letter        | `/usr/games/words`    | the 1988 letter-cube word hunt (1988)             | shipped     | native |
 | Before the Tide     | `/usr/games/words`    | the Berkeley word-guessing game (1983)            | shipped     | native |

@@ -286,6 +286,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/mille:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/pom/app:
     devDependencies:
       playwright:
