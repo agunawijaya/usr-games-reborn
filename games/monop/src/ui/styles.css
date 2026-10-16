@@ -1,0 +1,2005 @@
+/* Deeds & Dice: the panels over the miniature world. Each board has its own panel colours in
+   both looks, set on the game root as data-board and data-look. All names start with dd-. */
+
+.dd-app {
+  --dd-font: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --dd-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-radius: 16px;
+  --dd-gap: clamp(8px, 0.7vw, 14px);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--dd-font);
+  font-size: clamp(14px, 0.62vw + 6px, 18px);
+  color: var(--dd-ink);
+}
+
+.dd-app[data-board='harbour'][data-look='light'] {
+  --dd-panel: rgba(255, 255, 255, 0.88);
+  --dd-panel-2: rgba(240, 246, 251, 0.95);
+  --dd-ink: #132036;
+  --dd-muted: #475770;
+  --dd-line: rgba(19, 32, 54, 0.14);
+  --dd-accent: #1c64a8;
+  --dd-accent-ink: #ffffff;
+  --dd-shadow: 0 10px 30px rgba(20, 40, 70, 0.18);
+  --dd-display: 'Bricolage Grotesque Variable', var(--dd-font);
+}
+.dd-app[data-board='harbour'][data-look='dark'] {
+  --dd-panel: rgba(13, 17, 38, 0.84);
+  --dd-panel-2: rgba(24, 30, 62, 0.92);
+  --dd-ink: #eef2ff;
+  --dd-muted: #b0bbdd;
+  --dd-line: rgba(176, 187, 221, 0.2);
+  --dd-accent: #4fc3ff;
+  --dd-accent-ink: #061226;
+  --dd-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
+  --dd-display: 'Bricolage Grotesque Variable', var(--dd-font);
+}
+.dd-app[data-board='colony'][data-look='light'] {
+  --dd-panel: rgba(247, 250, 255, 0.88);
+  --dd-panel-2: rgba(234, 240, 255, 0.95);
+  --dd-ink: #161c3a;
+  --dd-muted: #4a5278;
+  --dd-line: rgba(22, 28, 58, 0.14);
+  --dd-accent: #4b62d8;
+  --dd-accent-ink: #ffffff;
+  --dd-shadow: 0 10px 30px rgba(30, 40, 90, 0.2);
+  --dd-display: 'Fredoka Variable', var(--dd-font);
+}
+.dd-app[data-board='colony'][data-look='dark'] {
+  --dd-panel: rgba(10, 12, 30, 0.84);
+  --dd-panel-2: rgba(22, 26, 56, 0.92);
+  --dd-ink: #e9ecff;
+  --dd-muted: #aab1e0;
+  --dd-line: rgba(170, 177, 224, 0.2);
+  --dd-accent: #8fa6ff;
+  --dd-accent-ink: #0b0e24;
+  --dd-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+  --dd-display: 'Fredoka Variable', var(--dd-font);
+}
+.dd-app[data-board='popup'][data-look='light'] {
+  --dd-panel: rgba(251, 244, 229, 0.94);
+  --dd-panel-2: rgba(244, 233, 210, 0.97);
+  --dd-ink: #2b2118;
+  --dd-muted: #5e4b38;
+  --dd-line: rgba(43, 33, 24, 0.22);
+  --dd-accent: #9c3f33;
+  --dd-accent-ink: #fff8ee;
+  --dd-shadow: 0 8px 22px rgba(60, 40, 20, 0.22);
+  --dd-display: 'Fraunces Variable', Georgia, serif;
+}
+.dd-app[data-board='popup'][data-look='dark'] {
+  --dd-panel: rgba(33, 24, 17, 0.9);
+  --dd-panel-2: rgba(48, 36, 26, 0.95);
+  --dd-ink: #f6ead4;
+  --dd-muted: #d2bd9c;
+  --dd-line: rgba(246, 234, 212, 0.2);
+  --dd-accent: #e6a35a;
+  --dd-accent-ink: #24170d;
+  --dd-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --dd-display: 'Fraunces Variable', Georgia, serif;
+}
+
+.dd-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.dd-hud > *,
+.dd-left > * {
+  pointer-events: auto;
+}
+
+.dd-panel {
+  background: var(--dd-panel);
+  border: 1px solid var(--dd-line);
+  border-radius: var(--dd-radius);
+  box-shadow: var(--dd-shadow);
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+.dd-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-family: var(--dd-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dd-coin {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+/* —— top left: the board, and the players under it —— */
+.dd-left {
+  position: absolute;
+  left: clamp(12px, 1.4vw, 28px);
+  top: clamp(12px, 1.4vw, 28px);
+  width: clamp(250px, 17.5vw, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dd-gap);
+}
+.dd-badge-panel {
+  padding: 0.75em 1em 0.85em;
+}
+.dd-board-name {
+  margin: 0;
+  font-family: var(--dd-display);
+  font-size: 1.55em;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.dd-round {
+  margin: 0.25em 0 0.55em;
+  color: var(--dd-muted);
+  font-size: 0.86em;
+}
+.dd-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--dd-line);
+  overflow: hidden;
+}
+.dd-progress span {
+  display: block;
+  height: 100%;
+  background: var(--dd-accent);
+  border-radius: 3px;
+}
+.dd-seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--dd-gap) * 0.7);
+}
+.dd-seat {
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
+  padding: 0.55em 0.75em;
+  border-left: 5px solid var(--seat);
+}
+.dd-seat--active {
+  background: var(--dd-panel-2);
+  outline: 2px solid var(--seat);
+  outline-offset: -1px;
+}
+.dd-seat-face {
+  position: relative;
+  flex: none;
+  line-height: 0;
+}
+.dd-seat-token {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+}
+.dd-seat-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1em;
+}
+.dd-seat-title {
+  font-weight: 400;
+  color: var(--dd-muted);
+  font-size: 0.82em;
+}
+.dd-seat-coins {
+  margin: 0.15em 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+.dd-seat-worth {
+  color: var(--dd-muted);
+  font-size: 0.8em;
+}
+.dd-seat-groups {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 12px;
+}
+.dd-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--pip) 45%, transparent);
+  border: 1.5px solid var(--pip);
+}
+.dd-pip--full {
+  background: var(--pip);
+}
+.dd-seat-status {
+  margin-left: auto;
+  font-size: 0.76em;
+  font-weight: 700;
+  color: var(--dd-accent-ink);
+  background: var(--seat);
+  padding: 0.1em 0.55em;
+  border-radius: 999px;
+}
+
+/* —— top centre: what just happened —— */
+.dd-banner {
+  position: absolute;
+  top: clamp(12px, 1.4vw, 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.55em 1.2em 0.55em 0.65em;
+  border-radius: 999px;
+  font-size: 1.08em;
+  max-width: 46vw;
+}
+.dd-banner-dice {
+  display: inline-flex;
+  gap: 6px;
+}
+.dd-banner-text strong {
+  font-family: var(--dd-display);
+}
+
+/* —— right: the lot's card, below the Hall's pause pill —— */
+.dd-card {
+  position: absolute;
+  right: clamp(12px, 1.4vw, 28px);
+  top: clamp(84px, 9vh, 110px);
+  width: clamp(240px, 15.5vw, 300px);
+  padding: 0 0 0.9em;
+  overflow: hidden;
+}
+.dd-card-band {
+  background: var(--group);
+  color: #ffffff;
+  padding: 0.55em 1em;
+  font-weight: 700;
+  font-size: 0.82em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.dd-card-name {
+  margin: 0.45em 1rem 0.25em;
+  font-family: var(--dd-display);
+  font-size: 1.5em;
+  line-height: 1.08;
+}
+.dd-card-owner {
+  margin: 0 1rem 0.5em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--dd-muted);
+  font-size: 0.9em;
+}
+.dd-card-owner strong {
+  color: var(--dd-ink);
+}
+.dd-card-rents {
+  width: calc(100% - 2rem);
+  margin: 0 1rem;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+.dd-card-rents caption {
+  text-align: left;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dd-muted);
+  padding-bottom: 0.2em;
+}
+.dd-card-rents th {
+  text-align: left;
+  font-weight: 400;
+  padding: 0.22em 0;
+  color: var(--dd-muted);
+}
+.dd-card-rents td {
+  text-align: right;
+}
+.dd-card-rents tr {
+  border-top: 1px solid var(--dd-line);
+}
+.dd-card-now th,
+.dd-card-now td {
+  color: var(--dd-ink);
+  font-weight: 700;
+}
+.dd-card-now th::before {
+  content: '▸ ';
+  color: var(--group);
+}
+.dd-card-meta {
+  margin: 0.6em 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5em;
+  font-size: 0.82em;
+  color: var(--dd-muted);
+}
+.dd-card-meta .dd-amount {
+  color: var(--dd-ink);
+}
+.dd-card-due {
+  margin: 0.7em 1rem 0;
+  padding: 0.5em 0.8em;
+  border-radius: 10px;
+  background: var(--dd-panel-2);
+  border: 1.5px solid var(--group);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+/* —— bottom: the actions, clear of the toast corner on the left —— */
+.dd-actions {
+  position: absolute;
+  bottom: clamp(12px, 1.6vw, 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.45em;
+  padding: 0.5em;
+  border-radius: 999px;
+}
+.dd-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.6em 1.05em;
+  border-radius: 999px;
+  border: 1.5px solid var(--dd-line);
+  background: transparent;
+  color: var(--dd-ink);
+  font: 700 1em var(--dd-font);
+  cursor: pointer;
+}
+.dd-action kbd {
+  font: 600 0.75em var(--dd-mono);
+  padding: 0.1em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  color: var(--dd-muted);
+}
+.dd-action--primary {
+  background: var(--dd-accent);
+  border-color: var(--dd-accent);
+  color: var(--dd-accent-ink);
+}
+.dd-action--primary kbd {
+  color: var(--dd-accent-ink);
+  border-color: color-mix(in srgb, var(--dd-accent-ink) 40%, transparent);
+}
+.dd-action:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+.dd-action:focus-visible,
+.dd-deed:focus-visible {
+  outline: 3px solid var(--dd-accent);
+  outline-offset: 2px;
+}
+
+.dd-ticker {
+  position: absolute;
+  right: clamp(12px, 1.4vw, 28px);
+  bottom: clamp(12px, 1.6vw, 28px);
+  width: clamp(240px, 15.5vw, 300px);
+  padding: 0.55em 0.9em;
+  font-size: 0.82em;
+  color: var(--dd-muted);
+}
+.dd-ticker ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.2em;
+}
+.dd-ticker li:first-child {
+  color: var(--dd-ink);
+}
+
+/* —— a celebration's caption —— */
+.dd-moment {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 48px);
+  transform: translateX(-50%);
+  text-align: center;
+  padding: 0.7em 1.8em 0.8em;
+  border-radius: 22px;
+}
+.dd-moment-kicker {
+  margin: 0;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dd-accent);
+}
+.dd-moment h2 {
+  margin: 0.1em 0 0.15em;
+  font-family: var(--dd-display);
+  font-size: 2.1em;
+  line-height: 1.05;
+}
+.dd-moment p:last-child {
+  margin: 0;
+  color: var(--dd-muted);
+}
+
+/* —— the trade table —— */
+.dd-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(5, 10, 25, 0.25), rgba(5, 10, 25, 0.6));
+  backdrop-filter: blur(3px);
+}
+.dd-trade {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(880px, 70vw);
+  padding: 1.2em 1.4em 1.3em;
+  display: grid;
+  gap: 0.9em;
+}
+.dd-trade-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+}
+.dd-trade-head h2 {
+  margin: 0;
+  font-family: var(--dd-display);
+  font-size: 1.6em;
+}
+.dd-trade-head p {
+  margin: 0;
+  color: var(--dd-muted);
+}
+.dd-trade-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+}
+.dd-trade-side {
+  background: var(--dd-panel-2);
+  border: 1px solid var(--dd-line);
+  border-radius: 12px;
+  padding: 0.7em 0.9em 0.8em;
+}
+.dd-trade-side h3 {
+  margin: 0 0 0.5em;
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dd-muted);
+}
+.dd-deeds {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45em;
+}
+.dd-deed {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 0.6em;
+  padding: 0.45em 0.7em 0.5em;
+  border-radius: 10px;
+  background: var(--dd-panel);
+  border: 1px solid var(--dd-line);
+  border-left: 6px solid var(--group);
+  cursor: grab;
+}
+.dd-deed-band {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dd-muted);
+}
+.dd-deed-name {
+  grid-row: 2;
+  font-weight: 700;
+  font-family: var(--dd-display);
+  font-size: 1.08em;
+}
+.dd-deed-value {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+}
+.dd-drop {
+  border: 1.5px dashed var(--dd-line);
+  border-radius: 10px;
+  padding: 0.5em 0.7em;
+  color: var(--dd-muted);
+  font-size: 0.82em;
+  text-align: center;
+}
+.dd-trade-coins {
+  margin: 0.6em 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  padding: 0.35em 0.6em;
+  border-radius: 8px;
+}
+.dd-changed {
+  box-shadow: 0 0 0 2px var(--seat) inset;
+  background: color-mix(in srgb, var(--seat) 14%, var(--dd-panel));
+  position: relative;
+}
+.dd-changed::after {
+  content: 'changed';
+  position: absolute;
+  right: 0.5em;
+  top: -0.7em;
+  font-size: 0.66em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.05em 0.5em;
+  border-radius: 999px;
+  background: var(--seat);
+  color: #ffffff;
+}
+.dd-meter {
+  display: grid;
+  gap: 0.35em;
+}
+.dd-meter-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.9em;
+}
+.dd-meter-track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #d6455a, #f2b21b 35%, #2fae64 50%, #f2b21b 65%, #d6455a);
+}
+.dd-meter-fair {
+  position: absolute;
+  left: 42%;
+  width: 16%;
+  top: -3px;
+  bottom: -3px;
+  border: 2px solid var(--dd-ink);
+  border-radius: 6px;
+  opacity: 0.35;
+}
+.dd-meter-needle {
+  position: absolute;
+  top: -6px;
+  width: 6px;
+  height: 24px;
+  margin-left: -3px;
+  border-radius: 3px;
+  background: var(--dd-ink);
+  box-shadow: 0 0 0 2px var(--dd-panel);
+}
+.dd-meter-values {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--dd-mono);
+  font-size: 0.82em;
+  color: var(--dd-muted);
+}
+.dd-reply {
+  margin: 0;
+  display: flex;
+  gap: 0.8em;
+  align-items: flex-start;
+}
+.dd-reply blockquote {
+  margin: 0;
+  flex: 1;
+  background: var(--dd-panel-2);
+  border: 1.5px solid var(--seat);
+  border-radius: 4px 14px 14px 14px;
+  padding: 0.6em 0.9em;
+}
+.dd-reply blockquote p {
+  margin: 0;
+  font-size: 1.05em;
+}
+.dd-reply-kind {
+  font-size: 0.72em !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dd-muted);
+  margin-bottom: 0.2em !important;
+}
+.dd-trade-actions {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-panel {
+    transition: none;
+  }
+}
+
+/* —— the play screen's layers —— */
+.dd-stage {
+  position: absolute;
+  inset: 0;
+}
+.dd-world {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.dd-fx,
+.dd-heat {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.dd-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.dd-overlay > * {
+  pointer-events: auto;
+}
+.dd-overlay > .dd-moment {
+  pointer-events: none;
+  /* In play the caption sits just above the action bar; lists close while it shows. */
+  bottom: clamp(84px, 11vh, 120px);
+}
+
+/* coins rising from a lot */
+.dd-pop {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  font-size: 1.15em;
+  font-weight: 700;
+  background: var(--dd-panel);
+  border: 2px solid var(--dd-line);
+  box-shadow: var(--dd-shadow);
+  white-space: nowrap;
+  animation: dd-rise 1.6s ease-out forwards;
+}
+.dd-pop--gain {
+  border-color: #1fae64;
+  color: #0f7a43;
+}
+.dd-pop--loss {
+  border-color: #d6455a;
+  color: #b0283e;
+}
+.dd-app[data-look='dark'] .dd-pop--gain {
+  color: #6fe3a1;
+}
+.dd-app[data-look='dark'] .dd-pop--loss {
+  color: #ff8a99;
+}
+@keyframes dd-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -260%) scale(1);
+  }
+}
+
+/* the coach's landing heat: warm discs under the lots */
+.dd-heat-dot {
+  position: absolute;
+  left: -22px;
+  top: -22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 120, 40, 0.9),
+    rgba(255, 70, 40, 0.35) 55%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+}
+.dd-app[data-look='light'] .dd-heat-dot {
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    circle,
+    rgba(235, 90, 20, 0.85),
+    rgba(235, 90, 20, 0.3) 55%,
+    transparent 72%
+  );
+}
+
+/* a drawn card */
+.dd-drawn {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: min(460px, 80vw);
+  padding: 1.2em 1.4em 1.1em;
+  text-align: center;
+  border-top: 10px solid var(--dd-accent);
+  animation: dd-flip 0.45s ease-out;
+}
+.dd-drawn--b {
+  border-top-color: #d6455a;
+}
+.dd-drawn-deck {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.8em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dd-muted);
+}
+.dd-drawn-text {
+  margin: 0.5em 0 0.9em;
+  font-family: var(--dd-display);
+  font-size: 1.45em;
+  line-height: 1.25;
+}
+@keyframes dd-flip {
+  from {
+    transform: translate(-50%, -50%) rotateX(80deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) rotateX(0);
+    opacity: 1;
+  }
+}
+
+/* the auction, the fix-it panel and the lists sit above the actions */
+.dd-auction,
+.dd-debt,
+.dd-list {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(84px, 11vh, 120px);
+  transform: translateX(-50%);
+  width: min(600px, 86vw);
+  padding: 1em 1.2em 1.1em;
+}
+.dd-auction {
+  border-top: 8px solid var(--group);
+}
+.dd-auction-head h2,
+.dd-debt h2,
+.dd-list h2 {
+  margin: 0.1em 0 0.15em;
+  font-family: var(--dd-display);
+  font-size: 1.6em;
+  line-height: 1.1;
+}
+.dd-auction-head p,
+.dd-debt header p {
+  margin: 0;
+  color: var(--dd-muted);
+}
+.dd-auction-high {
+  margin: 0.7em 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  font-size: 1.4em;
+  font-weight: 700;
+}
+.dd-auction-high span:last-child {
+  font-size: 0.7em;
+  color: var(--dd-muted);
+  font-weight: 400;
+}
+.dd-bidders {
+  list-style: none;
+  margin: 0 0 0.8em;
+  padding: 0;
+  display: flex;
+  gap: 0.6em;
+  flex-wrap: wrap;
+}
+.dd-bidder {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.25em 0.7em 0.25em 0.3em;
+  border-radius: 999px;
+  border: 2px solid var(--dd-line);
+  line-height: 0;
+}
+.dd-bidder span,
+.dd-bidder em {
+  line-height: 1.2;
+}
+.dd-bidder em {
+  font-style: normal;
+  font-size: 0.78em;
+  color: var(--dd-muted);
+}
+.dd-bidder--calling {
+  border-color: var(--seat);
+  background: color-mix(in srgb, var(--seat) 14%, transparent);
+}
+.dd-bidder--out {
+  opacity: 0.45;
+}
+.dd-auction-clock {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--dd-line);
+  overflow: hidden;
+  margin-bottom: 0.7em;
+}
+.dd-auction-clock span {
+  display: block;
+  height: 100%;
+  background: var(--dd-accent);
+}
+.dd-auction-bids,
+.dd-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45em;
+}
+.dd-auction-wait {
+  margin: 0;
+  color: var(--dd-muted);
+}
+
+/* lists: build, mortgage, raise money */
+.dd-list header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1em;
+}
+.dd-close {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--dd-muted);
+  font: inherit;
+}
+.dd-close kbd,
+.dd-row kbd,
+.dd-tab kbd {
+  font: 600 0.75em var(--dd-mono);
+  padding: 0.1em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  color: var(--dd-muted);
+}
+.dd-rows {
+  list-style: none;
+  margin: 0.7em 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35em;
+  max-height: 42vh;
+  overflow: auto;
+}
+.dd-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.55em 0.8em;
+  border-radius: 10px;
+  border: 1px solid var(--dd-line);
+  background: var(--dd-panel-2);
+  color: var(--dd-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dd-row:hover {
+  border-color: var(--dd-accent);
+}
+.dd-row > span:first-child,
+.dd-row-text {
+  flex: 1;
+}
+.dd-row-text small {
+  display: block;
+  color: var(--dd-muted);
+  font-size: 0.82em;
+  margin-top: 0.1em;
+}
+.dd-row-amount--gain {
+  color: #0f7a43;
+}
+.dd-row-amount--loss {
+  color: var(--dd-ink);
+}
+.dd-app[data-look='dark'] .dd-row-amount--gain {
+  color: #6fe3a1;
+}
+.dd-empty {
+  color: var(--dd-muted);
+  padding: 0.5em 0.2em;
+}
+.dd-debt {
+  border-top: 8px solid #d6455a;
+}
+.dd-row:focus-visible,
+.dd-tab:focus-visible,
+.dd-step:focus-visible,
+.dd-back:focus-visible,
+.dd-close:focus-visible {
+  outline: 3px solid var(--dd-accent);
+  outline-offset: 2px;
+}
+
+/* a short notice above the actions */
+.dd-notice {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(84px, 11vh, 120px);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.6em 1.2em;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* the lot card's extra lines */
+.dd-card-note {
+  margin: 0.6em 1rem 0;
+  font-size: 0.85em;
+  color: #b0283e;
+}
+.dd-app[data-look='dark'] .dd-card-note {
+  color: #ff8a99;
+}
+.dd-card-advice {
+  margin: 0.7em 1rem 0;
+  font-size: 0.86em;
+  line-height: 1.35;
+  color: var(--dd-ink);
+}
+.dd-card-advice span {
+  display: inline-block;
+  margin-right: 0.45em;
+  padding: 0 0.45em;
+  border-radius: 6px;
+  background: var(--dd-accent);
+  color: var(--dd-accent-ink);
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* the trade table in play */
+.dd-deeds li {
+  list-style: none;
+}
+button.dd-deed {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--dd-ink);
+  cursor: pointer;
+}
+button.dd-deed:disabled {
+  cursor: default;
+}
+.dd-trade .dd-deed {
+  opacity: 0.62;
+}
+.dd-trade .dd-deed--in {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--group) inset;
+}
+.dd-trade .dd-deed--blocked {
+  opacity: 0.38;
+}
+.dd-trade-tabs {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4em;
+}
+.dd-tab {
+  display: inline-flex;
+  gap: 0.45em;
+  align-items: center;
+  padding: 0.4em 0.8em;
+  border-radius: 999px;
+  border: 1.5px solid var(--dd-line);
+  background: transparent;
+  color: var(--dd-ink);
+  font: 700 0.9em var(--dd-font);
+  cursor: pointer;
+}
+.dd-tab[aria-pressed='true'] {
+  border-color: var(--seat);
+  background: color-mix(in srgb, var(--seat) 16%, transparent);
+}
+.dd-trade-steps {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 0.25em;
+}
+.dd-step {
+  font: 600 0.78em var(--dd-mono);
+  padding: 0.15em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  background: var(--dd-panel);
+  color: var(--dd-ink);
+  cursor: pointer;
+}
+.dd-trade-coins {
+  gap: 0.6em;
+}
+.dd-trade-problem {
+  margin: 0;
+  color: #b0283e;
+  font-weight: 700;
+}
+.dd-app[data-look='dark'] .dd-trade-problem {
+  color: #ff8a99;
+}
+.dd-trade .dd-deeds {
+  max-height: 34vh;
+  overflow: auto;
+}
+
+/* the game menu */
+.dd-menu {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at 30% 50%, transparent, rgba(5, 10, 25, 0.28));
+}
+.dd-back {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  padding: 0.55em 1em;
+  border-radius: 999px;
+  border: 1px solid var(--dd-line);
+  background: var(--dd-panel);
+  color: var(--dd-ink);
+  font: 700 0.95em var(--dd-font);
+  cursor: pointer;
+  box-shadow: var(--dd-shadow);
+}
+.dd-menu-card {
+  justify-self: start;
+  margin-left: clamp(16px, 7vw, 120px);
+  width: min(560px, 90vw);
+  padding: 1.6em 1.8em 1.7em;
+}
+.dd-menu-card h1 {
+  margin: 0.05em 0 0.15em;
+  font-family: var(--dd-display);
+  font-size: clamp(2.6em, 4.4vw, 4em);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.dd-menu-tagline {
+  margin: 0 0 1.1em;
+  font-size: 1.12em;
+  color: var(--dd-muted);
+}
+.dd-menu-game {
+  padding: 0.9em 1em;
+  border-radius: 14px;
+  background: var(--dd-panel-2);
+  border: 1px solid var(--dd-line);
+}
+.dd-menu-game h2 {
+  margin: 0 0 0.25em;
+  font-family: var(--dd-display);
+  font-size: 1.3em;
+}
+.dd-menu-game > p {
+  margin: 0 0 0.7em;
+  color: var(--dd-muted);
+}
+.dd-menu-rivals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6em;
+}
+.dd-menu-rivals li {
+  display: flex;
+  gap: 0.8em;
+  align-items: center;
+}
+.dd-menu-rivals p {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--dd-muted);
+}
+.dd-menu-rivals .dd-menu-rival {
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--dd-ink);
+}
+.dd-menu-rival span {
+  font-weight: 400;
+  color: var(--dd-muted);
+}
+.dd-menu-actions,
+.dd-results-actions {
+  margin-top: 1.1em;
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+/* the recap */
+.dd-results-page {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at center, rgba(5, 10, 25, 0.2), rgba(5, 10, 25, 0.55));
+}
+.dd-results {
+  width: min(1080px, 92vw);
+  padding: 1.4em 1.6em 1.5em;
+}
+.dd-results h2 {
+  margin: 0.05em 0 0.5em;
+  font-family: var(--dd-display);
+  font-size: clamp(2.2em, 3.4vw, 3.2em);
+  line-height: 1;
+}
+.dd-results-body {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 2.4fr;
+  gap: 1.2em;
+  align-items: start;
+}
+.dd-standings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5em;
+}
+.dd-standing {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.45em 0.7em;
+  border-radius: 12px;
+  background: var(--dd-panel-2);
+  border-left: 5px solid var(--seat);
+}
+.dd-standing--you {
+  outline: 2px solid var(--seat);
+}
+.dd-standing-place {
+  font: 700 1.2em var(--dd-display);
+  width: 1.2em;
+  text-align: center;
+}
+.dd-standing-name {
+  flex: 1;
+  font-weight: 700;
+}
+.dd-standing-name small {
+  font-weight: 400;
+  color: var(--dd-muted);
+}
+.dd-results-chart {
+  margin: 0;
+}
+.dd-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.dd-chart text {
+  font: 500 11px var(--dd-mono);
+  fill: var(--dd-muted);
+}
+.dd-chart-grid {
+  stroke: var(--dd-line);
+}
+.dd-chart-turn {
+  stroke: var(--dd-ink);
+  stroke-dasharray: 4 4;
+  opacity: 0.6;
+}
+.dd-chart .dd-chart-turn-label {
+  fill: var(--dd-ink);
+  font-weight: 600;
+}
+.dd-results-chart figcaption {
+  margin-top: 0.5em;
+  font-family: var(--dd-display);
+  font-size: 1.2em;
+}
+.dd-facts {
+  list-style: none;
+  margin: 1em 0 0;
+  padding: 0;
+  display: flex;
+  gap: 1.6em;
+  flex-wrap: wrap;
+  color: var(--dd-muted);
+}
+.dd-facts strong {
+  margin-left: 0.4em;
+  color: var(--dd-ink);
+  font-family: var(--dd-mono);
+}
+
+/* the attract-mode card until the demo comes */
+.dd-demo {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(160deg, #8fd3f4 0%, #3a8fe0 55%, #1c3f7a 100%);
+}
+.dd-demo[data-look='dark'] {
+  background: linear-gradient(160deg, #1a2350 0%, #0d1126 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-pop,
+  .dd-drawn {
+    animation: none;
+  }
+}
+
+/* —— stage 4: the menu's boards and doors, the pages off the menu, goals —— */
+.dd-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.dd-board-picks {
+  display: flex;
+  gap: 0.4em;
+  margin: 0 0 0.8em;
+  flex-wrap: wrap;
+}
+.dd-board-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  border: 1.5px solid var(--dd-line);
+  background: transparent;
+  color: var(--dd-ink);
+  font: 700 0.92em var(--dd-font);
+  cursor: pointer;
+}
+.dd-board-pick kbd,
+.dd-door kbd,
+.dd-chapter kbd,
+.dd-back kbd {
+  font: 600 0.75em var(--dd-mono);
+  padding: 0.1em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  color: var(--dd-muted);
+}
+.dd-board-pick[aria-checked='true'] {
+  background: var(--dd-accent);
+  border-color: var(--dd-accent);
+  color: var(--dd-accent-ink);
+}
+.dd-board-pick[aria-checked='true'] kbd {
+  color: var(--dd-accent-ink);
+  border-color: color-mix(in srgb, var(--dd-accent-ink) 40%, transparent);
+}
+.dd-menu-game .dd-menu-actions {
+  margin-top: 0.8em;
+}
+.dd-doors {
+  margin-top: 0.9em;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45em;
+}
+.dd-door {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.55em 0.8em;
+  border-radius: 12px;
+  border: 1.5px solid var(--dd-line);
+  background: var(--dd-panel-2);
+  color: var(--dd-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dd-door:hover,
+.dd-board-pick:hover {
+  border-color: var(--dd-accent);
+}
+.dd-door-text {
+  flex: 1;
+  min-width: 0;
+}
+.dd-door-text strong {
+  display: block;
+  font-family: var(--dd-display);
+  font-size: 1.05em;
+}
+.dd-door-text span {
+  display: block;
+  color: var(--dd-muted);
+  font-size: 0.82em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* pages off the menu: one sheet over the dimmed town */
+.dd-page {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 64px clamp(12px, 3vw, 48px) 24px;
+  overflow: auto;
+  background: radial-gradient(ellipse at 50% 50%, rgba(5, 10, 25, 0.18), rgba(5, 10, 25, 0.5));
+}
+.dd-sheet {
+  width: min(1040px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  padding: 1.3em 1.6em 1.4em;
+}
+.dd-sheet-head h2 {
+  margin: 0.05em 0 0.5em;
+  font-family: var(--dd-display);
+  font-size: clamp(1.8em, 2.6vw, 2.5em);
+  line-height: 1.05;
+}
+.dd-sheet h3 {
+  margin: 0.9em 0 0.45em;
+  font-family: var(--dd-display);
+  font-size: 1.15em;
+}
+.dd-sheet h4 {
+  margin: 0.9em 0 0.3em;
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-muted);
+}
+.dd-setup-note {
+  margin: 0.8em 0 0;
+  color: var(--dd-muted);
+  font-size: 0.86em;
+}
+.dd-back kbd {
+  margin-left: 0.4em;
+}
+
+/* New game */
+.dd-setup-columns,
+.dd-career-columns {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 1.6em;
+  align-items: start;
+}
+.dd-setup-seats {
+  list-style: none;
+  margin: 0 0 0.7em;
+  padding: 0;
+  display: grid;
+  gap: 0.4em;
+}
+.dd-setup-seat {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 46px;
+  padding: 0.3em 0.6em;
+  border-radius: 12px;
+  background: var(--dd-panel-2);
+  border: 1px solid var(--dd-line);
+}
+.dd-setup-swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--seat);
+}
+.dd-setup-seat-name,
+.dd-setup-guest {
+  font-weight: 700;
+}
+.dd-setup-guest {
+  color: var(--dd-muted);
+  font-weight: 600;
+}
+.dd-setup-seat select,
+.dd-sheet select {
+  font: 600 0.92em var(--dd-font);
+  color: var(--dd-ink);
+  background: var(--dd-panel);
+  border: 1.5px solid var(--dd-line);
+  border-radius: 8px;
+  padding: 0.35em 0.5em;
+}
+.dd-setup-seat select[data-field='seat'] {
+  flex: 1;
+  min-width: 0;
+}
+.dd-setup-seat .dd-close {
+  margin-left: auto;
+  font-size: 1.05em;
+}
+.dd-token-picks {
+  display: inline-flex;
+  gap: 0.3em;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.dd-token-pick {
+  padding: 2px;
+  line-height: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+}
+.dd-token-pick[aria-pressed='true'] {
+  border-color: var(--dd-ink);
+}
+.dd-token-pick:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.dd-sheet fieldset {
+  border: 0;
+  margin: 0 0 0.6em;
+  padding: 0;
+  display: grid;
+  gap: 0.3em;
+}
+.dd-sheet legend {
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-muted);
+  margin-bottom: 0.2em;
+}
+.dd-choice {
+  display: flex;
+  gap: 0.6em;
+  align-items: flex-start;
+  padding: 0.35em 0.5em;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.dd-choice:hover {
+  background: var(--dd-panel-2);
+}
+.dd-choice input {
+  margin-top: 0.25em;
+  accent-color: var(--dd-accent);
+  width: 1.05em;
+  height: 1.05em;
+}
+.dd-choice strong {
+  display: block;
+}
+.dd-choice small {
+  display: block;
+  color: var(--dd-muted);
+  font-size: 0.84em;
+  line-height: 1.35;
+}
+.dd-choice--locked {
+  opacity: 0.55;
+  cursor: default;
+}
+.dd-sheet select:focus-visible,
+.dd-choice input:focus-visible,
+.dd-token-pick:focus-visible,
+.dd-board-pick:focus-visible,
+.dd-door:focus-visible,
+.dd-chapter:focus-visible {
+  outline: 3px solid var(--dd-accent);
+  outline-offset: 2px;
+}
+
+/* scenarios */
+.dd-chapters {
+  display: flex;
+  gap: 0.4em;
+  flex-wrap: wrap;
+}
+.dd-chapter {
+  --seat: var(--dd-accent);
+}
+.dd-chapter[aria-selected='true'] {
+  border-color: var(--dd-accent);
+  background: color-mix(in srgb, var(--dd-accent) 16%, transparent);
+}
+.dd-chapter small {
+  color: var(--dd-muted);
+  font-weight: 600;
+}
+.dd-scenarios-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 1.4em;
+  align-items: start;
+  margin-top: 0.7em;
+}
+.dd-scenario-list {
+  max-height: none;
+  margin: 0;
+}
+.dd-scenario-row[aria-current='true'] {
+  border-color: var(--dd-accent);
+  box-shadow: 0 0 0 2px var(--dd-accent) inset;
+}
+.dd-row > span.dd-scenario-number {
+  flex: none;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 700 0.9em var(--dd-mono);
+  background: var(--dd-panel);
+  border: 1px solid var(--dd-line);
+}
+.dd-scenario-row small {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dd-row-text {
+  min-width: 0;
+}
+.dd-scenario-row .dd-row-text {
+  flex: 1;
+}
+.dd-scenario-status {
+  flex: none;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: var(--dd-muted);
+}
+.dd-scenario-status--won {
+  color: #0f7a43;
+}
+.dd-app[data-look='dark'] .dd-scenario-status--won {
+  color: #6fe3a1;
+}
+.dd-scenario-detail h3 {
+  margin: 0.1em 0 0.3em;
+  font-size: 1.7em;
+  line-height: 1.05;
+}
+.dd-scenario-brief {
+  margin: 0;
+  line-height: 1.45;
+}
+.dd-scenario-goals,
+.dd-scenario-rules,
+.dd-scenario-rivals {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3em;
+}
+.dd-scenario-goals li {
+  font-weight: 700;
+  padding-left: 1.1em;
+  position: relative;
+}
+.dd-scenario-goals li::before {
+  content: '';
+  position: absolute;
+  left: 0.15em;
+  top: 0.5em;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 2px;
+  background: var(--dd-accent);
+}
+.dd-scenario-rules {
+  margin-top: 0.6em;
+}
+.dd-scenario-rules li {
+  font-size: 0.88em;
+  padding: 0.3em 0.6em;
+  border-radius: 8px;
+  background: var(--dd-panel-2);
+  border: 1px dashed var(--dd-line);
+}
+.dd-scenario-rivals li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.dd-scenario-rivals small {
+  margin-left: 0.5em;
+  padding: 0 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  color: var(--dd-muted);
+  font-size: 0.78em;
+  font-weight: 700;
+}
+
+/* the Daily Deal */
+.dd-daily .dd-sheet {
+  width: min(640px, 100%);
+}
+.dd-daily-where {
+  margin: -0.3em 0 0.6em;
+  color: var(--dd-muted);
+  font-weight: 600;
+}
+.dd-daily-result {
+  margin: 0.9em 0 0;
+  padding: 0.6em 0.9em;
+  border-radius: 12px;
+  background: var(--dd-panel-2);
+  border-left: 5px solid var(--dd-muted);
+  font-weight: 700;
+}
+.dd-daily-result--won {
+  border-left-color: #1fae64;
+}
+
+/* career */
+.dd-career-line {
+  margin: -0.3em 0 0.4em;
+  color: var(--dd-muted);
+}
+.dd-career-next p {
+  margin: 0 0 0.4em;
+}
+.dd-career-meter {
+  display: grid;
+  grid-template-columns: 6.5em 1fr auto;
+  gap: 0.6em;
+  align-items: center;
+  margin-bottom: 0.35em;
+  font-size: 0.9em;
+}
+.dd-career-meter strong {
+  font: 600 0.92em var(--dd-mono);
+}
+.dd-career-stats {
+  list-style: none;
+  margin: 0.9em 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.3em;
+  color: var(--dd-muted);
+  font-size: 0.9em;
+}
+.dd-career-stats strong {
+  margin-left: 0.35em;
+  color: var(--dd-ink);
+  font-family: var(--dd-mono);
+}
+.dd-ladder {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3em;
+}
+.dd-ladder li {
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  gap: 0 0.7em;
+  padding: 0.4em 0.6em;
+  border-radius: 10px;
+  border: 1px solid var(--dd-line);
+  font-size: 0.9em;
+}
+.dd-ladder li span {
+  color: var(--dd-muted);
+}
+.dd-ladder li small {
+  grid-column: 2;
+  color: var(--dd-muted);
+  font-size: 0.86em;
+}
+.dd-ladder--reached {
+  background: color-mix(in srgb, var(--dd-accent) 12%, transparent);
+  border-color: var(--dd-accent) !important;
+}
+.dd-career-tokens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3em;
+}
+.dd-career-tokens li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: 700;
+}
+.dd-career-extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.dd-packages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3em;
+}
+.dd-packages li {
+  padding: 0.35em 0.55em;
+  border-radius: 8px;
+  border: 1px dashed var(--dd-line);
+  font-size: 0.82em;
+  color: var(--dd-muted);
+}
+.dd-packages strong {
+  display: block;
+  color: var(--dd-ink);
+}
+.dd-package--earned {
+  border-style: solid !important;
+  border-color: #1fae64 !important;
+  background: color-mix(in srgb, #1fae64 10%, transparent);
+}
+
+/* a scenario's goals on the board badge and in the recap */
+.dd-goals {
+  list-style: none;
+  margin: 0.6em 0 0;
+  padding: 0.5em 0 0;
+  border-top: 1px solid var(--dd-line);
+  display: grid;
+  gap: 0.25em;
+  font-size: 0.86em;
+}
+.dd-goals li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6em;
+}
+.dd-goals strong {
+  flex: none;
+  font: 600 0.92em var(--dd-mono);
+}
+.dd-goal--done {
+  color: #0f7a43;
+}
+.dd-app[data-look='dark'] .dd-goal--done {
+  color: #6fe3a1;
+}
+.dd-results-goals {
+  list-style: none;
+  margin: -0.2em 0 0.7em;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+  font-weight: 700;
+}
+.dd-results-goals span {
+  margin-right: 0.35em;
+}
+.dd-results-notes {
+  list-style: none;
+  margin: 0.8em 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+.dd-results-notes li {
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  background: var(--dd-panel-2);
+  border: 1px solid var(--dd-line);
+  font-size: 0.86em;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .dd-setup-columns,
+  .dd-career-columns,
+  .dd-scenarios-body {
+    grid-template-columns: 1fr;
+  }
+  .dd-doors {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-height: 760px) {
+  .dd-menu-card {
+    padding: 1.1em 1.4em 1.2em;
+  }
+  .dd-menu-card h1 {
+    font-size: clamp(2.2em, 3.6vw, 3em);
+  }
+  .dd-menu-tagline {
+    margin-bottom: 0.7em;
+  }
+  .dd-menu-rivals p:not(.dd-menu-rival) {
+    display: none;
+  }
+}
+
+/* —— stage 5: help and settings, coins in flight —— */
+.dd-menu-links {
+  margin-top: 0.7em;
+  display: flex;
+  gap: 1.2em;
+}
+.dd-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.15em 0;
+  border: 0;
+  background: none;
+  color: var(--dd-accent);
+  font: 700 0.9em var(--dd-font);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.dd-link kbd {
+  font: 600 0.8em var(--dd-mono);
+  padding: 0.05em 0.4em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+  color: var(--dd-muted);
+  text-decoration: none;
+}
+.dd-link:focus-visible {
+  outline: 3px solid var(--dd-accent);
+  outline-offset: 2px;
+}
+.dd-settings-page .dd-sheet {
+  width: min(720px, 100%);
+}
+.dd-help {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.8em;
+}
+.dd-help p {
+  margin: 0 0 0.4em;
+  line-height: 1.5;
+}
+.dd-help h3:first-child {
+  margin-top: 0;
+}
+.dd-keys {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92em;
+}
+.dd-keys th {
+  text-align: left;
+  padding: 0.25em 0.8em 0.25em 0;
+  white-space: nowrap;
+}
+.dd-keys td {
+  padding: 0.25em 0;
+  color: var(--dd-muted);
+}
+.dd-keys kbd {
+  font: 600 0.85em var(--dd-mono);
+  padding: 0.1em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--dd-line);
+}
+.dd-flying-coin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+.dd-flying-coin .dd-coin {
+  width: 100%;
+  height: 100%;
+}
+@media (max-width: 860px) {
+  .dd-help {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* the flat map, over the hidden town */
+.dd-map {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.dd-app[data-board='harbour'][data-look='light'] {
+  --dd-map-table: #cfe3ef;
+}
+.dd-app[data-board='harbour'][data-look='dark'] {
+  --dd-map-table: #0e1530;
+}
+.dd-app[data-board='colony'][data-look='light'] {
+  --dd-map-table: #d9def5;
+}
+.dd-app[data-board='colony'][data-look='dark'] {
+  --dd-map-table: #0b0d22;
+}
+.dd-app[data-board='popup'][data-look='light'] {
+  --dd-map-table: #e9dcc0;
+}
+.dd-app[data-board='popup'][data-look='dark'] {
+  --dd-map-table: #2a1f16;
+}
+.dd-view-toggle {
+  margin-top: 0.5em;
+  font-size: 0.82em;
+}
+.dd-menu-continue {
+  margin: 0.5em 0 0;
+  color: var(--dd-muted);
+  font-size: 0.86em;
+}
+.dd-page-notice {
+  z-index: 5;
+  max-width: min(640px, 90vw);
+  text-align: center;
+}

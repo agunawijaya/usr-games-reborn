@@ -25,7 +25,7 @@
     { "id": "gomoku", "source": "game" },
     { "id": "dab", "source": "game" },
     { "id": "backgammon", "source": "placeholder" },
-    { "id": "monop", "source": "placeholder" },
+    { "id": "monop", "source": "game" },
     { "id": "cribbage", "source": "placeholder" },
     { "id": "canfield", "source": "game" },
     { "id": "fish", "source": "game" },

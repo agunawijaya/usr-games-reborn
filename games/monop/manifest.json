@@ -1,0 +1,134 @@
+{
+  "id": "monop",
+  "title": "Deeds & Dice",
+  "tagline": "Roll. Buy. Build. Out-deal everyone.",
+  "teaser": "A tiny living city in the palm of your hand. Roll the dice, buy the streets you land on, raise towers block by block — and out-trade rivals who know exactly what every deed is worth. Born on a Berkeley terminal in 1980, descended from a 1904 board game about landlords.",
+  "category": "board",
+  "directory": "/usr/games/board",
+  "players": {
+    "min": 1,
+    "max": 6
+  },
+  "sessionMinutes": [20, 90],
+  "status": "shipped",
+  "accent": "#e07b2e",
+  "emblem": "M8 22L24 8l16 14M11 22v20h26V22M17 28h0M24 32h0M31 36h0",
+  "inspiredBy": {
+    "program": "monop",
+    "originalTitle": "monop",
+    "uiTitle": "the 1980 Berkeley property-trading game",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "deeds — roll, buy and build a living miniature town on one of three boards, and out-trade rivals who reason about every deed.",
+    "description": "Ken Arnold wrote monop for Berkeley Unix in 1980: a referee for up to nine people sharing one terminal, with no computer players at all and a bank that lends you what you cannot pay. Deeds & Dice keeps its rules, offers them as Berkeley 1980 beside a Standard set, and adds rivals with minds of their own, a coach, twenty-four scenarios, a Daily Deal and three towns drawn entirely in code.",
+    "seeAlso": ["mille", "backgammon", "cribbage"]
+  },
+  "howToPlay": [
+    "Roll and walk the loop: buy lots you land on or send them to auction; pay rent on others'.",
+    "Own a whole district to double its rent and build on it. Trade deeds and coins between rolls.",
+    "Space roll, B buy, H build, M mortgage, T trade, E end turn, V map. Richest at the end wins."
+  ],
+  "cronGoals": [
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} games of Deeds & Dice",
+      "min": 1,
+      "max": 3
+    },
+    {
+      "id": "landmarks",
+      "stat": "landmarks",
+      "label": "Raise {n} landmarks",
+      "min": 1,
+      "max": 4
+    },
+    {
+      "id": "deals",
+      "stat": "deals",
+      "label": "Make {n} trades",
+      "min": 2,
+      "max": 6
+    }
+  ],
+  "packages": [
+    {
+      "id": "first-deed",
+      "title": "Keys in hand",
+      "description": "Buy your first deed.",
+      "tier": "core"
+    },
+    {
+      "id": "full-set",
+      "title": "The whole street",
+      "description": "Hold every lot of a district.",
+      "tier": "core"
+    },
+    {
+      "id": "skyline",
+      "title": "On the skyline",
+      "description": "Raise a landmark.",
+      "tier": "core"
+    },
+    {
+      "id": "deal-maker",
+      "title": "Shake on it",
+      "description": "Make three trades in one game.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Regular at the table",
+      "description": "Play the Daily Deal on seven different days.",
+      "tier": "core"
+    },
+    {
+      "id": "never-jailed",
+      "title": "Clean record",
+      "description": "Win a Quick or Classic game without once being locked up.",
+      "tier": "extra"
+    },
+    {
+      "id": "transit-baron",
+      "title": "All lines lead home",
+      "description": "Own all four transit stops at once.",
+      "tier": "extra"
+    },
+    {
+      "id": "comeback",
+      "title": "Back from the brink",
+      "description": "Fall into debt, climb out of it, and win.",
+      "tier": "extra"
+    },
+    {
+      "id": "auctioneer",
+      "title": "Going, going, mine",
+      "description": "Win a lot at auction for less than its price.",
+      "tier": "extra"
+    },
+    {
+      "id": "berkeley-rules",
+      "title": "Berkeley, 1980",
+      "description": "Win a game under the Berkeley 1980 rules, where the bank lends to anyone.",
+      "tier": "extra"
+    },
+    {
+      "id": "scenario-12",
+      "title": "Puzzle box",
+      "description": "Win twelve different scenarios.",
+      "tier": "rare"
+    },
+    {
+      "id": "all-boards",
+      "title": "Three towns",
+      "description": "Win on Harbour City, Ring Colony and Pop-up 1904.",
+      "tier": "rare"
+    }
+  ]
+}

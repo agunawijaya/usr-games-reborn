@@ -292,6 +292,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/monop:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+      three:
+        specifier: 0.169.0
+        version: 0.169.0
+    devDependencies:
+      '@types/three':
+        specifier: 0.169.0
+        version: 0.169.0
+
   games/pom/app:
     devDependencies:
       playwright:
