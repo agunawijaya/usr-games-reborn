@@ -228,6 +228,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/kit
 
+  games/cribbage:
+    dependencies:
+      '@usr-games/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+
   games/dab:
     dependencies:
       '@usr-games/kit':

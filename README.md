@@ -69,7 +69,7 @@ the days you play, and two quiet days a week are covered automatically.
 | Double Cross        | `/usr/games/board`    | the NetBSD dots-and-boxes game (2003)             | shipped     | native |
 | Backgammon          | `/usr/games/board`    | backgammon (1980)                                 | coming soon | native |
 | Deeds & Dice        | `/usr/games/board`    | the 1980 Berkeley property-trading game (1980)    | shipped     | native |
-| Cribbage            | `/usr/games/cards`    | cribbage (1980)                                   | coming soon | native |
+| Fifteen-Two         | `/usr/games/cards`    | the Berkeley cribbage (1980)                      | shipped     | native |
 | Thirteen Down       | `/usr/games/cards`    | the Berkeley solitaire with a bank account (1980) | shipped     | native |
 | Gone Fishing        | `/usr/games/cards`    | the Berkeley Go Fish (1990)                       | shipped     | native |
 | Detour              | `/usr/games/cards`    | the Berkeley road-race card game (1982)           | shipped     | native |

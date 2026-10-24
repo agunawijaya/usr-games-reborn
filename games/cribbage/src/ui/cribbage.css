@@ -1,0 +1,366 @@
+/*
+ * Fifteen-Two's panels, drawn in HTML over the table: the status card, the prompt bar with its
+ * buttons, the counting ledger, the claim pad and the key strip. Every class starts with ft-.
+ * The table panels sit on a 1920 × 1080 sheet scaled with the canvas, so they are written in
+ * design pixels. Colours come from the look (--ft-* on .ft-app), so Porch and Fireside each
+ * keep their own paper and ink.
+ */
+
+.ft-app {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  color: var(--ft-ink);
+  --ft-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --ft-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ft-radius: 18px;
+}
+
+.ft-app[data-look='porch'] {
+  --ft-ink: #2a1b0f;
+  --ft-ink-2: #5a432c;
+  --ft-panel: rgba(252, 246, 234, 0.94);
+  --ft-panel-edge: rgba(150, 110, 60, 0.35);
+  --ft-panel-strong: #fffaf0;
+  --ft-accent: #8a470a;
+  --ft-accent-ink: #fff8ec;
+  --ft-accent-soft: rgba(138, 71, 10, 0.12);
+  --ft-focus: #1f5fbf;
+  --ft-shadow: 0 10px 28px rgba(70, 40, 10, 0.22), 0 2px 5px rgba(70, 40, 10, 0.16);
+  --ft-fifteen: #b35c00;
+  --ft-pair: #b8205a;
+  --ft-run: #137a52;
+  --ft-flush: #1f5fbf;
+  --ft-nobs: #7b35c4;
+  --ft-good: #146c43;
+  --ft-bad: #a3241a;
+}
+
+.ft-app[data-look='fireside'] {
+  --ft-ink: #f8ead2;
+  --ft-ink-2: #d9c3a2;
+  --ft-panel: rgba(30, 17, 10, 0.9);
+  --ft-panel-edge: rgba(240, 176, 79, 0.28);
+  --ft-panel-strong: #2b190e;
+  --ft-accent: #f0b04f;
+  --ft-accent-ink: #2a1608;
+  --ft-accent-soft: rgba(240, 176, 79, 0.16);
+  --ft-focus: #8fc7ff;
+  --ft-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.45);
+  --ft-fifteen: #ffc240;
+  --ft-pair: #ff7aa2;
+  --ft-run: #5fe0aa;
+  --ft-flush: #8ab4ff;
+  --ft-nobs: #d39cff;
+  --ft-good: #7ee2a8;
+  --ft-bad: #ff8a80;
+}
+
+.ft-app canvas.ft-table {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.ft-app :focus-visible {
+  outline: 3px solid var(--ft-focus);
+  outline-offset: 3px;
+}
+
+/* The design sheet: 1920 × 1080, scaled and placed by the app to sit over the canvas. */
+.ft-sheet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.ft-sheet > * {
+  pointer-events: auto;
+}
+
+.ft-panel {
+  background: var(--ft-panel);
+  border: 1px solid var(--ft-panel-edge);
+  border-radius: var(--ft-radius);
+  box-shadow: var(--ft-shadow);
+}
+
+/* Top left: whose deal, which hand, how long the game. */
+.ft-status {
+  position: absolute;
+  left: 36px;
+  top: 26px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px 10px 12px;
+}
+
+.ft-status__badge {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--ft-accent-soft);
+  color: var(--ft-accent);
+}
+
+.ft-status__badge svg {
+  width: 28px;
+  height: 28px;
+}
+
+.ft-status__name {
+  font: 700 20px/1.1 var(--ft-display);
+}
+
+.ft-status__line {
+  margin-top: 3px;
+  font-size: calc(15px * var(--ft-text-boost, 1));
+  color: var(--ft-ink-2);
+}
+
+/* The prompt bar above your hand: what to do, and the buttons to do it. */
+.ft-prompt {
+  position: absolute;
+  left: 800px;
+  top: 742px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 10px 9px 22px;
+  white-space: nowrap;
+  font-size: calc(19px * var(--ft-text-boost, 1));
+  font-weight: 600;
+}
+
+.ft-prompt[hidden] {
+  display: none;
+}
+
+.ft-prompt__text strong {
+  font-family: var(--ft-display);
+  font-weight: 700;
+}
+
+.ft-button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font:
+    700 17px/1 'Atkinson Hyperlegible Next',
+    system-ui,
+    sans-serif;
+  color: var(--ft-accent-ink);
+  background: var(--ft-accent);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
+}
+
+.ft-button:hover {
+  filter: brightness(1.08);
+}
+
+.ft-button:active {
+  transform: translateY(1px);
+}
+
+.ft-button[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.ft-button--quiet {
+  color: var(--ft-accent);
+  background: var(--ft-accent-soft);
+}
+
+.ft-key {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  margin-left: 8px;
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  font: 600 13px/1.4 var(--ft-mono);
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* The ledger under a hand being counted: each combination as it lights, the total growing. */
+.ft-ledger {
+  position: absolute;
+  left: 800px;
+  top: 736px;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 28px;
+  width: 1000px;
+  padding: 18px 26px 18px 28px;
+}
+
+.ft-ledger[hidden] {
+  display: none;
+}
+
+.ft-ledger__title {
+  grid-column: 1;
+  font:
+    700 15px/1 'Atkinson Hyperlegible Next',
+    system-ui,
+    sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ft-ink-2);
+}
+
+.ft-ledger__items {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ft-ledger__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 14px 7px 12px;
+  border-radius: 999px;
+  background: var(--ft-accent-soft);
+  font-size: calc(18px * var(--ft-text-boost, 1));
+  font-weight: 600;
+  opacity: 0.72;
+}
+
+.ft-ledger__item::before {
+  content: '';
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ft-kind);
+}
+
+.ft-ledger__item[data-active='true'] {
+  opacity: 1;
+  background: var(--ft-panel-strong);
+  box-shadow: 0 0 0 2px var(--ft-kind);
+}
+
+.ft-ledger__item b {
+  font: 700 20px/1 var(--ft-display);
+  color: var(--ft-kind);
+}
+
+.ft-ledger__item[data-kind='fifteen'] {
+  --ft-kind: var(--ft-fifteen);
+}
+.ft-ledger__item[data-kind='pair'] {
+  --ft-kind: var(--ft-pair);
+}
+.ft-ledger__item[data-kind='run'] {
+  --ft-kind: var(--ft-run);
+}
+.ft-ledger__item[data-kind='flush'] {
+  --ft-kind: var(--ft-flush);
+}
+.ft-ledger__item[data-kind='nobs'] {
+  --ft-kind: var(--ft-nobs);
+}
+
+.ft-ledger__total {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  justify-items: center;
+  min-width: 112px;
+}
+
+.ft-ledger__total b {
+  font: 600 72px/0.95 var(--ft-display);
+  color: var(--ft-accent);
+}
+
+.ft-ledger__total span {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-ink-2);
+}
+
+.ft-ledger[data-perfect='true'] {
+  box-shadow:
+    0 0 0 3px #e6b23a,
+    0 0 48px rgba(255, 200, 80, 0.55),
+    var(--ft-shadow);
+}
+
+.ft-ledger[data-perfect='true'] .ft-ledger__total b {
+  color: #c4880f;
+}
+
+.ft-app[data-look='fireside'] .ft-ledger[data-perfect='true'] .ft-ledger__total b {
+  color: #ffcf5c;
+}
+
+.ft-ledger__note {
+  grid-column: 1;
+  font: italic 600 19px/1.2 var(--ft-display);
+  color: var(--ft-ink-2);
+}
+
+/* The key strip along the bottom: quiet reminders of the keys. */
+.ft-keys {
+  position: absolute;
+  left: 800px;
+  top: 1046px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 22px;
+  font-size: calc(14px * var(--ft-text-boost, 1));
+  color: var(--ft-ink-2);
+  white-space: nowrap;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--ft-panel);
+  opacity: 0.86;
+}
+
+.ft-keys kbd {
+  font: 600 13px var(--ft-mono);
+  margin-right: 6px;
+  color: var(--ft-ink);
+}
+
+.ft-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-button {
+    transition: none;
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "id": "cribbage",
+  "title": "Fifteen-Two",
+  "tagline": "Fifteen-two, fifteen-four… see every point.",
+  "teaser": "The old pub card game with a peg board, finally easy to follow. Play to 31, throw two cards to the crib, and watch every fifteen, pair and run light up as your pegs leap down the board. Count it yourself the 1980 way, or let the cards count for you.",
+  "category": "cards",
+  "directory": "/usr/games/cards",
+  "players": {
+    "min": 1,
+    "max": 1
+  },
+  "sessionMinutes": [10, 30],
+  "status": "shipped",
+  "accent": "#d9a441",
+  "emblem": "M6 17h36v14H6zM12 24h.01M18 24h.01M24 24h.01M30 24h.01M36 24h.01M18 17V8M16 8h4",
+  "inspiredBy": {
+    "program": "cribbage",
+    "originalTitle": "cribbage",
+    "uiTitle": "the Berkeley cribbage",
+    "year": 1980
+  },
+  "daily": true,
+  "kind": "native",
+  "build": {
+    "kind": "native"
+  },
+  "manPage": {
+    "synopsis": "fifteen-two — cribbage with a peg board: lay away to the crib, play to 31, and watch every fifteen, pair and run light up.",
+    "description": "Earl T. Cohen wrote the game logic and Ken Arnold the screen interface for the Berkeley cribbage in 1980. It never counted your hand for you: claim too much and the computer pegged two, claim too little and the rest was lost, and a claim of 19 meant nothing at all. Fifteen-Two keeps that way of counting as Classic 1980, plays Cohen’s own computer player card for card, and adds a wooden board, a sharper opponent, a counting trainer and a Daily Discard.",
+    "seeAlso": ["canfield", "fish", "mille"]
+  },
+  "howToPlay": [
+    "Keep four of your six cards and lay two away in the crib, which belongs to the dealer.",
+    "Take turns laying cards towards 31, pegging for fifteens, pairs, runs, 31 and the last card.",
+    "Count your hand with the starter, then the crib, and be first round the board."
+  ],
+  "cronGoals": [
+    {
+      "id": "wins",
+      "stat": "wins",
+      "label": "Win {n} games of cribbage",
+      "min": 2,
+      "max": 6
+    },
+    {
+      "id": "thirty-ones",
+      "stat": "thirtyOnes",
+      "label": "Make the count exactly 31, {n} times",
+      "min": 3,
+      "max": 10
+    },
+    {
+      "id": "trainer",
+      "stat": "trainerRight",
+      "label": "Count {n} hands right in the trainer",
+      "min": 10,
+      "max": 40
+    }
+  ],
+  "packages": [
+    {
+      "id": "thirty-one",
+      "title": "Thirty-one for two",
+      "description": "Lay the card that brings the count to exactly 31.",
+      "tier": "core"
+    },
+    {
+      "id": "his-heels",
+      "title": "His heels",
+      "description": "Deal, and turn up a jack as the starter: two pegs before anyone plays.",
+      "tier": "core"
+    },
+    {
+      "id": "twenty-plus",
+      "title": "Twenty and up",
+      "description": "Count a hand or a crib worth 20 points or more.",
+      "tier": "core"
+    },
+    {
+      "id": "long-game",
+      "title": "Twice around",
+      "description": "Win a game to 121.",
+      "tier": "core"
+    },
+    {
+      "id": "daily-regular",
+      "title": "Daily dealer",
+      "description": "Lay away in the Daily Discard on seven different days.",
+      "tier": "core"
+    },
+    {
+      "id": "twenty-four-plus",
+      "title": "Two dozen",
+      "description": "Count a hand or a crib worth 24 points or more.",
+      "tier": "extra"
+    },
+    {
+      "id": "skunk",
+      "title": "Skunked",
+      "description": "Win while your opponent is still behind the skunk line.",
+      "tier": "extra"
+    },
+    {
+      "id": "perfect-counter",
+      "title": "Counted true",
+      "description": "Count every one of your hands exactly right through a whole game of Classic 1980.",
+      "tier": "extra"
+    },
+    {
+      "id": "trainer-50",
+      "title": "Quick sums",
+      "description": "Count fifty hands right in the counting trainer.",
+      "tier": "extra"
+    },
+    {
+      "id": "double-skunk",
+      "title": "Double skunk",
+      "description": "Win a game to 121 before your opponent has gone once around the board.",
+      "tier": "rare"
+    },
+    {
+      "id": "beat-sharp",
+      "title": "Sharper still",
+      "description": "Win a game against Sharp.",
+      "tier": "rare"
+    },
+    {
+      "id": "perfect-29",
+      "title": "Twenty-nine",
+      "description": "Hold the perfect hand: three fives and the jack, the last five cut to match.",
+      "tier": "rare"
+    }
+  ]
+}
